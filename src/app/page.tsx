@@ -26,10 +26,10 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10 text-center">
           <ScrollAnimation>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
-              Transforme sua Presença Digital
+              Transforme sua Presença Digital em uma Experiência Extraordinária
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Criamos sites impressionantes e aplicações web poderosas que ajudam empresas a crescer na era digital.
+            <p className="text-xl md:text-2xl text-gray-900 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+              Nossa missão é criar experiências digitais que não apenas impressionam, mas que impulsionam seu negócio para novos patamares. Sites e aplicações web que combinam arte e tecnologia para resultados excepcionais.
             </p>
             <a
               href="/contato"
@@ -47,7 +47,7 @@ export default function Home() {
           <ScrollAnimation>
             <SectionHeader
               title="O que Nossos Clientes Dizem"
-              description="Descubra como ajudamos empresas a transformar sua presença digital"
+              description="Descubra como transformamos ideias em resultados extraordinários"
             />
           </ScrollAnimation>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
@@ -130,7 +130,7 @@ export default function Home() {
           <ScrollAnimation>
             <SectionHeader
               title="Nossos Serviços"
-              description="Soluções web completas para o seu negócio"
+              description="Soluções tecnológicas que revolucionam seu negócio"
             />
           </ScrollAnimation>
           <ScrollAnimation delay={0.2}>
@@ -144,35 +144,55 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <ScrollAnimation>
             <SectionHeader
-              title="Nossos Processos"
-              description="Metodologia comprovada para resultados excepcionais"
+              title="Nossa Metodologia"
+              description="Um processo inovador que transforma ideias em experiências digitais extraordinárias"
             />
           </ScrollAnimation>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-12">
             {[
               {
                 number: "1",
-                title: "Descoberta",
-                description: "Entendemos suas necessidades e objetivos",
-                items: ["Análise de requisitos", "Pesquisa de mercado", "Definição de escopo", "Planejamento estratégico"]
+                title: "Descoberta & Estratégia",
+                description: "Imersão profunda no seu negócio para criar uma estratégia digital vencedora",
+                items: [
+                  "Análise completa de requisitos e objetivos de negócio",
+                  "Pesquisa avançada de mercado e análise competitiva",
+                  "Definição clara de escopo e entregáveis estratégicos",
+                  "Planejamento personalizado com roadmap detalhado"
+                ]
               },
               {
                 number: "2",
-                title: "Design",
-                description: "Criamos designs bonitos e funcionais",
-                items: ["Wireframes e protótipos", "Design de interface", "Design responsivo", "Experiência do usuário"]
+                title: "Design & Experiência",
+                description: "Criação de interfaces que encantam e convertem visitantes em clientes fiéis",
+                items: [
+                  "Wireframes e protótipos interativos de alta fidelidade",
+                  "Design de interface moderno, intuitivo e memorável",
+                  "Design responsivo otimizado para todos os dispositivos",
+                  "Otimização contínua da experiência do usuário"
+                ]
               },
               {
                 number: "3",
-                title: "Desenvolvimento",
-                description: "Construímos com tecnologias modernas",
-                items: ["Desenvolvimento frontend", "Desenvolvimento backend", "Integrações", "Testes e otimização"]
+                title: "Desenvolvimento & Excelência",
+                description: "Construção com tecnologias de ponta e padrões de qualidade internacionais",
+                items: [
+                  "Desenvolvimento frontend com React e Next.js de última geração",
+                  "Backend robusto, escalável e de alta performance",
+                  "Integrações avançadas com APIs e serviços externos",
+                  "Testes automatizados e otimização contínua"
+                ]
               },
               {
                 number: "4",
-                title: "Lançamento",
-                description: "Implantação e monitoramento",
-                items: ["Implantação", "Monitoramento", "Manutenção", "Suporte contínuo"]
+                title: "Lançamento & Evolução",
+                description: "Implantação suave e suporte contínuo para garantir seu crescimento digital",
+                items: [
+                  "Implantação segura com monitoramento em tempo real",
+                  "Monitoramento proativo de performance e segurança",
+                  "Manutenção preventiva e suporte técnico dedicado",
+                  "Evolução contínua baseada em métricas e feedback"
+                ]
               }
             ].map((step, index) => (
               <ScrollAnimation key={index} delay={index * 0.1}>
@@ -180,11 +200,28 @@ export default function Home() {
                   <div className="w-16 h-16 bg-indigo-600 dark:bg-indigo-500 rounded-full flex items-center justify-center text-2xl font-bold text-white mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                     {step.number}
                   </div>
-                  <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{step.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400">{step.description}</p>
-                  <ul className="mt-4 text-left text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
+                    {step.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">{step.description}</p>
+                  <ul className="text-left text-sm text-gray-600 dark:text-gray-400 space-y-2">
                     {step.items.map((item, i) => (
-                      <li key={i}>• {item}</li>
+                      <li key={i} className="flex items-start">
+                        <svg
+                          className="w-4 h-4 text-indigo-500 dark:text-indigo-400 mr-2 mt-0.5 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        {item}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -200,7 +237,7 @@ export default function Home() {
           <ScrollAnimation>
             <SectionHeader
               title="Tecnologias que Utilizamos"
-              description="Stack moderno para soluções poderosas"
+              description="Stack de ponta para criar experiências digitais extraordinárias"
             />
           </ScrollAnimation>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12">
@@ -227,7 +264,7 @@ export default function Home() {
         <ScrollAnimation className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Pronto para Transformar sua Presença Digital?</h2>
           <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
-            Vamos discutir seu projeto e criar algo incrível juntos.
+            Vamos criar algo extraordinário juntos. Nossa equipe está pronta para transformar sua visão em realidade.
           </p>
           <a
             href="/contato"
