@@ -53,15 +53,6 @@ export const services = [
   }
 ];
 
-export const team = [
-  {
-    name: 'Henrique Alexandre de Camargo',
-    role: 'Founder & Full Stack Developer',
-    image: '/team/henrique.jpg',
-    bio: 'Web development and automation specialist with over 5 years of experience in creating innovative digital solutions.'
-  }
-];
-
 export const values = [
   {
     title: 'Inovação',

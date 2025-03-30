@@ -1,45 +1,67 @@
-import Image from 'next/image';
+'use client';
+
 import { testimonials } from '../constants';
-import { Card, CardBody } from './ui/Card';
-import { Section, SectionHeader } from './ui/Section';
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
-const Testimonials = () => {
+export default function Testimonials() {
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
-    <Section variant="dark">
-      <SectionHeader
-        title="O que nossos clientes dizem"
-      />
-      <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {testimonials.map((testimonial, index) => (
-          <Card key={index}>
-            <CardBody>
-              <div className="flex items-center mb-4">
-                <div className="relative h-12 w-12 rounded-full overflow-hidden">
-                  <Image
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="ml-4">
-                  <h4 className="text-lg font-medium text-secondary-900 dark:text-white">
-                    {testimonial.name}
-                  </h4>
-                  <p className="text-sm text-secondary-500 dark:text-secondary-400">
-                    {testimonial.role}
-                  </p>
-                </div>
-              </div>
-              <p className="text-secondary-600 dark:text-secondary-300">
-                &ldquo;{testimonial.content}&rdquo;
-              </p>
-            </CardBody>
-          </Card>
-        ))}
-      </div>
-    </Section>
-  );
-};
+    <div className="py-12 bg-white dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <h2 className="text-base text-indigo-500 dark:text-indigo-400 font-semibold tracking-wide uppercase">
+            Depoimentos
+          </h2>
+          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+            O que nossos clientes dizem
+          </p>
+        </div>
 
-export default Testimonials; 
+        <div className="mt-10">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {testimonials.map((testimonial, index) => (
+              <div
+                key={index}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700"
+              >
+                <div className="flex items-center mb-6">
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-indigo-500">
+                    <Image
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="ml-4">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      {testimonial.name}
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {testimonial.role} at {testimonial.company}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 italic">
+                  "{testimonial.content}"
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+} 
