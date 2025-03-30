@@ -17,14 +17,14 @@ const Testimonials = () => {
                 <div className="relative h-12 w-12 rounded-full overflow-hidden">
                   <Image
                     src={testimonial.image}
-                    alt={testimonial.author}
+                    alt={testimonial.name}
                     fill
                     className="object-cover"
                   />
                 </div>
                 <div className="ml-4">
                   <h4 className="text-lg font-medium text-secondary-900 dark:text-white">
-                    {testimonial.author}
+                    {testimonial.name}
                   </h4>
                   <p className="text-sm text-secondary-500 dark:text-secondary-400">
                     {testimonial.role}

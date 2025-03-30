@@ -1,19 +1,244 @@
-import Header from './components/Header';
-import Hero from './components/Hero';
+import dynamic from 'next/dynamic';
+import { services, testimonials } from './constants';
+import SectionHeader from './components/SectionHeader';
 import Services from './components/Services';
-import Testimonials from './components/Testimonials';
 import Footer from './components/Footer';
+import Header from './components/Header';
+import ScrollAnimation from './components/ScrollAnimation';
+
+const HeroAnimation = dynamic(() => import('./components/HeroAnimation'), {
+  ssr: false,
+  loading: () => (
+    <div className="absolute inset-0 -z-10 bg-gradient-to-b from-gray-900 to-gray-800" />
+  ),
+});
 
 export default function Home() {
   return (
-    <>
+    <main className="min-h-screen bg-gray-900 text-white">
       <Header />
-      <main>
-        <Hero />
-        <Services />
-        <Testimonials />
-      </main>
+      
+      {/* Hero Section with 3D Animation */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <HeroAnimation />
+        </div>
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <ScrollAnimation>
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+              Transforme sua Presença Digital
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+              Criamos sites impressionantes e aplicações web poderosas que ajudam empresas a crescer na era digital.
+            </p>
+            <a
+              href="/contato"
+              className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-full transition-colors duration-300"
+            >
+              Comece Agora
+            </a>
+          </ScrollAnimation>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-gray-800">
+        <div className="container mx-auto px-4">
+          <ScrollAnimation>
+            <SectionHeader
+              title="O que Nossos Clientes Dizem"
+              description="Descubra como ajudamos empresas a transformar sua presença digital"
+            />
+          </ScrollAnimation>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+            {testimonials.map((testimonial, index) => (
+              <ScrollAnimation key={index} delay={index * 0.1}>
+                <div
+                  className="bg-gray-900 p-8 rounded-xl border border-gray-700 hover:border-indigo-500 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/20"
+                >
+                  <div className="flex items-center mb-6">
+                    <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-indigo-500">
+                      <img
+                        src={`/testimonials/${testimonial.name.toLowerCase()}.jpg`}
+                        alt={testimonial.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="ml-4">
+                      <h4 className="font-semibold text-white text-lg">{testimonial.name}</h4>
+                      <p className="text-indigo-400 text-sm">{testimonial.role}</p>
+                      <p className="text-gray-500 text-sm">{testimonial.company}</p>
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <svg
+                      className="absolute -top-4 -left-4 h-8 w-8 text-indigo-500 opacity-50"
+                      fill="currentColor"
+                      viewBox="0 0 32 32"
+                    >
+                      <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
+                    </svg>
+                    <p className="text-gray-300 text-lg leading-relaxed pl-4">
+                      "{testimonial.content}"
+                    </p>
+                  </div>
+                  <div className="mt-6 flex items-center">
+                    <div className="flex text-yellow-400">
+                      {[...Array(5)].map((_, i) => (
+                        <svg
+                          key={i}
+                          className="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
+                    <span className="ml-2 text-gray-400 text-sm">5.0</span>
+                  </div>
+                </div>
+              </ScrollAnimation>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 bg-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { number: "100+", text: "Projetos Entregues" },
+              { number: "50+", text: "Clientes Satisfeitos" },
+              { number: "5+", text: "Anos de Experiência" }
+            ].map((stat, index) => (
+              <ScrollAnimation key={index} delay={index * 0.1}>
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-indigo-500 mb-2">{stat.number}</div>
+                  <div className="text-gray-400">{stat.text}</div>
+                </div>
+              </ScrollAnimation>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="py-20 bg-gray-800">
+        <div className="container mx-auto px-4">
+          <ScrollAnimation>
+            <SectionHeader
+              title="Nossos Serviços"
+              description="Soluções web completas para o seu negócio"
+            />
+          </ScrollAnimation>
+          <ScrollAnimation delay={0.2}>
+            <Services />
+          </ScrollAnimation>
+        </div>
+      </section>
+
+      {/* Process Section */}
+      <section className="py-20 bg-gray-900">
+        <div className="container mx-auto px-4">
+          <ScrollAnimation>
+            <SectionHeader
+              title="Nosso Processo"
+              description="Como transformamos sua visão em realidade"
+            />
+          </ScrollAnimation>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-12">
+            {[
+              {
+                number: "1",
+                title: "Descoberta",
+                description: "Entendemos suas necessidades e objetivos",
+                items: ["Análise de requisitos", "Pesquisa de mercado", "Definição de escopo", "Planejamento estratégico"]
+              },
+              {
+                number: "2",
+                title: "Design",
+                description: "Criamos designs bonitos e funcionais",
+                items: ["Wireframes e protótipos", "Design de interface", "Design responsivo", "Experiência do usuário"]
+              },
+              {
+                number: "3",
+                title: "Desenvolvimento",
+                description: "Construímos com tecnologias modernas",
+                items: ["Desenvolvimento frontend", "Desenvolvimento backend", "Integrações", "Testes e otimização"]
+              },
+              {
+                number: "4",
+                title: "Lançamento",
+                description: "Implantação e monitoramento",
+                items: ["Implantação", "Monitoramento", "Manutenção", "Suporte contínuo"]
+              }
+            ].map((step, index) => (
+              <ScrollAnimation key={index} delay={index * 0.1}>
+                <div className="text-center group">
+                  <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    {step.number}
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+                  <p className="text-gray-400">{step.description}</p>
+                  <ul className="mt-4 text-left text-sm text-gray-400 space-y-2">
+                    {step.items.map((item, i) => (
+                      <li key={i}>• {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              </ScrollAnimation>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Technologies Section */}
+      <section className="py-20 bg-gray-800">
+        <div className="container mx-auto px-4">
+          <ScrollAnimation>
+            <SectionHeader
+              title="Tecnologias que Utilizamos"
+              description="Stack moderno para soluções poderosas"
+            />
+          </ScrollAnimation>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12">
+            {['React', 'Next.js', 'TypeScript', 'TailwindCSS', 'Node.js', 'MongoDB', 'PostgreSQL', 'Docker'].map((tech, index) => (
+              <ScrollAnimation key={index} delay={index * 0.05}>
+                <div
+                  className="bg-gray-900 p-6 rounded-xl border border-gray-700 hover:border-indigo-500 transition-colors duration-300 text-center"
+                >
+                  <img
+                    src={`/icons/${tech.toLowerCase().replace('.', '')}.svg`}
+                    alt={tech}
+                    className="w-12 h-12 mx-auto mb-4"
+                  />
+                  <div className="text-gray-300">{tech}</div>
+                </div>
+              </ScrollAnimation>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-indigo-600 to-purple-600">
+        <ScrollAnimation className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Pronto para Transformar sua Presença Digital?</h2>
+          <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
+            Vamos discutir seu projeto e criar algo incrível juntos.
+          </p>
+          <a
+            href="/contato"
+            className="inline-block bg-white text-indigo-600 font-semibold py-3 px-8 rounded-full hover:bg-gray-100 transition-colors duration-300"
+          >
+            Entre em Contato
+          </a>
+        </ScrollAnimation>
+      </section>
+
       <Footer />
-    </>
+    </main>
   );
 }
