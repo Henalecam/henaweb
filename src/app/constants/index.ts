@@ -25,7 +25,8 @@ export const services = [
       'E-commerce otimizado para maximizar conversões e vendas',
       'Landing pages que convertem visitantes em leads qualificados',
       'Aplicações web personalizadas que revolucionam sua operação'
-    ]
+    ],
+    image: '/services/websites.svg'
   },
   {
     id: 'automation',
@@ -37,7 +38,8 @@ export const services = [
       'Automação de processos que reduzem custos em até 60%',
       'Integração perfeita entre sistemas para operações mais eficientes',
       'Otimização de operações com IA e machine learning de ponta'
-    ]
+    ],
+    image: '/services/automation.svg'
   },
   {
     id: 'consulting',
@@ -49,7 +51,8 @@ export const services = [
       'Revisão de código com foco em segurança e escalabilidade',
       'Otimização de performance que impressiona seus usuários',
       'Implementação das melhores práticas do mercado para resultados excepcionais'
-    ]
+    ],
+    image: '/services/consulting.svg'
   }
 ];
 

@@ -75,8 +75,8 @@ export default function ServicosPage() {
                 <div className="lg:w-1/2">
                   <div className="aspect-w-16 aspect-h-9 rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden">
                     <div className="p-8 flex items-center justify-center">
-                      <div className="text-blue-600 h-32 w-32 opacity-20">
-                        {service.icon()}
+                      <div className="text-blue-600 h-80 w-80">
+                        <img src={service.image} alt={service.title} />
                       </div>
                     </div>
                   </div>
