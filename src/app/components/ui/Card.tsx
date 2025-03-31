@@ -1,30 +1,25 @@
 import { HTMLAttributes, ReactNode } from 'react';
+import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'hover';
-  children: ReactNode;
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }
 
-export function Card({ variant = 'default', children, className, ...props }: CardProps) {
-  const baseStyles = 'bg-white dark:bg-secondary-800 rounded-xl shadow-soft overflow-hidden';
-  
-  const variants = {
-    default: '',
-    hover: 'transition-transform duration-200 hover:scale-[1.02]',
-  };
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: 'default' | 'hover';
+}
 
+export function Card({ className, variant = 'default', ...props }: CardProps) {
   return (
     <div
-      className={twMerge(
-        baseStyles,
-        variants[variant],
+      className={cn(
+        'rounded-lg border border-gray-200 bg-white text-gray-950 shadow-sm dark:border-gray-800 dark:bg-gray-950 dark:text-gray-50',
+        variant === 'hover' && 'transition-all duration-300 hover:shadow-lg hover:shadow-primary-500/20 hover:border-primary-500 dark:hover:border-primary-400',
         className
       )}
       {...props}
-    >
-      {children}
-    </div>
+    />
   );
 }
 

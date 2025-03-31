@@ -96,4 +96,28 @@ export const testimonials = [
     content: 'O que mais me impressionou foi a capacidade da HenaWeb de entender profundamente nossas necessidades e transformá-las em soluções tecnológicas elegantes. O projeto foi entregue antes do prazo e com uma qualidade excepcional. São verdadeiros parceiros estratégicos.',
     image: '/testimonials/maria.jpg'
   }
+];
+
+export const projects = [
+  {
+    id: 1,
+    title: 'Dom Martiello',
+    description: 'Nesse site temos uma pizzaria com um cardápio extremamente irresistível, com uma interface moderna e responsiva.Cada detalhe preparado com muito cuidado para que o cliente se sinta em casa.',
+    image: '/portfolio/dom-martiello.png',
+    link: 'https://slight-homeowners-556639.framer.app/'
+  },
+  {
+    id: 2,
+    title: 'Hac Landing Page',
+    description: 'Uma simples landing page feito em uma página só que eu mesmo usava antes da criação deste em que está sendo publicado.',
+    image: '/portfolio/hac.png',
+    link: 'https://satisfied-guidance-466745.framer.app/'
+  },
+  {
+    id: 3,
+    title: 'Veneza',
+    description: 'Aqui temos algo similar ao Dom Martiello, mas com um cardápio mais simples e focado em um público mais requintado. O site foi feito em uma página só, com um menu de navegação e um cardápio com todos os produtos disponíveis.',
+    image: '/portfolio/veneza.png',
+    link: 'https://empowered-emojis-921453.framer.app/'
+  }
 ]; 
