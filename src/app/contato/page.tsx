@@ -169,7 +169,7 @@ export default function ContatoPage() {
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Siga-nos nas redes sociais</h3>
                   <div className="flex space-x-4">
                     <a
-                      href="https://api.whatsapp.com/send/?phone=5541991559480&text=Ol%C3%A1%2C+Henrique!+Gostaria+de+conversar+sobre+um+projeto."
+                      href="https://api.whatsapp.com/send/?phone=5541999155948&text=Ol%C3%A1%2C+Henrique!+Gostaria+de+conversar+sobre+um+projeto."
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-green-500 hover:bg-green-600 text-white p-3 rounded-full transition-colors duration-300"

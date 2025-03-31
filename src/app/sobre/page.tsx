@@ -113,7 +113,7 @@ export default function SobrePage() {
                       <span className="sr-only">LinkedIn</span>
                       <img src="/social-icons/linkedin.svg" alt="LinkedIn" className="h-6 w-6" />
                     </a>
-                    <a href="https://api.whatsapp.com/send/?phone=5541991559480&text=Ol%C3%A1%2C+Henrique!+Gostaria+de+conversar+sobre+um+projeto."
+                    <a href="https://api.whatsapp.com/send/?phone=5541999155948&text=Ol%C3%A1%2C+Henrique!+Gostaria+de+conversar+sobre+um+projeto."
                        target="_blank" rel="noopener noreferrer"
                        className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
                       <span className="sr-only">WhatsApp</span>
