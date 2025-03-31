@@ -21,21 +21,6 @@ export default function Header() {
             <span className="text-xl font-bold">HenaWeb</span>
           </Link>
 
-          {/* Mobile menu button */}
-          <button
-            type="button"
-            className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-secondary-600 hover:bg-secondary-100 hover:text-secondary-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-expanded="false"
-          >
-            <span className="sr-only">Open main menu</span>
-            {isMenuOpen ? (
-              <X className="block h-6 w-6" aria-hidden="true" />
-            ) : (
-              <Menu className="block h-6 w-6" aria-hidden="true" />
-            )}
-          </button>
-
           {/* Desktop navigation */}
           <nav className="hidden md:flex md:space-x-8">
             {navigation.map((item) => (
@@ -51,6 +36,20 @@ export default function Header() {
 
           <div className="flex items-center space-x-4">
             <ThemeToggle />
+            {/* Mobile menu button */}
+            <button
+              type="button"
+              className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-secondary-600 hover:bg-secondary-100 hover:text-secondary-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 dark:text-secondary-400 dark:hover:bg-secondary-800 dark:hover:text-white"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-expanded="false"
+            >
+              <span className="sr-only">Open main menu</span>
+              {isMenuOpen ? (
+                <X className="block h-6 w-6" aria-hidden="true" />
+              ) : (
+                <Menu className="block h-6 w-6" aria-hidden="true" />
+              )}
+            </button>
             <Link
               href="/contato"
               className="hidden rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-primary-500 dark:hover:bg-primary-600 dark:focus:ring-offset-secondary-900 md:block"
