@@ -5,7 +5,10 @@ import { ThemeProvider } from './providers/ThemeProvider';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata = {
-  title: 'HenaWeb - Desenvolvimento Web e Automação',
+  title: 'HenaWeb',
+  icons: {
+    icon: '/hac.png',
+  },
   description: 'Desenvolvimento de sites profissionais e automação inteligente para otimizar seus processos e aumentar sua produtividade.',
 };
 
