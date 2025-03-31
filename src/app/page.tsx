@@ -92,9 +92,11 @@ export default function Home() {
                 <div className="relative h-48 w-full">
                   <Image
                     src={project.image}
-                    alt={project.title}
+                    alt={`${project.title} - Projeto desenvolvido pela HenaWeb`}
                     fill
                     className="object-cover"
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                 </div>
                 <div className="p-6">
@@ -134,8 +136,9 @@ export default function Home() {
                 >
                   <img
                     src={`/icons/${tech.toLowerCase().replace('.', '')}.svg`}
-                    alt={tech}
+                    alt={`${tech} - Tecnologia utilizada pela HenaWeb`}
                     className="w-12 h-12 mx-auto mb-4"
+                    loading="lazy"
                   />
                   <div className="text-gray-900 dark:text-gray-300">{tech}</div>
                 </div>

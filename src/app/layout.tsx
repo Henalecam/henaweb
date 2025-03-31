@@ -1,16 +1,12 @@
+import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { defaultMetadata } from './metadata';
 import { ThemeProvider } from './providers/ThemeProvider';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
-export const metadata = {
-  title: 'HenaWeb',
-  icons: {
-    icon: '/hac.png',
-  },
-  description: 'Desenvolvimento de sites profissionais e automação inteligente para otimizar seus processos e aumentar sua produtividade.',
-};
+export const metadata: Metadata = defaultMetadata;
 
 export default function RootLayout({
   children,
@@ -19,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className={inter.variable}>
+      <body className={inter.variable} suppressHydrationWarning>
         <ThemeProvider>
           {children}
         </ThemeProvider>

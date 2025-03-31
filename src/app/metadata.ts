@@ -1,8 +1,11 @@
 import { Metadata } from 'next';
 
 export const defaultMetadata: Metadata = {
+  icons: {
+    icon: '/hac.png',
+  },
   title: {
-    default: 'HenaWeb | Desenvolvimento Web Premium',
+    default: 'HenaWeb',
     template: '%s | HenaWeb'
   },
   description: 'Transforme sua presença digital com soluções web premium. Desenvolvimento de sites, automação inteligente e consultoria estratégica para impulsionar seu negócio.',
@@ -15,32 +18,25 @@ export const defaultMetadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://henaweb.com'),
+  metadataBase: new URL('https://hacamargo.shop'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
-    url: 'https://henaweb.com',
+    url: 'https://hacamargo.shop',
     siteName: 'HenaWeb',
     title: 'HenaWeb | Desenvolvimento Web Premium',
     description: 'Transforme sua presença digital com soluções web premium. Desenvolvimento de sites, automação inteligente e consultoria estratégica para impulsionar seu negócio.',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/hac.png',
         width: 1200,
         height: 630,
         alt: 'HenaWeb - Desenvolvimento Web Premium',
       },
     ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'HenaWeb | Desenvolvimento Web Premium',
-    description: 'Transforme sua presença digital com soluções web premium. Desenvolvimento de sites, automação inteligente e consultoria estratégica para impulsionar seu negócio.',
-    images: ['/og-image.jpg'],
-    creator: '@henaweb',
   },
   robots: {
     index: true,
