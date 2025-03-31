@@ -159,7 +159,8 @@ export default function Home() {
                   "Pesquisa avançada de mercado e análise competitiva",
                   "Definição clara de escopo e entregáveis estratégicos",
                   "Planejamento personalizado com roadmap detalhado"
-                ]
+                ],
+                highlight: "Entendemos seu negócio como ninguém"
               },
               {
                 number: "2",
@@ -170,7 +171,8 @@ export default function Home() {
                   "Design de interface moderno, intuitivo e memorável",
                   "Design responsivo otimizado para todos os dispositivos",
                   "Otimização contínua da experiência do usuário"
-                ]
+                ],
+                highlight: "Designs que inspiram e convertem"
               },
               {
                 number: "3",
@@ -181,7 +183,8 @@ export default function Home() {
                   "Backend robusto, escalável e de alta performance",
                   "Integrações avançadas com APIs e serviços externos",
                   "Testes automatizados e otimização contínua"
-                ]
+                ],
+                highlight: "Código que define o futuro"
               },
               {
                 number: "4",
@@ -192,14 +195,26 @@ export default function Home() {
                   "Monitoramento proativo de performance e segurança",
                   "Manutenção preventiva e suporte técnico dedicado",
                   "Evolução contínua baseada em métricas e feedback"
-                ]
+                ],
+                highlight: "Suporte que faz a diferença"
               }
             ].map((step, index) => (
               <ScrollAnimation key={index} delay={index * 0.1}>
-                <div className="text-center group">
-                  <div className="w-16 h-16 bg-indigo-600 dark:bg-indigo-500 rounded-full flex items-center justify-center text-2xl font-bold text-white mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                    {step.number}
+                <div className="text-center group relative">
+                  {/* Connection Line */}
+                  {index < 3 && (
+                    <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-indigo-200 dark:bg-indigo-800 transform -translate-y-1/2" />
+                  )}
+                  
+                  <div className="relative">
+                    <div className="w-16 h-16 bg-indigo-600 dark:bg-indigo-500 rounded-full flex items-center justify-center text-2xl font-bold text-white mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                      {step.number}
+                    </div>
+                    <div className="absolute -top-2 -right-2 bg-indigo-500 dark:bg-indigo-400 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                      {step.highlight}
+                    </div>
                   </div>
+
                   <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
                     {step.title}
                   </h3>
