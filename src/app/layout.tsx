@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { defaultMetadata } from './metadata';
 import { ThemeProvider } from './providers/ThemeProvider';
+import { Analytics } from './components/Analytics';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -17,6 +18,7 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={inter.variable} suppressHydrationWarning>
         <ThemeProvider>
+          <Analytics />
           {children}
         </ThemeProvider>
       </body>
