@@ -17,6 +17,11 @@ export default function ContatoPage() {
     whatsapp: ''
   });
 
+  const [submitStatus, setSubmitStatus] = useState({
+    success: false,
+    message: ''
+  });
+
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
@@ -46,8 +51,50 @@ export default function ContatoPage() {
       return;
     }
 
-    // Aqui você pode adicionar a lógica para enviar o formulário
-    console.log('Form submitted:', formData);
+    try {
+      const response = await fetch('/api/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao enviar mensagem');
+      }
+
+      // Limpar o formulário
+      setFormData({
+        name: '',
+        email: '',
+        whatsapp: '',
+        message: ''
+      });
+
+      // Mostrar mensagem de sucesso
+      setSubmitStatus({
+        success: true,
+        message: 'Mensagem enviada com sucesso! Entraremos em contato em breve.'
+      });
+
+      // Limpar mensagem de sucesso após 5 segundos
+      setTimeout(() => {
+        setSubmitStatus({
+          success: false,
+          message: ''
+        });
+      }, 5000);
+
+    } catch (error) {
+      console.error('Erro ao enviar mensagem:', error);
+      setSubmitStatus({
+        success: false,
+        message: 'Erro ao enviar mensagem. Por favor, tente novamente.'
+      });
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -105,7 +152,7 @@ export default function ContatoPage() {
                     </svg>
                   </div>
                   <div className="ml-3 text-base text-gray-500 dark:text-gray-400">
-                    <p>contato@henaweb.com.br</p>
+                    <p>henriquealexandredec@gmail.com</p>
                   </div>
                 </div>
                 <div className="mt-4 flex items-center">
@@ -115,7 +162,39 @@ export default function ContatoPage() {
                     </svg>
                   </div>
                   <div className="ml-3 text-base text-gray-500 dark:text-gray-400">
-                    <p>(11) 98765-4321</p>
+                    <p>(41) 99155-9480</p>
+                  </div>
+                </div>
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Siga-nos nas redes sociais</h3>
+                  <div className="flex space-x-4">
+                    <a
+                      href="https://api.whatsapp.com/send/?phone=5541991559480&text=Ol%C3%A1%2C+Henrique!+Gostaria+de+conversar+sobre+um+projeto."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-green-500 hover:bg-green-600 text-white p-3 rounded-full transition-colors duration-300"
+                      aria-label="WhatsApp"
+                    >
+                      <img src="/social-icons/whatsapp.svg" alt="WhatsApp" className="w-6 h-6" />
+                    </a>
+                    <a
+                      href="https://linkedin.com/company/henawebdesign"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition-colors duration-300"
+                      aria-label="LinkedIn"
+                    >
+                      <img src="/social-icons/linkedin.svg" alt="LinkedIn" className="w-6 h-6" />
+                    </a>
+                    <a
+                      href="https://instagram.com/henaweb"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-pink-600 hover:bg-pink-700 text-white p-3 rounded-full transition-colors duration-300"
+                      aria-label="Instagram"
+                    >
+                      <img src="/social-icons/instagram.svg" alt="Instagram" className="w-6 h-6" />
+                    </a>
                   </div>
                 </div>
               </div>
@@ -123,6 +202,13 @@ export default function ContatoPage() {
 
             <div className="mt-12 sm:mt-16 md:mt-0">
               <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-y-6">
+                {submitStatus.message && (
+                  <div className={`p-4 rounded-md ${
+                    submitStatus.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                  }`}>
+                    {submitStatus.message}
+                  </div>
+                )}
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Nome
@@ -194,7 +280,7 @@ export default function ContatoPage() {
                       required
                       value={formData.message}
                       onChange={handleChange}
-                      className="py-3 px-4 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
+                      className="py-3 px-4 block w-full text-black shadow-sm focus:ring-blue-500 focus:border-blue-500 border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
                     />
                   </div>
                 </div>
