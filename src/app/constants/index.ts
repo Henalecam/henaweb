@@ -80,7 +80,7 @@ export const testimonials = [
     role: 'CEO',
     company: 'TechStart Brasil',
     content: 'A HenaWeb não apenas construiu nosso site - eles transformaram nossa presença digital. O resultado foi além do que imaginávamos: um aumento de 150% no engajamento dos usuários e 80% mais conversões. A expertise e dedicação da equipe são impressionantes.',
-    image: '/testimonials/joao.jpg'
+    image: '/testimonials/rodrigo.jpg'
   },
   {
     name: 'Pedro Santos',
