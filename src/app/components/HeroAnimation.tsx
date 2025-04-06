@@ -98,9 +98,18 @@ export default function HeroAnimation() {
   const waveRef = useRef<THREE.Vector3>(new THREE.Vector3());
   const { theme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    // Check if device is mobile
+    const checkMobile = () => {
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isMobileDevice);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   useEffect(() => {
@@ -173,8 +182,19 @@ export default function HeroAnimation() {
 
       // Update camera
       if (cameraRef.current) {
-        cameraRef.current.position.x += (mouseRef.current.x - cameraRef.current.position.x) * 0.05;
-        cameraRef.current.position.y += (mouseRef.current.y - cameraRef.current.position.y) * 0.05;
+        if (isMobile) {
+          // Automatic camera movement for mobile
+          const time = timeRef.current;
+          const radius = 30;
+          const speed = 0.5;
+          cameraRef.current.position.x = Math.sin(time * speed) * radius;
+          cameraRef.current.position.y = Math.cos(time * speed * 0.5) * radius * 0.5;
+          cameraRef.current.position.z = Math.cos(time * speed * 0.3) * radius;
+        } else {
+          // Original mouse-based camera movement
+          cameraRef.current.position.x += (mouseRef.current.x - cameraRef.current.position.x) * 0.05;
+          cameraRef.current.position.y += (mouseRef.current.y - cameraRef.current.position.y) * 0.05;
+        }
         cameraRef.current.lookAt(0, 0, 0);
       }
 
@@ -189,7 +209,7 @@ export default function HeroAnimation() {
       containerRef.current?.removeChild(renderer.domElement);
       renderer.dispose();
     };
-  }, [mounted, resolvedTheme]);
+  }, [mounted, resolvedTheme, isMobile]);
 
   return (
     <div className="relative">

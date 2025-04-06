@@ -90,7 +90,7 @@ export default function Home() {
             {projects.map((project) => (
               <Card key={project.id} variant="hover" className="overflow-hidden">
                 <div className="relative h-48 w-full">
-                  <Image
+            <Image
                     src={project.image}
                     alt={`${project.title} - Projeto desenvolvido pela HenaWeb`}
                     fill
@@ -165,6 +165,6 @@ export default function Home() {
       </section>
 
       <Footer />
-    </main>
+      </main>
   );
 }
