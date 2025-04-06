@@ -14,10 +14,14 @@ const nextConfig = {
       },
     ],
     formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   experimental: {
     optimizeCss: true,
     optimizePackageImports: ['framer-motion'],
+    serverActions: true,
+    optimizeServerReact: true,
   },
   headers: async () => {
     return [
@@ -52,6 +56,9 @@ const nextConfig = {
       },
     ];
   },
+  compress: true,
+  staticPageGenerationTimeout: 1000,
+  modern: true,
 }
 
 module.exports = nextConfig 
