@@ -1,12 +1,10 @@
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 import Image from 'next/image';
+import { Section, SectionHeader } from '../components/ui/Section';
 import { values } from '../constants';
 
 export default function SobrePage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
-      <Header />
       <main className="pt-16">
         {/* Hero Section */}
         <div className="relative bg-blue-600">
@@ -126,7 +124,6 @@ export default function SobrePage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 } 

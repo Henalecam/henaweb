@@ -1,8 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-import forms from '@tailwindcss/forms';
-import typography from '@tailwindcss/typography';
-
-const config = {
+module.exports = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -23,7 +20,6 @@ const config = {
           700: '#0369a1',
           800: '#075985',
           900: '#0c4a6e',
-          950: '#082f49',
         },
         secondary: {
           50: '#f8fafc',
@@ -59,9 +55,30 @@ const config = {
         'grid-white': 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Crect x=\'0.5\' y=\'0.5\' width=\'19\' height=\'19\' stroke=\'%23FFFFFF\' stroke-opacity=\'0.1\'/%3E%3C/svg%3E")',
         'grid-gray-900': 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Crect x=\'0.5\' y=\'0.5\' width=\'19\' height=\'19\' stroke=\'%23111827\' stroke-opacity=\'0.1\'/%3E%3C/svg%3E")',
       },
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-in-out',
+        'slide-up': 'slideUp 0.5s ease-out',
+        'slide-down': 'slideDown 0.5s ease-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(20px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideDown: {
+          '0%': { transform: 'translateY(-20px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+      },
     },
   },
-  plugins: [forms, typography],
-};
-
-export default config; 
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/aspect-ratio'),
+  ],
+}; 

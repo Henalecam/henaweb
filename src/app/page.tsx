@@ -2,12 +2,12 @@ import dynamic from 'next/dynamic';
 import { services, testimonials, projects } from './constants';
 import SectionHeader from './components/SectionHeader';
 import Services from './components/Services';
-import Footer from './components/Footer';
-import Header from './components/Header';
 import ScrollAnimation from './components/ScrollAnimation';
 import { Card } from './components/ui/Card';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Section } from './components/ui/Section';
+import Contact from './components/Contact';
 
 const HeroAnimation = dynamic(() => import('./components/HeroAnimation'), {
   ssr: false,
@@ -19,8 +19,6 @@ const HeroAnimation = dynamic(() => import('./components/HeroAnimation'), {
 export default function Home() {
   return (
     <main className="min-h-screen bg-gray-900 text-white">
-      <Header />
-      
       {/* Hero Section with 3D Animation */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
@@ -163,8 +161,6 @@ export default function Home() {
           </a>
         </ScrollAnimation>
       </section>
-
-      <Footer />
-      </main>
+    </main>
   );
 }

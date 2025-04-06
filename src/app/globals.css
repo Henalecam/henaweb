@@ -79,6 +79,10 @@ body {
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-secondary-400 dark:bg-secondary-500;
   }
+
+  html {
+    font-size: var(--font-size);
+  }
 }
 
 @layer utilities {
@@ -98,10 +102,49 @@ body {
     animation: shimmer 2s infinite;
     content: '';
   }
+
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
 }
 
 @keyframes shimmer {
   100% {
     transform: translateX(100%);
+  }
+}
+
+/* Acessibilidade */
+.high-contrast {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity)) !important;
+  color: rgb(255 255 255 / var(--tw-text-opacity)) !important;
+}
+
+.high-contrast * {
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity)) !important;
+  color: rgb(255 255 255 / var(--tw-text-opacity)) !important;
+  border-color: rgb(255 255 255 / var(--tw-border-opacity)) !important;
+}
+
+.grayscale {
+  filter: grayscale(100%);
+}
+
+.reduced-motion * {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Componentes personalizados */
+@layer components {
+  .btn-primary {
+    @apply bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors;
+  }
+  
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6;
   }
 }
