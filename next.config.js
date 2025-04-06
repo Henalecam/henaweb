@@ -20,7 +20,6 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
     optimizePackageImports: ['framer-motion'],
-    serverActions: true,
     optimizeServerReact: true,
   },
   headers: async () => {
@@ -58,7 +57,6 @@ const nextConfig = {
   },
   compress: true,
   staticPageGenerationTimeout: 1000,
-  modern: true,
 }
 
 module.exports = nextConfig 

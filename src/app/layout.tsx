@@ -43,8 +43,6 @@ export const metadata: Metadata = {
   description: 'Transforme sua presença digital com soluções web modernas e inovadoras.',
   keywords: ['desenvolvimento web', 'sites', 'aplicações web', 'tecnologia', 'soluções digitais'],
   authors: [{ name: 'HenaWeb' }],
-  viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#4F46E6',
 };
 
 export const viewport: Viewport = {
