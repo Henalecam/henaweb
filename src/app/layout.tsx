@@ -43,6 +43,16 @@ export const metadata: Metadata = {
   description: 'Transforme sua presença digital com soluções web modernas e inovadoras.',
   keywords: ['desenvolvimento web', 'sites', 'aplicações web', 'tecnologia', 'soluções digitais'],
   authors: [{ name: 'HenaWeb' }],
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png', sizes: '32x32' },
+      { url: '/icon.png', type: 'image/png', sizes: '192x192' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180' },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
@@ -59,7 +69,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="scroll-smooth" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.png" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
