@@ -16,11 +16,39 @@ interface Pixel {
   originalPosition: THREE.Vector3;
 }
 
-function createPixel(geometry: THREE.BoxGeometry, material: THREE.Material, theme: string | undefined): Pixel {
+function createPixel(geometry: THREE.BoxGeometry, material: THREE.Material, theme: string | undefined, colorIndex?: number): Pixel {
   const size = Math.random() * 1.0 + 0.45;
-  const color = new THREE.Color(theme === 'dark' ? 0x4f46e5 : 0x6366f1);
   
-  const mesh = new THREE.Mesh(geometry, material);
+  // Define 3 base colors that match the site's theme
+  const baseColors = [
+    new THREE.Color().setHSL(0.7, 0.8, 0.6),  // Roxo principal (indigo-600)
+    new THREE.Color().setHSL(0.6, 0.8, 0.6),  // Azul (indigo-500)
+    new THREE.Color().setHSL(0.7, 0.3, 0.9),  // Branco com tom roxo
+  ];
+  
+  // Use the specified color index or generate a random one
+  const color = colorIndex !== undefined 
+    ? baseColors[colorIndex % baseColors.length].clone()
+    : baseColors[Math.floor(Math.random() * baseColors.length)].clone();
+  
+  // Add subtle variation to the base color
+  const hsl = { h: 0, s: 0, l: 0 };
+  color.getHSL(hsl);
+  color.setHSL(
+    (hsl.h + (Math.random() - 0.5) * 0.05) % 1,  // Reduced variation for more consistent colors
+    hsl.s + (Math.random() - 0.5) * 0.1,
+    hsl.l + (Math.random() - 0.5) * 0.1
+  );
+  
+  // Create a new material instance for each pixel
+  const pixelMaterial = new THREE.MeshPhongMaterial({
+    color: color,
+    emissive: color.clone().multiplyScalar(0.5),
+    emissiveIntensity: 0.5,
+    shininess: 100,
+  });
+  
+  const mesh = new THREE.Mesh(geometry, pixelMaterial);
   mesh.scale.set(size, size, size);
   
   const angle = Math.random() * Math.PI * 2;
@@ -80,10 +108,13 @@ function updatePixel(pixel: Pixel, mouse: THREE.Vector3, time: number, wave: THR
   pixel.mesh.rotation.y += pixel.rotationSpeed.y;
   pixel.mesh.rotation.z += pixel.rotationSpeed.z;
   
+  // Update color with very subtle animation
   const material = pixel.mesh.material as THREE.MeshPhongMaterial;
   const hsl = { h: 0, s: 0, l: 0 };
-  const hue = (pixel.baseColor.getHSL(hsl).h + time * 0.05) % 1;
-  material.color.setHSL(hue, 0.7, 0.5);
+  pixel.baseColor.getHSL(hsl);
+  const hue = (hsl.h + time * 0.001) % 1; // Reduced from 0.01 to 0.001 for much slower color change
+  material.color.setHSL(hue, hsl.s, hsl.l);
+  material.emissive.setHSL(hue, hsl.s, hsl.l * 0.5);
 }
 
 export default function HeroAnimation() {
@@ -149,14 +180,15 @@ export default function HeroAnimation() {
     const pixelCount = 500;
     const pixelGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
     const pixelMaterial = new THREE.MeshPhongMaterial({
-      color: resolvedTheme === 'dark' ? 0x4f46e5 : 0x6366f1,
-      emissive: resolvedTheme === 'dark' ? 0x4f46e5 : 0x6366f1,
+      color: 0xffffff,
+      emissive: 0x000000,
       emissiveIntensity: 0.5,
       shininess: 100,
     });
 
+    // Create pixels with random distribution of the three colors
     for (let i = 0; i < pixelCount; i++) {
-      const pixel = createPixel(pixelGeometry, pixelMaterial, resolvedTheme);
+      const pixel = createPixel(pixelGeometry, pixelMaterial, resolvedTheme, Math.floor(Math.random() * 3));
       scene.add(pixel.mesh);
       pixelsRef.current.push(pixel);
     }
