@@ -37,20 +37,27 @@ export default function Testimonials() {
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700"
               >
                 <div className="flex items-center mb-6">
-                  <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-indigo-500">
-                    <Image
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      fill
-                      className="object-cover"
-                    />
+                  <div className="relative flex-shrink-0 w-16 h-16">
+                    <div className="absolute inset-0 rounded-full overflow-hidden border-2 border-indigo-500">
+                      <Image
+                        src={testimonial.image}
+                        alt={testimonial.name}
+                        fill
+                        className="object-cover"
+                        style={{
+                          objectPosition: 'center',
+                          aspectRatio: '1/1'
+                        }}
+                        sizes="64px"
+                      />
+                    </div>
                   </div>
                   <div className="ml-4">
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                       {testimonial.name}
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {testimonial.role} at {testimonial.company}
+                      {testimonial.role} em {testimonial.company}
                     </div>
                   </div>
                 </div>

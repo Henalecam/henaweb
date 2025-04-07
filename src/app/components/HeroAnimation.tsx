@@ -168,7 +168,17 @@ export default function HeroAnimation() {
       mouseRef.current.set(x * 20, y * 20, 0);
     };
 
+    // Resize handler
+    const handleResize = () => {
+      if (cameraRef.current && rendererRef.current) {
+        cameraRef.current.aspect = window.innerWidth / window.innerHeight;
+        cameraRef.current.updateProjectionMatrix();
+        rendererRef.current.setSize(window.innerWidth, window.innerHeight);
+      }
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('resize', handleResize);
 
     // Animation loop
     const animate = () => {
@@ -182,19 +192,42 @@ export default function HeroAnimation() {
 
       // Update camera
       if (cameraRef.current) {
+        const time = timeRef.current;
+        const radius = 30;
+        const speed = 0.5;
+
+        // Base camera movement
+        const baseX = Math.sin(time * speed) * radius;
+        const baseY = Math.cos(time * speed * 0.5) * radius * 0.5;
+        const baseZ = Math.cos(time * speed * 0.3) * radius;
+
         if (isMobile) {
-          // Automatic camera movement for mobile
-          const time = timeRef.current;
-          const radius = 30;
-          const speed = 0.5;
-          cameraRef.current.position.x = Math.sin(time * speed) * radius;
-          cameraRef.current.position.y = Math.cos(time * speed * 0.5) * radius * 0.5;
-          cameraRef.current.position.z = Math.cos(time * speed * 0.3) * radius;
+          // Mobile: Use only automatic movement
+          cameraRef.current.position.x = baseX;
+          cameraRef.current.position.y = baseY;
+          cameraRef.current.position.z = baseZ;
         } else {
-          // Original mouse-based camera movement
-          cameraRef.current.position.x += (mouseRef.current.x - cameraRef.current.position.x) * 0.05;
-          cameraRef.current.position.y += (mouseRef.current.y - cameraRef.current.position.y) * 0.05;
+          // Desktop: Combine automatic movement with mouse interaction
+          const mouseInfluence = 0.3; // How much the mouse affects the camera
+          const autoInfluence = 0.7; // How much the automatic movement affects the camera
+
+          cameraRef.current.position.x = 
+            (baseX * autoInfluence) + (mouseRef.current.x * mouseInfluence);
+          cameraRef.current.position.y = 
+            (baseY * autoInfluence) + (mouseRef.current.y * mouseInfluence);
+          cameraRef.current.position.z = baseZ;
         }
+
+        // Smooth camera movement
+        cameraRef.current.position.lerp(
+          new THREE.Vector3(
+            cameraRef.current.position.x,
+            cameraRef.current.position.y,
+            cameraRef.current.position.z
+          ),
+          0.1
+        );
+
         cameraRef.current.lookAt(0, 0, 0);
       }
 
@@ -206,6 +239,7 @@ export default function HeroAnimation() {
     // Cleanup
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', handleResize);
       containerRef.current?.removeChild(renderer.domElement);
       renderer.dispose();
     };

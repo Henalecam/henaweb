@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Section } from './components/ui/Section';
 import Contact from './components/Contact';
+import Testimonials from './components/Testimonials';
 
 const HeroAnimation = dynamic(() => import('./components/HeroAnimation'), {
   ssr: false,
@@ -73,6 +74,21 @@ export default function Home() {
           </ScrollAnimation>
           <ScrollAnimation delay={0.2}>
             <Services />
+          </ScrollAnimation>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <ScrollAnimation>
+            <SectionHeader
+              title="Depoimentos"
+              description="O que nossos clientes dizem sobre nossos serviços"
+            />
+          </ScrollAnimation>
+          <ScrollAnimation delay={0.2}>
+            <Testimonials />
           </ScrollAnimation>
         </div>
       </section>
