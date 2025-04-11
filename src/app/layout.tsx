@@ -40,9 +40,31 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'HenaWeb - Desenvolvimento Web e Soluções Digitais',
-  description: 'Transforme sua presença digital com soluções web modernas e inovadoras.',
+  description: 'Transforme sua presença digital com soluções web modernas e inovadoras. Sites, aplicações web e soluções digitais personalizadas para seu negócio.',
   keywords: ['desenvolvimento web', 'sites', 'aplicações web', 'tecnologia', 'soluções digitais'],
   authors: [{ name: 'HenaWeb' }],
+  openGraph: {
+    title: 'HenaWeb - Desenvolvimento Web e Soluções Digitais',
+    description: 'Transforme sua presença digital com soluções web modernas e inovadoras. Sites, aplicações web e soluções digitais personalizadas para seu negócio.',
+    url: 'https://henaweb.com.br',
+    siteName: 'HenaWeb',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'HenaWeb - Desenvolvimento Web e Soluções Digitais',
+      },
+    ],
+    locale: 'pt_BR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'HenaWeb - Desenvolvimento Web e Soluções Digitais',
+    description: 'Transforme sua presença digital com soluções web modernas e inovadoras.',
+    images: ['/og-image.jpg'],
+  },
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -53,6 +75,7 @@ export const metadata: Metadata = {
       { url: '/apple-icon.png', sizes: '180x180' },
     ],
   },
+  metadataBase: new URL('https://henaweb.com.br'),
 };
 
 export const viewport: Viewport = {
