@@ -5,7 +5,7 @@ import { services } from '../constants';
 export default function ServicosPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
-      <main className="pt-16">
+      <main>
         {/* Hero Section */}
         <div className="relative bg-blue-600">
           <div className="absolute inset-0">

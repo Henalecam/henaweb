@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Container from './ui/Container';
 import { ThemeToggle } from './ui/ThemeToggle';
-import { navigation } from '../constants';
+import { navigation as navigationItems } from '../constants';
 import { Menu, X } from 'lucide-react';
 
 export default function Header() {
@@ -23,7 +23,9 @@ export default function Header() {
 
           {/* Desktop navigation */}
           <nav className="hidden md:flex md:space-x-8">
-            {navigation.map((item) => (
+            {[
+              ...navigationItems,
+            ].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -66,7 +68,9 @@ export default function Header() {
           } md:hidden transition-all duration-300 ease-in-out`}
         >
           <div className="space-y-1 px-2 pb-3 pt-2">
-            {navigation.map((item) => (
+            {[
+              ...navigationItems,
+            ].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

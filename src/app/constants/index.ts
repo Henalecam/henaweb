@@ -12,6 +12,7 @@ export const navigation = [
   { name: 'Sobre', href: '/sobre' },
   { name: 'Serviços', href: '/servicos' },
   { name: 'Contato', href: '/contato' },
+  { name: 'Portfólio', href: '/portfolio'}
 ];
 
 export const services = [
@@ -116,7 +117,7 @@ export const projects = [
   {
     id: 3,
     title: 'Veneza',
-    description: 'Aqui temos algo similar ao Dom Martiello, mas com um cardápio mais simples e focado em um público mais requintado. O site foi feito em uma página só, com um menu de navegação e um cardápio com todos os produtos disponíveis.',
+    description: 'Um cardápio para um restaurante que preza pelo simples, com um cardápio mais simples e focado em um público mais requintado. O site foi feito em uma página só, com um menu de navegação e um cardápio com todos os produtos disponíveis.',
     image: '/portfolio/veneza.png',
     link: 'https://empowered-emojis-921453.framer.app/'
   }
