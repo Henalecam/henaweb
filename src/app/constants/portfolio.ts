@@ -29,6 +29,14 @@ export const portfolioItems: PortfolioItem[] = [
     category: 'sites',
   },
   {
+    name: "Lawyer Studio",
+    description: "Landing page for lawyers, modern design, professional and focused on capturing leads.",
+    link: "https://firebase-lawyer-studio.vercel.app/",
+    image: "/portfolio/lawyer-camargo.png",
+    category: "sites",
+
+  },
+  {
     name: 'Sistema Exemplo 2',
     description: 'Descrição do sistema exemplo 2.',
     link: 'https://sistema2.com',
