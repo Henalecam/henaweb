@@ -9,110 +9,100 @@ export type PortfolioItem = {
 export const portfolioItems: PortfolioItem[] = [
   {
     name: 'Dom Martiello',
-    description: 'Nesse site temos uma pizzaria com um cardápio extremamente irresistível, com uma interface moderna e responsiva.Cada detalhe preparado com muito cuidado para que o cliente se sinta em casa.',
+    description: 'Site moderno para pizzaria gourmet, com design responsivo e interface intuitiva. Cardápio digital interativo que destaca a qualidade dos produtos e proporciona uma experiência gastronômica única aos clientes.',
     link: 'https://slight-homeowners-556639.framer.app/',
     image: '/portfolio/dom-martiello.png',
     category: 'sites',
   },
   {
     name: 'Hac Landing Page',
-    description: 'Uma simples landing page feito em uma página só que eu mesmo usava antes da criação deste em que está sendo publicado.',
+    description: 'Landing page profissional com design minimalista e alta taxa de conversão. Desenvolvida com foco em performance e experiência do usuário, utilizando as mais recentes tecnologias web.',
     link: 'https://satisfied-guidance-466745.framer.app/',
     image: '/portfolio/hac.png',
     category: 'sites',
   },
   {
     name: 'Veneza',
-    description: 'Um cardápio para um restaurante que preza pelo simples, com um cardápio mais simples e focado em um público mais requintado. O site foi feito em uma página só, com um menu de navegação e um cardápio com todos os produtos disponíveis.',
+    description: 'Site elegante para restaurante fine dining, com cardápio digital sofisticado. Design clean que reflete a exclusividade do estabelecimento, proporcionando uma experiência digital refinada aos clientes.',
     link: 'https://empowered-emojis-921453.framer.app/',
     image: '/portfolio/veneza.png',
     category: 'sites',
   },
   {
-    name: "Lawyer Studio",
-    description: "Landing page for lawyers, modern design, professional and focused on capturing leads.",
+    name: "Camargo Leal",
+    description: "Landing page especializada para advocacia trabalhista, com design profissional e estratégia focada em captação de leads. Interface moderna que transmite confiança e autoridade, ideal para conectar o escritório com potenciais clientes.",
     link: "https://firebase-lawyer-studio.vercel.app/",
     image: "/portfolio/lawyer-camargo.png",
     category: "sites",
-
   },
   {
     name: 'Diconta',
-    description: 'ERP for accounting offices, streamlining financial management, tax calculations, and accounting reports, making it more efficient and integrated.',
+    description: 'Sistema ERP completo para escritórios de contabilidade, desenvolvido para otimizar a gestão financeira, cálculos tributários e relatórios contábeis. Interface intuitiva que simplifica processos complexos e aumenta a produtividade da equipe.',
     link: 'https://diconta.vercel.app/dashboard',
     image: '/portfolio/diconta.png',
     category: 'systems',
   },
   {
     name: 'Agente de IA para Atendimento ao Cliente',
-    description:
-      'atendimento ao cliente, onde um agente de IA responde aos clientes de forma autônoma, fornecendo suporte e informações de maneira eficiente.',
+    description: 'Solução avançada de atendimento automatizado que utiliza Inteligência Artificial para oferecer suporte 24/7. Capaz de entender contexto, resolver problemas e escalar conforme necessário.',
     link: '#',
     image: '/portfolio/automation.svg',
     category: 'automations',
   },
   {
     name: 'Coleta de Leads via Google',
-    description:
-      'Automação para busca de leads através do Google, identificando todos os comércios na região selecionada, facilitando a prospecção e o alcance de novos clientes.',
+    description: 'Automação inteligente que mapeia e identifica potenciais clientes através do Google Maps, analisando dados de localização e perfil de negócios para gerar leads qualificados.',
     link: '#',
     image: '/portfolio/automation.svg',
     category: 'automations',
   },
   {
     name: 'Abordagem de Leads Automatizada',
-    description:
-      'Automação que realiza a abordagem inicial dos leads coletados, engajando potenciais clientes de forma automática e personalizada.',
+    description: 'Sistema automatizado de nurturing que personaliza a comunicação com leads baseado em comportamento e interesses, aumentando significativamente as taxas de conversão.',
     link: '#',
     image: '/portfolio/automation.svg',
     category: 'automations',
   },
   {
     name: "Boas-Vindas e Onboarding",
-    description:
-      "Melhora a experiência inicial do cliente. Envia e-mail de boas-vindas personalizado e pode acionar sequências de onboarding. Adiciona clientes a segmentos específicos.",
+    description: "Automação que personaliza a jornada inicial do cliente, enviando conteúdo relevante e instruções no momento certo. Aumenta o engajamento e reduz o tempo de adaptação do usuário.",
     link: "#",
     image: "/portfolio/automation.svg",
     category: "automations",
   },
   {
     name: "Recuperação de Carrinho Abandonado",
-    description:
-      "Recupera vendas perdidas no e-commerce. Envia e-mails de lembrete quando clientes não finalizam a compra, podendo incluir descontos e incentivos.",
+    description: "Sistema inteligente que monitora e recupera vendas perdidas, com sequência automatizada de e-mails personalizados e ofertas especiais para reconquistar clientes indecisos.",
     link: "#",
     image: "/portfolio/automation.svg",
     category: "automations",
   },
   {
     name: "Solicitação e Gestão de Feedback",
-    description:
-      "Simplifica a coleta e gestão de feedback. Após uma compra, envia e-mail solicitando avaliação e pode alertar a equipe ou publicar feedbacks positivos.",
+    description: "Automatização completa do processo de coleta e análise de feedback, com gatilhos inteligentes para solicitar avaliações e sistema de gestão de reputação integrado.",
     link: "#",
     image: "/portfolio/automation.svg",
     category: "automations",
   },
   {
     name: "Geração de Relatórios e Dashboards",
-    description:
-      "Cria e distribui relatórios e dashboards de negócios. Coleta dados de várias fontes e gera relatórios periódicos para as partes interessadas.",
+    description: "Automação que transforma dados brutos em insights acionáveis, gerando relatórios personalizados e dashboards interativos para tomada de decisão baseada em dados.",
     link: "#",
     image: "/portfolio/automation.svg",
     category: "automations",
   },
   {
     name: "Recuperação de Leads",
-    description:
-      "Reengaja leads que esfriaram. Rastreia interações e aciona esforços de divulgação personalizados, como e-mails e ofertas, para reconquistar esses leads.",
+    description: "Sistema automatizado que identifica e reengaja leads inativos através de campanhas personalizadas, utilizando análise comportamental para maximizar as chances de conversão.",
     link: "#",
     image: "/portfolio/automation.svg",
     category: "automations",
   },
   {
     name: "Segmentação Dinâmica de Clientes",
-    description:
-      "Segmenta clientes dinamicamente, monitorando suas ações. Atualiza segmentos para campanhas direcionadas, ofertas personalizadas ou mensagens customizadas.",
+    description: "Automação que categoriza clientes em tempo real com base em comportamento e interações, permitindo comunicação altamente personalizada e ofertas direcionadas.",
     link: "#",
     image: "/portfolio/automation.svg",
     category: "automations",
-  },
+  }
 ];
