@@ -43,6 +43,14 @@ export const portfolioItems: PortfolioItem[] = [
     category: 'systems',
   },
   {
+    name: "Scheduly",
+    description:
+      "Transforme seu agendamento com a inteligência artificial do Scheduly! Gerencie sua agenda de forma inteligente e automatizada, otimizando seu tempo e melhorando a eficiência. Deixe o Scheduly cuidar dos detalhes para que você possa se concentrar no que realmente importa.",
+    link: "https://scheduly-eta.vercel.app/",
+    image: "/portfolio/scheduly.png",
+    category: "systems",
+  },
+  {
     name: 'Agente de IA para Atendimento ao Cliente',
     description: 'Solução avançada de atendimento automatizado que utiliza Inteligência Artificial para oferecer suporte 24/7. Capaz de entender contexto, resolver problemas e escalar conforme necessário.',
     link: '#',
