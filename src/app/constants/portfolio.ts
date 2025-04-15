@@ -37,10 +37,10 @@ export const portfolioItems: PortfolioItem[] = [
 
   },
   {
-    name: 'Sistema Exemplo 2',
-    description: 'Descrição do sistema exemplo 2.',
-    link: 'https://sistema2.com',
-    image: '/portfolio/dom-martiello.png',
+    name: 'Diconta',
+    description: 'ERP for accounting offices, streamlining financial management, tax calculations, and accounting reports, making it more efficient and integrated.',
+    link: 'https://diconta.vercel.app/dashboard',
+    image: '/portfolio/diconta.png',
     category: 'systems',
   },
   {
