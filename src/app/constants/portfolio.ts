@@ -15,6 +15,14 @@ export const portfolioItems: PortfolioItem[] = [
     category: 'sites',
   },
   {
+    name: "Contacerta",
+    description:
+      "Contacerta é o parceiro perfeito para o seu escritório contábil! Com foco em organização e eficiência, oferecemos uma plataforma completa para gestão financeira e contábil. Agilize seus processos, reduza erros e aumente a lucratividade do seu negócio com a Contacerta.",
+    link: "https://contacerta.vercel.app/",
+    image: "/portfolio/contacerta.png",
+    category: "sites",
+  },
+  {
     name: 'Hac Landing Page',
     description: 'Landing page profissional com design minimalista e alta taxa de conversão. Desenvolvida com foco em performance e experiência do usuário, utilizando as mais recentes tecnologias web.',
     link: 'https://satisfied-guidance-466745.framer.app/',
@@ -48,14 +56,6 @@ export const portfolioItems: PortfolioItem[] = [
       "Transforme seu agendamento com a inteligência artificial do Scheduly! Gerencie sua agenda de forma inteligente e automatizada, otimizando seu tempo e melhorando a eficiência. Deixe o Scheduly cuidar dos detalhes para que você possa se concentrar no que realmente importa.",
     link: "https://scheduly-eta.vercel.app/",
     image: "/portfolio/scheduly.png",
-    category: "systems",
-  },
-  {
-    name: "Contacerta",
-    description:
-      "Contacerta é o parceiro perfeito para o seu escritório contábil! Com foco em organização e eficiência, oferecemos uma plataforma completa para gestão financeira e contábil. Agilize seus processos, reduza erros e aumente a lucratividade do seu negócio com a Contacerta.",
-    link: "https://contacerta.vercel.app/",
-    image: "/portfolio/contacerta.png",
     category: "systems",
   },
   {
