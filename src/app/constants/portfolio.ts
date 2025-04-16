@@ -51,6 +51,14 @@ export const portfolioItems: PortfolioItem[] = [
     category: "systems",
   },
   {
+    name: "Contacerta",
+    description:
+      "Contacerta é o parceiro perfeito para o seu escritório contábil! Com foco em organização e eficiência, oferecemos uma plataforma completa para gestão financeira e contábil. Agilize seus processos, reduza erros e aumente a lucratividade do seu negócio com a Contacerta.",
+    link: "https://contacerta.vercel.app/",
+    image: "/portfolio/contacerta.png",
+    category: "systems",
+  },
+  {
     name: 'Agente de IA para Atendimento ao Cliente',
     description: 'Solução avançada de atendimento automatizado que utiliza Inteligência Artificial para oferecer suporte 24/7. Capaz de entender contexto, resolver problemas e escalar conforme necessário.',
     link: '#',
