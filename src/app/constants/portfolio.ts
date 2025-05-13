@@ -45,7 +45,7 @@ export const portfolioItems: PortfolioItem[] = [
   },
   { name: 'EcoBrain', 
     description: 'Sistema de gestão financeira, para pessoas físicas com um diferencial impactante que é insights feitos pela IA, para ajudar o usuário a tomar decisões mais informadas e saber aonde está indo o seu dinheiro.', 
-    link: 'https://ecobrain-frontend.vercel.app/', 
+    link: 'https://ecobrain.vercel.app/', 
     image: '/portfolio/ecobrain.png', 
     category: 'systems', 
   },
