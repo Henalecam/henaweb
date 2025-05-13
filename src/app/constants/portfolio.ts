@@ -43,6 +43,12 @@ export const portfolioItems: PortfolioItem[] = [
     image: "/portfolio/lawyer-camargo.png",
     category: "sites",
   },
+  { name: 'EcoBrain', 
+    description: 'Sistema de gestão financeira, para pessoas físicas com um diferencial impactante que é insights feitos pela IA, para ajudar o usuário a tomar decisões mais informadas e saber aonde está indo o seu dinheiro.', 
+    link: 'https://ecobrain-frontend.vercel.app/', 
+    image: '/portfolio/ecobrain.png', 
+    category: 'systems', 
+  },
   {
     name: 'Diconta',
     description: 'Sistema ERP completo para escritórios de contabilidade, desenvolvido para otimizar a gestão financeira, cálculos tributários e relatórios contábeis. Interface intuitiva que simplifica processos complexos e aumenta a produtividade da equipe.',
