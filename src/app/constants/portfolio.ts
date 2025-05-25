@@ -37,7 +37,7 @@ export const portfolioItems: PortfolioItem[] = [
     category: 'sites',
   },
   {
-    name: "Camargo Leal",
+    name: "Camargo Legal",
     description: "Landing page especializada para advocacia trabalhista, com design profissional e estratégia focada em captação de leads. Interface moderna que transmite confiança e autoridade, ideal para conectar o escritório com potenciais clientes.",
     link: "https://firebase-lawyer-studio.vercel.app/",
     image: "/portfolio/lawyer-camargo.png",
