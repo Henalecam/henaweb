@@ -25,13 +25,13 @@ export default function Automations() {
             className="relative flex flex-col rounded-lg border border-purple-200 bg-white dark:bg-gray-800 dark:border-purple-700 shadow-md overflow-hidden transition-shadow hover:shadow-purple-200 dark:hover:shadow-purple-900"
           >
             {automation.image && (
-              <div className="relative aspect-[16/9] w-full">
+              <div className="relative w-full h-[315px]">
                 <Image
                   src={automation.image}
                   alt={automation.name}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-contain"
+                  className="object-contain bg-gray-50 dark:bg-gray-900"
                   priority={index < 3}
                 />
               </div>
