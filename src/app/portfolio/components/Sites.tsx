@@ -24,12 +24,12 @@ export default function Sites() {
                     className="relative flex flex-col rounded-lg border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 shadow-md overflow-hidden transition-shadow hover:shadow-lg"
                 >
                     <a href={site.link} target="_blank" rel="noopener noreferrer">
-                        <div className="relative w-full h-64">
+                        <div className="relative w-full aspect-[16/9] bg-gray-50 dark:bg-gray-900">
                             <Image
                                 src={site.image}
                                 alt={site.name}
                                 fill
-                                className="object-cover hover:opacity-80 transition-opacity duration-300"
+                                className="object-contain hover:opacity-80 transition-opacity duration-300"
                             />
                         </div>
                     </a>

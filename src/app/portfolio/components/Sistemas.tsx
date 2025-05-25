@@ -25,12 +25,12 @@ export default function Sistemas() {
           >
             {item.link && (
               <a href={item.link} target="_blank" rel="noopener noreferrer">
-                <div className="relative w-full h-64">
+                <div className="relative w-full aspect-[16/9] bg-gray-50 dark:bg-gray-900">
                   <Image
                     src={item.image}
                     alt={item.name}
                     fill
-                    className="object-cover hover:opacity-80 transition-opacity duration-300"
+                    className="object-contain hover:opacity-80 transition-opacity duration-300"
                   />
                 </div>
               </a>
