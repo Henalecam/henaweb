@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { ThemeProvider } from './providers/ThemeProvider';
 import Script from 'next/script';
+import { Analytics } from "@vercel/analytics/next"
 
 // Dynamically import non-critical components
 const Header = dynamic(() => import('./components/Header'), {
