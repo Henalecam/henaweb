@@ -107,9 +107,12 @@ export default function RootLayout({
             fbq('track', 'PageView');
           `}
         </Script>
-        <noscript><img height="1" width="1" style="display:none"
-        src="https://www.facebook.com/tr?id=1389558105453782&ev=PageView&noscript=1"
-        /></noscript>
+        <noscript>
+          <img height="1" width="1" style={{ display: 'none' }}
+            src="https://www.facebook.com/tr?id=1389558105453782&ev=PageView&noscript=1"
+            alt="Meta Pixel"
+          />
+        </noscript>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.png" type="image/png" sizes="32x32" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
