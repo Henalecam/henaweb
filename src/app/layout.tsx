@@ -126,6 +126,7 @@ export default function RootLayout({
         <ThemeProvider>
           <Suspense fallback={null}>
             <Analytic />
+            <Analytics />
           </Suspense>
           <Header />
           {children}
