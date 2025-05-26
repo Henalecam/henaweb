@@ -30,7 +30,7 @@ const WhatsAppButton = dynamic(() => import('./components/WhatsAppButton'), {
   ssr: false,
 });
 
-const Analytics = dynamic(() => import('./components/analytics/Analytics'), {
+const Analytic = dynamic(() => import('./components/analytics/Analytics'), {
   ssr: false,
 });
 
@@ -125,7 +125,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider>
           <Suspense fallback={null}>
-            <Analytics />
+            <Analytic />
           </Suspense>
           <Header />
           {children}
