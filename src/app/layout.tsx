@@ -92,7 +92,6 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="scroll-smooth" suppressHydrationWarning>
       <head>
-        <!-- Meta Pixel Code -->
         <script>
         !function(f,b,e,v,n,t,s)
         {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -108,7 +107,6 @@ export default function RootLayout({
         <noscript><img height="1" width="1" style="display:none"
         src="https://www.facebook.com/tr?id=1389558105453782&ev=PageView&noscript=1"
         /></noscript>
-        <!-- End Meta Pixel Code -->
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.png" type="image/png" sizes="32x32" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
