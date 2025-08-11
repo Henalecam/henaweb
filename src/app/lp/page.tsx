@@ -290,7 +290,11 @@ export default function LandingPage({
       </Section>
 
       {/* Quiz de recomendação */}
-      <Section id="quiz">
+      <Section
+        id="quiz"
+        className="relative isolate overflow-hidden bg-gradient-to-br from-indigo-50 via-fuchsia-50 to-cyan-50 dark:from-secondary-900 dark:via-secondary-900/90 dark:to-secondary-800"
+      >
+        <AnimatedBackground />
         <Quiz utmQuery={utmQuery} />
       </Section>
 
