@@ -1,7 +1,12 @@
 import Link from 'next/link';
 import { navigation, services } from '../constants';
+import { usePathname } from 'next/navigation';
 
 const Footer = () => {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/lp')) {
+    return null;
+  }
   return (
     <footer className="bg-secondary-900 text-white">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
