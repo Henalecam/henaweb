@@ -9,6 +9,8 @@ const ScrollAnimation = dynamic(() => import("../components/ScrollAnimation"), {
 const AnimatedBackground = dynamic(() => import("./AnimatedBackground"), { ssr: false });
 const TrackedCta = dynamic(() => import("./TrackedCta"), { ssr: false });
 const Quiz = dynamic(() => import("./Quiz"), { ssr: false });
+const BackToTop = dynamic(() => import("../components/back-to-top/BackToTop"), { ssr: false });
+const Testimonials = dynamic(() => import("../components/Testimonials"), { ssr: false });
 
 export const metadata: Metadata = {
   title: "Planos e Serviços – HenaWeb | Landing",
@@ -58,7 +60,7 @@ export default function LandingPage({
     <main className="bg-white dark:bg-secondary-900">
       <JsonLd />
       {/* Hero de Conversão */}
-      <Section className="relative isolate pt-24 sm:pt-32 pb-20 overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-800">
+      <Section className="relative isolate pt-24 sm:pt-32 pb-24 overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-800">
         <AnimatedBackground />
         <div className="max-w-4xl text-center mx-auto">
           <ScrollAnimation>
@@ -67,20 +69,21 @@ export default function LandingPage({
             </span>
           </ScrollAnimation>
           <ScrollAnimation delay={0.1}>
-            <h1 className="mt-4 text-4xl sm:text-6xl font-extrabold text-white">
+            <h1 className="mt-4 text-4xl sm:text-6xl font-extrabold text-white leading-tight">
               Encontre seu plano ideal em segundos
             </h1>
           </ScrollAnimation>
           <ScrollAnimation delay={0.2}>
-            <p className="mt-4 text-indigo-100 text-lg">
-              Responda um quiz rápido. Sem preços na tela — mostramos a melhor rota e conectamos você.
+            <p className="mt-4 text-indigo-100 text-base sm:text-lg max-w-2xl mx-auto">
+              Responda um quiz rápido. Sem preços na tela — indicamos a melhor rota para seu contexto e conectamos você a um especialista.
             </p>
           </ScrollAnimation>
           <ScrollAnimation delay={0.3}>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4">
               <a
                 href="#quiz"
-                className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-base font-semibold text-indigo-700 shadow-sm hover:bg-indigo-50"
+                className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-base font-semibold text-indigo-700 shadow-sm hover:bg-indigo-50 w-full sm:w-auto"
+                aria-label="Começar o quiz de recomendação"
               >
                 Começar o quiz
               </a>
@@ -95,9 +98,19 @@ export default function LandingPage({
           <p className="mt-3 text-xs text-indigo-100/80">
             Sem compromisso. Resposta em até 24h úteis.
           </p>
+
+          {/* Indicador para rolar */}
+          <ScrollAnimation delay={0.45}>
+            <div className="mt-10 hidden sm:flex flex-col items-center gap-2 text-indigo-100/80">
+              <span className="text-xs">Desça para saber mais</span>
+              <svg className="w-5 h-5 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </ScrollAnimation>
         </div>
         {/* Sticky CTA Mobile */}
-        <div className="fixed inset-x-0 bottom-0 z-40 bg-indigo-700/90 backdrop-blur supports-[backdrop-filter]:bg-indigo-700/60 p-3 sm:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-40 bg-indigo-700/90 backdrop-blur supports-[backdrop-filter]:bg-indigo-700/60 p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:hidden">
           <a
             href="#quiz"
             className="inline-flex w-full items-center justify-center rounded-lg bg-white px-5 py-3 text-base font-semibold text-indigo-700 shadow-sm"
@@ -107,13 +120,75 @@ export default function LandingPage({
         </div>
       </Section>
 
-      {/* Benefícios/Serviços rápidos */}
+      {/* Social proof / métricas */}
+      <Section variant="dark" className="py-12 sm:py-16">
+        <ScrollAnimation>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-10 text-center">
+            <div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-secondary-900 dark:text-white">150%</div>
+              <div className="text-xs sm:text-sm text-secondary-600 dark:text-secondary-400">aumento médio de engajamento</div>
+            </div>
+            <div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-secondary-900 dark:text-white">40%</div>
+              <div className="text-xs sm:text-sm text-secondary-600 dark:text-secondary-400">redução de custos com automação</div>
+            </div>
+            <div className="col-span-2 sm:col-span-1">
+              <div className="text-3xl sm:text-4xl font-extrabold text-secondary-900 dark:text-white">+100</div>
+              <div className="text-xs sm:text-sm text-secondary-600 dark:text-secondary-400">projetos e diagnósticos entregues</div>
+            </div>
+          </div>
+        </ScrollAnimation>
+      </Section>
+
+      {/* Benefícios/Serviços rápidos - Mobile carrossel + Grid desktop */}
       <Section variant="dark">
         <SectionHeader
           title="O que podemos fazer por você"
           description="Serviços com foco em conversão e eficiência operacional"
         />
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Mobile: carrossel horizontal com snap */}
+        <div className="mt-8 md:hidden -mx-4 px-4 overflow-x-auto snap-x snap-mandatory flex gap-4 pb-4">
+          {services.map((svc) => (
+            <ScrollAnimation key={svc.id} className="snap-center shrink-0 min-w-[85%]">
+              <Card className="h-full">
+                <div className="p-6">
+                  <div className="flex items-start gap-4">
+                    {svc.icon && (
+                      <div className="text-indigo-600 dark:text-indigo-400">
+                        <svc.icon />
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">
+                        {svc.title}
+                      </h3>
+                      <p className="mt-2 text-secondary-600 dark:text-secondary-400 text-sm">
+                        {svc.description}
+                      </p>
+                    </div>
+                  </div>
+                  <ul className="mt-6 space-y-2 text-sm text-secondary-600 dark:text-secondary-300">
+                    {svc.features.slice(0, 4).map((f, i) => (
+                      <li key={i} className="flex items-start">
+                        <svg
+                          className="w-5 h-5 text-indigo-500 mr-2 mt-0.5 flex-shrink-0"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Card>
+            </ScrollAnimation>
+          ))}
+        </div>
+        {/* Desktop: grid tradicional */}
+        <div className="mt-12 hidden md:grid grid-cols-1 md:grid-cols-3 gap-6">
           {services.map((svc) => (
             <ScrollAnimation key={svc.id}>
               <Card className="h-full">
@@ -155,9 +230,73 @@ export default function LandingPage({
         </div>
       </Section>
 
+      {/* Como funciona */}
+      <Section>
+        <SectionHeader
+          title="Como vamos do diagnóstico à entrega"
+          description="Um caminho claro para sair da ideia e chegar ao resultado com previsibilidade"
+        />
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {[
+            {
+              step: '1',
+              title: 'Diagnóstico rápido',
+              desc: 'Entendemos o momento do seu negócio e traçamos o plano ideal para avançar sem desperdícios.'
+            },
+            {
+              step: '2',
+              title: 'Protótipo & validação',
+              desc: 'Iteramos com você em versões leves para validar cedo e acelerar a entrega final.'
+            },
+            {
+              step: '3',
+              title: 'Entrega com impacto',
+              desc: 'Publicação assistida, acompanhamento e melhoria contínua focados em resultado.'
+            }
+          ].map((item) => (
+            <ScrollAnimation key={item.step}>
+              <Card className="h-full">
+                <div className="p-6">
+                  <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">
+                    {item.step}
+                  </div>
+                  <h3 className="mt-4 text-lg sm:text-xl font-semibold text-secondary-900 dark:text-white">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-secondary-600 dark:text-secondary-300 text-sm">
+                    {item.desc}
+                  </p>
+                </div>
+              </Card>
+            </ScrollAnimation>
+          ))}
+        </div>
+        <ScrollAnimation delay={0.1}>
+          <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4">
+            <a
+              href="#quiz"
+              className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-indigo-700 w-full sm:w-auto"
+            >
+              Começar agora
+            </a>
+            <TrackedCta href={buildWhatsappLink(
+              "Olá! Quero entender qual o melhor caminho para meu projeto.",
+              utmQuery
+            )}>
+              Falar com especialista
+            </TrackedCta>
+          </div>
+        </ScrollAnimation>
+      </Section>
+
       {/* Quiz de recomendação */}
       <Section id="quiz">
         <Quiz utmQuery={utmQuery} />
+      </Section>
+
+      {/* Depoimentos */}
+      <Section variant="dark">
+        <Testimonials />
       </Section>
 
       {/* FAQ/CTA final */}
@@ -213,6 +352,9 @@ export default function LandingPage({
           </Card>
         </div>
       </Section>
+
+      {/* Botão flutuante de voltar ao topo */}
+      <BackToTop />
     </main>
   );
 }
