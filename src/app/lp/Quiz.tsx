@@ -200,25 +200,25 @@ export default function Quiz({ utmQuery }: QuizProps) {
         <AnimatePresence mode="wait">
           {step === 0 && (
             <motion.div key="step-0" variants={fadeUp} initial="initial" animate="animate" exit="exit">
-              <Card className="p-6 sm:p-8 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-secondary-900/60 shadow-soft">
-                <h4 className="text-2xl font-semibold">O que você precisa agora?</h4>
+              <Card className="p-5 sm:p-8 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-secondary-900/60 shadow-soft">
+                <h4 className="text-2xl font-semibold">O que você precisa agora? 🧩</h4>
                 <p className="mt-1 text-sm text-secondary-600 dark:text-secondary-300">Escolha um serviço.</p>
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <button onClick={() => select('service', 'websites')} className="group rounded-xl border border-secondary-200 dark:border-secondary-700 p-4 hover:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 transition shadow-sm hover:shadow">
                     <div className="text-left">
-                      <div className="text-base font-semibold">Desenvolvimento Web</div>
+                      <div className="text-base font-semibold">Desenvolvimento Web 🌐</div>
                       <div className="mt-1 text-xs text-secondary-600 dark:text-secondary-400">Sites e landing pages</div>
                     </div>
                   </button>
                   <button onClick={() => select('service', 'automation')} className="group rounded-xl border border-secondary-200 dark:border-secondary-700 p-4 hover:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 transition shadow-sm hover:shadow">
                     <div className="text-left">
-                      <div className="text-base font-semibold">Automação & IA</div>
+                      <div className="text-base font-semibold">Automação & IA 🤖</div>
                       <div className="mt-1 text-xs text-secondary-600 dark:text-secondary-400">Fluxos e integrações</div>
                     </div>
                   </button>
                   <button onClick={() => select('service', 'consulting')} className="group rounded-xl border border-secondary-200 dark:border-secondary-700 p-4 hover:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 transition shadow-sm hover:shadow">
                     <div className="text-left">
-                      <div className="text-base font-semibold">Consultoria Técnica</div>
+                      <div className="text-base font-semibold">Consultoria Técnica 🧠</div>
                       <div className="mt-1 text-xs text-secondary-600 dark:text-secondary-400">Sessões e revisão</div>
                     </div>
                   </button>
@@ -229,8 +229,8 @@ export default function Quiz({ utmQuery }: QuizProps) {
 
           {step === 1 && answers.service === 'websites' && (
             <motion.div key="step-1-web" variants={fadeUp} initial="initial" animate="animate" exit="exit">
-              <Card className="p-6 sm:p-8 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-secondary-900/60 shadow-soft">
-                <h4 className="text-xl font-semibold">Qual tipo de projeto web?</h4>
+              <Card className="p-5 sm:p-8 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-secondary-900/60 shadow-soft">
+                <h4 className="text-xl font-semibold">Qual tipo de projeto web? 🌐</h4>
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <button onClick={() => select('projectType', 'landing')} className="rounded-xl border border-secondary-200 dark:border-secondary-700 p-4 hover:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 transition shadow-sm hover:shadow">Landing page</button>
                   <button onClick={() => select('projectType', 'institutional')} className="rounded-xl border border-secondary-200 dark:border-secondary-700 p-4 hover:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 transition shadow-sm hover:shadow">Site institucional</button>
@@ -245,8 +245,8 @@ export default function Quiz({ utmQuery }: QuizProps) {
 
           {step === 1 && answers.service === 'automation' && (
             <motion.div key="step-1-auto" variants={fadeUp} initial="initial" animate="animate" exit="exit">
-              <Card className="p-6 sm:p-8 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-secondary-900/60 shadow-soft">
-                <h4 className="text-xl font-semibold">O que deseja automatizar?</h4>
+              <Card className="p-5 sm:p-8 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-secondary-900/60 shadow-soft">
+                <h4 className="text-xl font-semibold">O que deseja automatizar? ⚙️</h4>
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <button onClick={() => select('projectType', 'simple')} className="rounded-xl border border-secondary-200 dark:border-secondary-700 p-4 hover:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 transition shadow-sm hover:shadow">Tarefa simples</button>
                   <button onClick={() => select('projectType', 'multi')} className="rounded-xl border border-secondary-200 dark:border-secondary-700 p-4 hover:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 transition shadow-sm hover:shadow">Fluxos multi-etapas</button>
@@ -261,8 +261,8 @@ export default function Quiz({ utmQuery }: QuizProps) {
 
           {step === 1 && answers.service === 'consulting' && (
             <motion.div key="step-1-cons" variants={fadeUp} initial="initial" animate="animate" exit="exit">
-              <Card className="p-6 sm:p-8 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-secondary-900/60 shadow-soft">
-                <h4 className="text-xl font-semibold">Qual modalidade de consultoria?</h4>
+              <Card className="p-5 sm:p-8 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-secondary-900/60 shadow-soft">
+                <h4 className="text-xl font-semibold">Qual modalidade de consultoria? 🎯</h4>
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <button onClick={() => select('projectType', 'diagnostic')} className="rounded-xl border border-secondary-200 dark:border-secondary-700 p-4 hover:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 transition shadow-sm hover:shadow">Diagnóstico (1h)</button>
                   <button onClick={() => select('projectType', 'package4h')} className="rounded-xl border border-secondary-200 dark:border-secondary-700 p-4 hover:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 transition shadow-sm hover:shadow">Pacote 4h</button>
@@ -277,8 +277,8 @@ export default function Quiz({ utmQuery }: QuizProps) {
 
           {step === 2 && (
             <motion.div key="step-2" variants={fadeUp} initial="initial" animate="animate" exit="exit">
-              <Card className="p-6 sm:p-8 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-secondary-900/60 shadow-soft">
-                <h4 className="text-xl font-semibold">Qual a urgência?</h4>
+              <Card className="p-5 sm:p-8 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-secondary-900/60 shadow-soft">
+                <h4 className="text-xl font-semibold">Qual a urgência? ⏱️</h4>
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <button onClick={() => select('urgency', 'now')} className="rounded-xl border border-secondary-200 dark:border-secondary-700 p-4 hover:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 transition shadow-sm hover:shadow">Para esta semana</button>
                   <button onClick={() => select('urgency', 'soon')} className="rounded-xl border border-secondary-200 dark:border-secondary-700 p-4 hover:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 transition shadow-sm hover:shadow">Em 2–4 semanas</button>
@@ -293,7 +293,7 @@ export default function Quiz({ utmQuery }: QuizProps) {
 
           {step === 3 && (
             <motion.div key="step-3" variants={fadeUp} initial="initial" animate="animate" exit="exit">
-              <Card className="p-6 sm:p-8 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-secondary-900/60 shadow-soft">
+              <Card className="p-5 sm:p-8 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-secondary-900/60 shadow-soft">
                 <h4 className="text-xl font-semibold">Tem uma faixa de orçamento em mente?</h4>
                 <p className="mt-1 text-sm text-secondary-600 dark:text-secondary-300">Se não souber ainda, tudo bem.</p>
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">

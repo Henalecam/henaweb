@@ -8,7 +8,7 @@ interface SectionProps extends HTMLAttributes<HTMLElement> {
 }
 
 export function Section({ children, variant = 'default', className, ...props }: SectionProps) {
-  const baseStyles = 'py-16 sm:py-24';
+  const baseStyles = 'py-10 sm:py-24';
   
   const variants = {
     default: 'bg-white dark:bg-secondary-900',
