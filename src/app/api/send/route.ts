@@ -1,11 +1,25 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resendClient: Resend | null = null;
+
+function getResendClient(): Resend | null {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return null;
+  if (!resendClient) {
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
+}
 
 export async function POST(request: Request) {
   try {
     const { name, email, whatsapp, message } = await request.json();
+
+    const resend = getResendClient();
+    if (!resend) {
+      return NextResponse.json({ success: false, error: 'Email service not configured' }, { status: 503 });
+    }
 
     const data = await resend.emails.send({
       from: 'HenaWeb <onboarding@resend.dev>',

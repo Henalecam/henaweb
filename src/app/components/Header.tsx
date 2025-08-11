@@ -6,9 +6,15 @@ import Container from './ui/Container';
 import { ThemeToggle } from './ui/ThemeToggle';
 import { navigation as navigationItems } from '../constants';
 import { Menu, X } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  if (pathname?.startsWith('/lp')) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-secondary-200/80 bg-white/80 backdrop-blur-sm transition-colors dark:border-secondary-800/80 dark:bg-secondary-950/80">

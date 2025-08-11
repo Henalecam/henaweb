@@ -1,10 +1,16 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 
 export default function WhatsAppButton() {
   const whatsappNumber = '5541991559480';
   const defaultMessage = 'Olá, Henrique! Gostaria de conversar sobre um projeto.';
+  const pathname = usePathname();
+
+  if (pathname?.startsWith('/lp')) {
+    return null;
+  }
 
   const handleClick = () => {
     const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(defaultMessage)}`;
