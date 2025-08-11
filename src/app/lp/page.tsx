@@ -60,48 +60,51 @@ export default function LandingPage({
     <main className="bg-white dark:bg-secondary-900">
       <JsonLd />
       {/* Hero de Conversão */}
-      <Section className="relative isolate pt-24 sm:pt-32 pb-24 overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-800">
+      <Section className="relative isolate pt-20 sm:pt-28 pb-24 overflow-hidden bg-gradient-to-br from-indigo-600 via-fuchsia-600 to-cyan-500">
         <AnimatedBackground />
         <div className="max-w-4xl text-center mx-auto">
           <ScrollAnimation>
-            <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-indigo-100 ring-1 ring-white/20">
-              Novidade: prazos reduzidos para LPS — 5 a 10 dias úteis
+            <span className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-indigo-50 ring-1 ring-white/20">
+              ✨ Novidade: prazos reduzidos para LPS — 5 a 10 dias úteis
             </span>
           </ScrollAnimation>
           <ScrollAnimation delay={0.1}>
-            <h1 className="mt-4 text-4xl sm:text-6xl font-extrabold text-white leading-tight">
-              Encontre seu plano ideal em segundos
+            <h1 className="mt-4 text-4xl sm:text-6xl font-extrabold text-white leading-tight tracking-tight">
+              Encontre seu plano ideal em segundos ⚡
             </h1>
           </ScrollAnimation>
           <ScrollAnimation delay={0.2}>
-            <p className="mt-4 text-indigo-100 text-base sm:text-lg max-w-2xl mx-auto">
+            <p className="mt-3 text-indigo-50 text-base sm:text-lg max-w-2xl mx-auto">
               Responda um quiz rápido. Sem preços na tela — indicamos a melhor rota para seu contexto e conectamos você a um especialista.
             </p>
           </ScrollAnimation>
           <ScrollAnimation delay={0.3}>
-            <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4">
+            <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4">
               <a
                 href="#quiz"
-                className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-base font-semibold text-indigo-700 shadow-sm hover:bg-indigo-50 w-full sm:w-auto"
+                className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-base font-semibold text-indigo-700 shadow-soft hover:bg-indigo-50 w-full sm:w-auto"
                 aria-label="Começar o quiz de recomendação"
               >
-                Começar o quiz
+                🚀 Começar o quiz
               </a>
-              <TrackedCta href={buildWhatsappLink(
-                "Olá! Vim da landing e quero um diagnóstico rápido.",
-                utmQuery
-              )}>
-                Falar no WhatsApp agora
+              <TrackedCta
+                href={buildWhatsappLink(
+                  "Olá! Vim da landing e quero um diagnóstico rápido.",
+                  utmQuery
+                )}
+                className="inline-flex items-center justify-center rounded-xl bg-emerald-500 px-5 py-3 text-base font-semibold text-white shadow-soft hover:bg-emerald-600 w-full sm:w-auto"
+              >
+                💬 Falar no WhatsApp agora
               </TrackedCta>
             </div>
           </ScrollAnimation>
-          <p className="mt-3 text-xs text-indigo-100/80">
-            Sem compromisso. Resposta em até 24h úteis.
+          <p className="mt-2 text-xs text-indigo-50/90">
+            ⏱️ Sem compromisso. Resposta em até 24h úteis.
           </p>
 
           {/* Indicador para rolar */}
           <ScrollAnimation delay={0.45}>
-            <div className="mt-10 hidden sm:flex flex-col items-center gap-2 text-indigo-100/80">
+            <div className="mt-8 hidden sm:flex flex-col items-center gap-2 text-indigo-50/90">
               <span className="text-xs">Desça para saber mais</span>
               <svg className="w-5 h-5 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -110,30 +113,43 @@ export default function LandingPage({
           </ScrollAnimation>
         </div>
         {/* Sticky CTA Mobile */}
-        <div className="fixed inset-x-0 bottom-0 z-40 bg-indigo-700/90 backdrop-blur supports-[backdrop-filter]:bg-indigo-700/60 p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:hidden">
-          <a
-            href="#quiz"
-            className="inline-flex w-full items-center justify-center rounded-lg bg-white px-5 py-3 text-base font-semibold text-indigo-700 shadow-sm"
-          >
-            Começar o quiz
-          </a>
+        <div className="fixed inset-x-0 bottom-0 z-40 sm:hidden">
+          <div className="mx-3 mb-3 rounded-2xl bg-white/90 p-2 shadow-2xl ring-1 ring-indigo-100 backdrop-blur">
+            <div className="flex gap-2">
+              <a
+                href="#quiz"
+                className="inline-flex flex-1 items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-soft hover:bg-indigo-700"
+              >
+                🚀 Quiz
+              </a>
+              <a
+                href={buildWhatsappLink(
+                  "Olá! Vim da landing e quero um diagnóstico rápido.",
+                  utmQuery
+                )}
+                className="inline-flex flex-1 items-center justify-center rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-soft hover:bg-emerald-600"
+              >
+                💬 WhatsApp
+              </a>
+            </div>
+          </div>
         </div>
       </Section>
 
       {/* Social proof / métricas */}
-      <Section variant="dark" className="py-12 sm:py-16">
+      <Section variant="dark" className="py-10 sm:py-16">
         <ScrollAnimation>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-10 text-center">
             <div>
-              <div className="text-3xl sm:text-4xl font-extrabold text-secondary-900 dark:text-white">150%</div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-secondary-900 dark:text-white">📈 150%</div>
               <div className="text-xs sm:text-sm text-secondary-600 dark:text-secondary-400">aumento médio de engajamento</div>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl font-extrabold text-secondary-900 dark:text-white">40%</div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-secondary-900 dark:text-white">💡 40%</div>
               <div className="text-xs sm:text-sm text-secondary-600 dark:text-secondary-400">redução de custos com automação</div>
             </div>
             <div className="col-span-2 sm:col-span-1">
-              <div className="text-3xl sm:text-4xl font-extrabold text-secondary-900 dark:text-white">+100</div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-secondary-900 dark:text-white">🚀 +100</div>
               <div className="text-xs sm:text-sm text-secondary-600 dark:text-secondary-400">projetos e diagnósticos entregues</div>
             </div>
           </div>
@@ -141,17 +157,17 @@ export default function LandingPage({
       </Section>
 
       {/* Benefícios/Serviços rápidos - Mobile carrossel + Grid desktop */}
-      <Section variant="dark">
+      <Section variant="dark" className="pt-10 sm:pt-16">
         <SectionHeader
           title="O que podemos fazer por você"
           description="Serviços com foco em conversão e eficiência operacional"
         />
         {/* Mobile: carrossel horizontal com snap */}
-        <div className="mt-8 md:hidden -mx-4 px-4 overflow-x-auto snap-x snap-mandatory flex gap-4 pb-4">
+        <div className="mt-6 md:hidden -mx-4 px-4 overflow-x-auto snap-x snap-mandatory flex gap-4 pb-4">
           {services.map((svc) => (
             <ScrollAnimation key={svc.id} className="snap-center shrink-0 min-w-[85%]">
-              <Card className="h-full">
-                <div className="p-6">
+              <Card className="h-full shadow-soft">
+                <div className="p-5">
                   <div className="flex items-start gap-4">
                     {svc.icon && (
                       <div className="text-indigo-600 dark:text-indigo-400">
@@ -159,15 +175,15 @@ export default function LandingPage({
                       </div>
                     )}
                     <div>
-                      <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">
+                      <h3 className="text-base font-semibold text-secondary-900 dark:text-white">
                         {svc.title}
                       </h3>
-                      <p className="mt-2 text-secondary-600 dark:text-secondary-400 text-sm">
+                      <p className="mt-1 text-secondary-600 dark:text-secondary-400 text-sm">
                         {svc.description}
                       </p>
                     </div>
                   </div>
-                  <ul className="mt-6 space-y-2 text-sm text-secondary-600 dark:text-secondary-300">
+                  <ul className="mt-5 space-y-2 text-sm text-secondary-600 dark:text-secondary-300">
                     {svc.features.slice(0, 4).map((f, i) => (
                       <li key={i} className="flex items-start">
                         <svg
@@ -191,7 +207,7 @@ export default function LandingPage({
         <div className="mt-12 hidden md:grid grid-cols-1 md:grid-cols-3 gap-6">
           {services.map((svc) => (
             <ScrollAnimation key={svc.id}>
-              <Card className="h-full">
+              <Card className="h-full shadow-soft">
                 <div className="p-6">
                   <div className="flex items-start gap-4">
                     {svc.icon && (
@@ -231,9 +247,9 @@ export default function LandingPage({
       </Section>
 
       {/* Como funciona */}
-      <Section>
+      <Section className="pt-10 sm:pt-16">
         <SectionHeader
-          title="Como vamos do diagnóstico à entrega"
+          title="Como vamos do diagnóstico à entrega 🧭"
           description="Um caminho claro para sair da ideia e chegar ao resultado com previsibilidade"
         />
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -255,9 +271,9 @@ export default function LandingPage({
             }
           ].map((item) => (
             <ScrollAnimation key={item.step}>
-              <Card className="h-full">
+              <Card className="h-full shadow-soft">
                 <div className="p-6">
-                  <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">
+                  <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold shadow-soft">
                     {item.step}
                   </div>
                   <h3 className="mt-4 text-lg sm:text-xl font-semibold text-secondary-900 dark:text-white">
@@ -275,32 +291,36 @@ export default function LandingPage({
           <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4">
             <a
               href="#quiz"
-              className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-indigo-700 w-full sm:w-auto"
+              className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-base font-semibold text-white shadow-soft hover:bg-indigo-700 w-full sm:w-auto"
             >
-              Começar agora
+              🚀 Começar agora
             </a>
             <TrackedCta href={buildWhatsappLink(
               "Olá! Quero entender qual o melhor caminho para meu projeto.",
               utmQuery
-            )}>
-              Falar com especialista
+            )} className="inline-flex items-center justify-center rounded-xl bg-emerald-500 px-5 py-3 text-base font-semibold text-white shadow-soft hover:bg-emerald-600 w-full sm:w-auto">
+              💬 Falar com especialista
             </TrackedCta>
           </div>
         </ScrollAnimation>
       </Section>
 
       {/* Quiz de recomendação */}
-      <Section id="quiz">
+      <Section
+        id="quiz"
+        className="relative isolate overflow-hidden bg-gradient-to-br from-indigo-50 via-fuchsia-50 to-cyan-50 dark:from-secondary-900 dark:via-secondary-900/90 dark:to-secondary-800"
+      >
+        <AnimatedBackground />
         <Quiz utmQuery={utmQuery} />
       </Section>
 
       {/* Depoimentos */}
-      <Section variant="dark">
+      <Section variant="dark" className="pt-10 sm:pt-16">
         <Testimonials />
       </Section>
 
       {/* FAQ/CTA final */}
-      <Section variant="dark">
+      <Section variant="dark" className="pt-10 sm:pt-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2">
             <SectionHeader title="Perguntas frequentes" />
@@ -331,10 +351,10 @@ export default function LandingPage({
               </div>
             </div>
           </div>
-          <Card className="h-full">
+          <Card className="h-full shadow-soft">
             <div className="p-6">
               <h3 className="text-xl font-bold text-secondary-900 dark:text-white">
-                Garanta prioridade esta semana
+                Garanta prioridade esta semana 🔥
               </h3>
               <p className="mt-2 text-secondary-600 dark:text-secondary-300">
                 Vagas limitadas para novos projetos. Fale agora e receba um diagnóstico inicial gratuito.
@@ -344,9 +364,9 @@ export default function LandingPage({
                   "Olá! Vim da landing e quero prioridade para iniciar esta semana.",
                   utmQuery
                 )}
-                className="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-primary-500 dark:hover:bg-primary-600"
+                className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-emerald-500 px-4 py-3 text-base font-semibold text-white shadow-soft hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-emerald-500 dark:hover:bg-emerald-600"
               >
-                Falar agora no WhatsApp
+                💬 Falar agora no WhatsApp
               </a>
             </div>
           </Card>
