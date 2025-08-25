@@ -67,7 +67,7 @@ export const portfolioItems: PortfolioItem[] = [
   {
     name: "Dropcota",
     description:
-      "Sistema inovador de gestão e automação para cotação de produtos e serviços. Plataforma inteligente que otimiza processos de precificação, oferecendo ferramentas avançadas para análise de mercado e geração de propostas competitivas.",
+      "Sistema inovador de gestão e automação para rifas e sorteios. Plataforma inteligente que revoluciona a organização de rifas, oferecendo ferramentas avançadas para gestão de participantes, sorteios automáticos e controle completo de prêmios. Transforme suas rifas em experiências digitais seguras e emocionantes.",
     link: "https://dropcota.fun",
     image: "/portfolio/dropcota.png",
     category: "systems",
