@@ -65,6 +65,14 @@ export const portfolioItems: PortfolioItem[] = [
     category: "systems",
   },
   {
+    name: "Dropcota",
+    description:
+      "Sistema inovador de gestão e automação para cotação de produtos e serviços. Plataforma inteligente que otimiza processos de precificação, oferecendo ferramentas avançadas para análise de mercado e geração de propostas competitivas.",
+    link: "https://dropcota.fun",
+    image: "/portfolio/dropcota.png",
+    category: "systems",
+  },
+  {
     name: 'Agente de IA para Atendimento ao Cliente',
     description: 'Solução avançada de atendimento automatizado que utiliza Inteligência Artificial para oferecer suporte 24/7. Capaz de entender contexto, resolver problemas e escalar conforme necessário.',
     link: '#',
