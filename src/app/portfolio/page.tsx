@@ -1,6 +1,7 @@
 import Sites from './components/Sites';
 import Sistemas from './components/Sistemas';
 import Automations from './components/Automations';
+import WhiteLabels from './components/WhiteLabels';
 
 export default function Portfolio() {
   return (
@@ -34,6 +35,11 @@ export default function Portfolio() {
         <section id="automacoes" className="mb-12">
           <div className="max-w-lg mx-auto md:max-w-none md:grid md:grid-cols-1 md:gap-8">
             <Automations />
+          </div>
+        </section>
+        <section id="white-labels" className="mb-12">
+          <div className="max-w-lg mx-auto md:max-w-none md:grid md:grid-cols-1 md:gap-8">
+            <WhiteLabels />
           </div>
         </section>
       </div>

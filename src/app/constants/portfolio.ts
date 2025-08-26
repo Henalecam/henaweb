@@ -3,7 +3,7 @@ export type PortfolioItem = {
   description: string;
   link: string;
   image: string;
-  category: 'sites' | 'systems' | 'automations';
+  category: 'sites' | 'systems' | 'automations' | 'white-labels';
 };
 
 export const portfolioItems: PortfolioItem[] = [
@@ -70,7 +70,7 @@ export const portfolioItems: PortfolioItem[] = [
       "Sistema inovador de gestão e automação para rifas e sorteios. Plataforma inteligente que revoluciona a organização de rifas, oferecendo ferramentas avançadas para gestão de participantes, sorteios automáticos e controle completo de prêmios. Transforme suas rifas em experiências digitais seguras e emocionantes.",
     link: "https://dropcota.fun",
     image: "/portfolio/dropcota.png",
-    category: "systems",
+    category: "white-labels",
   },
   {
     name: 'Agente de IA para Atendimento ao Cliente',
