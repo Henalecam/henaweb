@@ -22,6 +22,11 @@ export default function Portfolio() {
       </div>
 
       <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+        <section id="white-labels" className="mb-12">
+          <div className="max-w-lg mx-auto md:max-w-none md:grid md:grid-cols-1 md:gap-8">
+            <WhiteLabels />
+          </div>
+        </section>
         <section id="sites" className="mb-12">
           <div className="max-w-lg mx-auto md:max-w-none md:grid md:grid-cols-1 md:gap-8">
             <Sites />
@@ -35,11 +40,6 @@ export default function Portfolio() {
         <section id="automacoes" className="mb-12">
           <div className="max-w-lg mx-auto md:max-w-none md:grid md:grid-cols-1 md:gap-8">
             <Automations />
-          </div>
-        </section>
-        <section id="white-labels" className="mb-12">
-          <div className="max-w-lg mx-auto md:max-w-none md:grid md:grid-cols-1 md:gap-8">
-            <WhiteLabels />
           </div>
         </section>
       </div>
