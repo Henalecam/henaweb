@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { CheckCircle, Shield, Users, Clock, Globe, Code, Smartphone, Search } from 'lucide-react';
+import { CheckCircle, Shield, Users, Clock, Globe, Code, Smartphone, Search, Scale } from 'lucide-react';
 
 export default function ProspectPage() {
   const params = useParams();
