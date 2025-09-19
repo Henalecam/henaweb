@@ -43,6 +43,14 @@ export const portfolioItems: PortfolioItem[] = [
     image: "/portfolio/lawyer-camargo.png",
     category: "sites",
   },
+  {
+    name: "Dropcota",
+    description:
+      "Sistema inovador de gestão e automação para rifas e sorteios. Plataforma inteligente que revoluciona a organização de rifas, oferecendo ferramentas avançadas para gestão de participantes, sorteios automáticos e controle completo de prêmios. Transforme suas rifas em experiências digitais seguras e emocionantes.",
+    link: "https://dropcota.fun",
+    image: "/portfolio/dropcota.png",
+    category: "systems",
+  },
   { name: 'EcoBrain', 
     description: 'Sistema de gestão financeira, para pessoas físicas com um diferencial impactante que é insights feitos pela IA, para ajudar o usuário a tomar decisões mais informadas e saber aonde está indo o seu dinheiro.', 
     link: 'https://ecobrain.vercel.app/', 
@@ -63,14 +71,6 @@ export const portfolioItems: PortfolioItem[] = [
     link: "https://scheduly-eta.vercel.app/",
     image: "/portfolio/scheduly.png",
     category: "systems",
-  },
-  {
-    name: "Dropcota",
-    description:
-      "Sistema inovador de gestão e automação para rifas e sorteios. Plataforma inteligente que revoluciona a organização de rifas, oferecendo ferramentas avançadas para gestão de participantes, sorteios automáticos e controle completo de prêmios. Transforme suas rifas em experiências digitais seguras e emocionantes.",
-    link: "https://dropcota.fun",
-    image: "/portfolio/dropcota.png",
-    category: "white-labels",
   },
   {
     name: "Fintech Henaweb",
