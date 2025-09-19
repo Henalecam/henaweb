@@ -73,6 +73,14 @@ export const portfolioItems: PortfolioItem[] = [
     category: "white-labels",
   },
   {
+    name: "Fintech Henaweb",
+    description:
+      "Plataforma fintech inovadora desenvolvida para revolucionar o setor financeiro. Solução completa que oferece serviços bancários digitais modernos, com foco em experiência do usuário e tecnologia de ponta para facilitar transações e gestão financeira.",
+    link: "https://fintech-henaweb.vercel.app/",
+    image: "/portfolio/fintech-henaweb.png",
+    category: "systems",
+  },
+  {
     name: 'Agente de IA para Atendimento ao Cliente',
     description: 'Solução avançada de atendimento automatizado que utiliza Inteligência Artificial para oferecer suporte 24/7. Capaz de entender contexto, resolver problemas e escalar conforme necessário.',
     link: '#',
