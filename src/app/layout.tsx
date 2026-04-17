@@ -108,6 +108,28 @@ export default function RootLayout({
             fbq('track', 'PageView');
           `}
         </Script>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "HenaWeb",
+              "url": "https://henaweb.com.br",
+              "logo": "https://henaweb.com.br/icon.png",
+              "description": "Transforme sua presença digital com soluções web modernas e inovadoras.",
+              "founder": {
+                "@type": "Person",
+                "name": "Henrique Alexandre de Camargo"
+              },
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+55-41-99915-5948",
+                "contactType": "customer service"
+              }
+            })
+          }}
+        />
         <noscript>
           <img height="1" width="1" style={{ display: 'none' }}
             src="https://www.facebook.com/tr?id=1389558105453782&ev=PageView&noscript=1"

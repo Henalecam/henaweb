@@ -31,14 +31,14 @@ export const services = [
   },
   {
     id: 'automation',
-    title: 'Automação Inteligente & IA',
-    description: 'Liberte seu time de tarefas repetitivas com soluções de automação que não apenas economizam tempo, mas que também aprendem e evoluem com seu negócio. Transforme processos manuais em fluxos de trabalho inteligentes.',
+    title: 'Automação Inteligente & n8n',
+    description: 'Liberte seu time de tarefas repetitivas com integrações hiper-personalizadas de CRMs, dashboards e canais de contato usando n8n. Transforme processos manuais em fluxos de trabalho autônomos.',
     icon: BotIcon,
     features: [
-      'Bots inteligentes que aprendem e se adaptam ao seu negócio',
-      'Automação de processos que reduzem custos em até 60%',
-      'Integração perfeita entre sistemas para operações mais eficientes',
-      'Otimização de operações com IA e machine learning de ponta'
+      'Integrações avançadas entre sistemas via n8n e APIs',
+      'Rastreabilidade total de ponta a ponta para gestão de leads',
+      'Automação de follow-ups e recuperação de clientes',
+      'Sincronização inteligente de dados com dashboards em tempo real'
     ],
     image: '/services/automation.svg'
   },
@@ -105,20 +105,23 @@ export const projects = [
     title: 'Dom Martiello',
     description: 'Nesse site temos uma pizzaria com um cardápio extremamente irresistível, com uma interface moderna e responsiva.Cada detalhe preparado com muito cuidado para que o cliente se sinta em casa.',
     image: '/portfolio/dom-martiello.png',
-    link: 'https://slight-homeowners-556639.framer.app/'
+    link: 'https://slight-homeowners-556639.framer.app/',
+    tags: ['Framer', 'UI/UX', 'Web Design']
   },
   {
     id: 2,
     title: 'Hac Landing Page',
     description: 'Uma simples landing page feito em uma página só que eu mesmo usava antes da criação deste em que está sendo publicado.',
     image: '/portfolio/hac.png',
-    link: 'https://satisfied-guidance-466745.framer.app/'
+    link: 'https://satisfied-guidance-466745.framer.app/',
+    tags: ['Next.js', 'React', 'TailwindCSS']
   },
   {
     id: 3,
     title: 'Veneza',
     description: 'Um cardápio para um restaurante que preza pelo simples, com um cardápio mais simples e focado em um público mais requintado. O site foi feito em uma página só, com um menu de navegação e um cardápio com todos os produtos disponíveis.',
     image: '/portfolio/veneza.png',
-    link: 'https://empowered-emojis-921453.framer.app/'
+    link: 'https://empowered-emojis-921453.framer.app/',
+    tags: ['Framer', 'Responsividade', 'E-commerce']
   }
 ]; 

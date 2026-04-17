@@ -1,3 +1,5 @@
+"use client";
+
 import Link from 'next/link';
 import { navigation, services } from '../constants';
 import { usePathname } from 'next/navigation';
