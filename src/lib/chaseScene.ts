@@ -54,41 +54,61 @@ function flowerTexture() {
 }
 
 /**
- * Side livery, laid out around the van's own features (texture is 2048x640 over a 4.0 x 1.25 panel):
- * wheels cover the lower corners around x 282 and x 1766, the logo sits in the middle,
- * so flowers go in a garland between the wheels, in the upper corners and beside the name.
+ * Livery panels. Each one is sized to the FLAT part of its body box (corners curve away
+ * beyond it), so nothing hangs off the van. Texture pixels map to panel metres:
+ *   lower  4.00 x 0.80 m  ->  2048 x 410 px   (wheels hide the bottom around x 282 and x 1766)
+ *   upper  3.84 x 0.92 m  ->  2048 x 491 px   (windows sit between y 43 and y 342)
  */
-function decalTexture() {
+export const LOWER_PANEL = { w: 4.0, h: 0.8, y: 1.08 };
+export const UPPER_PANEL = { w: 3.84, h: 0.92, y: 2.2 };
+
+function bloom(ctx: CanvasRenderingContext2D, list: [number, number, number, number][]) {
+  list.forEach(([x, y, r, rot], i) => paintFlower(ctx, x, y, r, rot, PETAL[i % 3], CORE[i % 3]));
+}
+
+/** Green lower body: the name in the middle, flowers over the wheel arches and a garland under the name. */
+function lowerLivery() {
   const c = document.createElement('canvas');
   c.width = 2048;
-  c.height = 640;
+  c.height = 410;
   const ctx = c.getContext('2d')!;
-  ctx.clearRect(0, 0, c.width, c.height);
-
-  const blooms: [number, number, number, number][] = [
-    // garland between the wheels, under the name
-    [600, 565, 62, 0.4], [745, 528, 92, 1.3], [895, 585, 52, 2.1], [1153, 585, 52, 0.7], [1303, 528, 92, 1.9], [1448, 565, 62, 0.2],
-    // rear upper corner
-    [150, 170, 96, 0.9], [300, 120, 58, 2.3], [70, 320, 50, 1.6],
-    // upper corner by the door
-    [1898, 170, 96, 0.1], [1748, 120, 58, 1.2], [1978, 320, 50, 2.6],
-    // little ones beside the name
-    [470, 330, 40, 1.0], [1578, 330, 40, 0.5],
-  ];
-  blooms.forEach(([x, y, r, rot], i) => paintFlower(ctx, x, y, r, rot, PETAL[i % 3], CORE[i % 3]));
-
-  // logo
+  bloom(ctx, [
+    // over the rear wheel
+    [282, 120, 78, 0.9], [150, 215, 44, 2.2], [420, 205, 48, 1.4],
+    // over the front wheel
+    [1766, 120, 78, 0.3], [1898, 215, 44, 1.1], [1628, 205, 48, 2.5],
+    // garland under the name, between the wheels
+    [600, 345, 46, 0.4], [730, 330, 60, 1.3], [870, 355, 40, 2.1], [1178, 355, 40, 0.7], [1318, 330, 60, 1.9], [1448, 345, 46, 0.2],
+  ]);
   const groovy = getComputedStyle(document.documentElement).getPropertyValue('--font-shrikhand').trim() || 'Georgia';
-  ctx.font = `230px ${groovy}, Georgia, serif`;
+  ctx.font = `176px ${groovy}, Georgia, serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.lineJoin = 'round';
-  ctx.lineWidth = 28;
+  ctx.lineWidth = 24;
   ctx.strokeStyle = '#140a26';
-  ctx.strokeText('HenaWeb', 1024, 300);
+  ctx.strokeText('HenaWeb', 1024, 175);
   ctx.fillStyle = '#f7931e';
-  ctx.fillText('HenaWeb', 1024, 300);
+  ctx.fillText('HenaWeb', 1024, 175);
+  return canvasTexture(c);
+}
 
+/** Turquoise upper body: a band of flowers under the windows and blooms peeking between them. */
+function upperLivery() {
+  const c = document.createElement('canvas');
+  c.width = 2048;
+  c.height = 491;
+  const ctx = c.getContext('2d')!;
+  const band: [number, number, number, number][] = [];
+  for (let i = 0; i < 14; i++) {
+    const x = 70 + i * 147;
+    band.push([x, i % 2 ? 440 : 420, i % 3 === 0 ? 62 : 46, i * 0.7]);
+  }
+  bloom(ctx, [
+    ...band,
+    // between the windows (gap centres at x 410, 837, 1264, 1725)
+    [410, 150, 52, 0.5], [837, 250, 46, 1.8], [1264, 140, 52, 1.1], [1725, 230, 48, 2.4],
+  ]);
   return canvasTexture(c);
 }
 
@@ -149,13 +169,13 @@ export function createChaseScene(canvas: HTMLCanvasElement, { reducedMotion }: {
   const van = new THREE.Group();
   const vanBody = new THREE.Group();
   van.add(vanBody);
-  const lower = inked(new RoundedBoxGeometry(4.4, 1.1, 2.0, 5, 0.3), 0xa6d64b);
+  const lower = inked(new RoundedBoxGeometry(4.4, 1.1, 2.0, 5, 0.14), 0xa6d64b);
   lower.position.y = 1.08;
   vanBody.add(lower);
-  const upper = inked(new RoundedBoxGeometry(4.34, 1.4, 1.96, 5, 0.42), 0x3cc6b4);
+  const upper = inked(new RoundedBoxGeometry(4.34, 1.4, 1.96, 5, 0.22), 0x3cc6b4);
   upper.position.y = 2.2;
   vanBody.add(upper);
-  const belt = new THREE.Mesh(track(new RoundedBoxGeometry(4.46, 0.14, 2.06, 2, 0.06)), toon(0xf9e27d));
+  const belt = new THREE.Mesh(track(new RoundedBoxGeometry(4.46, 0.14, 2.06, 2, 0.06)), toon(0xf7931e));
   belt.position.y = 1.6;
   vanBody.add(belt);
   const rack = inked(new THREE.BoxGeometry(2.6, 0.1, 1.5), 0x8b5cc7, 0.03);
@@ -227,14 +247,20 @@ export function createChaseScene(canvas: HTMLCanvasElement, { reducedMotion }: {
     vanBody.add(cab);
   }
 
-  // flower livery on both sides
-  const liveryMat = track(new THREE.MeshBasicMaterial({ map: track(decalTexture()), transparent: true }));
-  const liveryGeo = track(new THREE.PlaneGeometry(4.0, 1.25));
-  for (const side of [1, -1]) {
-    const decal = new THREE.Mesh(liveryGeo, liveryMat);
-    decal.position.set(0, 1.12, side * 1.025);
-    if (side === -1) decal.rotation.y = Math.PI;
-    vanBody.add(decal);
+  // flower livery on both sides, upper and lower, sitting flush on the flat faces
+  const panels = [
+    { tex: lowerLivery(), ...LOWER_PANEL, z: 1.006 },
+    { tex: upperLivery(), ...UPPER_PANEL, z: 0.986 },
+  ];
+  for (const pnl of panels) {
+    const mat = track(new THREE.MeshBasicMaterial({ map: track(pnl.tex), transparent: true, polygonOffset: true, polygonOffsetFactor: -2 }));
+    const geo = track(new THREE.PlaneGeometry(pnl.w, pnl.h));
+    for (const side of [1, -1]) {
+      const decal = new THREE.Mesh(geo, mat);
+      decal.position.set(0, pnl.y, side * pnl.z);
+      if (side === -1) decal.rotation.y = Math.PI;
+      vanBody.add(decal);
+    }
   }
 
   // flower stickers: two on the nose under the headlights, a cluster on the tail
