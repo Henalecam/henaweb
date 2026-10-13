@@ -3,12 +3,6 @@
 import { useRef } from 'react';
 import { gsap, useGSAP } from '@/lib/gsap';
 import { clients } from '@/lib/content';
-import Marquee from './Marquee';
-
-const groups = [
-  { key: 'public' as const, label: 'Setor público' },
-  { key: 'private' as const, label: 'Empresas' },
-];
 
 export default function Clients() {
   const root = useRef<HTMLElement>(null);
@@ -17,7 +11,6 @@ export default function Clients() {
     () => {
       gsap.from('[data-client]', {
         y: 40,
-        rotate: (i: number) => (i % 2 ? 4 : -4),
         autoAlpha: 0,
         duration: 0.8,
         ease: 'back.out(1.7)',
@@ -33,7 +26,7 @@ export default function Clients() {
       ref={root}
       id="clientes"
       aria-labelledby="clientes-titulo"
-      className="sky relative z-[5] -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon pt-[clamp(5rem,9vw,8rem)]"
+      className="sky relative z-[5] -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon py-[clamp(5rem,9vw,8rem)]"
     >
       <div className="gutter">
         <div className="grid gap-6 md:grid-cols-12 md:items-end">
@@ -49,50 +42,33 @@ export default function Clients() {
           </p>
         </div>
 
-        <div data-clients-grid className="mt-14 flex flex-col gap-10">
-          {groups.map((g) => (
-            <div key={g.key}>
-              <span className="label">{g.label}</span>
-              <ul className={`mt-4 grid gap-4 sm:grid-cols-2 ${g.key === 'public' ? 'lg:grid-cols-3' : 'lg:grid-cols-5'}`}>
-                {clients
-                  .filter((c) => c.group === g.key)
-                  .map((c, i) => (
-                    <li key={c.name} data-client>
-                      {/* hover lives on the inner card so it never fights the entrance tween */}
-                      <div
-                        className={`toon group relative flex h-full min-h-[8.5rem] flex-col justify-between overflow-hidden rounded-2xl p-5 transition-transform duration-300 hover:-translate-y-1 hover:-rotate-1 ${
-                          g.key === 'public' ? 'bg-paper text-acid-ink' : i % 2 ? 'bg-lemon text-acid-ink' : 'bg-cyan text-acid-ink'
-                        }`}
-                      >
-                        <span className="font-mono text-[0.62rem] font-bold tracking-widest uppercase opacity-60">{c.sector}</span>
-                        <span className="mt-4 text-[clamp(1.5rem,2.2vw,2rem)] leading-[1.02] font-semibold tracking-[-0.03em]">{c.name}</span>
-                        <span
-                          aria-hidden
-                          className="font-groovy absolute -right-2 -bottom-6 text-[5.5rem] leading-none opacity-[0.08] transition-opacity group-hover:opacity-20"
-                        >
-                          ✦
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-              </ul>
-            </div>
+        <ul data-clients-grid className="mt-14 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          {clients.map((c) => (
+            <li key={c.name} data-client>
+              {/* hover lives on the inner tile so it never fights the entrance tween */}
+              <div
+                title={c.name}
+                className="toon flex aspect-[16/9] items-center justify-center rounded-2xl bg-white p-[12%] transition-transform duration-300 hover:-translate-y-1 hover:-rotate-1"
+              >
+                {c.logo ? (
+                  // plain img: the logos are mostly SVG and already sized for the tile
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={c.logo}
+                    alt={c.name}
+                    loading="lazy"
+                    decoding="async"
+                    className="max-h-full max-w-full object-contain"
+                    style={{ transform: c.scale ? `scale(${c.scale})` : undefined }}
+                  />
+                ) : (
+                  <span className="text-[clamp(1.4rem,2.6vw,2.2rem)] font-semibold tracking-[-0.02em] text-[#1a2b5f]">{c.name}</span>
+                )}
+              </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
-
-      <div className="mt-[clamp(4rem,8vw,6rem)] border-y-[3px] border-toon bg-acid py-4 text-acid-ink">
-        <Marquee
-          speed={40}
-          items={clients.map((c) => (
-            <span key={c.name} className="font-groovy text-2xl md:text-3xl">
-              {c.name}
-            </span>
-          ))}
-          separator={<span className="mx-6 text-lg">✦</span>}
-        />
-      </div>
-      <div className="h-16" />
     </section>
   );
 }

@@ -11,7 +11,53 @@ export type ChaseScene = { dispose: () => void };
 
 const ROAD_LEN = 60;
 
-/** Side livery: groovy 70s flowers scattered along the panel and the logo. */
+const PETAL = ['#f7931e', '#f7931e', '#f9e27d'];
+const CORE = ['#f9e27d', '#f9e27d', '#f7931e'];
+
+function paintFlower(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, rot: number, petal: string, core: string) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.lineWidth = Math.max(6, r * 0.12);
+  ctx.strokeStyle = '#140a26';
+  for (let i = 0; i < 5; i++) {
+    ctx.save();
+    ctx.rotate((i * Math.PI * 2) / 5);
+    ctx.beginPath();
+    ctx.ellipse(0, -r * 0.62, r * 0.42, r * 0.62, 0, 0, Math.PI * 2);
+    ctx.fillStyle = petal;
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 0.36, 0, Math.PI * 2);
+  ctx.fillStyle = core;
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function canvasTexture(c: HTMLCanvasElement) {
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+/** One flower, for stickers on the nose and the rear. */
+function flowerTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  paintFlower(c.getContext('2d')!, 128, 128, 112, 0.3, PETAL[0], CORE[0]);
+  return canvasTexture(c);
+}
+
+/**
+ * Side livery, laid out around the van's own features (texture is 2048x640 over a 4.0 x 1.25 panel):
+ * wheels cover the lower corners around x 282 and x 1766, the logo sits in the middle,
+ * so flowers go in a garland between the wheels, in the upper corners and beside the name.
+ */
 function decalTexture() {
   const c = document.createElement('canvas');
   c.width = 2048;
@@ -19,37 +65,17 @@ function decalTexture() {
   const ctx = c.getContext('2d')!;
   ctx.clearRect(0, 0, c.width, c.height);
 
-  const flower = (x: number, y: number, r: number, rot: number, petal: string, core: string) => {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rot);
-    ctx.lineWidth = Math.max(6, r * 0.12);
-    ctx.strokeStyle = '#140a26';
-    for (let i = 0; i < 5; i++) {
-      ctx.save();
-      ctx.rotate((i * Math.PI * 2) / 5);
-      ctx.beginPath();
-      ctx.ellipse(0, -r * 0.62, r * 0.42, r * 0.62, 0, 0, Math.PI * 2);
-      ctx.fillStyle = petal;
-      ctx.fill();
-      ctx.stroke();
-      ctx.restore();
-    }
-    ctx.beginPath();
-    ctx.arc(0, 0, r * 0.36, 0, Math.PI * 2);
-    ctx.fillStyle = core;
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-  };
-
-  // flowers blooming up from the lower edge, a few climbing higher
   const blooms: [number, number, number, number][] = [
-    [120, 470, 120, 0.2], [330, 540, 80, 1.1], [520, 430, 140, 0.6], [760, 560, 70, 2.0],
-    [1290, 545, 75, 0.9], [1480, 440, 130, 1.7], [1700, 540, 85, 0.3], [1900, 455, 115, 1.2],
-    [980, 150, 60, 0.4], [1660, 160, 70, 1.4], [260, 170, 55, 2.2],
+    // garland between the wheels, under the name
+    [600, 565, 62, 0.4], [745, 528, 92, 1.3], [895, 585, 52, 2.1], [1153, 585, 52, 0.7], [1303, 528, 92, 1.9], [1448, 565, 62, 0.2],
+    // rear upper corner
+    [150, 170, 96, 0.9], [300, 120, 58, 2.3], [70, 320, 50, 1.6],
+    // upper corner by the door
+    [1898, 170, 96, 0.1], [1748, 120, 58, 1.2], [1978, 320, 50, 2.6],
+    // little ones beside the name
+    [470, 330, 40, 1.0], [1578, 330, 40, 0.5],
   ];
-  blooms.forEach(([x, y, r, rot], i) => flower(x, y, r, rot, i % 3 === 2 ? '#f9e27d' : '#f7931e', i % 3 === 2 ? '#f7931e' : '#f9e27d'));
+  blooms.forEach(([x, y, r, rot], i) => paintFlower(ctx, x, y, r, rot, PETAL[i % 3], CORE[i % 3]));
 
   // logo
   const groovy = getComputedStyle(document.documentElement).getPropertyValue('--font-shrikhand').trim() || 'Georgia';
@@ -59,14 +85,11 @@ function decalTexture() {
   ctx.lineJoin = 'round';
   ctx.lineWidth = 28;
   ctx.strokeStyle = '#140a26';
-  ctx.strokeText('HenaWeb', 1024, 320);
+  ctx.strokeText('HenaWeb', 1024, 300);
   ctx.fillStyle = '#f7931e';
-  ctx.fillText('HenaWeb', 1024, 320);
+  ctx.fillText('HenaWeb', 1024, 300);
 
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 4;
-  return tex;
+  return canvasTexture(c);
 }
 
 export function createChaseScene(canvas: HTMLCanvasElement, { reducedMotion }: { reducedMotion: boolean }): ChaseScene {
@@ -213,6 +236,22 @@ export function createChaseScene(canvas: HTMLCanvasElement, { reducedMotion }: {
     if (side === -1) decal.rotation.y = Math.PI;
     vanBody.add(decal);
   }
+
+  // flower stickers: two on the nose under the headlights, a cluster on the tail
+  const stickerMat = track(new THREE.MeshBasicMaterial({ map: track(flowerTexture()), transparent: true, side: THREE.DoubleSide }));
+  const stickerGeo = track(new THREE.PlaneGeometry(1, 1));
+  const sticker = (x: number, y: number, z: number, size: number, rotY: number, spin: number) => {
+    const m = new THREE.Mesh(stickerGeo, stickerMat);
+    m.position.set(x, y, z);
+    m.rotation.set(0, rotY, spin);
+    m.scale.setScalar(size);
+    vanBody.add(m);
+  };
+  sticker(2.215, 0.86, 0.72, 0.34, Math.PI / 2, 0.3);
+  sticker(2.215, 0.86, -0.72, 0.34, Math.PI / 2, 1.1);
+  sticker(-2.215, 1.25, 0.0, 0.62, -Math.PI / 2, 0.6);
+  sticker(-2.215, 1.02, 0.55, 0.3, -Math.PI / 2, 1.9);
+  sticker(-2.215, 1.5, -0.52, 0.34, -Math.PI / 2, 2.4);
 
   // round headlights + beam
   for (const z of [0.68, -0.68]) {

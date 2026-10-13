@@ -324,13 +324,14 @@ export const homeFaq = [
   },
 ];
 
-export const clients: { name: string; sector: string; group: 'public' | 'private' }[] = [
-  { name: 'Estado do Paraná', sector: 'Governo estadual', group: 'public' },
-  { name: 'Secretaria do Estado do Paraná', sector: 'Governo estadual', group: 'public' },
-  { name: 'Governo de São Paulo', sector: 'Governo estadual', group: 'public' },
-  { name: 'Neodent', sector: 'Saúde', group: 'private' },
-  { name: 'The Coffee', sector: 'Cafeterias', group: 'private' },
-  { name: "Habib's", sector: 'Alimentação', group: 'private' },
-  { name: 'Condor', sector: 'Supermercados', group: 'private' },
-  { name: 'Assaí Atacadista', sector: 'Atacado', group: 'private' },
+/** Client wall. Logos come from Wikimedia Commons and the clients' own sites; Neodent awaits the official file. */
+export const clients: { name: string; group: 'public' | 'private'; logo?: string; scale?: number }[] = [
+  { name: 'Estado do Paraná', group: 'public', logo: '/clients/brasao-parana.svg', scale: 1.15 },
+  { name: 'Secretaria do Estado do Paraná', group: 'public', logo: '/clients/governo-parana.webp' },
+  { name: 'Governo de São Paulo', group: 'public', logo: '/clients/governo-sp.svg' },
+  { name: 'Neodent', group: 'private' },
+  { name: 'The Coffee', group: 'private', logo: '/clients/the-coffee.svg', scale: 0.9 },
+  { name: "Habib's", group: 'private', logo: '/clients/habibs.svg', scale: 0.85 },
+  { name: 'Condor', group: 'private', logo: '/clients/condor.png' },
+  { name: 'Assaí Atacadista', group: 'private', logo: '/clients/assai.svg', scale: 1.05 },
 ];
