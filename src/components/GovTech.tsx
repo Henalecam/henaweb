@@ -32,8 +32,10 @@ export default function GovTech() {
       const tl = gsap.timeline({
         scrollTrigger: { trigger: '[data-panel]', start: 'top 70%', end: 'bottom 55%', scrub: 0.6 },
       });
-      tl.fromTo('[data-rail]', { scaleY: 0 }, { scaleY: 1, ease: 'none', duration: steps.length }, 0);
       steps.forEach((s, i) => {
+        // each segment fills from this dot to the next one
+        const seg = s.querySelector('[data-seg]');
+        if (seg) tl.fromTo(seg, { scaleY: 0 }, { scaleY: 1, ease: 'none', duration: 0.8 }, i + 0.2);
         tl.to(s.querySelector('[data-dot]'), { backgroundColor: '#a6d64b', borderColor: '#a6d64b', duration: 0.2 }, i)
           .to(s, { opacity: 1, duration: 0.2 }, i)
           .to(s.querySelector('[data-status]'), { opacity: 1, duration: 0.2 }, i)
@@ -115,17 +117,18 @@ export default function GovTech() {
             </div>
 
             <div className="grid md:grid-cols-[1.1fr_1fr]">
-              <ol className="relative p-6 md:p-8">
-                <span className="absolute top-10 bottom-10 left-[2.15rem] w-px bg-line md:left-[2.65rem]" />
-                <span
-                  data-rail
-                  className="absolute top-10 bottom-10 left-[2.15rem] w-px origin-top bg-mint md:left-[2.65rem]"
-                />
+              <ol className="p-6 md:p-8">
                 {govFlow.map((step, i) => (
                   <li key={step} data-step className="relative flex items-center gap-5 py-3.5 opacity-35">
+                    {/* rail segment anchored to this dot's center, reaching the next dot's center */}
+                    {i < govFlow.length - 1 && (
+                      <span aria-hidden className="absolute top-1/2 left-[6px] h-full w-[2px] bg-ink/15">
+                        <span data-seg className="block h-full w-full origin-top scale-y-0 bg-mint" />
+                      </span>
+                    )}
                     <span
                       data-dot
-                      className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border border-ink/30 bg-bg-2"
+                      className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 border-ink/30 bg-bg-2"
                     />
                     <span className="flex-1 text-lg tracking-tight">{step}</span>
                     <span data-status className="font-mono text-[0.65rem] text-mint uppercase opacity-0">

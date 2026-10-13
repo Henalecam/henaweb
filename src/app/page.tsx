@@ -3,6 +3,7 @@ import Hero from '@/components/Hero';
 import Marquee from '@/components/Marquee';
 import Manifesto from '@/components/Manifesto';
 import Capabilities from '@/components/Capabilities';
+import Clients from '@/components/Clients';
 import Mystery from '@/components/Mystery';
 import GovTech from '@/components/GovTech';
 import Work from '@/components/Work';
@@ -80,6 +81,7 @@ export default function Home() {
           </div>
           <Manifesto />
         </DavidStage>
+        <Clients />
         <Capabilities />
         <Mystery />
         <GovTech />

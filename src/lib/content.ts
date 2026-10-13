@@ -1,5 +1,6 @@
 export const site = {
   name: 'HenaWeb',
+  legalName: 'Henaweb Ltda',
   url: 'https://henaweb.com',
   city: 'Curitiba, PR',
   coords: '25.4284° S · 49.2733° W',
@@ -17,6 +18,7 @@ export const whatsappLink = (text = 'Olá! Quero conversar sobre um projeto com 
   `https://api.whatsapp.com/send?phone=${site.whatsapp}&text=${encodeURIComponent(text)}`;
 
 export const nav = [
+  { label: 'Clientes', href: '/#clientes' },
   { label: 'Capacidades', href: '/#capacidades' },
   { label: 'Setor público', href: '/#govtech' },
   { label: 'Projetos', href: '/#projetos' },
@@ -320,4 +322,15 @@ export const homeFaq = [
     q: 'Vocês fazem sistemas para prefeituras e órgãos públicos?',
     a: 'Sim. Desenvolvemos workflows de aprovação, gestão de verbas e editais e painéis de transparência, com trilha de auditoria, LGPD e acessibilidade eMAG e WCAG.',
   },
+];
+
+export const clients: { name: string; sector: string; group: 'public' | 'private' }[] = [
+  { name: 'Estado do Paraná', sector: 'Governo estadual', group: 'public' },
+  { name: 'Secretaria do Estado do Paraná', sector: 'Governo estadual', group: 'public' },
+  { name: 'Governo de São Paulo', sector: 'Governo estadual', group: 'public' },
+  { name: 'Neodent', sector: 'Saúde', group: 'private' },
+  { name: 'The Coffee', sector: 'Cafeterias', group: 'private' },
+  { name: "Habib's", sector: 'Alimentação', group: 'private' },
+  { name: 'Condor', sector: 'Supermercados', group: 'private' },
+  { name: 'Assaí Atacadista', sector: 'Atacado', group: 'private' },
 ];

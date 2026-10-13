@@ -11,42 +11,58 @@ export type ChaseScene = { dispose: () => void };
 
 const ROAD_LEN = 60;
 
+/** Side livery: groovy 70s flowers scattered along the panel and the logo. */
 function decalTexture() {
   const c = document.createElement('canvas');
-  c.width = 1024;
-  c.height = 256;
+  c.width = 2048;
+  c.height = 640;
   const ctx = c.getContext('2d')!;
   ctx.clearRect(0, 0, c.width, c.height);
-  // 70s starburst
-  ctx.save();
-  ctx.translate(150, 128);
-  ctx.beginPath();
-  for (let i = 0; i < 28; i++) {
-    const r = i % 2 ? 46 : 104;
-    const a = (Math.PI * i) / 14 - Math.PI / 2;
-    ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
-  }
-  ctx.closePath();
-  ctx.fillStyle = '#f7931e';
-  ctx.fill();
-  ctx.lineWidth = 12;
-  ctx.strokeStyle = '#140a26';
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(0, 0, 30, 0, Math.PI * 2);
-  ctx.fillStyle = '#f9e27d';
-  ctx.fill();
-  ctx.stroke();
-  ctx.restore();
+
+  const flower = (x: number, y: number, r: number, rot: number, petal: string, core: string) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    ctx.lineWidth = Math.max(6, r * 0.12);
+    ctx.strokeStyle = '#140a26';
+    for (let i = 0; i < 5; i++) {
+      ctx.save();
+      ctx.rotate((i * Math.PI * 2) / 5);
+      ctx.beginPath();
+      ctx.ellipse(0, -r * 0.62, r * 0.42, r * 0.62, 0, 0, Math.PI * 2);
+      ctx.fillStyle = petal;
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.36, 0, Math.PI * 2);
+    ctx.fillStyle = core;
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  };
+
+  // flowers blooming up from the lower edge, a few climbing higher
+  const blooms: [number, number, number, number][] = [
+    [120, 470, 120, 0.2], [330, 540, 80, 1.1], [520, 430, 140, 0.6], [760, 560, 70, 2.0],
+    [1290, 545, 75, 0.9], [1480, 440, 130, 1.7], [1700, 540, 85, 0.3], [1900, 455, 115, 1.2],
+    [980, 150, 60, 0.4], [1660, 160, 70, 1.4], [260, 170, 55, 2.2],
+  ];
+  blooms.forEach(([x, y, r, rot], i) => flower(x, y, r, rot, i % 3 === 2 ? '#f9e27d' : '#f7931e', i % 3 === 2 ? '#f7931e' : '#f9e27d'));
+
   // logo
   const groovy = getComputedStyle(document.documentElement).getPropertyValue('--font-shrikhand').trim() || 'Georgia';
-  ctx.font = `120px ${groovy}, Georgia, serif`;
+  ctx.font = `230px ${groovy}, Georgia, serif`;
+  ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.lineWidth = 14;
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 28;
   ctx.strokeStyle = '#140a26';
-  ctx.strokeText('HenaWeb', 300, 132);
+  ctx.strokeText('HenaWeb', 1024, 320);
   ctx.fillStyle = '#f7931e';
-  ctx.fillText('HenaWeb', 300, 132);
+  ctx.fillText('HenaWeb', 1024, 320);
+
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 4;
@@ -106,29 +122,54 @@ export function createChaseScene(canvas: HTMLCanvasElement, { reducedMotion }: {
   rail.position.set(0, 0.7, -3.7);
   scene.add(rail);
 
-  // ── van ────────────────────────────────────────────────
+  // ── van: classic 60s/70s split-window bus ───────────
   const van = new THREE.Group();
   const vanBody = new THREE.Group();
   van.add(vanBody);
-  const lower = inked(new RoundedBoxGeometry(4.2, 0.9, 2.0, 4, 0.22), 0xa6d64b);
-  lower.position.y = 0.95;
+  const lower = inked(new RoundedBoxGeometry(4.4, 1.1, 2.0, 5, 0.3), 0xa6d64b);
+  lower.position.y = 1.08;
   vanBody.add(lower);
-  const upper = inked(new RoundedBoxGeometry(3.7, 1.15, 1.94, 4, 0.35), 0x3cc6b4);
-  upper.position.set(-0.22, 1.95, 0);
+  const upper = inked(new RoundedBoxGeometry(4.34, 1.4, 1.96, 5, 0.42), 0x3cc6b4);
+  upper.position.y = 2.2;
   vanBody.add(upper);
-  const hood = inked(new RoundedBoxGeometry(0.9, 0.6, 1.94, 4, 0.25), 0x3cc6b4);
-  hood.position.set(1.7, 1.55, 0);
-  hood.rotation.z = -0.35;
-  vanBody.add(hood);
-  const stripe = new THREE.Mesh(track(new THREE.BoxGeometry(4.24, 0.12, 2.04)), toon(0xf9e27d));
-  stripe.position.y = 1.42;
-  vanBody.add(stripe);
-  const rack = inked(new THREE.BoxGeometry(2.4, 0.12, 1.5), 0x8b5cc7, 0.03);
-  rack.position.set(-0.3, 2.62, 0);
+  const belt = new THREE.Mesh(track(new RoundedBoxGeometry(4.46, 0.14, 2.06, 2, 0.06)), toon(0xf9e27d));
+  belt.position.y = 1.6;
+  vanBody.add(belt);
+  const rack = inked(new THREE.BoxGeometry(2.6, 0.1, 1.5), 0x8b5cc7, 0.03);
+  rack.position.set(-0.4, 3.0, 0);
   vanBody.add(rack);
+  for (const x of [-1.5, 0.7]) {
+    const leg = new THREE.Mesh(track(new THREE.BoxGeometry(0.08, 0.16, 1.5)), toon(0x8b5cc7));
+    leg.position.set(x, 2.92, 0);
+    vanBody.add(leg);
+  }
 
-  // windows with scared eyes
+  // split windshield on the flat nose
   const glass = toon(0x1e1442);
+  for (const z of [0.45, -0.45]) {
+    const pane = inked(new RoundedBoxGeometry(0.06, 0.62, 0.78, 2, 0.04), glass, 0.025);
+    pane.position.set(2.17, 2.3, z);
+    vanBody.add(pane);
+  }
+  // the V on the nose
+  const vShape = new THREE.Shape();
+  vShape.moveTo(-0.95, 0.42);
+  vShape.lineTo(0, -0.38);
+  vShape.lineTo(0.95, 0.42);
+  vShape.lineTo(0.62, 0.42);
+  vShape.lineTo(0, -0.08);
+  vShape.lineTo(-0.62, 0.42);
+  vShape.closePath();
+  const vPanel = new THREE.Mesh(track(new THREE.ShapeGeometry(vShape)), toon(0x3cc6b4, { side: THREE.DoubleSide }));
+  vPanel.rotation.y = Math.PI / 2;
+  vPanel.position.set(2.21, 1.28, 0);
+  vanBody.add(vPanel);
+  const badge = inked(new THREE.CylinderGeometry(0.16, 0.16, 0.05, 24), 0xfdf3e1, 0.02);
+  badge.rotation.z = Math.PI / 2;
+  badge.position.set(2.22, 1.6, 0);
+  vanBody.add(badge);
+
+  // side windows with scared eyes peeking out
   const eyeWhite = toon(0xffffff);
   const pupilMat = new THREE.MeshBasicMaterial({ color: 0x140a26 });
   track(pupilMat);
@@ -136,43 +177,52 @@ export function createChaseScene(canvas: HTMLCanvasElement, { reducedMotion }: {
   eyeGeo.scale(1, 1.25, 0.5);
   const pupilGeo = track(new THREE.SphereGeometry(0.045, 10, 8));
   const pupils: THREE.Mesh[] = [];
-  for (const x of [-1.35, -0.4, 0.6]) {
+  const windowXs = [-1.55, -0.75, 0.05, 0.85];
+  windowXs.forEach((x, wi) => {
     for (const side of [1, -1]) {
-      const win = new THREE.Mesh(track(new THREE.BoxGeometry(0.8, 0.6, 0.02)), glass);
-      win.position.set(x, 2.0, side * 0.98);
+      const win = inked(new RoundedBoxGeometry(0.66, 0.56, 0.04, 2, 0.08), glass, 0.025);
+      win.position.set(x, 2.3, side * 0.99);
       vanBody.add(win);
-      if (side === 1) {
+      if (side === 1 && wi !== 2) {
         for (const dx of [-0.11, 0.11]) {
           const e = new THREE.Mesh(eyeGeo, eyeWhite);
-          e.position.set(x + dx, 1.98, 1.0);
+          e.position.set(x + dx, 2.28, 1.03);
           vanBody.add(e);
           const p = new THREE.Mesh(pupilGeo, pupilMat);
-          p.position.set(x + dx - 0.03, 1.98, 1.06);
+          p.position.set(x + dx - 0.03, 2.28, 1.08);
           p.userData.baseX = x + dx - 0.03;
           vanBody.add(p);
           pupils.push(p);
         }
       }
     }
+  });
+  // cab door window
+  for (const side of [1, -1]) {
+    const cab = inked(new RoundedBoxGeometry(0.5, 0.56, 0.04, 2, 0.08), glass, 0.025);
+    cab.position.set(1.7, 2.3, side * 0.99);
+    vanBody.add(cab);
   }
-  const windshield = new THREE.Mesh(track(new THREE.BoxGeometry(0.02, 0.62, 1.6)), glass);
-  windshield.position.set(1.42, 2.0, 0);
-  windshield.rotation.z = -0.35;
-  vanBody.add(windshield);
 
-  // side decal
-  const decal = new THREE.Mesh(
-    track(new THREE.PlaneGeometry(2.6, 0.65)),
-    track(new THREE.MeshBasicMaterial({ map: track(decalTexture()), transparent: true })),
-  );
-  decal.position.set(-0.1, 0.95, 1.02);
-  vanBody.add(decal);
+  // flower livery on both sides
+  const liveryMat = track(new THREE.MeshBasicMaterial({ map: track(decalTexture()), transparent: true }));
+  const liveryGeo = track(new THREE.PlaneGeometry(4.0, 1.25));
+  for (const side of [1, -1]) {
+    const decal = new THREE.Mesh(liveryGeo, liveryMat);
+    decal.position.set(0, 1.12, side * 1.025);
+    if (side === -1) decal.rotation.y = Math.PI;
+    vanBody.add(decal);
+  }
 
-  // headlights + beam
-  for (const z of [0.6, -0.6]) {
-    const lamp = inked(new THREE.CylinderGeometry(0.16, 0.16, 0.08, 20), toon(0xfff4c0, { emissive: 0xf9e27d }), 0.025);
+  // round headlights + beam
+  for (const z of [0.68, -0.68]) {
+    const ring = inked(new THREE.CylinderGeometry(0.21, 0.21, 0.08, 24), 0xd8d2c4, 0.025);
+    ring.rotation.z = Math.PI / 2;
+    ring.position.set(2.2, 1.25, z);
+    vanBody.add(ring);
+    const lamp = new THREE.Mesh(track(new THREE.CylinderGeometry(0.15, 0.15, 0.1, 24)), toon(0xfff4c0, { emissive: 0xf9e27d }));
     lamp.rotation.z = Math.PI / 2;
-    lamp.position.set(2.12, 1.1, z);
+    lamp.position.set(2.23, 1.25, z);
     vanBody.add(lamp);
   }
   const beamMat = track(
@@ -180,23 +230,23 @@ export function createChaseScene(canvas: HTMLCanvasElement, { reducedMotion }: {
   );
   const beam = new THREE.Mesh(track(new THREE.ConeGeometry(1.4, 5, 24, 1, true)), beamMat);
   beam.rotation.z = Math.PI / 2;
-  beam.position.set(4.6, 0.9, 0);
+  beam.position.set(4.7, 1.0, 0);
   van.add(beam);
   const headlight = new THREE.SpotLight(0xf9e27d, 30, 12, 0.5, 0.6, 1.5);
-  headlight.position.set(2.2, 1.1, 0);
+  headlight.position.set(2.3, 1.25, 0);
   headlight.target.position.set(8, 0, 0);
   van.add(headlight, headlight.target);
 
-  // bumpers
-  for (const x of [2.15, -2.15]) {
-    const b = inked(new RoundedBoxGeometry(0.2, 0.22, 2.1, 2, 0.08), 0xd8d2c4, 0.03);
-    b.position.set(x, 0.55, 0);
+  // chrome bumpers
+  for (const x of [2.3, -2.3]) {
+    const b = inked(new RoundedBoxGeometry(0.16, 0.2, 2.16, 2, 0.07), 0xd8d2c4, 0.03);
+    b.position.set(x, 0.62, 0);
     vanBody.add(b);
   }
 
   // wheels
   const wheels: THREE.Group[] = [];
-  for (const x of [-1.35, 1.35]) {
+  for (const x of [-1.45, 1.45]) {
     for (const z of [1.0, -1.0]) {
       const w = new THREE.Group();
       const tire = inked(new THREE.CylinderGeometry(0.48, 0.48, 0.36, 28), 0x140a26, 0.03);
@@ -386,7 +436,7 @@ export function createChaseScene(canvas: HTMLCanvasElement, { reducedMotion }: {
 
     puffs.forEach((p) => {
       p.t = (p.t + dt * 1.4) % 1;
-      p.m.position.set(van.position.x - 2.3 - p.t * 3, 0.45 + p.t * 0.7, 0.2 + Math.sin(p.t * 9) * 0.2);
+      p.m.position.set(van.position.x - 2.5 - p.t * 3, 0.45 + p.t * 0.7, 0.2 + Math.sin(p.t * 9) * 0.2);
       p.m.scale.setScalar(0.5 + p.t * 1.4);
       ((p.m.children[0] as THREE.Mesh).material as THREE.MeshToonMaterial).opacity = 1 - p.t;
       p.m.children[1].visible = p.t < 0.6;

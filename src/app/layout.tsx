@@ -73,11 +73,12 @@ const jsonLd = {
       '@type': 'Organization',
       '@id': `${site.url}/#organization`,
       name: 'HenaWeb',
+      legalName: 'Henaweb Ltda',
       url: site.url,
       logo: `${site.url}/icon.png`,
       email: site.email,
       sameAs,
-      founder: { '@type': 'Person', name: 'Henrique Alexandre de Camargo' },
+      founder: { '@type': 'Person', name: 'Henrique Alexandre de Camargo', jobTitle: 'Cientista da computação' },
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'sales',

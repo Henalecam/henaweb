@@ -61,7 +61,7 @@ export default function Studio() {
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,transparent_1.1px,rgb(18_8_42/0.85)_1.9px)] bg-[length:6px_6px] transition-opacity duration-700 group-hover:opacity-0" />
             </div>
             <figcaption className="mt-3 text-center text-acid-ink">
-              <span className="font-groovy block text-lg text-[#c2410c]">Fundador</span>
+              <span className="font-groovy block text-lg text-[#c2410c]">Fundador · Cientista da computação</span>
               <span className="serif block text-xl">Henrique Alexandre de Camargo</span>
             </figcaption>
           </figure>

@@ -255,6 +255,7 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
   const resize = () => {
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
+    if (!w || !h) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     // keep the whole stack in frame on narrow screens
@@ -264,7 +265,9 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
     camera.updateProjectionMatrix();
   };
   resize();
-  window.addEventListener('resize', resize);
+  // the sticky stage changes size with the mobile address bar, not only on window resize
+  const ro = new ResizeObserver(resize);
+  ro.observe(canvas);
 
   const mouse = { x: 0, tx: 0 };
   const onMove = (e: PointerEvent) => {
@@ -303,7 +306,7 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
     dispose: () => {
       cancelAnimationFrame(raf);
       io.disconnect();
-      window.removeEventListener('resize', resize);
+      ro.disconnect();
       window.removeEventListener('pointermove', onMove);
       disposables.forEach((d) => d.dispose());
       renderer.dispose();

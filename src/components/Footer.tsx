@@ -76,7 +76,7 @@ export default function Footer() {
       </div>
 
       <div className="label relative z-10 mt-2 flex flex-wrap justify-between gap-4 border-t border-line pt-6">
-        <span>© {new Date().getFullYear()} HenaWeb Studio</span>
+        <span>© {new Date().getFullYear()} Henaweb Ltda</span>
         <span>
           {site.city} · <Clock />
         </span>

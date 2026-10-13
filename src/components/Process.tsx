@@ -87,6 +87,23 @@ export default function Process() {
   const root = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const scene = useRef<BurgerScene | null>(null);
+  // scroll triggers can fire before the lazy 3D scene exists; they live here so the scene can catch up
+  const layerTriggers = useRef<ScrollTrigger[]>([]);
+  const versionTrigger = useRef<ScrollTrigger | null>(null);
+
+  const versionAt = (p: number) => versions[Math.min(versions.length - 1, Math.floor(p * versions.length))];
+
+  /** Bring the scene in line with wherever the reader already is on the page. */
+  const syncScene = () => {
+    const sc = scene.current;
+    if (!sc) return;
+    if (prefersReducedMotion()) {
+      [0, 1, 2, 3].forEach((i) => sc.setLayer(i, 1));
+      return;
+    }
+    layerTriggers.current.forEach((t, i) => sc.setLayer(i, t.progress));
+    if (versionTrigger.current) sc.setVersion(versionAt(versionTrigger.current.progress));
+  };
 
   // the 3D burger loads lazily, only when the section gets close
   useEffect(() => {
@@ -101,8 +118,8 @@ export default function Process() {
           if (cancelled) return;
           try {
             scene.current = createBurgerScene(el, { reducedMotion: prefersReducedMotion() });
-            if (prefersReducedMotion()) [0, 1, 2, 3].forEach((i) => scene.current?.setLayer(i, 1));
             ScrollTrigger.refresh();
+            syncScene();
           } catch {
             // no WebGL: the menu still tells the story
           }
@@ -141,14 +158,16 @@ export default function Process() {
             },
           );
 
+          layerTriggers.current = [];
           gsap.utils.toArray<HTMLElement>('[data-step]').forEach((step, i) => {
-            ScrollTrigger.create({
+            layerTriggers.current[i] = ScrollTrigger.create({
               trigger: step,
               start: 'top 80%',
               end: 'top 42%',
+              // progress is read straight from the trigger, so fast scrolls and reloads land on the right frame
               onUpdate: (self) => scene.current?.setLayer(i, self.progress),
-              onLeave: () => scene.current?.setLayer(i, 1),
-              onLeaveBack: () => scene.current?.setLayer(i, 0),
+              onToggle: (self) => scene.current?.setLayer(i, self.progress),
+              onRefresh: (self) => scene.current?.setLayer(i, self.progress),
             });
             const burst = root.current?.querySelector(`[data-burst="${i}"]`) ?? [];
             ScrollTrigger.create({
@@ -176,7 +195,7 @@ export default function Process() {
 
           const steps = root.current?.querySelectorAll('[data-step]');
           const last = steps?.[steps.length - 1];
-          ScrollTrigger.create({
+          versionTrigger.current = ScrollTrigger.create({
             trigger: last,
             start: 'top 35%',
             end: 'bottom 15%',
@@ -188,7 +207,7 @@ export default function Process() {
               gsap.to('[data-steam]', { opacity: 0, duration: 0.4 });
               finale.pause(0);
             },
-            onUpdate: (self) => scene.current?.setVersion(versions[Math.min(versions.length - 1, Math.floor(self.progress * versions.length))]),
+            onUpdate: (self) => scene.current?.setVersion(versionAt(self.progress)),
           });
           gsap.to('[data-steam] path', { y: -10, opacity: 0.4, duration: 1.4, repeat: -1, yoyo: true, stagger: 0.3, ease: 'sine.inOut' });
 
