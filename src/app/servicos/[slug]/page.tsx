@@ -1,0 +1,211 @@
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { services, serviceBySlug } from '@/lib/services';
+import { site, whatsappLink } from '@/lib/content';
+import Footer from '@/components/Footer';
+
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return services.map((s) => ({ slug: s.slug }));
+}
+
+export async function generateMetadata({ params }: PageProps<'/servicos/[slug]'>): Promise<Metadata> {
+  const { slug } = await params;
+  const s = serviceBySlug(slug);
+  if (!s) return {};
+  const path = `/servicos/${s.slug}`;
+  return {
+    title: s.seoTitle,
+    description: s.seoDescription,
+    keywords: s.keywords,
+    alternates: { canonical: path },
+    openGraph: {
+      type: 'website',
+      url: path,
+      title: `${s.seoTitle} · HenaWeb`,
+      description: s.seoDescription,
+      locale: 'pt_BR',
+      siteName: 'HenaWeb',
+      images: ['/opengraph-image'],
+    },
+    twitter: { card: 'summary_large_image', title: `${s.seoTitle} · HenaWeb`, description: s.seoDescription, images: ['/opengraph-image'] },
+  };
+}
+
+export default async function ServicePage({ params }: PageProps<'/servicos/[slug]'>) {
+  const { slug } = await params;
+  const s = serviceBySlug(slug);
+  if (!s) notFound();
+  const url = `${site.url}/servicos/${s.slug}`;
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Service',
+        '@id': `${url}#service`,
+        name: s.name,
+        serviceType: s.seoTitle,
+        description: s.seoDescription,
+        url,
+        provider: { '@id': `${site.url}/#organization` },
+        areaServed: { '@type': 'Country', name: 'Brasil' },
+        availableChannel: { '@type': 'ServiceChannel', serviceUrl: `${site.url}/#contato`, availableLanguage: 'pt-BR' },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Início', item: site.url },
+          { '@type': 'ListItem', position: 2, name: 'Serviços', item: `${site.url}/#capacidades` },
+          { '@type': 'ListItem', position: 3, name: s.name, item: url },
+        ],
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: s.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+      },
+    ],
+  };
+
+  const others = services.filter((o) => o.slug !== s.slug);
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <main className="sky min-h-screen text-ink">
+        <article className="gutter mx-auto max-w-6xl pt-36 pb-24">
+          <nav aria-label="Trilha" className="label">
+            <ol className="flex flex-wrap gap-2">
+              <li>
+                <a href="/" className="hover:text-ink">Início</a>
+              </li>
+              <li aria-hidden>·</li>
+              <li>
+                <a href="/#capacidades" className="hover:text-ink">Serviços</a>
+              </li>
+              <li aria-hidden>·</li>
+              <li aria-current="page" className="text-ink">{s.name}</li>
+            </ol>
+          </nav>
+
+          <h1 className="mt-8 max-w-4xl text-[clamp(2.6rem,6.5vw,6rem)] leading-[0.92] font-medium tracking-[-0.05em]">
+            {s.h1}{' '}
+            <span className="font-groovy text-[0.85em] tracking-normal text-acid [text-shadow:4px_4px_0_#140a26]">{s.h1Accent}</span>
+          </h1>
+          <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink/75 md:text-xl">{s.intro}</p>
+          <div className="mt-10 flex flex-wrap gap-3">
+            <a href="/#contato" className="toon toon-press rounded-full bg-acid px-6 py-4 font-medium text-acid-ink">
+              Abrir um caso →
+            </a>
+            <a
+              href={whatsappLink(`Olá! Quero conversar sobre ${s.name.toLowerCase()} com a HenaWeb.`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="toon toon-press rounded-full bg-cyan px-6 py-4 font-medium text-acid-ink"
+            >
+              WhatsApp
+            </a>
+          </div>
+
+          <section className="mt-24" aria-labelledby="sintomas">
+            <h2 id="sintomas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-groovy [text-shadow:3px_3px_0_#140a26]">
+              Sintomas que resolvemos
+            </h2>
+            <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+              {s.problems.map((p) => (
+                <li key={p} className="toon-sm rounded-xl bg-paper p-5 text-acid-ink">
+                  <span className="mr-2 text-[#c2410c]">✦</span>
+                  {p}
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="mt-24" aria-labelledby="entregas">
+            <h2 id="entregas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-teal [text-shadow:3px_3px_0_#140a26]">
+              O que você recebe
+            </h2>
+            <ol className="mt-8 grid gap-5 md:grid-cols-2">
+              {s.deliverables.map((d, i) => (
+                <li key={d.title} className="win flex flex-col">
+                  <div className="win-bar">
+                    <span>etapa_{String(i + 1).padStart(2, '0')}.txt</span>
+                  </div>
+                  <div className="m-1.5 flex-1 border-2 border-[#7d7394] bg-paper p-6 text-acid-ink">
+                    <h3 className="text-2xl font-medium tracking-tight">{d.title}</h3>
+                    <p className="mt-2 leading-relaxed text-acid-ink/75">{d.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <section className="mt-24" aria-labelledby="exemplos">
+            <h2 id="exemplos" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-acid [text-shadow:3px_3px_0_#140a26]">
+              Exemplos
+            </h2>
+            <ul className="mt-8 grid gap-4 md:grid-cols-3">
+              {s.examples.map((e) => (
+                <li key={e.name} className="toon-sm rounded-xl bg-bg-2/80 p-5">
+                  <h3 className="text-xl font-medium tracking-tight">
+                    {e.href ? (
+                      <a href={e.href} target="_blank" rel="noopener noreferrer" className="hover:text-acid">
+                        {e.name} ↗
+                      </a>
+                    ) : (
+                      e.name
+                    )}
+                  </h3>
+                  <p className="mt-2 leading-relaxed text-ink/70">{e.note}</p>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 flex flex-wrap gap-2">
+              {s.stack.map((t) => (
+                <span key={t} className="rounded-full border-2 border-ink/25 px-3 py-0.5 font-mono text-xs text-ink/75 uppercase">
+                  {t}
+                </span>
+              ))}
+            </p>
+          </section>
+
+          <section className="mt-24" aria-labelledby="perguntas">
+            <h2 id="perguntas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-groovy [text-shadow:3px_3px_0_#140a26]">
+              Perguntas frequentes
+            </h2>
+            <div className="mt-8 flex flex-col gap-3">
+              {s.faq.map((f) => (
+                <details key={f.q} className="toon-sm group rounded-xl bg-paper p-5 text-acid-ink">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium">
+                    {f.q}
+                    <span className="text-2xl transition-transform group-open:rotate-45" aria-hidden>
+                      +
+                    </span>
+                  </summary>
+                  <p className="mt-3 leading-relaxed text-acid-ink/75">{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-24" aria-labelledby="outros">
+            <h2 id="outros" className="label">
+              Outras capacidades
+            </h2>
+            <ul className="mt-4 flex flex-wrap gap-3">
+              {others.map((o) => (
+                <li key={o.slug}>
+                  <a href={`/servicos/${o.slug}`} className="toon-sm toon-press inline-block rounded-full bg-lemon px-4 py-2 text-acid-ink">
+                    {o.name} →
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </article>
+      </main>
+      <Footer />
+    </>
+  );
+}

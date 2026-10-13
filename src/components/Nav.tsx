@@ -1,0 +1,112 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { nav } from '@/lib/content';
+import { gsap, onReady } from '@/lib/gsap';
+import Magnetic from './Magnetic';
+import Social from './Social';
+
+export default function Nav() {
+  const inner = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    let last = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setHidden(y > 200 && y > last);
+      setScrolled(y > 40);
+      last = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    const off = onReady(() =>
+      gsap.from(inner.current, { yPercent: -120, duration: 1.1, ease: 'expo.out', delay: 0.5 }),
+    );
+    return () => {
+      off();
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.style.overflow = open ? 'hidden' : '';
+  }, [open]);
+
+  return (
+    <>
+      <header
+        className={`gutter fixed inset-x-0 top-0 z-50 transition-transform duration-500 ease-[var(--ease-out-expo)] ${
+          hidden && !open ? '-translate-y-full' : ''
+        }`}
+      >
+        <div
+          className={`pointer-events-none absolute inset-0 -z-10 border-b transition-[background-color,border-color,backdrop-filter] duration-500 ${
+            scrolled ? 'border-line bg-bg/75 backdrop-blur-xl' : 'border-transparent bg-transparent'
+          }`}
+        />
+        <div ref={inner} className="flex h-20 items-center justify-between">
+          <a href="/#topo" className="font-groovy flex items-baseline gap-1 text-2xl text-acid [text-shadow:3px_3px_0_#120626]" aria-label="HenaWeb, início">
+            HenaWeb<span className="text-[0.6rem] align-super">®</span>
+          </a>
+          <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
+            {nav.map((item) => (
+              <a key={item.href} href={item.href} className="group relative text-sm text-ink">
+                {item.label}
+                <span className="absolute -bottom-1 left-0 h-px w-full origin-right scale-x-0 bg-current transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:origin-left group-hover:scale-x-100" />
+              </a>
+            ))}
+          </nav>
+          <div className="hidden md:block">
+            <Magnetic>
+              <a
+                href="/#contato"
+                className="toon-sm toon-press flex items-center gap-2 rounded-full bg-acid px-5 py-2.5 text-sm font-medium text-acid-ink"
+              >
+                <span className="h-1.5 w-1.5 animate-[blink_1.4s_infinite] rounded-full bg-acid-ink" />
+                Iniciar projeto
+              </a>
+            </Magnetic>
+          </div>
+          <button
+            type="button"
+            className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden"
+            aria-expanded={open}
+            aria-controls="menu-mobile"
+            aria-label={open ? 'Fechar menu' : 'Abrir menu'}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span className={`h-px w-6 bg-ink transition-transform duration-300 ${open ? 'translate-y-[3.5px] rotate-45' : ''}`} />
+            <span className={`h-px w-6 bg-ink transition-transform duration-300 ${open ? '-translate-y-[3.5px] -rotate-45' : ''}`} />
+          </button>
+        </div>
+      </header>
+
+      <div
+        id="menu-mobile"
+        className={`gutter fixed inset-0 z-40 flex flex-col justify-end bg-bg pb-10 transition-[clip-path] duration-700 ease-[var(--ease-out-expo)] md:hidden ${
+          open ? '[clip-path:inset(0_0_0_0)]' : 'pointer-events-none [clip-path:inset(0_0_100%_0)]'
+        }`}
+      >
+        <nav className="flex flex-col gap-2" aria-label="Menu mobile">
+          {[...nav, { label: 'Contato', href: '/#contato' }].map((item, i) => (
+            <a
+              key={item.href}
+              href={item.href}
+              onClick={() => setOpen(false)}
+              className="flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight"
+            >
+              <span className="label">0{i + 1}</span>
+              {item.label}
+            </a>
+          ))}
+        </nav>
+        <div className="mt-8 flex items-center justify-between">
+          <span className="label">@henaweb</span>
+          <Social />
+        </div>
+      </div>
+    </>
+  );
+}
