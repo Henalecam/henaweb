@@ -40,7 +40,7 @@ export default function CasesIndex() {
             {projects.map((p, i) => (
               <li key={p.slug}>
                 <a href={`/casos/${p.slug}`} className="group block">
-                  <div className="win">
+                  <div className="win transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:-translate-y-1.5 group-hover:-rotate-[0.6deg] group-focus-visible:-translate-y-1.5">
                     <div className="win-bar">
                       <span className="truncate">caso_{String(i + 1).padStart(2, '0')}.exe</span>
                     </div>
@@ -51,7 +51,12 @@ export default function CasesIndex() {
                           alt={`Tela de ${p.name}`}
                           fill
                           sizes="(max-width: 768px) 92vw, 540px"
-                          className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
+                          className={`object-cover object-top ${
+                            // long pages scroll by slowly on hover, like browsing the real site
+                            p.shot.height > 1200
+                              ? 'transition-[object-position] duration-[6000ms] ease-linear group-hover:object-bottom'
+                              : 'transition-transform duration-700 group-hover:scale-[1.03]'
+                          }`}
                         />
                       ) : (
                         p.mock && <MockUI variant={p.mock.variant} hue={p.mock.hue} />
