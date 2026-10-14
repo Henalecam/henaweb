@@ -63,9 +63,8 @@ export async function POST(request: Request) {
       .join('');
 
     const { data, error } = await resend.emails.send({
-      // onboarding@resend.dev only delivers to the Resend account owner;
-      // set CONTACT_FROM to an address on a domain verified in Resend.
-      from: process.env.CONTACT_FROM || 'HenaWeb <onboarding@resend.dev>',
+      // mail.henaweb.com is the domain verified in Resend; CONTACT_FROM can override it
+      from: process.env.CONTACT_FROM || 'HenaWeb <site@mail.henaweb.com>',
       to: [process.env.CONTACT_TO || site.email],
       replyTo,
       subject: `[${escape(subject)}] Novo briefing de ${escape(name)}`,

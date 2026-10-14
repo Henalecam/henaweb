@@ -32,7 +32,7 @@ npm run build && npm start
 | --- | --- |
 | `RESEND_API_KEY` | Envio do briefing por e-mail (sem ela a API responde 503) |
 | `CONTACT_TO` | Destino dos briefings (padrão: henrique@henaweb.com) |
-| `CONTACT_FROM` | Remetente, ex.: `HenaWeb <site@henaweb.com>` (domínio verificado no Resend). Sem ela usa `onboarding@resend.dev`, que só entrega para o dono da conta Resend |
+| `CONTACT_FROM` | Remetente (padrão: `HenaWeb <site@mail.henaweb.com>`, domínio verificado no Resend) |
 | `NEXT_PUBLIC_GA_ID` | Google Analytics (opcional) |
 | `NEXT_PUBLIC_CLARITY_ID` | Microsoft Clarity (opcional) |
 
