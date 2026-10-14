@@ -21,13 +21,12 @@ export async function generateMetadata({ params }: PageProps<'/casos/[slug]'>): 
   const title = `${p.name}: ${p.kind}`;
   const description = `${p.challenge} ${p.built}`;
   const path = `/casos/${p.slug}`;
-  const images = p.shot ? [p.shot.desktop] : ['/opengraph-image'];
   return {
     title,
     description,
     alternates: { canonical: path },
-    openGraph: { type: 'article', url: path, title: `${title} · HenaWeb`, description, locale: 'pt_BR', siteName: 'HenaWeb', images },
-    twitter: { card: 'summary_large_image', title: `${title} · HenaWeb`, description, images },
+    openGraph: { type: 'article', url: path, title: `${title} · HenaWeb`, description, locale: 'pt_BR', siteName: 'HenaWeb' },
+    twitter: { card: 'summary_large_image', title: `${title} · HenaWeb`, description },
   };
 }
 
