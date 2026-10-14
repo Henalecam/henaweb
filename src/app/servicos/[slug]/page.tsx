@@ -27,9 +27,8 @@ export async function generateMetadata({ params }: PageProps<'/servicos/[slug]'>
       description: s.seoDescription,
       locale: 'pt_BR',
       siteName: 'HenaWeb',
-      images: ['/opengraph-image'],
     },
-    twitter: { card: 'summary_large_image', title: `${s.seoTitle} · HenaWeb`, description: s.seoDescription, images: ['/opengraph-image'] },
+    twitter: { card: 'summary_large_image', title: `${s.seoTitle} · HenaWeb`, description: s.seoDescription },
   };
 }
 
