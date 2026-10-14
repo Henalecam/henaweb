@@ -9,6 +9,7 @@ import Preloader from '@/components/Preloader';
 import Cursor from '@/components/Cursor';
 import Nav from '@/components/Nav';
 import ConversionTracking from '@/components/ConversionTracking';
+import FloatingContact from '@/components/FloatingContact';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' });
@@ -139,6 +140,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Cursor />
         <Nav />
         <ConversionTracking />
+        <FloatingContact />
         {children}
         <div className="grain" aria-hidden />
 
