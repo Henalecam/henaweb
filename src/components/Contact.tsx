@@ -10,7 +10,15 @@ import Social from './Social';
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
 const field =
-  'w-full border-b-2 border-acid-ink/35 bg-transparent py-3 text-lg text-acid-ink placeholder:text-acid-ink/65 focus:border-acid-ink focus:outline-none';
+  'w-full border-b-2 border-acid-ink/35 bg-transparent py-3 text-lg text-acid-ink placeholder:text-acid-ink/65 focus:border-acid-ink focus:outline-none user-invalid:border-[#b3122b]';
+
+// browser validation bubbles in our own words (and always in Portuguese)
+const explain = (e: FormEvent<HTMLInputElement>) => {
+  const el = e.currentTarget;
+  if (el.validity.valueMissing) el.setCustomValidity(el.type === 'email' ? 'Precisamos do seu e-mail para responder o caso.' : 'Como podemos te chamar?');
+  else if (el.validity.typeMismatch) el.setCustomValidity('Esse e-mail parece incompleto. Confere pra gente?');
+};
+const clear = (e: FormEvent<HTMLInputElement>) => e.currentTarget.setCustomValidity('');
 
 export default function Contact() {
   const root = useRef<HTMLElement>(null);
@@ -265,8 +273,8 @@ export default function Contact() {
               <fieldset>
                 <legend className="label mb-2 !text-acid-ink/60">3 · Quem está investigando</legend>
                 <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
-                  <input name="name" required placeholder="Seu nome" autoComplete="name" className={field} aria-label="Nome" />
-                  <input name="email" type="email" required placeholder="E-mail" autoComplete="email" className={field} aria-label="E-mail" />
+                  <input name="name" required placeholder="Seu nome" autoComplete="name" className={field} aria-label="Nome" onInvalid={explain} onInput={clear} />
+                  <input name="email" type="email" required placeholder="E-mail" autoComplete="email" className={field} aria-label="E-mail" onInvalid={explain} onInput={clear} />
                   <input name="whatsapp" type="tel" inputMode="tel" placeholder="WhatsApp (opcional)" autoComplete="tel" className={field} aria-label="WhatsApp" />
                   <input name="org" placeholder="Empresa ou órgão (opcional)" autoComplete="organization" className={field} aria-label="Empresa ou órgão" />
                 </div>
