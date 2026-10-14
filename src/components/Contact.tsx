@@ -14,6 +14,7 @@ const field =
 
 export default function Contact() {
   const root = useRef<HTMLElement>(null);
+  const done = useRef<HTMLDivElement>(null);
   const [picked, setPicked] = useState<string[]>([]);
   const [timeline, setTimeline] = useState(timelines[1]);
   const [status, setStatus] = useState<Status>('idle');
@@ -140,6 +141,11 @@ export default function Contact() {
       });
       if (!res.ok) throw new Error();
       setStatus('sent');
+      // the form is replaced by the confirmation: bring it on screen and move focus there
+      requestAnimationFrame(() => {
+        done.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        done.current?.focus({ preventScroll: true });
+      });
       track({ name: 'lead', capability: capabilities.join(' + ') || undefined, timeline });
     } catch {
       setStatus('error');
@@ -179,11 +185,33 @@ export default function Contact() {
 
         <div className="lg:col-span-7">
           {status === 'sent' ? (
-            <div className="flex h-full flex-col justify-center rounded-2xl border-[3px] border-acid-ink bg-paper p-10 shadow-[6px_6px_0_#120626]">
-              <span className="font-groovy text-5xl text-[#c2410c]">Caso aberto!</span>
+            <div
+              ref={done}
+              tabIndex={-1}
+              role="status"
+              className="relative flex flex-col justify-center overflow-hidden rounded-2xl border-[3px] border-acid-ink bg-paper p-8 shadow-[6px_6px_0_#120626] outline-none md:p-10 lg:sticky lg:top-28"
+            >
+              {/* rubber stamp, like the diner order slip */}
+              <div
+                aria-hidden
+                className="stamp-in pointer-events-none absolute top-9 right-7 rounded-md border-4 border-[#d7263d] px-3 py-1 font-mono text-sm font-bold tracking-widest text-[#d7263d] opacity-85 md:text-base"
+              >
+                CASO ABERTO · {caseNo}
+              </div>
+              <span className="font-groovy mt-12 text-5xl text-[#c2410c]">Caso aberto!</span>
               <p className="mt-4 text-2xl font-medium tracking-tight">Recebemos a ficha nº {caseNo}.</p>
-              <p className="mt-3 text-lg text-acid-ink/70">Em breve entraremos em contato. Se preferir, fale agora pelo WhatsApp.</p>
-              <p className="mt-6 text-acid-ink/70">Quer levar o diagnóstico para o seu time? Guarde a ficha:</p>
+              <p className="mt-3 text-lg text-acid-ink/70">Em breve entraremos em contato. Se tiver pressa, chame agora:</p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <a
+                  href={whatsappLink(`Olá! Acabei de abrir o caso nº ${caseNo} pelo site.`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="toon-sm toon-press rounded-full bg-[#25d366] px-5 py-2.5 text-sm font-medium"
+                >
+                  Falar pelo WhatsApp
+                </a>
+              </div>
+              <p className="mt-8 text-acid-ink/70">Quer levar o diagnóstico para o seu time? Guarde a ficha:</p>
               <div>{saveButton}</div>
             </div>
           ) : (
