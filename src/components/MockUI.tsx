@@ -55,7 +55,7 @@ function body(variant: MockVariant) {
       );
     case 'raffle':
       return (
-        <div className="grid h-full grid-cols-10 content-start gap-[1.2%]">
+        <div className="grid h-full grid-cols-10 content-center gap-[1.2%]">
           {Array.from({ length: 60 }).map((_, i) => {
             const hit = [3, 14, 22, 27, 38, 41, 49, 55].includes(i);
             const sold = (i * 7) % 5 === 0;
