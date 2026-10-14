@@ -20,9 +20,17 @@ const escape = (v: unknown) =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 
+const EMAIL_RE = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
+
 export async function POST(request: Request) {
+  let body: Record<string, unknown>;
   try {
-    const body = await request.json();
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+
+  try {
     const { name, email, whatsapp, subject, timeline, org, message, company } = body ?? {};
 
     // Honeypot: bots fill the hidden field. Pretend success.
@@ -30,6 +38,11 @@ export async function POST(request: Request) {
 
     if (!name || !email || !subject || !message) {
       return NextResponse.json({ error: 'Name, email, subject and message are required' }, { status: 400 });
+    }
+
+    const replyTo = String(email).trim().slice(0, 254);
+    if (!EMAIL_RE.test(replyTo)) {
+      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
     }
 
     const resend = getResendClient();
@@ -50,16 +63,22 @@ export async function POST(request: Request) {
       .join('');
 
     const { data, error } = await resend.emails.send({
-      from: 'HenaWeb <onboarding@resend.dev>',
+      // onboarding@resend.dev only delivers to the Resend account owner;
+      // set CONTACT_FROM to an address on a domain verified in Resend.
+      from: process.env.CONTACT_FROM || 'HenaWeb <onboarding@resend.dev>',
       to: [process.env.CONTACT_TO || site.email],
-      replyTo: String(email),
+      replyTo,
       subject: `[${escape(subject)}] Novo briefing de ${escape(name)}`,
       html: `<h2>Novo briefing pelo site</h2>${rows}<p><strong>Mensagem:</strong></p><p>${escape(message).replace(/\n/g, '<br>')}</p>`,
     });
 
-    if (error) return NextResponse.json({ error }, { status: 400 });
-    return NextResponse.json({ data });
-  } catch {
+    if (error) {
+      console.error('[contact] resend error', error);
+      return NextResponse.json({ error: 'Email delivery failed' }, { status: 502 });
+    }
+    return NextResponse.json({ ok: true, id: data?.id });
+  } catch (err) {
+    console.error('[contact] unexpected error', err);
     return NextResponse.json({ error: 'Unexpected error' }, { status: 500 });
   }
 }

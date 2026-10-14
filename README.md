@@ -12,7 +12,7 @@ Site institucional da HenaWeb, studio de engenharia de software (sistemas sob me
 - **Tailwind CSS 4** (tokens em `src/app/globals.css`)
 - **GSAP 3** (ScrollTrigger + SplitText) e **Lenis** para scroll suave
 - **Three.js** — Davi de Michelangelo em meio-tom (`src/lib/davidScene.ts`): campo de fluxo + busto iluminado como mármore renderizados em baixa resolução e desenhados como pontos, com separação RGB e glitch. O olhar segue o cursor e a estátua acompanha o scroll do hero ao manifesto (`src/components/DavidStage.tsx`).
-- Modelo em `public/models/david.glb` (237 KB, meshopt; original de 4,8 MB sem texturas)
+- Modelo em `public/models/detective.glb` (442 KB, meshopt + quantização)
 - Seção **O Caso do Sistema Assombrado** (`src/components/Mystery.tsx`): homenagem original aos desenhos de mistério dos anos 70 — ilustração SVG própria, sem nomes, personagens ou marcas de terceiros.
 - **Processo como hambúrguer** (`src/components/Process.tsx`): cada etapa derruba uma camada no sanduíche ao rolar.
 - **Abra um caso** (`src/components/Contact.tsx`): sintomas → diagnóstico preliminar ao vivo, enviado junto com o briefing.
@@ -32,6 +32,7 @@ npm run build && npm start
 | --- | --- |
 | `RESEND_API_KEY` | Envio do briefing por e-mail (sem ela a API responde 503) |
 | `CONTACT_TO` | Destino dos briefings (padrão: henrique@henaweb.com) |
+| `CONTACT_FROM` | Remetente, ex.: `HenaWeb <site@henaweb.com>` (domínio verificado no Resend). Sem ela usa `onboarding@resend.dev`, que só entrega para o dono da conta Resend |
 | `NEXT_PUBLIC_GA_ID` | Google Analytics (opcional) |
 | `NEXT_PUBLIC_CLARITY_ID` | Microsoft Clarity (opcional) |
 
