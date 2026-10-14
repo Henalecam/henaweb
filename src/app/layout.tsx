@@ -11,6 +11,7 @@ import Nav from '@/components/Nav';
 import ConversionTracking from '@/components/ConversionTracking';
 import FloatingContact from '@/components/FloatingContact';
 import TabHaunt from '@/components/TabHaunt';
+import ScrollProgress from '@/components/ScrollProgress';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' });
@@ -149,6 +150,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ConversionTracking />
         <FloatingContact />
         <TabHaunt />
+        <ScrollProgress />
         {children}
         <div className="grain" aria-hidden />
 

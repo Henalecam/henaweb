@@ -289,3 +289,22 @@
 
 /* skip-link target: focusable for screen readers, no ring around the whole page */
 main:focus { outline: none; }
+
+/* scrollbar in the site palette */
+html {
+  scrollbar-color: #f7931e #140c2e;
+}
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  background: #140c2e;
+}
+::-webkit-scrollbar-thumb {
+  background: #f7931e;
+  border: 3px solid #140c2e;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f9e27d;
+}
