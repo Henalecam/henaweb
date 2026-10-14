@@ -133,10 +133,10 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
   const bunTex = paint(1024, 256, (ctx) => {
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, 1024, 256);
-    dots(ctx, 260, 1024, 256, 6, 22, 'rgba(160, 82, 28, 0.13)');
-    dots(ctx, 120, 1024, 256, 3, 8, 'rgba(120, 58, 18, 0.22)');
+    dots(ctx, 260, 1024, 256, 8, 26, 'rgba(160, 82, 28, 0.07)');
+    dots(ctx, 120, 1024, 256, 3, 7, 'rgba(120, 58, 18, 0.12)');
     dots(ctx, 380, 1024, 256, 1.2, 2.6, 'rgba(255, 252, 240, 0.9)');
-    ctx.strokeStyle = 'rgba(130, 64, 20, 0.25)';
+    ctx.strokeStyle = 'rgba(130, 64, 20, 0.14)';
     ctx.lineWidth = 1.6;
     for (let i = 0; i < 70; i++) {
       const x = trand() * 1024;
@@ -360,10 +360,10 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
     // drips: a thin neck that swells into a round drop, hanging from the draped edge
     for (const [ang, len] of [[0, 0.26], [Math.PI / 2, 0.18], [Math.PI, 0.3], [Math.PI * 1.5, 0.2]] as const) {
       const prof: [number, number][] = [
-        [0, 0.02], [0.13, 0.02], [0.1, -len * 0.3], [0.075, -len * 0.62], [0.1, -len * 0.82], [0.115, -len - 0.02],
-        [0.085, -len - 0.11], [0, -len - 0.14],
+        [0, 0.02], [0.13, 0.02], [0.105, -len * 0.25], [0.085, -len * 0.55], [0.095, -len * 0.78], [0.112, -len * 0.95],
+        [0.115, -len - 0.03], [0.1, -len - 0.09], [0.06, -len - 0.13], [0, -len - 0.145],
       ];
-      const drip = inked(new THREE.LatheGeometry(prof.map(([x, y]) => new THREE.Vector2(x, y)).reverse(), 18), 0xffc22e, 0.022);
+      const drip = inked(new THREE.LatheGeometry(prof.map(([x, y]) => new THREE.Vector2(x, y)).reverse(), 28), 0xffc22e, 0.022);
       drip.position.set(Math.cos(ang) * 1.99, -0.47, Math.sin(ang) * 1.99);
       cheese.add(drip);
       gleam(drip, 0.05, -len - 0.02, 0.07, 0.22, 0.1);
