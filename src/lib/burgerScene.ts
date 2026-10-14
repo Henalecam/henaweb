@@ -330,7 +330,7 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
   // III: melted cheese, double lettuce, tomatoes, pickles and onion rings
   {
     // cheese: a thick sheet that drapes over the patty edge
-    const cgeo = new THREE.BoxGeometry(3.0, 0.06, 3.0, 56, 1, 56);
+    const cgeo = new THREE.BoxGeometry(3.4, 0.06, 3.4, 64, 1, 64);
     cgeo.rotateY(Math.PI / 4);
     const cp = cgeo.getAttribute('position');
     for (let i = 0; i < cp.count; i++) {
@@ -339,27 +339,40 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
       const r = Math.hypot(x, z);
       let y = cp.getY(i) + Math.sin(x * 3.1) * Math.cos(z * 2.7) * 0.012;
       let f = 1;
-      if (r > 1.62) {
-        // drape over the edge, but stop short of the plate
-        const d = Math.min(r - 1.62, 0.32);
-        y -= d * d * 2.2 + d * 0.15;
-        f = 1 - d * 0.35;
+      if (r > 1.6) {
+        // follow the patty's rounded shoulder, then let the corners hang down its side
+        const d = r - 1.6;
+        let nr: number;
+        if (d < 0.37) {
+          nr = 1.6 + d;
+          y -= (d / 0.37) ** 2 * 0.27;
+        } else {
+          const h = Math.min(d - 0.37, 0.26);
+          nr = 1.97 + h * 0.06;
+          y -= 0.27 + h * 0.9;
+        }
+        f = nr / r;
       }
       cp.setXYZ(i, x * f, y, z * f);
     }
     cgeo.computeVertexNormals();
     const cheese = inked(cgeo, 0xffc22e, 0.03);
-    for (const [ang, len] of [[0.79, 0.55], [2.36, 0.4], [3.93, 0.6], [5.5, 0.45], [1.6, 0.3]] as const) {
-      const drip = inked(new THREE.CapsuleGeometry(0.11, len, 6, 12), 0xffc22e, 0.025);
-      drip.position.set(Math.cos(ang) * 1.86, -0.12 - len / 2, Math.sin(ang) * 1.86);
+    // drips: a thin neck that swells into a round drop, hanging from the draped edge
+    for (const [ang, len] of [[0, 0.26], [Math.PI / 2, 0.18], [Math.PI, 0.3], [Math.PI * 1.5, 0.2]] as const) {
+      const prof: [number, number][] = [
+        [0, 0.02], [0.13, 0.02], [0.1, -len * 0.3], [0.075, -len * 0.62], [0.1, -len * 0.82], [0.115, -len - 0.02],
+        [0.085, -len - 0.11], [0, -len - 0.14],
+      ];
+      const drip = inked(new THREE.LatheGeometry(prof.map(([x, y]) => new THREE.Vector2(x, y)).reverse(), 18), 0xffc22e, 0.022);
+      drip.position.set(Math.cos(ang) * 1.99, -0.47, Math.sin(ang) * 1.99);
       cheese.add(drip);
-      gleam(drip, 0.06, len * 0.15, 0.08, 0.35, 0.05);
+      gleam(drip, 0.05, -len - 0.02, 0.07, 0.22, 0.1);
     }
     gleam(cheese, -0.5, 0.06, 1.55, 0.6, 1.5, 0.4);
     stackAt(2, cheese, 1.06);
 
     const bacon = (phase: number) => {
-      const g = new THREE.BoxGeometry(4.9, 0.08, 0.6, 100, 1, 8);
+      const g = new THREE.BoxGeometry(4.5, 0.08, 0.6, 100, 1, 8);
       const bp = g.getAttribute('position');
       const colors = new Float32Array(bp.count * 3);
       const bands: [number, number][] = [[0.18, 0x8e2a18], [0.42, 0xf6d4ab], [0.74, 0xc4412a], [1, 0xf3c99a]];
@@ -370,10 +383,12 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
         const t = (z + 0.3) / 0.6;
         c.set(bands.find(([edge]) => t <= edge)?.[1] ?? 0xf3c99a);
         // crispy, darker ends
-        const crisp = THREE.MathUtils.smoothstep(Math.abs(x), 1.9, 2.45);
+        const crisp = THREE.MathUtils.smoothstep(Math.abs(x), 1.8, 2.25);
         c.lerp(new THREE.Color(0x6a2410), crisp * 0.55);
         colors.set([c.r, c.g, c.b], i * 3);
-        bp.setXYZ(i, x, bp.getY(i) + Math.sin(x * 3.4 + phase) * 0.07, z + Math.sin(x * 1.8 + phase) * 0.05);
+        // wavy like real fried bacon, ends curling down over the edge
+        const droop = THREE.MathUtils.smoothstep(Math.abs(x), 1.85, 2.25) * 0.16;
+        bp.setXYZ(i, x, bp.getY(i) + Math.sin(x * 4.6 + phase) * 0.08 - droop, z + Math.sin(x * 2.2 + phase) * 0.07);
       }
       g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
       g.computeVertexNormals();
@@ -402,10 +417,10 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
     stackAt(2, leaf2, 1.22);
     const bacon1 = bacon(0);
     bacon1.rotation.y = 0.35;
-    stackAt(2, bacon1, 1.29);
+    stackAt(2, bacon1, 1.32);
     const bacon2 = bacon(1.7);
     bacon2.rotation.y = -1.05;
-    stackAt(2, bacon2, 1.31);
+    stackAt(2, bacon2, 1.34);
 
     const tomatoes = new THREE.Group();
     for (const [x, z] of [
