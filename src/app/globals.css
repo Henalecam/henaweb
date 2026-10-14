@@ -50,6 +50,12 @@
     outline: 2px solid var(--color-acid);
     outline-offset: 3px;
   }
+  /* on cream, white and orange sections the orange ring disappears; use thick ink there */
+  .paper :focus-visible,
+  #clientes :focus-visible,
+  #contato :focus-visible {
+    outline: 3px solid var(--color-acid-ink);
+  }
 
   html.lenis,
   html.lenis body {
