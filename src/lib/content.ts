@@ -22,6 +22,7 @@ export const nav = [
   { label: 'Capacidades', href: '/#capacidades' },
   { label: 'Setor público', href: '/#govtech' },
   { label: 'Projetos', href: '/#projetos' },
+  { label: 'Casos', href: '/casos' },
   { label: 'Processo', href: '/#processo' },
   { label: 'Studio', href: '/#studio' },
 ];
@@ -78,6 +79,10 @@ export const govFlow = ['Solicitação', 'Análise', 'Parecer', 'Aprovação', '
 export type MockVariant = 'ledger' | 'raffle' | 'insights' | 'calendar' | 'bank' | 'site';
 
 export type Project = {
+  /** URL segment for /casos/[slug] */
+  slug: string;
+  /** related service page under /servicos */
+  service: string;
   name: string;
   kind: string;
   summary: string;
@@ -92,6 +97,8 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    slug: 'diconta',
+    service: 'sistemas-sob-medida',
     name: 'Diconta',
     kind: 'ERP contábil',
     summary: 'ERP para escritórios de contabilidade: financeiro, notas fiscais, documentos, tarefas e indicadores fiscais em um único painel.',
@@ -102,6 +109,8 @@ export const projects: Project[] = [
     shot: { desktop: '/cases/diconta.jpg', mobile: '/cases/diconta-m.jpg', height: 2700 },
   },
   {
+    slug: 'scheduly',
+    service: 'automacao-e-ia',
     name: 'Scheduly',
     kind: 'Agendamento com IA',
     summary: 'Agendamento em linguagem natural: o cliente diz o que precisa e a IA entende, sugere horários e organiza a agenda.',
@@ -112,6 +121,8 @@ export const projects: Project[] = [
     shot: { desktop: '/cases/scheduly.jpg', mobile: '/cases/scheduly-m.jpg', height: 900 },
   },
   {
+    slug: 'ecobrain',
+    service: 'automacao-e-ia',
     name: 'EcoBrain',
     kind: 'Finanças pessoais + IA',
     summary: 'Gestão financeira pessoal com IA que categoriza transações, prevê gastos e sugere onde economizar.',
@@ -122,6 +133,8 @@ export const projects: Project[] = [
     shot: { desktop: '/cases/ecobrain.jpg', mobile: '/cases/ecobrain-m.jpg', height: 900 },
   },
   {
+    slug: 'dropcota',
+    service: 'sistemas-sob-medida',
     name: 'Dropcota',
     kind: 'Plataforma de sorteios',
     summary: 'Plataforma completa de rifas e sorteios com gestão de participantes, sorteio automatizado e controle de prêmios.',
@@ -132,6 +145,8 @@ export const projects: Project[] = [
     mock: { variant: 'raffle', hue: 20 },
   },
   {
+    slug: 'next-card',
+    service: 'sites-e-produtos',
     name: 'NEXT Card',
     kind: 'Produto financeiro',
     summary: 'Experiência de cartão digital: narrativa de produto, cartão interativo e jornada de solicitação.',
@@ -142,6 +157,8 @@ export const projects: Project[] = [
     shot: { desktop: '/cases/fintech.jpg', mobile: '/cases/fintech-m.jpg', height: 2700 },
   },
   {
+    slug: 'contacerta',
+    service: 'sites-e-produtos',
     name: 'Contacerta',
     kind: 'Site · Contabilidade',
     summary: 'Site para escritório contábil com diagnóstico gratuito, quiz de qualificação e conteúdo para gerar confiança.',
@@ -152,6 +169,8 @@ export const projects: Project[] = [
     shot: { desktop: '/cases/contacerta.jpg', mobile: '/cases/contacerta-m.jpg', height: 2700 },
   },
   {
+    slug: 'camargo-legal',
+    service: 'sites-e-produtos',
     name: 'Camargo Legal',
     kind: 'Site · Advocacia',
     summary: 'Landing de advocacia trabalhista com calculadora de direitos e contato direto pelo WhatsApp.',

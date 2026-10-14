@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { services } from '@/lib/services';
-import { site } from '@/lib/content';
+import { projects, site } from '@/lib/content';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -12,5 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly' as const,
       priority: s.slug === 'sistemas-sob-medida' || s.slug === 'sistemas-publicos' ? 0.9 : 0.8,
     })),
+    { url: `${site.url}/casos`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    ...projects.map((p) => ({ url: `${site.url}/casos/${p.slug}`, lastModified: now, changeFrequency: 'yearly' as const, priority: 0.6 })),
   ];
 }

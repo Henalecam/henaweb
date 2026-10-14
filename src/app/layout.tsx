@@ -50,6 +50,7 @@ export const metadata: Metadata = {
   formatDetection: { telephone: false, email: false, address: false },
   openGraph: { type: 'website', locale: 'pt_BR', url: '/', siteName: 'HenaWeb', title, description },
   twitter: { card: 'summary_large_image', title, description },
+  verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
   robots: {
     index: true,
     follow: true,

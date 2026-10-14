@@ -203,6 +203,12 @@ export default function Work() {
               >
                 Visitar {p.name} ↗
               </a>
+              <a
+                href={`/casos/${p.slug}`}
+                className="toon toon-press inline-flex w-fit items-center gap-2 rounded-full bg-paper px-5 py-3 font-medium text-acid-ink"
+              >
+                Ver caso completo →
+              </a>
             </div>
           </div>
         </div>
@@ -222,6 +228,9 @@ export default function Work() {
                   <h3 className="text-3xl leading-none font-medium tracking-[-0.04em]">{item.name}</h3>
                   <span className="serif -mt-1 text-lg text-ink/60">{item.kind}</span>
                   <Story p={item} />
+                  <a href={`/casos/${item.slug}`} className="mt-2 w-fit font-medium text-acid underline-offset-4 hover:underline">
+                    Ver caso completo →
+                  </a>
                 </div>
               </li>
             ))}

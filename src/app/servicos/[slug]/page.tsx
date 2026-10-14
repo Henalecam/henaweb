@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { services, serviceBySlug } from '@/lib/services';
-import { site, whatsappLink } from '@/lib/content';
+import { projects, site, whatsappLink } from '@/lib/content';
 import Footer from '@/components/Footer';
 
 export const dynamicParams = false;
@@ -149,13 +149,22 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
               {s.examples.map((e) => (
                 <li key={e.name} className="toon-sm rounded-xl bg-bg-2/80 p-5">
                   <h3 className="text-xl font-medium tracking-tight">
-                    {e.href ? (
-                      <a href={e.href} target="_blank" rel="noopener noreferrer" className="hover:text-acid">
-                        {e.name} ↗
-                      </a>
-                    ) : (
-                      e.name
-                    )}
+                    {(() => {
+                      const caseSlug = projects.find((pr) => pr.name === e.name)?.slug;
+                      if (caseSlug)
+                        return (
+                          <a href={`/casos/${caseSlug}`} className="hover:text-acid">
+                            {e.name} →
+                          </a>
+                        );
+                      return e.href ? (
+                        <a href={e.href} target="_blank" rel="noopener noreferrer" className="hover:text-acid">
+                          {e.name} ↗
+                        </a>
+                      ) : (
+                        e.name
+                      );
+                    })()}
                   </h3>
                   <p className="mt-2 leading-relaxed text-ink/70">{e.note}</p>
                 </li>
