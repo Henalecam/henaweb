@@ -287,9 +287,15 @@ function MobileFile() {
   return (
     <div data-mob className="gutter relative pt-28 pb-20 lg:hidden">
       <span className="label !text-teal">{copy.intro.kicker}</span>
-      <h2 className="font-groovy mt-3 text-[clamp(2.4rem,10vw,3.6rem)] leading-[0.95] text-groovy [text-shadow:3px_3px_0_#140a26]">
+      {/* The desktop board already renders the real <h2>; this copy is display:none
+          there, so it is exposed as a heading to assistive tech without a duplicate h2 tag. */}
+      <p
+        role="heading"
+        aria-level={2}
+        className="font-groovy mt-3 text-[clamp(2.4rem,10vw,3.6rem)] leading-[0.95] text-groovy [text-shadow:3px_3px_0_#140a26]"
+      >
         {copy.intro.title}
-      </h2>
+      </p>
       <p className="mt-4 text-lg leading-relaxed text-ink/75">{copy.intro.body}</p>
 
       {/* the evidence, pinned down a strip of cork and stitched with red thread */}
