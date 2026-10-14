@@ -342,3 +342,12 @@ details[open]::details-content {
     transition: none;
   }
 }
+
+/* 404: the ghost detective drifts while it searches */
+@keyframes ghost-bob {
+  0%, 100% { translate: 0 -50%; rotate: -3deg; }
+  50% { translate: 0 calc(-50% - 14px); rotate: 3deg; }
+}
+.ghost-bob {
+  animation: ghost-bob 4.5s ease-in-out infinite;
+}
