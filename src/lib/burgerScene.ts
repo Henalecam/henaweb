@@ -17,8 +17,8 @@ export type BurgerScene = {
 };
 
 function toonRamp() {
-  const data = new Uint8Array([90, 90, 90, 255, 180, 180, 180, 255, 255, 255, 255, 255]);
-  const tex = new THREE.DataTexture(data, 3, 1, THREE.RGBAFormat);
+  const data = new Uint8Array([95, 95, 95, 255, 160, 160, 160, 255, 215, 215, 215, 255, 255, 255, 255, 255]);
+  const tex = new THREE.DataTexture(data, 4, 1, THREE.RGBAFormat);
   tex.minFilter = THREE.NearestFilter;
   tex.magFilter = THREE.NearestFilter;
   tex.generateMipmaps = false;
@@ -33,20 +33,23 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
-  scene.add(new THREE.AmbientLight(0xffffff, 1.1));
-  const key = new THREE.DirectionalLight(0xffffff, 2.2);
+  scene.add(new THREE.HemisphereLight(0xfff1d6, 0x3a2350, 1.0));
+  const key = new THREE.DirectionalLight(0xffe2b0, 2.6);
   key.position.set(-3, 6, 5);
   scene.add(key);
   const rim = new THREE.DirectionalLight(0x3cc6b4, 1.6);
   rim.position.set(2, 3, -6);
   scene.add(rim);
+  const warm = new THREE.PointLight(0xffa64a, 6, 9, 1.4);
+  warm.position.set(2.6, 2.4, 3.2);
+  scene.add(warm);
 
   const ramp = toonRamp();
   const outlineMat = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide });
   const disposables: { dispose: () => void }[] = [ramp, outlineMat];
 
-  const toon = (color: number) => {
-    const m = new THREE.MeshToonMaterial({ color, gradientMap: ramp });
+  const toon = (color: number, vertexColors = false) => {
+    const m = new THREE.MeshToonMaterial({ color, gradientMap: ramp, vertexColors });
     disposables.push(m);
     return m;
   };
@@ -55,7 +58,7 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
   const inked = (geo: THREE.BufferGeometry, color: number, thickness = 0.045) => {
     disposables.push(geo);
     const g = new THREE.Group();
-    g.add(new THREE.Mesh(geo, toon(color)));
+    g.add(new THREE.Mesh(geo, toon(geo.getAttribute('color') ? 0xffffff : color, !!geo.getAttribute('color'))));
     const hullGeo = geo.clone();
     const pos = hullGeo.getAttribute('position');
     const nor = hullGeo.getAttribute('normal');
@@ -74,6 +77,34 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
     );
     geo.computeVertexNormals();
     return geo;
+  };
+
+  /** golden-brown toast: darker on top, lighter toward the rim, by height */
+  const toastColors = (geo: THREE.BufferGeometry, light: number, dark: number, y0: number, y1: number) => {
+    const pos = geo.getAttribute('position');
+    const a = new THREE.Color(light);
+    const b = new THREE.Color(dark);
+    const c = new THREE.Color();
+    const arr = new Float32Array(pos.count * 3);
+    for (let i = 0; i < pos.count; i++) {
+      const t = THREE.MathUtils.smoothstep(pos.getY(i), y0, y1);
+      c.copy(a).lerp(b, t);
+      arr.set([c.r, c.g, c.b], i * 3);
+    }
+    geo.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+    return geo;
+  };
+  const gleamMat = new THREE.MeshBasicMaterial({ color: 0xfffbea });
+  disposables.push(gleamMat);
+  const gleamGeo = new THREE.CapsuleGeometry(0.05, 0.3, 4, 10);
+  disposables.push(gleamGeo);
+  /** the little white shine streak cartoons put on tasty food */
+  const gleam = (parent: THREE.Object3D, x: number, y: number, z: number, scale = 1, rotZ = 0.9, rotY = 0) => {
+    const m = new THREE.Mesh(gleamGeo, gleamMat);
+    m.position.set(x, y, z);
+    m.rotation.set(0, rotY, rotZ);
+    m.scale.setScalar(scale);
+    parent.add(m);
   };
 
   const burger = new THREE.Group();
@@ -119,7 +150,7 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
 
   // I: bottom bun with a toasted cut face
   {
-    const bun = inked(lathe([[0, 0], [1.55, 0], [1.72, 0.06], [1.8, 0.2], [1.82, 0.34], [1.76, 0.44], [0, 0.44]]), 0xe9a24c);
+    const bun = inked(toastColors(lathe([[0, 0], [1.55, 0], [1.72, 0.06], [1.8, 0.2], [1.82, 0.34], [1.76, 0.44], [0, 0.44]]), 0xf3c27a, 0xd98a36, 0, 0.44), 0xe9a24c);
     const toast = new THREE.Mesh(new THREE.CircleGeometry(1.7, 64), toon(0xd9893a));
     disposables.push(toast.geometry);
     toast.rotation.x = -Math.PI / 2;
@@ -144,7 +175,9 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
       p.setXYZ(i, x * k, y + lump, z * k);
     }
     geo.computeVertexNormals();
-    const patty = inked(geo, 0x7a4a24);
+    const patty = inked(geo, 0x6e3a1a);
+    gleam(patty, -0.9, 0.3, 1.55, 0.8, 0.2, 0.5);
+    gleam(patty, 0.6, 0.32, 1.7, 0.6, 0.15, -0.3);
     const speckGeo = new THREE.SphereGeometry(0.035, 6, 5);
     disposables.push(speckGeo);
     const specks = new THREE.InstancedMesh(speckGeo, toon(0x3e200f), 70);
@@ -167,7 +200,9 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
       sp.setY(i, sp.getY(i) - drip);
     }
     sauceGeo.computeVertexNormals();
-    stackAt(1, inked(sauceGeo, 0xd8452e, 0.025), 1.02);
+    const sauce = inked(sauceGeo, 0xe23a22, 0.025);
+    for (const ang of [0.3, 1.55, 2.8, 4.05, 5.3]) gleam(sauce, Math.cos(ang) * 1.86, 0.04, Math.sin(ang) * 1.86, 0.45, 1.4, -ang);
+    stackAt(1, sauce, 1.02);
   }
 
   // III: melted cheese, double lettuce, tomatoes, pickles and onion rings
@@ -191,7 +226,15 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
       cp.setXYZ(i, x * f, y, z * f);
     }
     cgeo.computeVertexNormals();
-    stackAt(2, inked(cgeo, 0xf9d65c, 0.03), 1.06);
+    const cheese = inked(cgeo, 0xffc22e, 0.03);
+    for (const [ang, len] of [[0.79, 0.55], [2.36, 0.4], [3.93, 0.6], [5.5, 0.45], [1.6, 0.3]] as const) {
+      const drip = inked(new THREE.CapsuleGeometry(0.11, len, 6, 12), 0xffc22e, 0.025);
+      drip.position.set(Math.cos(ang) * 1.86, -0.12 - len / 2, Math.sin(ang) * 1.86);
+      cheese.add(drip);
+      gleam(drip, 0.06, len * 0.15, 0.08, 0.35, 0.05);
+    }
+    gleam(cheese, -0.5, 0.06, 1.55, 0.6, 1.5, 0.4);
+    stackAt(2, cheese, 1.06);
 
     const leaf = (radius: number, waves: number, amp: number, color: number) => {
       const g = new THREE.CylinderGeometry(radius, radius, 0.08, 160, 1);
@@ -209,8 +252,8 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
       g.computeVertexNormals();
       return inked(g, color, 0.03);
     };
-    stackAt(2, leaf(2.02, 15, 0.09, 0x7cae3a), 1.15);
-    const leaf2 = leaf(1.92, 11, 0.07, 0xa6d64b);
+    stackAt(2, leaf(2.02, 15, 0.09, 0x5fa82b), 1.15);
+    const leaf2 = leaf(1.92, 11, 0.07, 0x9be04a);
     leaf2.rotation.y = 0.4;
     stackAt(2, leaf2, 1.22);
 
@@ -220,7 +263,8 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
       [0.85, -0.2],
       [0, 0.95],
     ]) {
-      const t = inked(new THREE.CylinderGeometry(0.85, 0.85, 0.16, 40), 0xe8553f, 0.035);
+      const t = inked(new THREE.CylinderGeometry(0.85, 0.85, 0.16, 40), 0xf0402c, 0.035);
+      gleam(t, -0.25, 0.1, 0.25, 0.35, 1.5, 0.8);
       t.position.set(x, 0, z);
       const inner = new THREE.Mesh(new THREE.CircleGeometry(0.62, 32), toon(0xff8a70));
       disposables.push(inner.geometry);
@@ -276,11 +320,19 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
       const a = (i / 18) * (Math.PI / 2);
       pts.push([Math.cos(a) * 1.9, 0.08 + Math.sin(a) * 1.22]);
     }
-    const top = inked(lathe(pts, 72), 0xe9a24c);
+    const top = inked(toastColors(lathe(pts, 72), 0xf6c983, 0xc9752a, 0.1, 1.3), 0xe9a24c);
+    // shine streaks all around the dome so one always faces the camera on the turntable
+    for (let k = 0; k < 4; k++) {
+      const ang = (k / 4) * Math.PI * 2 + 0.6;
+      // radius of the dome surface at a given height (ellipse 1.9 wide, 1.22 tall, base at 0.08)
+      const surf = (y: number) => 1.9 * Math.sqrt(1 - ((y - 0.08) / 1.22) ** 2) + 0.03;
+      gleam(top, Math.cos(ang) * surf(0.78), 0.78, Math.sin(ang) * surf(0.78), 1.1, 0.5, -ang + Math.PI / 2);
+      gleam(top, Math.cos(ang + 0.3) * surf(1.02), 1.02, Math.sin(ang + 0.3) * surf(1.02), 0.55, 0.6, -ang + Math.PI / 2 - 0.3);
+    }
     const seedGeo = new THREE.SphereGeometry(0.07, 10, 8);
     seedGeo.scale(1, 0.5, 1.9);
     disposables.push(seedGeo);
-    const seeds = new THREE.InstancedMesh(seedGeo, toon(0xfff4dc), 52);
+    const seeds = new THREE.InstancedMesh(seedGeo, toon(0xfff1d2), 52);
     const m = new THREE.Matrix4();
     const q = new THREE.Quaternion();
     const v = new THREE.Vector3();

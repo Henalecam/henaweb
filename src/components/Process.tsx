@@ -52,9 +52,9 @@ function DinerBack() {
         CARDÁPIO DO DIA · SISTEMA DA CASA
       </text>
       <g data-steam stroke="#a8a0c4" strokeWidth="5" fill="none" strokeLinecap="round" opacity="0">
-        <path d="M250,150 C235,130 265,115 250,95" />
-        <path d="M300,140 C285,118 315,102 300,80" />
-        <path d="M350,150 C335,130 365,115 350,95" />
+        <path d="M250,215 C235,195 265,180 250,160" />
+        <path d="M300,205 C285,183 315,167 300,145" />
+        <path d="M350,215 C335,195 365,180 350,160" />
       </g>
       <rect x="0" y="494" width="600" height="46" fill="url(#diner-check)" stroke={INK} strokeWidth="5" />
       <rect x="-6" y="482" width="612" height="16" rx="6" fill="#3cc6b4" stroke={INK} strokeWidth="5" />
@@ -70,6 +70,24 @@ function DinerBack() {
 function DinerFront() {
   return (
     <svg viewBox="0 0 600 540" className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden>
+      {/* twinkling sparkles: the cartoon sign for "delicious" */}
+      {[
+        [150, 210, 16, 0],
+        [470, 175, 20, 0.6],
+        [500, 330, 13, 1.2],
+        [120, 360, 12, 1.8],
+        [440, 250, 9, 0.9],
+      ].map(([x, y, r, delay]) => (
+        <path
+          key={`${x}-${y}`}
+          className="sparkle"
+          style={{ animationDelay: `${delay}s`, transformOrigin: `${x}px ${y}px`, transformBox: 'view-box' }}
+          d={`M${x},${y - r} Q${x},${y} ${x + r},${y} Q${x},${y} ${x},${y + r} Q${x},${y} ${x - r},${y} Q${x},${y} ${x},${y - r} Z`}
+          fill="#fff6c9"
+          stroke={INK}
+          strokeWidth="2.5"
+        />
+      ))}
       {bursts.map((b, i) => (
         <g key={b.word} data-burst={i} opacity="0" style={{ transformOrigin: `${b.x}px ${b.y}px`, transformBox: 'view-box' }}>
           <g transform={`rotate(${b.r} ${b.x} ${b.y})`}>
