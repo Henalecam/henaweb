@@ -48,17 +48,17 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
   const outlineMat = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide });
   const disposables: { dispose: () => void }[] = [ramp, outlineMat];
 
-  const toon = (color: number, vertexColors = false) => {
-    const m = new THREE.MeshToonMaterial({ color, gradientMap: ramp, vertexColors });
+  const toon = (color: number, vertexColors = false, map: THREE.Texture | null = null) => {
+    const m = new THREE.MeshToonMaterial({ color, gradientMap: ramp, vertexColors, map });
     disposables.push(m);
     return m;
   };
 
   /** mesh + slightly inflated back-face hull for the cartoon outline */
-  const inked = (geo: THREE.BufferGeometry, color: number, thickness = 0.045) => {
+  const inked = (geo: THREE.BufferGeometry, color: number, thickness = 0.045, map: THREE.Texture | null = null) => {
     disposables.push(geo);
     const g = new THREE.Group();
-    g.add(new THREE.Mesh(geo, toon(geo.getAttribute('color') ? 0xffffff : color, !!geo.getAttribute('color'))));
+    g.add(new THREE.Mesh(geo, toon(geo.getAttribute('color') ? 0xffffff : color, !!geo.getAttribute('color'), map)));
     const hullGeo = geo.clone();
     const pos = hullGeo.getAttribute('position');
     const nor = hullGeo.getAttribute('normal');
@@ -107,6 +107,140 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
     parent.add(m);
   };
 
+  // ── painted textures ──────────────────────────────
+  let tseed = 11;
+  const trand = () => ((tseed = (tseed * 16807) % 2147483647) / 2147483647);
+  const paint = (w: number, h: number, draw: (ctx: CanvasRenderingContext2D) => void, wrap = false) => {
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    draw(c.getContext('2d')!);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    if (wrap) tex.wrapS = THREE.RepeatWrapping;
+    disposables.push(tex);
+    return tex;
+  };
+  const dots = (ctx: CanvasRenderingContext2D, n: number, w: number, h: number, rMin: number, rMax: number, color: string) => {
+    ctx.fillStyle = color;
+    for (let i = 0; i < n; i++) {
+      ctx.beginPath();
+      ctx.ellipse(trand() * w, trand() * h, rMin + trand() * (rMax - rMin), (rMin + trand() * (rMax - rMin)) * 0.7, trand() * Math.PI, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  };
+  // bun crust: toasted mottling, flour flecks and fine cracks (white base multiplies with the toast gradient)
+  const bunTex = paint(1024, 256, (ctx) => {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, 1024, 256);
+    dots(ctx, 260, 1024, 256, 6, 22, 'rgba(160, 82, 28, 0.13)');
+    dots(ctx, 120, 1024, 256, 3, 8, 'rgba(120, 58, 18, 0.22)');
+    dots(ctx, 380, 1024, 256, 1.2, 2.6, 'rgba(255, 252, 240, 0.9)');
+    ctx.strokeStyle = 'rgba(130, 64, 20, 0.25)';
+    ctx.lineWidth = 1.6;
+    for (let i = 0; i < 70; i++) {
+      const x = trand() * 1024;
+      const y = trand() * 256;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + 6 + trand() * 10, y - 4 + trand() * 8, x + 12 + trand() * 16, y - 2 + trand() * 4);
+      ctx.stroke();
+    }
+  }, true);
+  // patty: seared crust with darker grill streaks and juicy highlights
+  const pattyTex = paint(1024, 256, (ctx) => {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, 1024, 256);
+    dots(ctx, 500, 1024, 256, 3, 12, 'rgba(60, 25, 8, 0.28)');
+    dots(ctx, 220, 1024, 256, 2, 6, 'rgba(255, 196, 140, 0.35)');
+    ctx.strokeStyle = 'rgba(40, 16, 5, 0.35)';
+    ctx.lineWidth = 9;
+    for (let x = -256; x < 1024; x += 64) {
+      ctx.beginPath();
+      ctx.moveTo(x, 256);
+      ctx.lineTo(x + 256, 0);
+      ctx.stroke();
+    }
+  }, true);
+  // tomato cross section: skin ring, pink flesh, jelly chambers with seeds
+  const tomatoTex = paint(256, 256, (ctx) => {
+    ctx.fillStyle = '#e8402a';
+    ctx.beginPath();
+    ctx.arc(128, 128, 128, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ff8a72';
+    ctx.beginPath();
+    ctx.arc(128, 128, 112, 0, Math.PI * 2);
+    ctx.fill();
+    for (let k = 0; k < 4; k++) {
+      const a = (k / 4) * Math.PI * 2 + 0.4;
+      const cx = 128 + Math.cos(a) * 58;
+      const cy = 128 + Math.sin(a) * 58;
+      ctx.fillStyle = '#ff5a3e';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 34, 24, a, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fff1c9';
+      for (let j = 0; j < 4; j++) {
+        ctx.beginPath();
+        ctx.ellipse(cx + Math.cos(a + 1.57) * (j - 1.5) * 12, cy + Math.sin(a + 1.57) * (j - 1.5) * 12, 5, 3, a, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.fillStyle = '#ffb3a0';
+    ctx.beginPath();
+    ctx.arc(128, 128, 18, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  // pickle chip: dark skin ring, pale flesh, a ring of seeds
+  const pickleTex = paint(256, 256, (ctx) => {
+    ctx.fillStyle = '#4f7f22';
+    ctx.beginPath();
+    ctx.arc(128, 128, 128, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#a9cf62';
+    ctx.beginPath();
+    ctx.arc(128, 128, 104, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#d6ec9a';
+    ctx.beginPath();
+    ctx.arc(128, 128, 56, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#f4f8d8';
+    for (let k = 0; k < 9; k++) {
+      const a = (k / 9) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.ellipse(128 + Math.cos(a) * 40, 128 + Math.sin(a) * 40, 7, 4, a, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+  // lettuce veins radiating from the middle (cylinder cap UVs are radial)
+  const leafTex = paint(512, 512, (ctx) => {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, 512, 512);
+    ctx.strokeStyle = 'rgba(235, 255, 200, 0.9)';
+    ctx.lineCap = 'round';
+    for (let k = 0; k < 18; k++) {
+      const a = (k / 18) * Math.PI * 2;
+      ctx.lineWidth = 7;
+      ctx.beginPath();
+      ctx.moveTo(256, 256);
+      ctx.quadraticCurveTo(256 + Math.cos(a + 0.15) * 140, 256 + Math.sin(a + 0.15) * 140, 256 + Math.cos(a) * 250, 256 + Math.sin(a) * 250);
+      ctx.stroke();
+      ctx.lineWidth = 2.5;
+      for (let j = 1; j < 4; j++) {
+        const r = j * 60;
+        const bx = 256 + Math.cos(a) * r;
+        const by = 256 + Math.sin(a) * r;
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        ctx.lineTo(bx + Math.cos(a + 0.6) * 40, by + Math.sin(a + 0.6) * 40);
+        ctx.stroke();
+      }
+    }
+    dots(ctx, 120, 512, 512, 4, 12, 'rgba(60, 120, 20, 0.12)');
+  });
+
   const burger = new THREE.Group();
   scene.add(burger);
   let flagPaint: (t: string) => void = () => {};
@@ -150,7 +284,7 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
 
   // I: bottom bun with a toasted cut face
   {
-    const bun = inked(toastColors(lathe([[0, 0], [1.55, 0], [1.72, 0.06], [1.8, 0.2], [1.82, 0.34], [1.76, 0.44], [0, 0.44]]), 0xf3c27a, 0xd98a36, 0, 0.44), 0xe9a24c);
+    const bun = inked(toastColors(lathe([[0, 0], [1.55, 0], [1.72, 0.06], [1.8, 0.2], [1.82, 0.34], [1.76, 0.44], [0, 0.44]]), 0xf3c27a, 0xd98a36, 0, 0.44), 0xe9a24c, 0.045, bunTex);
     const toast = new THREE.Mesh(new THREE.CircleGeometry(1.7, 64), toon(0xd9893a));
     disposables.push(toast.geometry);
     toast.rotation.x = -Math.PI / 2;
@@ -159,7 +293,7 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
     stackAt(0, bun, 0.16);
   }
 
-  // II: lumpy patty with char specks and a ketchup ribbon dripping off the edge
+  // II: seared, lumpy patty with char specks
   {
     const prof: [number, number][] = [[0, 0], [1.6, 0], [1.82, 0.06], [1.9, 0.21], [1.82, 0.36], [1.6, 0.42], [1.2, 0.43], [0.8, 0.42], [0.4, 0.43], [0, 0.42]];
     const geo = lathe(prof, 96);
@@ -175,7 +309,7 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
       p.setXYZ(i, x * k, y + lump, z * k);
     }
     geo.computeVertexNormals();
-    const patty = inked(geo, 0x6e3a1a);
+    const patty = inked(geo, 0x7a4220, 0.045, pattyTex);
     gleam(patty, -0.9, 0.3, 1.55, 0.8, 0.2, 0.5);
     gleam(patty, 0.6, 0.32, 1.7, 0.6, 0.15, -0.3);
     const speckGeo = new THREE.SphereGeometry(0.035, 6, 5);
@@ -191,18 +325,6 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
     patty.add(specks);
     stackAt(1, patty, 0.58);
 
-    const sauceGeo = new THREE.TorusGeometry(1.84, 0.07, 10, 160);
-    sauceGeo.rotateX(Math.PI / 2);
-    const sp = sauceGeo.getAttribute('position');
-    for (let i = 0; i < sp.count; i++) {
-      const ang = Math.atan2(sp.getZ(i), sp.getX(i));
-      const drip = Math.pow(Math.max(0, Math.sin(ang * 5 + 0.6)), 6) * 0.22;
-      sp.setY(i, sp.getY(i) - drip);
-    }
-    sauceGeo.computeVertexNormals();
-    const sauce = inked(sauceGeo, 0xe23a22, 0.025);
-    for (const ang of [0.3, 1.55, 2.8, 4.05, 5.3]) gleam(sauce, Math.cos(ang) * 1.86, 0.04, Math.sin(ang) * 1.86, 0.45, 1.4, -ang);
-    stackAt(1, sauce, 1.02);
   }
 
   // III: melted cheese, double lettuce, tomatoes, pickles and onion rings
@@ -236,6 +358,28 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
     gleam(cheese, -0.5, 0.06, 1.55, 0.6, 1.5, 0.4);
     stackAt(2, cheese, 1.06);
 
+    const bacon = (phase: number) => {
+      const g = new THREE.BoxGeometry(4.9, 0.08, 0.6, 100, 1, 8);
+      const bp = g.getAttribute('position');
+      const colors = new Float32Array(bp.count * 3);
+      const bands: [number, number][] = [[0.18, 0x8e2a18], [0.42, 0xf6d4ab], [0.74, 0xc4412a], [1, 0xf3c99a]];
+      const c = new THREE.Color();
+      for (let i = 0; i < bp.count; i++) {
+        const x = bp.getX(i);
+        const z = bp.getZ(i);
+        const t = (z + 0.3) / 0.6;
+        c.set(bands.find(([edge]) => t <= edge)?.[1] ?? 0xf3c99a);
+        // crispy, darker ends
+        const crisp = THREE.MathUtils.smoothstep(Math.abs(x), 1.9, 2.45);
+        c.lerp(new THREE.Color(0x6a2410), crisp * 0.55);
+        colors.set([c.r, c.g, c.b], i * 3);
+        bp.setXYZ(i, x, bp.getY(i) + Math.sin(x * 3.4 + phase) * 0.07, z + Math.sin(x * 1.8 + phase) * 0.05);
+      }
+      g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      g.computeVertexNormals();
+      return inked(g, 0xffffff, 0.025);
+    };
+
     const leaf = (radius: number, waves: number, amp: number, color: number) => {
       const g = new THREE.CylinderGeometry(radius, radius, 0.08, 160, 1);
       const lp = g.getAttribute('position');
@@ -250,12 +394,18 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
         }
       }
       g.computeVertexNormals();
-      return inked(g, color, 0.03);
+      return inked(g, color, 0.03, leafTex);
     };
     stackAt(2, leaf(2.02, 15, 0.09, 0x5fa82b), 1.15);
     const leaf2 = leaf(1.92, 11, 0.07, 0x9be04a);
     leaf2.rotation.y = 0.4;
     stackAt(2, leaf2, 1.22);
+    const bacon1 = bacon(0);
+    bacon1.rotation.y = 0.35;
+    stackAt(2, bacon1, 1.29);
+    const bacon2 = bacon(1.7);
+    bacon2.rotation.y = -1.05;
+    stackAt(2, bacon2, 1.31);
 
     const tomatoes = new THREE.Group();
     for (const [x, z] of [
@@ -266,20 +416,11 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
       const t = inked(new THREE.CylinderGeometry(0.85, 0.85, 0.16, 40), 0xf0402c, 0.035);
       gleam(t, -0.25, 0.1, 0.25, 0.35, 1.5, 0.8);
       t.position.set(x, 0, z);
-      const inner = new THREE.Mesh(new THREE.CircleGeometry(0.62, 32), toon(0xff8a70));
+      const inner = new THREE.Mesh(new THREE.CircleGeometry(0.84, 40), toon(0xffffff, false, tomatoTex));
       disposables.push(inner.geometry);
       inner.rotation.x = -Math.PI / 2;
-      inner.position.y = 0.085;
+      inner.position.y = 0.082;
       t.add(inner);
-      for (let k = 0; k < 4; k++) {
-        const ang = (k / 4) * Math.PI * 2 + 0.4;
-        const sd = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), toon(0xfff1c9));
-        disposables.push(sd.geometry);
-        sd.scale.set(1, 0.4, 1.6);
-        sd.position.set(Math.cos(ang) * 0.36, 0.09, Math.sin(ang) * 0.36);
-        sd.rotation.y = -ang;
-        t.add(sd);
-      }
       tomatoes.add(t);
     }
     stackAt(2, tomatoes, 1.34);
@@ -287,8 +428,19 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
     const pickles = new THREE.Group();
     for (let k = 0; k < 5; k++) {
       const ang = (k / 5) * Math.PI * 2 + 0.25;
-      const pk = inked(new THREE.CylinderGeometry(0.34, 0.34, 0.06, 28), 0x5f8f2a, 0.025);
-      const face = new THREE.Mesh(new THREE.CircleGeometry(0.26, 24), toon(0x9cc25a));
+      const pg = new THREE.CylinderGeometry(0.36, 0.36, 0.06, 56);
+      const pp = pg.getAttribute('position');
+      for (let i = 0; i < pp.count; i++) {
+        const x = pp.getX(i);
+        const z = pp.getZ(i);
+        if (Math.hypot(x, z) > 0.3) {
+          const k = 1 + Math.sin(Math.atan2(z, x) * 16) * 0.05;
+          pp.setXYZ(i, x * k, pp.getY(i), z * k);
+        }
+      }
+      pg.computeVertexNormals();
+      const pk = inked(pg, 0x4f7f22, 0.025);
+      const face = new THREE.Mesh(new THREE.CircleGeometry(0.35, 40), toon(0xffffff, false, pickleTex));
       disposables.push(face.geometry);
       face.rotation.x = -Math.PI / 2;
       face.position.y = 0.032;
@@ -320,7 +472,7 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
       const a = (i / 18) * (Math.PI / 2);
       pts.push([Math.cos(a) * 1.9, 0.08 + Math.sin(a) * 1.22]);
     }
-    const top = inked(toastColors(lathe(pts, 72), 0xf6c983, 0xc9752a, 0.1, 1.3), 0xe9a24c);
+    const top = inked(toastColors(lathe(pts, 72), 0xf6c983, 0xc9752a, 0.1, 1.3), 0xe9a24c, 0.045, bunTex);
     // shine streaks all around the dome so one always faces the camera on the turntable
     for (let k = 0; k < 4; k++) {
       const ang = (k / 4) * Math.PI * 2 + 0.6;
