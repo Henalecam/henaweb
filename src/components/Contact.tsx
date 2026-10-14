@@ -10,7 +10,7 @@ import Social from './Social';
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
 const field =
-  'w-full border-b border-acid-ink/25 bg-transparent py-3 text-lg text-acid-ink placeholder:text-acid-ink/45 focus:border-acid-ink focus:outline-none';
+  'w-full border-b-2 border-acid-ink/35 bg-transparent py-3 text-lg text-acid-ink placeholder:text-acid-ink/65 focus:border-acid-ink focus:outline-none';
 
 export default function Contact() {
   const root = useRef<HTMLElement>(null);
@@ -225,7 +225,7 @@ export default function Contact() {
                 <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
                   <input name="name" required placeholder="Seu nome" autoComplete="name" className={field} aria-label="Nome" />
                   <input name="email" type="email" required placeholder="E-mail" autoComplete="email" className={field} aria-label="E-mail" />
-                  <input name="whatsapp" placeholder="WhatsApp (opcional)" autoComplete="tel" className={field} aria-label="WhatsApp" />
+                  <input name="whatsapp" type="tel" inputMode="tel" placeholder="WhatsApp (opcional)" autoComplete="tel" className={field} aria-label="WhatsApp" />
                   <input name="org" placeholder="Empresa ou órgão (opcional)" autoComplete="organization" className={field} aria-label="Empresa ou órgão" />
                 </div>
                 <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
