@@ -5,6 +5,7 @@ import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { process, stack } from '@/lib/content';
 import type { BurgerScene } from '@/lib/burgerScene';
 import Marquee from './Marquee';
+import OrderTicket from './OrderTicket';
 
 const INK = '#140a26';
 const versions = ['v1.0', 'v1.1', 'v1.2', 'v2.0', 'v2.1', 'v3.0'];
@@ -213,8 +214,9 @@ export default function Process() {
 
           gsap.fromTo(
             '[data-ticket]',
-            { clipPath: 'inset(0% 0% 100% 0%)', y: -30 },
-            { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: 1.4, ease: 'steps(14)', scrollTrigger: { trigger: '[data-ticket]', start: 'top 85%' } },
+            // negative side insets keep the paper's hard shadow visible while it prints
+            { clipPath: 'inset(0% -8% 100% -8%)', y: -30 },
+            { clipPath: 'inset(0% -8% -8% -8%)', y: 0, duration: 1.4, ease: 'steps(14)', scrollTrigger: { trigger: '[data-ticket]', start: 'top 85%' } },
           );
         },
       );
@@ -288,30 +290,7 @@ export default function Process() {
 
             {/* order ticket */}
             <div className="pb-24">
-              <div
-                data-ticket
-                className="mx-auto w-full max-w-sm rotate-[1.5deg] bg-white px-6 pt-6 pb-8 font-mono text-sm text-acid-ink shadow-[6px_6px_0_#140a26]"
-              >
-                <p className="text-center text-xs tracking-[0.3em]">LANCHES &amp; SISTEMAS</p>
-                <p className="font-groovy mt-1 text-center text-2xl text-[#c2410c]">Pedido nº 0142</p>
-                <p className="mt-1 text-center text-[0.65rem] text-acid-ink/60">1× SANDUÍCHE DO SISTEMA · MESA: SUA EMPRESA</p>
-                <div className="my-4 border-t-2 border-dashed border-acid-ink/40" />
-                <ul className="flex flex-col gap-2 text-[0.78rem]">
-                  {process.map((s) => (
-                    <li key={s.n} className="flex gap-3">
-                      <span className="w-6 shrink-0">{s.n}</span>
-                      <span className="flex-1">{s.deliverable}</span>
-                      <span>✓</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="my-4 border-t-2 border-dashed border-acid-ink/40" />
-                <p className="flex justify-between font-bold">
-                  <span>TOTAL</span>
-                  <span>SISTEMA NO AR</span>
-                </p>
-                <p className="mt-4 text-center text-[0.65rem] tracking-[0.2em] text-acid-ink/60">*** VOLTE SEMPRE: TEMOS ROADMAP ***</p>
-              </div>
+              <OrderTicket />
             </div>
           </div>
         </div>
