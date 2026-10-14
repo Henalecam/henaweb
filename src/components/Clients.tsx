@@ -24,7 +24,7 @@ export default function Clients() {
           items={clients.map((c) => (
             <span key={c.name} className="flex h-[clamp(3rem,6vw,4.5rem)] items-center">
               {c.logo ? (
-                // plain img: mostly SVG logos, sized by height
+                // plain img: small SVG/WebP logos (about 2x their display size), sized by height
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={c.logo}

@@ -345,12 +345,12 @@ export const homeFaq = [
 
 /** Client logos (Wikimedia Commons, the clients' own sites and files provided by the client list owner). */
 export const clients: { name: string; group: 'public' | 'private'; logo?: string; scale?: number }[] = [
-  { name: 'Estado do Paraná', group: 'public', logo: '/clients/brasao-parana.svg', scale: 1.15 },
+  { name: 'Estado do Paraná', group: 'public', logo: '/clients/brasao-parana.webp', scale: 1.15 },
   { name: 'Secretaria do Estado do Paraná', group: 'public', logo: '/clients/governo-parana.webp' },
-  { name: 'Governo de São Paulo', group: 'public', logo: '/clients/governo-sp.svg' },
+  { name: 'Governo de São Paulo', group: 'public', logo: '/clients/governo-sp.webp' },
   { name: 'Neodent', group: 'private', logo: '/clients/neodent.webp', scale: 0.8 },
   { name: 'The Coffee', group: 'private', logo: '/clients/the-coffee.svg', scale: 0.9 },
   { name: "Habib's", group: 'private', logo: '/clients/habibs.svg', scale: 0.85 },
-  { name: 'Condor', group: 'private', logo: '/clients/condor.png' },
+  { name: 'Condor', group: 'private', logo: '/clients/condor.webp' },
   { name: 'Assaí Atacadista', group: 'private', logo: '/clients/assai.svg', scale: 1.05 },
 ];
