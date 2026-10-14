@@ -71,7 +71,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <main className="sky min-h-screen text-ink">
+      <main id="conteudo" tabIndex={-1} className="sky min-h-screen text-ink">
         <article className="gutter mx-auto max-w-6xl pt-36 pb-24">
           <nav aria-label="Trilha" className="label">
             <ol className="flex flex-wrap gap-2">

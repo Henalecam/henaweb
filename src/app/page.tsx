@@ -50,7 +50,7 @@ export default function Home() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <main className="bg-bg">
+      <main id="conteudo" tabIndex={-1} className="bg-bg">
         <DavidStage>
           <Hero />
           {/* two crossed tapes: the aesthetic one and the mystery one */}

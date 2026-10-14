@@ -16,7 +16,7 @@ const links = [
 export default function NotFound() {
   return (
     <>
-      <main className="sky relative flex min-h-[100svh] items-center overflow-hidden text-ink">
+      <main id="conteudo" tabIndex={-1} className="sky relative flex min-h-[100svh] items-center overflow-hidden text-ink">
         <div className="grid-floor !h-[32%] opacity-60" aria-hidden />
         <div className="gutter relative mx-auto w-full max-w-5xl py-32">
           <div className="win max-w-xl">

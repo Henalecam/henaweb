@@ -286,3 +286,6 @@
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
 }
+
+/* skip-link target: focusable for screen readers, no ring around the whole page */
+main:focus { outline: none; }
