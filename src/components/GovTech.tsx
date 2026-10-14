@@ -119,7 +119,7 @@ export default function GovTech() {
             <div className="grid md:grid-cols-[1.1fr_1fr]">
               <ol className="p-6 md:p-8">
                 {govFlow.map((step, i) => (
-                  <li key={step} data-step className="relative flex items-center gap-5 py-3.5 opacity-35">
+                  <li key={step} data-step className="relative flex items-center gap-5 py-3.5 opacity-60">
                     {/* rail segment anchored to this dot's center, reaching the next dot's center */}
                     {i < govFlow.length - 1 && (
                       <span aria-hidden className="absolute top-1/2 left-[6px] h-full w-[2px] bg-ink/15">

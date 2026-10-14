@@ -54,7 +54,8 @@ export default function Home() {
         <DavidStage>
           <Hero />
           {/* two crossed tapes: the aesthetic one and the mystery one */}
-          <div className="relative h-36 overflow-hidden md:h-44" aria-label="O que fazemos">
+          <div className="relative h-36 overflow-hidden md:h-44">
+            <p className="sr-only">O que fazemos: {ticker.join(', ')}</p>
             <div className="toon absolute top-1/2 -left-[5%] w-[110%] -translate-y-1/2 rotate-[3deg] bg-acid py-3 text-acid-ink">
               <Marquee
                 speed={50}

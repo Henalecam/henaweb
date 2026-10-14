@@ -8,6 +8,7 @@ import SmoothScroll from '@/components/SmoothScroll';
 import Preloader from '@/components/Preloader';
 import Cursor from '@/components/Cursor';
 import Nav from '@/components/Nav';
+import ConversionTracking from '@/components/ConversionTracking';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' });
@@ -137,6 +138,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SmoothScroll />
         <Cursor />
         <Nav />
+        <ConversionTracking />
         {children}
         <div className="grain" aria-hidden />
 

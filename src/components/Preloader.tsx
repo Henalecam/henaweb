@@ -23,6 +23,13 @@ export default function Preloader() {
         sessionStorage.setItem('hena:seen', '1');
       } catch {}
 
+      // phones skip the intro so the headline paints right away (it is the page's LCP)
+      if (window.matchMedia('(max-width: 767px)').matches) {
+        gsap.set(root.current, { display: 'none' });
+        markReady();
+        return;
+      }
+
       if (seen || prefersReducedMotion()) {
         gsap.to(root.current, { autoAlpha: 0, duration: 0.35, onStart: markReady });
         return;
@@ -58,7 +65,7 @@ export default function Preloader() {
       ref={root}
       data-preloader
       aria-hidden
-      className="sky fixed inset-0 z-[100] flex items-center justify-center overflow-hidden px-4"
+      className="sky fixed inset-0 z-[100] max-md:hidden flex items-center justify-center overflow-hidden px-4"
       style={{ clipPath: 'inset(0% 0% 0% 0%)' }}
     >
       <div className="sun absolute top-[10%] left-1/2 w-[min(70vw,520px)] -translate-x-1/2" />

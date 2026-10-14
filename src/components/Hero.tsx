@@ -12,15 +12,16 @@ export default function Hero() {
 
   useGSAP(
     () => {
-      const split = SplitText.create('[data-hero-title]', { type: 'lines', mask: 'lines', linesClass: 'line-mask' });
-      gsap.set(split.lines, { yPercent: 105 });
+      // desktop: the headline rises line by line after the intro; phones keep it painted from the first frame
+      const reveal = window.matchMedia('(min-width: 768px) and (prefers-reduced-motion: no-preference)').matches;
+      const split = reveal ? SplitText.create('[data-hero-title]', { type: 'lines', mask: 'lines', linesClass: 'line-mask', aria: 'none' }) : null;
+      if (split) gsap.set(split.lines, { yPercent: 105 });
       gsap.set('[data-hero-fade]', { autoAlpha: 0, y: 24 });
 
       const off = onReady(() => {
-        gsap
-          .timeline({ delay: 0.25 })
-          .to(split.lines, { yPercent: 0, duration: 1.3, ease: 'expo.out', stagger: 0.09 })
-          .to('[data-hero-fade]', { autoAlpha: 1, y: 0, duration: 1, ease: 'expo.out', stagger: 0.08 }, '-=0.9');
+        const tl = gsap.timeline({ delay: reveal ? 0.25 : 0 });
+        if (split) tl.to(split.lines, { yPercent: 0, duration: 1.3, ease: 'expo.out', stagger: 0.09 });
+        tl.to('[data-hero-fade]', { autoAlpha: 1, y: 0, duration: 1, ease: 'expo.out', stagger: 0.08 }, split ? '-=0.9' : 0);
       });
 
       gsap.to('[data-hero-inner]', {
@@ -32,7 +33,7 @@ export default function Hero() {
 
       return () => {
         off();
-        split.revert();
+        split?.revert();
       };
     },
     { scope: root },

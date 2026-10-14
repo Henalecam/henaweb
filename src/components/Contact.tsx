@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { gsap, SplitText, useGSAP } from '@/lib/gsap';
 import { symptoms, timelines, whatsappLink, site } from '@/lib/content';
 import { renderCaseCard, shareOrDownload } from '@/lib/caseCard';
+import { track } from '@/lib/track';
 import Social from './Social';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
@@ -37,6 +38,7 @@ export default function Contact() {
         timeline,
       });
       await shareOrDownload(blob, `ficha-do-caso-${caseNo.replace('/', '-')}.png`);
+      track({ name: 'case_card_download' });
     } finally {
       setSaving(false);
     }
@@ -124,7 +126,7 @@ export default function Contact() {
       });
       if (!res.ok) throw new Error();
       setStatus('sent');
-      (window as unknown as { fbq?: (...a: unknown[]) => void }).fbq?.('track', 'Lead', { content_name: capabilities[0] });
+      track({ name: 'lead', capability: capabilities.join(' + ') || undefined, timeline });
     } catch {
       setStatus('error');
     }

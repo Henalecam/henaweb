@@ -28,7 +28,14 @@ export default function DavidStage({ children }: { children: ReactNode }) {
           { yPercent: 55, ease: 'none', scrollTrigger: { trigger: stage.current, start: 'top top', end: 'bottom bottom', scrub: true } },
         );
 
-    import('@/lib/davidScene').then(({ createDavidScene }) => {
+    // the 3D scene waits for the page to finish loading so it never competes with first paint
+    const whenIdle = (cb: () => void) => {
+      const idle = () => ('requestIdleCallback' in window ? window.requestIdleCallback(cb, { timeout: 1500 }) : setTimeout(cb, 200));
+      if (document.readyState === 'complete') idle();
+      else window.addEventListener('load', idle, { once: true });
+    };
+
+    whenIdle(() => import('@/lib/davidScene').then(({ createDavidScene }) => {
       if (cancelled || !canvas.current) return;
       try {
         scene = createDavidScene(canvas.current, {
@@ -45,7 +52,7 @@ export default function DavidStage({ children }: { children: ReactNode }) {
         onUpdate: (self) => scene?.setProgress(self.progress),
       });
       offReady = onReady(() => scene?.reveal());
-    });
+    }));
 
     return () => {
       cancelled = true;

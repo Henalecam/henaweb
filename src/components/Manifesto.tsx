@@ -9,10 +9,10 @@ export default function Manifesto() {
 
   useGSAP(
     () => {
-      const split = SplitText.create('[data-manifesto]', { type: 'words' });
+      const split = SplitText.create('[data-manifesto]', { type: 'words', aria: 'none' });
       gsap.fromTo(
         split.words,
-        { opacity: 0.12 },
+        { opacity: 0.38 },
         {
           opacity: 1,
           stagger: 0.1,

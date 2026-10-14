@@ -255,7 +255,7 @@ export default function Process() {
                 <li
                   key={s.n}
                   data-step
-                  className="group/step flex min-h-[56svh] flex-col justify-center border-t-2 border-bg/10 py-10 opacity-35 transition-opacity duration-500 motion-reduce:opacity-100 [&.is-active]:opacity-100 lg:min-h-[70vh]"
+                  className="group/step flex min-h-[56svh] flex-col justify-center border-t-2 border-bg/10 py-10 opacity-75 transition-opacity duration-500 motion-reduce:opacity-100 [&.is-active]:opacity-100 lg:min-h-[70vh]"
                 >
                   {/* menu line: number, dish, dotted leader, "price" (the time it takes) */}
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2 md:flex-nowrap md:gap-4">
