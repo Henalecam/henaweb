@@ -58,7 +58,7 @@ export default function Capabilities() {
                   {c.title}
                 </span>
                 <span
-                  className={`relative hidden justify-self-end text-3xl transition-transform duration-500 md:col-span-4 md:block ${
+                  className={`toon-sm relative hidden h-12 w-12 items-center justify-center self-center justify-self-end rounded-full bg-acid text-3xl leading-none text-acid-ink transition-transform duration-500 md:col-span-4 md:flex ${
                     isOpen ? 'rotate-45' : ''
                   }`}
                   aria-hidden
