@@ -9,7 +9,7 @@ import MockUI from './MockUI';
 const pad = (n: number) => String(n).padStart(2, '0');
 
 /** Win95 window with the desktop capture and a phone overlapping its corner. */
-function Screen({ p, priority, tall = true }: { p: Project; priority?: boolean; tall?: boolean }) {
+function Screen({ p, tall = true }: { p: Project; tall?: boolean }) {
   const host = new URL(p.href).hostname;
   return (
     <div className="relative h-full w-full">
@@ -28,7 +28,6 @@ function Screen({ p, priority, tall = true }: { p: Project; priority?: boolean; 
               src={p.shot.desktop}
               alt={`Captura de tela de ${p.name}`}
               fill
-              priority={priority}
               sizes="(max-width: 1024px) 92vw, 58vw"
               className={`object-cover object-top ${
                 tall && p.shot.height > 1200 ? 'transition-[object-position] duration-[6000ms] ease-linear group-hover/screen:object-bottom' : ''
@@ -181,7 +180,7 @@ export default function Work() {
               className="group/screen block aspect-[16/9.4]"
             >
               <div data-exhibit className="h-full">
-                <Screen p={p} priority />
+                <Screen p={p} />
               </div>
             </a>
             <div data-exhibit-text className="mt-10 grid gap-5 xl:grid-cols-[1fr_auto] xl:items-start">
