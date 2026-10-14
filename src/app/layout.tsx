@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 },
   },
-  icons: { icon: [{ url: '/favicon.ico' }, { url: '/icon.png', type: 'image/png' }], apple: '/apple-icon.png' },
+  icons: { icon: [{ url: '/favicon.ico', sizes: '32x32' }, { url: '/icon.png', type: 'image/png', sizes: '48x48' }, { url: '/icon-192.png', type: 'image/png', sizes: '192x192' }], apple: '/apple-icon.png' },
 };
 
 export const viewport: Viewport = { themeColor: '#140c2e', colorScheme: 'dark' };
@@ -81,7 +81,7 @@ const jsonLd = {
       name: 'HenaWeb',
       legalName: 'Henaweb Ltda',
       url: site.url,
-      logo: `${site.url}/icon.png`,
+      logo: `${site.url}/icon-512.png`,
       email: site.email,
       sameAs,
       founder: { '@type': 'Person', name: 'Henrique Alexandre de Camargo', jobTitle: 'Cientista da computação' },
