@@ -17,6 +17,8 @@ export default function Contact() {
   const [picked, setPicked] = useState<string[]>([]);
   const [timeline, setTimeline] = useState(timelines[1]);
   const [status, setStatus] = useState<Status>('idle');
+  // what the visitor filled in, kept so a failed send can hand the whole case to WhatsApp or e-mail
+  const [fallback, setFallback] = useState('');
   const [caseNo, setCaseNo] = useState('...');
   useEffect(() => setCaseNo(`${new Date().getFullYear()}/${Math.floor(100 + Math.random() * 900)}`), []);
 
@@ -108,6 +110,18 @@ export default function Contact() {
     const report = chosen.length
       ? `Sintomas: ${chosen.map((c) => c.label).join('; ')}\nDiagnóstico preliminar: ${capabilities.join(' + ')}\n\n`
       : '';
+    const message = `${report}${data.get('message') ?? ''}`.trim();
+    setFallback(
+      [
+        `Olá! Quero abrir um caso com a HenaWeb (ficha nº ${caseNo}).`,
+        `Nome: ${data.get('name') ?? ''}`,
+        data.get('org') ? `Empresa ou órgão: ${data.get('org')}` : '',
+        `Prazo: ${timeline}`,
+        message,
+      ]
+        .filter(Boolean)
+        .join('\n'),
+    );
     setStatus('sending');
     try {
       const res = await fetch('/api/contact', {
@@ -120,7 +134,7 @@ export default function Contact() {
           org: data.get('org'),
           subject: capabilities[0] ?? 'Novo caso',
           timeline,
-          message: `${report}${data.get('message') ?? ''}`.trim() || 'Sem detalhes adicionais.',
+          message: message || 'Sem detalhes adicionais.',
           company: data.get('company'),
         }),
       });
@@ -243,13 +257,25 @@ export default function Contact() {
                   <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
                 </button>
                 {status === 'error' && (
-                  <p className="text-sm" role="alert">
-                    Não foi possível enviar agora.{' '}
-                    <a href={whatsappLink()} className="underline" target="_blank" rel="noopener noreferrer">
-                      Fale pelo WhatsApp
-                    </a>
-                    .
-                  </p>
+                  <div role="alert" className="flex basis-full flex-col gap-3 rounded-2xl border-[3px] border-acid-ink bg-paper p-5 shadow-[5px_5px_0_#120626]">
+                    <p className="font-medium">O formulário travou, mas a sua ficha não se perdeu. Envie o mesmo caso por aqui:</p>
+                    <div className="flex flex-wrap gap-3">
+                      <a
+                        href={whatsappLink(fallback)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="toon-sm rounded-full bg-[#25d366] px-5 py-2.5 text-sm font-medium"
+                      >
+                        Enviar pelo WhatsApp
+                      </a>
+                      <a
+                        href={`mailto:${site.email}?subject=${encodeURIComponent(`Caso nº ${caseNo}`)}&body=${encodeURIComponent(fallback)}`}
+                        className="toon-sm rounded-full bg-lemon px-5 py-2.5 text-sm font-medium"
+                      >
+                        Enviar por e-mail
+                      </a>
+                    </div>
+                  </div>
                 )}
               </div>
             </form>
