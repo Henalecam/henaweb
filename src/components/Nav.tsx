@@ -9,6 +9,7 @@ import Social from './Social';
 export default function Nav() {
   const inner = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const toggleBtn = useRef<HTMLButtonElement>(null);
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -32,6 +33,15 @@ export default function Nav() {
 
   useEffect(() => {
     document.documentElement.style.overflow = open ? 'hidden' : '';
+    if (!open) return;
+    // Esc closes the menu and hands focus back to the toggle
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setOpen(false);
+      toggleBtn.current?.focus();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
   return (
@@ -70,6 +80,7 @@ export default function Nav() {
             </Magnetic>
           </div>
           <button
+            ref={toggleBtn}
             type="button"
             className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden"
             aria-expanded={open}
@@ -85,6 +96,7 @@ export default function Nav() {
 
       <div
         id="menu-mobile"
+        inert={!open}
         className={`gutter fixed inset-0 z-40 flex flex-col justify-end bg-bg pb-10 transition-[clip-path] duration-700 ease-[var(--ease-out-expo)] md:hidden ${
           open ? '[clip-path:inset(0_0_0_0)]' : 'pointer-events-none [clip-path:inset(0_0_100%_0)]'
         }`}
