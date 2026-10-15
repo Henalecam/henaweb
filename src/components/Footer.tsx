@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { gsap, useGSAP } from '@/lib/gsap';
 import { nav, projects, site, whatsappLink } from '@/lib/content';
 import { services } from '@/lib/services';
+import { CONSENT_OPEN } from '@/lib/consent';
 import Clock from './Clock';
 import Chase from './Chase';
 import Social from './Social';
@@ -118,6 +119,9 @@ export default function Footer() {
         <span>
           {site.city} · <Clock />
         </span>
+        <button type="button" onClick={() => window.dispatchEvent(new Event(CONSENT_OPEN))} className="label hover:text-ink">
+          Cookies
+        </button>
         {/* same-page anchor: on a case or service page "/#topo" sent the visitor to the home page */}
         <a href="#conteudo" className="hover:text-ink">
           Voltar ao topo ↑

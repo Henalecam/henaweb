@@ -12,6 +12,8 @@ import ConversionTracking from '@/components/ConversionTracking';
 import FloatingContact from '@/components/FloatingContact';
 import TabHaunt from '@/components/TabHaunt';
 import ScrollProgress from '@/components/ScrollProgress';
+import ConsentBanner from '@/components/ConsentBanner';
+import { analyticsLoader } from '@/lib/consent';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' });
@@ -69,6 +71,7 @@ export const viewport: Viewport = { themeColor: '#140c2e', colorScheme: 'dark' }
 const PIXEL_ID = '1389558105453782';
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID;
+const tools = [PIXEL_ID && 'Meta', GA_ID && 'Google', CLARITY_ID && 'Microsoft Clarity'].filter((x): x is string => !!x);
 
 const sameAs = site.social.map((x) => x.href);
 
@@ -155,21 +158,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <div className="grain" aria-hidden />
 
-        <Script id="meta-pixel" strategy="afterInteractive">
-          {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${PIXEL_ID}');fbq('track','PageView');`}
-        </Script>
-        {GA_ID && (
+        {tools.length > 0 && (
           <>
-            <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
-            <Script id="ga" strategy="afterInteractive">
-              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA_ID}');`}
+            {/* LGPD: the tools load only after the visitor accepts (or accepted on an earlier visit) */}
+            <Script id="analytics" strategy="afterInteractive">
+              {analyticsLoader({ pixel: PIXEL_ID, ga: GA_ID, clarity: CLARITY_ID })}
             </Script>
+            <ConsentBanner tools={tools} />
           </>
-        )}
-        {CLARITY_ID && (
-          <Script id="clarity" strategy="afterInteractive">
-            {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script","${CLARITY_ID}");`}
-          </Script>
         )}
       </body>
     </html>

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createAdaptiveLoop } from './adaptiveLoop';
 
 /**
  * Cartoon 3D burger, built from primitives: toon shading (3-step ramp) and
@@ -28,7 +29,8 @@ function toonRamp() {
 
 export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: { reducedMotion: boolean }): BurgerScene {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  renderer.setPixelRatio(dpr);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const scene = new THREE.Scene();
@@ -586,48 +588,65 @@ export function createBurgerScene(canvas: HTMLCanvasElement, { reducedMotion }: 
     camera.position.set(0, dist * 0.4, dist);
     camera.lookAt(0, 2.55, 0);
     camera.updateProjectionMatrix();
+    loop.request(); // resizing clears the canvas
   };
-  resize();
-  // the sticky stage changes size with the mobile address bar, not only on window resize
-  const ro = new ResizeObserver(resize);
-  ro.observe(canvas);
 
   const mouse = { x: 0, tx: 0 };
   const onMove = (e: PointerEvent) => {
     const r = canvas.getBoundingClientRect();
     mouse.tx = THREE.MathUtils.clamp((e.clientX - (r.left + r.width / 2)) / r.width, -1, 1);
   };
-  window.addEventListener('pointermove', onMove);
 
   let visible = true;
   const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting));
   io.observe(canvas);
 
-  let raf = 0;
   const start = performance.now();
-  const frame = (now: number) => {
-    raf = requestAnimationFrame(frame);
-    if (!visible || document.hidden) return;
+  const draw = (now: number, live: boolean) => {
     const t = (now - start) / 1000;
-    mouse.x += (mouse.tx - mouse.x) * 0.06;
+    // still frames (reduced motion, slow device) hold the turntable and skip the pointer drift
+    if (live) mouse.x += (mouse.tx - mouse.x) * 0.06;
     burger.rotation.y = (reducedMotion ? 0.4 : t * 0.35) + mouse.x * 0.6;
-    wobble *= 0.92;
+    wobble = live ? wobble * 0.92 : 0;
     burger.scale.setScalar(1 + Math.sin(t * 18) * wobble * 0.05);
     renderer.render(scene, camera);
   };
-  raf = requestAnimationFrame(frame);
+  const loop = createAdaptiveLoop({
+    draw,
+    visible: () => visible,
+    reducedMotion,
+    stillTime: start,
+    onTier: (tier) => {
+      if (tier === 1) {
+        dpr = 1;
+        renderer.setPixelRatio(dpr);
+        resize();
+      } else {
+        window.removeEventListener('pointermove', onMove);
+      }
+    },
+  });
+  resize();
+  // the sticky stage changes size with the mobile address bar, not only on window resize
+  const ro = new ResizeObserver(resize);
+  ro.observe(canvas);
+  if (!reducedMotion) window.addEventListener('pointermove', onMove);
 
   return {
     setLayer: (step, p) => {
       progress[step] = THREE.MathUtils.clamp(p, 0, 1);
       apply();
+      loop.request();
     },
-    setVersion: (label) => flagPaint(label),
+    setVersion: (label) => {
+      flagPaint(label);
+      loop.request();
+    },
     celebrate: () => {
       wobble = 1;
     },
     dispose: () => {
-      cancelAnimationFrame(raf);
+      loop.stop();
       io.disconnect();
       ro.disconnect();
       window.removeEventListener('pointermove', onMove);
