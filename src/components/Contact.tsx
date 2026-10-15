@@ -6,6 +6,7 @@ import { symptoms, timelines, whatsappLink, site } from '@/lib/content';
 import { renderCaseCard, shareOrDownload } from '@/lib/caseCard';
 import { track } from '@/lib/track';
 import { suggestEmail } from '@/lib/emailTypos';
+import { formatPhoneBR } from '@/lib/phone';
 import Social from './Social';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
@@ -371,7 +372,22 @@ export default function Contact() {
                       </p>
                     )}
                   </div>
-                  <input name="whatsapp" type="tel" inputMode="tel" placeholder="WhatsApp (opcional)" autoComplete="tel" className={field} aria-label="WhatsApp" />
+                  <input
+                    name="whatsapp"
+                    type="tel"
+                    inputMode="tel"
+                    placeholder="WhatsApp (opcional)"
+                    autoComplete="tel"
+                    maxLength={22}
+                    className={field}
+                    aria-label="WhatsApp"
+                    onInput={(e) => {
+                      // (41) 99999-9999 as it is typed; foreign numbers starting with + stay as typed
+                      const el = e.currentTarget;
+                      const atEnd = el.selectionStart === el.value.length;
+                      if (atEnd) el.value = formatPhoneBR(el.value);
+                    }}
+                  />
                   <input name="org" placeholder="Empresa ou órgão (opcional)" autoComplete="organization" className={field} aria-label="Empresa ou órgão" />
                 </div>
                 <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
