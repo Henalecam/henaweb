@@ -51,13 +51,13 @@ export default function Hero() {
 
         <h1
           data-hero-title
-          className="max-w-[12ch] text-[clamp(3rem,9vw,10rem)] leading-[0.88] font-medium tracking-[-0.055em] [text-shadow:0_0_48px_rgb(18_8_42/0.9)]"
+          className="max-w-[12ch] text-[clamp(3rem,9vw,10rem)] leading-[0.88] font-medium tracking-[-0.055em] [text-shadow:0_0_48px_rgb(18_8_42/0.9)] max-md:[text-shadow:0_2px_4px_rgb(18_8_42/0.95),0_0_22px_rgb(18_8_42/0.95),0_0_48px_rgb(18_8_42/0.9)]"
         >
           Sistemas <span className="font-groovy pr-[0.06em] text-[0.82em] tracking-normal text-acid [text-shadow:5px_5px_0_#120626,0_0_40px_rgb(255_113_206/0.6)]">esculpidos</span> para empresas e governos.
         </h1>
 
         <div className="mt-10 grid gap-8 md:mt-12 md:grid-cols-12 md:items-end">
-          <p data-hero-fade className="max-w-md text-base leading-relaxed text-ink/75 md:col-span-5 md:text-lg">
+          <p data-hero-fade className="max-w-md text-base leading-relaxed text-ink/75 max-md:text-ink/85 max-md:[text-shadow:0_1px_3px_rgb(18_8_42/0.95),0_0_14px_rgb(18_8_42/0.9)] md:col-span-5 md:text-lg">
             Todo escultor tira do mármore o que sobra. Fazemos o mesmo com processos: removemos o excesso até
             restar só o sistema. Sob medida, público ou com IA.
           </p>
