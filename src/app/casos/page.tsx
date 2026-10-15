@@ -3,15 +3,16 @@ import Image from 'next/image';
 import { projects, site } from '@/lib/content';
 import Footer from '@/components/Footer';
 import MockUI from '@/components/MockUI';
+import ClosingCta from '@/components/ClosingCta';
 
 const description =
-  'Casos resolvidos pela HenaWeb: ERPs, plataformas com IA, sistemas de agendamento, produtos financeiros e sites. Veja o problema de cada cliente e o que construímos.';
+  'Casos resolvidos pela HenaWeb: ERPs, plataformas com IA, agendamento, produtos financeiros e sites. Veja o problema de cada cliente e o que construímos.';
 
 export const metadata: Metadata = {
-  title: 'Casos e projetos',
+  title: 'Casos e projetos de software sob medida',
   description,
   alternates: { canonical: '/casos' },
-  openGraph: { type: 'website', url: '/casos', title: 'Casos e projetos · HenaWeb', description, locale: 'pt_BR', siteName: 'HenaWeb', images: ['/opengraph-image'] },
+  openGraph: { type: 'website', url: '/casos', title: 'Casos e projetos de software sob medida · HenaWeb', description, locale: 'pt_BR', siteName: 'HenaWeb', images: ['/opengraph-image'] },
 };
 
 export default function CasesIndex() {
@@ -70,6 +71,13 @@ export default function CasesIndex() {
               </li>
             ))}
           </ul>
+
+          <ClosingCta
+            title="Reconheceu o seu problema em algum"
+            accent="desses casos?"
+            text="Conte o que está travando a sua operação. Respondemos com um primeiro diagnóstico e o caminho mais curto até o sistema certo."
+            whatsappMessage="Olá! Vi os casos da HenaWeb e quero conversar sobre um projeto."
+          />
         </div>
       </main>
       <Footer />

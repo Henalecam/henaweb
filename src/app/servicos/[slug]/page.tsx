@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { services, serviceBySlug } from '@/lib/services';
 import { projects, site, whatsappLink } from '@/lib/content';
+import ClosingCta from '@/components/ClosingCta';
 import Footer from '@/components/Footer';
 
 export const dynamicParams = false;
@@ -211,6 +212,13 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
               ))}
             </ul>
           </section>
+
+          <ClosingCta
+            title="Seu caso parece com"
+            accent="esse?"
+            text="Marque os sintomas no formulário e receba um diagnóstico preliminar na hora, ou chame direto no WhatsApp."
+            whatsappMessage={`Olá! Quero conversar sobre ${s.name.toLowerCase()} com a HenaWeb.`}
+          />
         </article>
       </main>
       <Footer />
