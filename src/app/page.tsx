@@ -11,6 +11,7 @@ import Process from '@/components/Process';
 import Studio from '@/components/Studio';
 import Contact from '@/components/Contact';
 import Faq from '@/components/Faq';
+import Testimonials from '@/components/Testimonials';
 import { homeFaq, projects, site } from '@/lib/content';
 import Footer from '@/components/Footer';
 
@@ -87,6 +88,7 @@ export default function Home() {
         <Mystery />
         <GovTech />
         <Work />
+        <Testimonials />
         <Process />
         <Studio />
         <Faq />
