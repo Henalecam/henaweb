@@ -80,7 +80,8 @@ export default function Footer() {
         <span>
           {site.city} · <Clock />
         </span>
-        <a href="/#topo" className="hover:text-ink">
+        {/* same-page anchor: on a case or service page "/#topo" sent the visitor to the home page */}
+        <a href="#conteudo" className="hover:text-ink">
           Voltar ao topo ↑
         </a>
       </div>
