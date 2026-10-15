@@ -5,6 +5,7 @@ import { gsap, SplitText, useGSAP } from '@/lib/gsap';
 import { symptoms, timelines, whatsappLink, site } from '@/lib/content';
 import { renderCaseCard, shareOrDownload } from '@/lib/caseCard';
 import { track } from '@/lib/track';
+import { suggestEmail } from '@/lib/emailTypos';
 import Social from './Social';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
@@ -23,6 +24,10 @@ const clear = (e: FormEvent<HTMLInputElement>) => e.currentTarget.setCustomValid
 export default function Contact() {
   const root = useRef<HTMLElement>(null);
   const done = useRef<HTMLDivElement>(null);
+  const failBox = useRef<HTMLDivElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  // "did you mean …@gmail.com?" for addresses that would bounce
+  const [emailHint, setEmailHint] = useState<string | null>(null);
   const [picked, setPicked] = useState<string[]>([]);
   const [timeline, setTimeline] = useState(timelines[1]);
   const [status, setStatus] = useState<Status>('idle');
@@ -157,6 +162,11 @@ export default function Contact() {
       track({ name: 'lead', capability: capabilities.join(' + ') || undefined, timeline });
     } catch {
       setStatus('error');
+      // the fallback card renders below the button, often under the fold: bring it into view
+      requestAnimationFrame(() => {
+        failBox.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        failBox.current?.focus({ preventScroll: true });
+      });
     }
   }
 
@@ -274,7 +284,42 @@ export default function Contact() {
                 <legend className="label mb-2 !text-acid-ink/60">3 · Quem está investigando</legend>
                 <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
                   <input name="name" required placeholder="Seu nome" autoComplete="name" className={field} aria-label="Nome" onInvalid={explain} onInput={clear} />
-                  <input name="email" type="email" required placeholder="E-mail" autoComplete="email" className={field} aria-label="E-mail" onInvalid={explain} onInput={clear} />
+                  <div>
+                    <input
+                      ref={emailRef}
+                      name="email"
+                      type="email"
+                      required
+                      placeholder="E-mail"
+                      autoComplete="email"
+                      className={field}
+                      aria-label="E-mail"
+                      aria-describedby={emailHint ? 'email-hint' : undefined}
+                      onInvalid={explain}
+                      onInput={(e) => {
+                        clear(e);
+                        if (emailHint) setEmailHint(null);
+                      }}
+                      onBlur={(e) => setEmailHint(suggestEmail(e.currentTarget.value))}
+                    />
+                    {emailHint && (
+                      <p id="email-hint" className="mt-2 text-sm text-acid-ink/80">
+                        Você quis dizer{' '}
+                        <button
+                          type="button"
+                          className="font-medium underline decoration-2 underline-offset-2"
+                          onClick={() => {
+                            if (emailRef.current) emailRef.current.value = emailHint;
+                            setEmailHint(null);
+                            emailRef.current?.focus();
+                          }}
+                        >
+                          {emailHint}
+                        </button>
+                        ?
+                      </p>
+                    )}
+                  </div>
                   <input name="whatsapp" type="tel" inputMode="tel" placeholder="WhatsApp (opcional)" autoComplete="tel" className={field} aria-label="WhatsApp" />
                   <input name="org" placeholder="Empresa ou órgão (opcional)" autoComplete="organization" className={field} aria-label="Empresa ou órgão" />
                 </div>
@@ -292,8 +337,16 @@ export default function Contact() {
                   {status === 'sending' ? 'Enviando…' : 'Abrir o caso'}
                   <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
                 </button>
+                <p className="max-w-xs text-sm leading-snug text-acid-ink/75">
+                  Usamos seus dados só para responder este caso.
+                </p>
                 {status === 'error' && (
-                  <div role="alert" className="flex basis-full flex-col gap-3 rounded-2xl border-[3px] border-acid-ink bg-paper p-5 shadow-[5px_5px_0_#120626]">
+                  <div
+                    ref={failBox}
+                    tabIndex={-1}
+                    role="alert"
+                    className="flex basis-full flex-col gap-3 rounded-2xl border-[3px] border-acid-ink bg-paper p-5 shadow-[5px_5px_0_#120626] outline-none"
+                  >
                     <p className="font-medium">O formulário travou, mas a sua ficha não se perdeu. Envie o mesmo caso por aqui:</p>
                     <div className="flex flex-wrap gap-3">
                       <a
