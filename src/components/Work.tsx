@@ -68,6 +68,16 @@ export default function Work() {
   const [paused, setPaused] = useState(false);
   const p = projects[active];
 
+  // WAI-ARIA tabs: arrows, Home and End move between projects (focusing a tab selects it)
+  const onTabKey = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    const last = projects.length - 1;
+    const next = { ArrowDown: active + 1, ArrowRight: active + 1, ArrowUp: active - 1, ArrowLeft: active - 1, Home: 0, End: last }[e.key];
+    if (next === undefined) return;
+    e.preventDefault();
+    const i = next < 0 ? last : next > last ? 0 : next;
+    document.getElementById(`work-tab-${i}`)?.focus();
+  };
+
   useGSAP(
     () => {
       gsap.from('[data-work-in]', {
@@ -140,11 +150,16 @@ export default function Work() {
             {projects.map((item, i) => {
               const on = i === active;
               return (
-                <li key={item.name}>
+                <li key={item.name} role="presentation">
                   <button
                     type="button"
                     role="tab"
+                    id={`work-tab-${i}`}
                     aria-selected={on}
+                    aria-controls="work-panel"
+                    // roving focus: Tab enters the list once, arrows move between projects
+                    tabIndex={on ? 0 : -1}
+                    onKeyDown={onTabKey}
                     onMouseEnter={() => setActive(i)}
                     onFocus={() => setActive(i)}
                     onClick={() => setActive(i)}
@@ -176,7 +191,7 @@ export default function Work() {
             })}
           </ol>
 
-          <div className="lg:col-span-8" role="tabpanel" aria-label={p.name}>
+          <div className="lg:col-span-8" role="tabpanel" id="work-panel" aria-labelledby={`work-tab-${active}`}>
             <a
               href={p.href}
               target="_blank"
