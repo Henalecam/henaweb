@@ -86,12 +86,28 @@ export default function Contact() {
     { scope: root },
   );
 
+  // visitors who prefer WhatsApp over the form keep the diagnosis they just built
+  const whatsappWithCase = lead
+    ? whatsappLink(
+        `Olá! Montei a ficha nº ${caseNo} no site da HenaWeb.\nSintomas: ${chosen.map((c) => c.label).join('; ')}\nEspecialidade indicada: ${capabilities.join(' + ')}\nPrazo: ${timeline}`,
+      )
+    : whatsappLink();
+
   const diagnosis = (
           <div className="mt-8 rounded-2xl border-[3px] border-acid-ink bg-paper p-5 shadow-[6px_6px_0_#120626]" aria-live="polite">
             <div className="flex items-center justify-between gap-3 font-mono text-[0.68rem] uppercase">
               <span>Ficha do caso nº {caseNo}</span>
-              <span className={`rounded-full px-2 py-0.5 text-right ${lead ? 'bg-acid-ink text-acid' : 'border border-acid-ink/30'}`}>
-                {lead ? 'Suspeito identificado' : 'Aguardando pistas'}
+              <span className={`shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 ${lead ? 'bg-acid-ink text-acid' : 'border border-acid-ink/30'}`}>
+                {/* short form on phones so the pill stays on one line next to the case number */}
+                {lead ? (
+                  <>
+                    <span className="max-sm:hidden">Suspeito </span>identificado
+                  </>
+                ) : (
+                  <>
+                    Aguardando<span className="max-sm:hidden"> pistas</span>
+                  </>
+                )}
               </span>
             </div>
             {lead ? (
@@ -112,7 +128,19 @@ export default function Contact() {
             ) : (
               <p className="serif mt-4 text-xl text-acid-ink/60">Nenhuma pista ainda. Marque o que está acontecendo por aí.</p>
             )}
-            {saveButton}
+            {lead && (
+              <div className="flex flex-wrap items-center gap-x-3">
+                {saveButton}
+                <a
+                  href={whatsappWithCase}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="toon-sm toon-press mt-5 inline-flex items-center gap-2 rounded-full bg-[#25d366] px-4 py-2 text-sm font-medium text-acid-ink"
+                >
+                  Mandar a ficha pelo WhatsApp
+                </a>
+              </div>
+            )}
           </div>
   );
 
@@ -190,7 +218,7 @@ export default function Contact() {
           <div className="hidden lg:block">{diagnosis}</div>
 
           <div className="mt-8 flex flex-col gap-2 font-mono text-sm">
-            <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="w-fit underline-offset-4 hover:underline">
+            <a href={whatsappWithCase} target="_blank" rel="noopener noreferrer" className="w-fit underline-offset-4 hover:underline">
               WhatsApp · {site.whatsappDisplay} ↗
             </a>
             <a href={`mailto:${site.email}`} className="w-fit underline-offset-4 hover:underline">
