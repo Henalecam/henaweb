@@ -182,6 +182,18 @@ export const projects: Project[] = [
     highlights: ['Calculadora de direitos', 'WhatsApp', 'Captação de leads'],
     shot: { desktop: '/cases/camargo.jpg', mobile: '/cases/camargo-m.jpg', height: 2700 },
   },
+  {
+    slug: 'forno-di-lenha',
+    service: 'sites-e-produtos',
+    name: 'Forno di Lenha',
+    kind: 'Pizzaria online · Pedido interativo',
+    summary: 'Pizzaria online com monte-sua-pizza animado, 73 sabores, carrinho, pedido pelo WhatsApp e painel da cozinha.',
+    href: 'https://forno.henaweb.com',
+    challenge: 'Pedir pizza pelo WhatsApp vira troca de áudios, foto de cardápio e erro de pedido; e ninguém vê o que está montando.',
+    built: 'Uma loja onde o cliente monta a pizza vendo cada ingrediente cair na massa, com preço na hora, pedido direto para a cozinha e acompanhamento ao vivo.',
+    highlights: ['Monte sua pizza', 'Meio a meio', 'Pedido no WhatsApp', 'Painel da cozinha'],
+    shot: { desktop: '/cases/forno-di-lenha.jpg', mobile: '/cases/forno-di-lenha-m.jpg', height: 2700 },
+  },
 ];
 
 export const process = [

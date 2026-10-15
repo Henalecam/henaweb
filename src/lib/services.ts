@@ -179,6 +179,7 @@ export const services: ServicePage[] = [
     ],
     stack: ['Next.js', 'React', 'TypeScript', 'Tailwind', 'GSAP', 'Three.js', 'Vercel'],
     examples: [
+      { name: 'Forno di Lenha', href: 'https://forno.henaweb.com', note: 'Pizzaria online com monte-sua-pizza animado, pedido pelo WhatsApp e painel da cozinha.' },
       { name: 'Contacerta', href: 'https://contacerta.vercel.app/', note: 'Site de escritório contábil com diagnóstico gratuito e quiz de qualificação.' },
       { name: 'Camargo Legal', href: 'https://firebase-lawyer-studio.vercel.app/', note: 'Landing de advocacia trabalhista com calculadora de direitos.' },
       { name: 'NEXT Card', href: 'https://fintech-henaweb.vercel.app/', note: 'Produto financeiro com cartão interativo e jornada de solicitação.' },
