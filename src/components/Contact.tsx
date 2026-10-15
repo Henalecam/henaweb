@@ -293,7 +293,7 @@ export default function Contact() {
                     return (
                       <label
                         key={s.id}
-                        className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3 text-[0.95rem] transition-all has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-acid-ink ${
+                        className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3 text-[0.95rem] transition-all has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-acid-ink ${
                           on ? 'border-acid-ink bg-acid-ink text-acid shadow-[4px_4px_0_rgb(11_13_2/0.35)]' : 'border-acid-ink/25 hover:border-acid-ink'
                         }`}
                       >
@@ -320,7 +320,7 @@ export default function Contact() {
                   {timelines.map((o) => (
                     <label
                       key={o}
-                      className={`cursor-pointer rounded-full border-2 px-4 py-2 text-sm transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-acid-ink ${
+                      className={`cursor-pointer rounded-full border-2 px-4 py-2 text-sm transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-acid-ink ${
                         timeline === o ? 'border-acid-ink bg-acid-ink text-acid' : 'border-acid-ink/25 hover:border-acid-ink'
                       }`}
                     >
