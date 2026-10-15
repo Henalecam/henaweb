@@ -107,7 +107,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
               </div>
               <div className="relative m-1.5 aspect-[16/9.4] overflow-hidden border-2 border-[#7d7394] bg-acid-ink">
                 {p.shot ? (
-                  <Image src={p.shot.desktop} alt={`Tela de ${p.name}`} fill priority sizes="(max-width: 1200px) 92vw, 1100px" className="object-cover object-top" />
+                  <Image src={p.shot.desktop} alt={`Tela de ${p.name}`} fill preload fetchPriority="high" sizes="(max-width: 1200px) 92vw, 1100px" className="object-cover object-top" />
                 ) : (
                   p.mock && <MockUI variant={p.mock.variant} hue={p.mock.hue} />
                 )}
