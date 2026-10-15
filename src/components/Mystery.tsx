@@ -87,7 +87,7 @@ const evidenceBodies: Record<EvidenceId, { label: string; body: ReactNode }> = {
     label: 'Recorte de jornal',
     body: (
       <div className="bg-[#efe6d2] text-acid-ink" style={{ padding: u(1.2), boxShadow: `${u(0.6)} ${u(0.6)} 0 rgb(20 10 38 / 0.6)` }}>
-        <p className="font-mono tracking-widest uppercase opacity-60" style={{ fontSize: u(1.2) }}>
+        <p className="font-mono tracking-widest uppercase opacity-70" style={{ fontSize: u(1.2) }}>
           Diário da Operação
         </p>
         <p className="serif leading-tight font-semibold" style={{ fontSize: u(2.5) }}>
