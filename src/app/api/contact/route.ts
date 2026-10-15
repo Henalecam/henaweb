@@ -13,7 +13,7 @@ function getResendClient(): Resend | null {
 
 const escape = (v: unknown) =>
   String(v ?? '')
-    .slice(0, 5000)
+    .slice(0, 8000)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -22,7 +22,30 @@ const escape = (v: unknown) =>
 
 const EMAIL_RE = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
 
+// Best-effort flood guard: a few briefings per address per window, kept in this instance's memory.
+// It won't stop a distributed attack, but a looping script stops filling the inbox (and the Resend quota).
+const WINDOW_MS = 10 * 60 * 1000;
+const MAX_PER_WINDOW = 5;
+const hits = new Map<string, number[]>();
+
+function rateLimited(ip: string, now = Date.now()) {
+  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
+  recent.push(now);
+  hits.set(ip, recent);
+  if (hits.size > 5000) {
+    for (const [k, v] of hits) if (now - v[v.length - 1] >= WINDOW_MS) hits.delete(k);
+  }
+  return recent.length > MAX_PER_WINDOW;
+}
+
+const clientIp = (request: Request) =>
+  request.headers.get('x-forwarded-for')?.split(',')[0].trim() || request.headers.get('x-real-ip') || 'unknown';
+
 export async function POST(request: Request) {
+  if (rateLimited(clientIp(request))) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429, headers: { 'Retry-After': '600' } });
+  }
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();
@@ -38,6 +61,10 @@ export async function POST(request: Request) {
 
     if (!name || !email || !subject || !message) {
       return NextResponse.json({ error: 'Name, email, subject and message are required' }, { status: 400 });
+    }
+
+    if (String(name).length > 200 || String(subject).length > 200 || String(message).length > 8000) {
+      return NextResponse.json({ error: 'Field too long' }, { status: 400 });
     }
 
     const replyTo = String(email).trim().slice(0, 254);

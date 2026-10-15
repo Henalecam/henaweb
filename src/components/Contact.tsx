@@ -335,7 +335,7 @@ export default function Contact() {
               <fieldset>
                 <legend className="label mb-2 !text-acid-ink/60">3 · Quem está investigando</legend>
                 <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
-                  <input name="name" required placeholder="Seu nome" autoComplete="name" className={field} aria-label="Nome" onInvalid={explain} onInput={clear} />
+                  <input name="name" required maxLength={120} placeholder="Seu nome" autoComplete="name" className={field} aria-label="Nome" onInvalid={explain} onInput={clear} />
                   <div>
                     <input
                       ref={emailRef}
@@ -391,7 +391,7 @@ export default function Contact() {
                   <input name="org" placeholder="Empresa ou órgão (opcional)" autoComplete="organization" className={field} aria-label="Empresa ou órgão" />
                 </div>
                 <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
-                <textarea name="message" rows={3} placeholder="Mais alguma pista? (opcional)" className={`${field} mt-2 resize-none`} aria-label="Mensagem" />
+                <textarea name="message" rows={3} maxLength={4000} placeholder="Mais alguma pista? (opcional)" className={`${field} mt-2 resize-none`} aria-label="Mensagem" />
               </fieldset>
 
               <div className="flex flex-wrap items-center gap-6">
