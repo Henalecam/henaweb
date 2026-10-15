@@ -223,7 +223,8 @@ export default function Work() {
             {projects.map((item, i) => (
               <li key={item.name} className="w-[86%] shrink-0 snap-center sm:w-[70%]">
                 {/* the screenshot opens the case page, like the link below it, instead of leaving for the client's site */}
-                <a href={`/casos/${item.slug}`} aria-label={`Ver caso ${item.name}`} className="block aspect-[16/10.5]">
+                {/* same target as "Ver caso completo" below: hidden from screen readers and the tab order so it isn't announced twice */}
+                <a href={`/casos/${item.slug}`} aria-hidden tabIndex={-1} className="block aspect-[16/10.5]">
                   <Screen p={item} tall={false} />
                 </a>
                 <div className="mt-8 flex flex-col gap-3">
