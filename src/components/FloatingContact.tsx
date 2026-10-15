@@ -5,7 +5,7 @@ import { whatsappLink } from '@/lib/content';
 
 /**
  * Phones only: a WhatsApp button that appears once the hero has scrolled away and
- * steps aside while the contact section or the footer is on screen. While reading
+ * steps aside while the FAQ, the contact section or the footer is on screen. While reading
  * downward it shrinks to a round icon so it covers less text; scrolling up brings the label back.
  */
 export default function FloatingContact() {
@@ -34,7 +34,9 @@ export default function FloatingContact() {
       },
       { threshold: 0.15 },
     );
-    document.querySelectorAll('#contato, footer').forEach((el) => io.observe(el));
+    // the FAQ toggles sit on the right edge, right where the button floats; contact and footer
+    // already show WhatsApp themselves
+    document.querySelectorAll('#perguntas, #contato, footer').forEach((el) => io.observe(el));
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => {
