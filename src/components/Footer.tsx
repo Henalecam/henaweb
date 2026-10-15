@@ -2,7 +2,8 @@
 
 import { useRef } from 'react';
 import { gsap, useGSAP } from '@/lib/gsap';
-import { nav, site, whatsappLink } from '@/lib/content';
+import { nav, projects, site, whatsappLink } from '@/lib/content';
+import { services } from '@/lib/services';
 import Clock from './Clock';
 import Chase from './Chase';
 import Social from './Social';
@@ -25,34 +26,68 @@ export default function Footer() {
 
   return (
     <footer ref={root} className="sky gutter relative z-50 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon pt-20 pb-6">
-      <div className="relative z-20 grid gap-12 md:grid-cols-12">
-        <div className="md:col-span-5">
+      <div className="relative z-20 grid gap-12 lg:grid-cols-12">
+        {/* who we are + the two ways to reach us */}
+        <div className="lg:col-span-4">
           <p className="max-w-sm text-2xl leading-tight font-medium tracking-tight">
-            Studio de engenharia de software para empresas e governos. <span className="font-groovy text-acid">Mistérios resolvidos sob medida.</span>
+            Studio de engenharia de software para empresas e governos.{' '}
+            <span className="font-groovy text-acid">Mistérios resolvidos sob medida.</span>
           </p>
-          <a
-            href={whatsappLink()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 inline-block font-mono text-sm text-acid underline-offset-4 hover:underline"
-          >
-            {site.whatsappDisplay} ↗
-          </a>
-          <a href={`mailto:${site.email}`} className="mt-2 block w-fit font-mono text-sm text-ink/75 underline-offset-4 hover:text-ink hover:underline">
-            {site.email}
-          </a>
-        </div>
-        <nav className="flex flex-col gap-2 md:col-span-3 md:col-start-7" aria-label="Rodapé">
-          <span className="label mb-2">Navegação</span>
-          {[...nav, { label: 'Contato', href: '/#contato' }].map((n) => (
-            <a key={n.href} href={n.href} className="w-fit text-ink/75 transition-colors hover:text-ink">
-              {n.label}
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a
+              href={whatsappLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="toon-sm toon-press inline-flex items-center gap-2 rounded-full bg-[#25d366] px-4 py-2.5 text-sm font-medium text-acid-ink"
+            >
+              WhatsApp · {site.whatsappDisplay}
             </a>
-          ))}
-        </nav>
-        <div className="flex flex-col gap-3 md:col-span-3">
-          <span className="label">@henaweb</span>
-          <Social />
+            <a
+              href={`mailto:${site.email}`}
+              className="toon-sm toon-press inline-flex items-center rounded-full bg-paper px-4 py-2.5 text-sm font-medium text-acid-ink"
+            >
+              {site.email}
+            </a>
+          </div>
+          <p className="mt-6 font-mono text-xs leading-relaxed text-ink/60">
+            {site.city} · {site.coords}
+            <br />
+            Atendemos todo o Brasil e o exterior.
+          </p>
+          <div className="mt-6 flex items-center gap-4">
+            <Social />
+            <span className="label">@henaweb</span>
+          </div>
+        </div>
+
+        {/* a little file tree, in keeping with the .exe windows: every page one click away */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:col-span-8">
+          <FooterColumn title="serviços/">
+            {services.map((x) => (
+              <FooterLink key={x.slug} href={`/servicos/${x.slug}`}>
+                {x.name}
+              </FooterLink>
+            ))}
+          </FooterColumn>
+          <FooterColumn title="casos/">
+            {projects.map((x) => (
+              <FooterLink key={x.slug} href={`/casos/${x.slug}`}>
+                {x.name}
+              </FooterLink>
+            ))}
+            <FooterLink href="/casos" accent>
+              Ver todos →
+            </FooterLink>
+          </FooterColumn>
+          <FooterColumn title="studio/" className="col-span-2 sm:col-span-1" listClassName="grid grid-cols-2 gap-x-6 sm:flex">
+            {[...nav.filter((n) => n.label !== 'Casos'), { label: 'Perguntas', href: '/#perguntas' }, { label: 'Contato', href: '/#contato' }].map(
+              (n) => (
+                <FooterLink key={n.href} href={n.href}>
+                  {n.label}
+                </FooterLink>
+              ),
+            )}
+          </FooterColumn>
         </div>
       </div>
 
@@ -76,7 +111,10 @@ export default function Footer() {
       </div>
 
       <div className="label relative z-10 mt-2 flex flex-wrap justify-between gap-4 border-t border-line pt-6">
-        <span>© {new Date().getFullYear()} Henaweb Ltda</span>
+        <span>
+          © {new Date().getFullYear()} {site.legalName}
+          {site.cnpj && <> · CNPJ {site.cnpj}</>}
+        </span>
         <span>
           {site.city} · <Clock />
         </span>
@@ -86,5 +124,42 @@ export default function Footer() {
         </a>
       </div>
     </footer>
+  );
+}
+
+function FooterColumn({
+  title,
+  children,
+  className = '',
+  listClassName = 'flex',
+}: {
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+  listClassName?: string;
+}) {
+  return (
+    <nav aria-label={title.replace('/', '')} className={className}>
+      <span className="label mb-4 block font-mono !text-teal">{title}</span>
+      <ul className={`flex-col gap-2.5 ${listClassName}`}>{children}</ul>
+    </nav>
+  );
+}
+
+function FooterLink({ href, children, accent = false }: { href: string; children: React.ReactNode; accent?: boolean }) {
+  return (
+    <li>
+      <a
+        href={href}
+        className={`group inline-flex items-baseline gap-2 transition-colors ${accent ? 'font-medium text-acid' : 'text-ink/75 hover:text-ink'}`}
+      >
+        {!accent && (
+          <span aria-hidden className="font-mono text-xs text-ink/30 transition-colors group-hover:text-acid">
+            ›
+          </span>
+        )}
+        {children}
+      </a>
+    </li>
   );
 }
