@@ -27,31 +27,44 @@ export default function GovTech() {
         scrollTrigger: { trigger: '[data-gov-title]', start: 'top 80%' },
       });
 
-      const steps = gsap.utils.toArray<HTMLElement>('[data-step]');
-      const logs = gsap.utils.toArray<HTMLElement>('[data-log]');
-      const tl = gsap.timeline({
-        scrollTrigger: { trigger: '[data-panel]', start: 'top 70%', end: 'bottom 55%', scrub: 0.6 },
-      });
-      steps.forEach((s, i) => {
-        // each segment fills from this dot to the next one
-        const seg = s.querySelector('[data-seg]');
-        if (seg) tl.fromTo(seg, { scaleY: 0 }, { scaleY: 1, ease: 'none', duration: 0.8 }, i + 0.2);
-        tl.to(s.querySelector('[data-dot]'), { backgroundColor: '#a6d64b', borderColor: '#a6d64b', duration: 0.2 }, i)
-          .to(s, { opacity: 1, duration: 0.2 }, i)
-          .to(s.querySelector('[data-status]'), { opacity: 1, duration: 0.2 }, i)
-          .to(logs[i], { opacity: 1, x: 0, duration: 0.3 }, i);
+      // the markup ships the finished flow, so it reads the same without JS or with reduced motion;
+      // only when motion is welcome do we rewind it and let the scroll play it back
+      const mm = gsap.matchMedia();
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        const steps = gsap.utils.toArray<HTMLElement>('[data-step]');
+        const logs = gsap.utils.toArray<HTMLElement>('[data-log]');
+        const tl = gsap.timeline({
+          scrollTrigger: { trigger: '[data-panel]', start: 'top 70%', end: 'bottom 55%', scrub: 0.6 },
+        });
+        steps.forEach((s, i) => {
+          // each segment fills from this dot to the next one
+          const seg = s.querySelector('[data-seg]');
+          if (seg) tl.fromTo(seg, { scaleY: 0 }, { scaleY: 1, ease: 'none', duration: 0.8 }, i + 0.2);
+          tl.fromTo(
+            s.querySelector('[data-dot]'),
+            { backgroundColor: '#1e1442', borderColor: 'rgb(253 243 225 / 0.3)' },
+            { backgroundColor: '#a6d64b', borderColor: '#a6d64b', duration: 0.2 },
+            i,
+          )
+            .fromTo(s, { opacity: 0.6 }, { opacity: 1, duration: 0.2 }, i)
+            .fromTo(s.querySelector('[data-status]'), { opacity: 0 }, { opacity: 1, duration: 0.2 }, i)
+            .fromTo(logs[i], { opacity: 0, x: 12 }, { opacity: 1, x: 0, duration: 0.3 }, i);
+        });
+
+        gsap.from('[data-pillar]', {
+          y: 30,
+          autoAlpha: 0,
+          duration: 0.9,
+          ease: 'expo.out',
+          stagger: 0.06,
+          scrollTrigger: { trigger: '[data-pillars]', start: 'top 85%' },
+        });
       });
 
-      gsap.from('[data-pillar]', {
-        y: 30,
-        autoAlpha: 0,
-        duration: 0.9,
-        ease: 'expo.out',
-        stagger: 0.06,
-        scrollTrigger: { trigger: '[data-pillars]', start: 'top 85%' },
-      });
-
-      return () => split.revert();
+      return () => {
+        mm.revert();
+        split.revert();
+      };
     },
     { scope: root },
   );
@@ -119,19 +132,19 @@ export default function GovTech() {
             <div className="grid md:grid-cols-[1.1fr_1fr]">
               <ol className="p-6 md:p-8">
                 {govFlow.map((step, i) => (
-                  <li key={step} data-step className="relative flex items-center gap-5 py-3.5 opacity-60">
+                  <li key={step} data-step className="relative flex items-center gap-5 py-3.5">
                     {/* rail segment anchored to this dot's center, reaching the next dot's center */}
                     {i < govFlow.length - 1 && (
                       <span aria-hidden className="absolute top-1/2 left-[6px] h-full w-[2px] bg-ink/15">
-                        <span data-seg className="block h-full w-full origin-top scale-y-0 bg-mint" />
+                        <span data-seg className="block h-full w-full origin-top bg-mint" />
                       </span>
                     )}
                     <span
                       data-dot
-                      className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 border-ink/30 bg-bg-2"
+                      className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 border-mint bg-mint"
                     />
                     <span className="flex-1 text-lg tracking-tight">{step}</span>
-                    <span data-status className="font-mono text-[0.65rem] text-mint uppercase opacity-0">
+                    <span data-status className="font-mono text-[0.65rem] text-mint uppercase">
                       ✓ {String(i + 1).padStart(2, '0')}
                     </span>
                   </li>
@@ -141,7 +154,7 @@ export default function GovTech() {
                 <span className="label">Trilha de auditoria</span>
                 <ul className="mt-5 space-y-3 font-mono text-[0.72rem] leading-snug">
                   {audit.map(([time, entry]) => (
-                    <li key={entry} data-log className="translate-x-3 opacity-0">
+                    <li key={entry} data-log>
                       <span className="text-muted">{time} ·</span> <span className="text-ink/85">{entry}</span>
                     </li>
                   ))}
