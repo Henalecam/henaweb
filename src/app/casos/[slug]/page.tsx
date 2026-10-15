@@ -38,6 +38,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
   const url = `${site.url}/casos/${p.slug}`;
   const i = projects.indexOf(p);
   const next = projects[(i + 1) % projects.length];
+  const prev = projects[(i - 1 + projects.length) % projects.length];
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -150,14 +151,18 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             </a>
           </div>
 
-          <nav aria-label="Relacionados" className="mt-24 grid gap-4 border-t border-line pt-10 md:grid-cols-2">
+          <nav aria-label="Relacionados" className="mt-24 grid gap-4 border-t border-line pt-10 md:grid-cols-3">
+            <a href={`/casos/${prev.slug}`} rel="prev" className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6">
+              <span className="label">Caso anterior</span>
+              <span className="mt-2 block text-2xl font-medium tracking-tight">← {prev.name}</span>
+            </a>
             {service && (
               <a href={`/servicos/${service.slug}`} className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6">
                 <span className="label">Serviço</span>
                 <span className="mt-2 block text-2xl font-medium tracking-tight">{service.name} →</span>
               </a>
             )}
-            <a href={`/casos/${next.slug}`} className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6">
+            <a href={`/casos/${next.slug}`} rel="next" className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6 md:text-right">
               <span className="label">Próximo caso</span>
               <span className="mt-2 block text-2xl font-medium tracking-tight">{next.name} →</span>
             </a>
