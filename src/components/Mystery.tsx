@@ -18,7 +18,7 @@ const evidenceBodies: Record<EvidenceId, { label: string; body: ReactNode }> = {
     label: 'Planilha com 14 abas',
     body: (
       <div className="overflow-hidden border-2 border-toon bg-white" style={{ borderRadius: u(0.6), boxShadow: `${u(0.6)} ${u(0.6)} 0 ${INK}` }}>
-        <div className="bg-[#2f8f5b] font-mono font-bold text-white" style={{ padding: `${u(0.5)} ${u(1)}`, fontSize: u(1.5) }}>
+        <div className="bg-[#23724a] font-mono font-bold text-white" style={{ padding: `${u(0.5)} ${u(1)}`, fontSize: u(1.5) }}>
           planilha_FINAL_v7.xlsx
         </div>
         <div className="grid grid-cols-4 font-mono text-acid-ink" style={{ fontSize: u(1.4) }}>
@@ -58,7 +58,7 @@ const evidenceBodies: Record<EvidenceId, { label: string; body: ReactNode }> = {
         <p className="serif leading-tight text-acid-ink" style={{ fontSize: u(2.8) }}>
           Quem mexeu nisso?!
         </p>
-        <p className="font-mono text-acid-ink/60" style={{ marginTop: u(1), fontSize: u(1.3) }}>
+        <p className="font-mono text-acid-ink/75" style={{ marginTop: u(1), fontSize: u(1.3) }}>
           (de novo)
         </p>
       </div>

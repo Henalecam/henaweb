@@ -129,7 +129,7 @@ export default function OrderTicket() {
             <p className="mt-1 text-center text-[0.65rem] tracking-[0.4em]">0142 2026 HENA</p>
           </div>
           <p className="mt-4 text-center text-[0.68rem] tracking-[0.2em]">*** VOLTE SEMPRE: TEMOS ROADMAP ***</p>
-          <p className="mt-1 text-center text-[0.65rem] text-acid-ink/50">henrique@henaweb.com</p>
+          <p className="mt-1 text-center text-[0.65rem] text-acid-ink/70">henrique@henaweb.com</p>
         </div>
         <Torn />
       </div>
