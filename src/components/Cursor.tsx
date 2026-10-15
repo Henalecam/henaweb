@@ -39,8 +39,12 @@ export default function Cursor() {
       const text = el?.dataset.cursor ?? '';
       setLabel(text);
       gsap.to(ring.current, {
-        scale: el ? (text ? 2.4 : 1.6) : 1,
+        scale: el ? (text ? 2 : 1.6) : 1,
         backgroundColor: text ? 'rgba(247,147,30,1)' : 'rgba(247,147,30,0)',
+        // the labelled bubble floats up and to the right of the pointer, so it never hides
+        // the text of the button being hovered
+        xPercent: text ? 140 : 0,
+        yPercent: text ? -140 : 0,
         duration: 0.4,
         ease: 'expo.out',
       });
