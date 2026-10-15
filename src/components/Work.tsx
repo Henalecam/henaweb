@@ -118,10 +118,15 @@ export default function Work() {
               <span className="font-groovy text-[0.85em] tracking-normal text-acid [text-shadow:4px_4px_0_#140a26]">resolvidos.</span>
             </h2>
           </div>
-          <p className="max-w-md text-lg leading-relaxed text-ink/70 md:col-span-5">
-            Cada projeto começou com um mistério na operação de alguém. Escolha um caso e veja o que encontramos e o que
-            construímos.
-          </p>
+          <div className="max-w-md md:col-span-5">
+            <p className="text-lg leading-relaxed text-ink/70">
+              Cada projeto começou com um mistério na operação de alguém. Escolha um caso e veja o que encontramos e o
+              que construímos.
+            </p>
+            <a href="/casos" className="mt-4 inline-block font-medium text-acid underline-offset-4 hover:underline">
+              Ver o arquivo completo →
+            </a>
+          </div>
         </div>
 
         {/* desktop: index + viewer */}
@@ -217,7 +222,8 @@ export default function Work() {
           <ol className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-[clamp(1rem,4vw,3.5rem)] pb-10 [scrollbar-width:none]">
             {projects.map((item, i) => (
               <li key={item.name} className="w-[86%] shrink-0 snap-center sm:w-[70%]">
-                <a href={item.href} target="_blank" rel="noopener noreferrer" className="block aspect-[16/10.5]">
+                {/* the screenshot opens the case page, like the link below it, instead of leaving for the client's site */}
+                <a href={`/casos/${item.slug}`} aria-label={`Ver caso ${item.name}`} className="block aspect-[16/10.5]">
                   <Screen p={item} tall={false} />
                 </a>
                 <div className="mt-8 flex flex-col gap-3">

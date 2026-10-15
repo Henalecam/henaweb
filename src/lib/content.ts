@@ -1,6 +1,8 @@
 export const site = {
   name: 'HenaWeb',
   legalName: 'Henaweb Ltda',
+  /** Shown in the footer (and the Organization JSON-LD) once filled in, e.g. '00.000.000/0001-00'. */
+  cnpj: '',
   url: 'https://henaweb.com',
   city: 'Curitiba, PR',
   coords: '25.4284° S · 49.2733° W',
@@ -21,8 +23,8 @@ export const nav = [
   { label: 'Clientes', href: '/#clientes' },
   { label: 'Capacidades', href: '/#capacidades' },
   { label: 'Setor público', href: '/#govtech' },
-  { label: 'Projetos', href: '/#projetos' },
-  { label: 'Casos', href: '/casos' },
+  // one entry for the cases: the home section, which links on to the full /casos archive
+  { label: 'Casos', href: '/#projetos' },
   { label: 'Processo', href: '/#processo' },
   { label: 'Studio', href: '/#studio' },
 ];
@@ -354,3 +356,11 @@ export const clients: { name: string; group: 'public' | 'private'; logo?: string
   { name: 'Condor', group: 'private', logo: '/clients/condor.webp' },
   { name: 'Assaí Atacadista', group: 'private', logo: '/clients/assai.svg', scale: 1.05 },
 ];
+
+/**
+ * Client testimonials, shown on the home page after the cases. The section stays hidden while
+ * this list is empty: only add real quotes, with the person's permission to publish them.
+ * Example: { quote: '…', name: 'Maria Souza', role: 'Sócia', org: 'Escritório X', project: 'diconta' }
+ * (project is optional and must match a slug in `projects`, linking the quote to its case page).
+ */
+export const testimonials: { quote: string; name: string; role: string; org: string; project?: string }[] = [];
