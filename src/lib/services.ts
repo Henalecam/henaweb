@@ -23,7 +23,7 @@ export const services: ServicePage[] = [
     name: 'Sistemas sob medida',
     seoTitle: 'Desenvolvimento de sistemas sob medida, ERP e SaaS',
     seoDescription:
-      'Desenvolvimento de sistemas web sob medida: ERPs, plataformas SaaS, painéis e portais internos feitos para o jeito que a sua empresa trabalha. Studio em Curitiba, atendimento em todo o Brasil.',
+      'Desenvolvimento de sistemas web sob medida: ERPs, plataformas SaaS, painéis e portais feitos para o jeito que a sua empresa trabalha. Studio em Curitiba.',
     keywords: ['desenvolvimento de sistemas sob medida', 'sistema web personalizado', 'ERP sob medida', 'desenvolvimento SaaS', 'software house Curitiba', 'sistema para empresas'],
     h1: 'Sistemas sob medida para a sua',
     h1Accent: 'operação.',
@@ -71,7 +71,7 @@ export const services: ServicePage[] = [
     name: 'Sistemas públicos',
     seoTitle: 'Sistemas para o setor público e GovTech',
     seoDescription:
-      'Sistemas para órgãos públicos com padrão de produto: workflows de aprovação, gestão de verbas e editais, trilha de auditoria, LGPD, acessibilidade eMAG e WCAG e integração com gov.br.',
+      'Sistemas para órgãos públicos: workflows de aprovação, gestão de verbas e editais, trilha de auditoria, LGPD, acessibilidade eMAG e WCAG e login gov.br.',
     keywords: ['sistemas para o setor público', 'govtech', 'software para prefeituras', 'sistema para órgão público', 'gestão de verbas e editais', 'acessibilidade eMAG'],
     h1: 'Sistemas públicos com',
     h1Accent: 'padrão de produto.',
@@ -115,7 +115,7 @@ export const services: ServicePage[] = [
     name: 'Automação & IA',
     seoTitle: 'Automação com n8n e agentes de IA para empresas',
     seoDescription:
-      'Automação de processos com n8n, agentes de IA e integrações entre CRM, WhatsApp e banco de dados. Tire o trabalho repetitivo do seu time e acompanhe cada lead de ponta a ponta.',
+      'Automação de processos com n8n, agentes de IA e integrações entre CRM, WhatsApp e banco de dados. Menos trabalho repetitivo e cada lead rastreado.',
     keywords: ['automação n8n', 'agente de IA para empresas', 'automação de processos', 'chatbot WhatsApp com IA', 'integração CRM WhatsApp', 'automação de atendimento'],
     h1: 'Automação e IA que devolvem',
     h1Accent: 'horas ao seu time.',
@@ -159,7 +159,7 @@ export const services: ServicePage[] = [
     name: 'Sites & produtos',
     seoTitle: 'Criação de sites, landing pages e produtos digitais',
     seoDescription:
-      'Criação de sites institucionais, landing pages e produtos digitais com design forte, SEO técnico e performance. O mesmo rigor de engenharia que aplicamos aos sistemas.',
+      'Criação de sites institucionais, landing pages e produtos digitais com design forte, SEO técnico e performance, feitos com rigor de engenharia.',
     keywords: ['criação de sites', 'landing page', 'site institucional', 'design de produto digital', 'SEO técnico', 'site para empresa Curitiba'],
     h1: 'Sites e produtos com',
     h1Accent: 'engenharia de verdade.',

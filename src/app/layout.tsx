@@ -25,9 +25,9 @@ const instrument = Instrument_Serif({
 
 const groovy = Shrikhand({ subsets: ['latin'], weight: '400', variable: '--font-shrikhand', display: 'swap' });
 
-const title = 'HenaWeb · Desenvolvimento de sistemas sob medida e para o setor público';
+const title = 'Desenvolvimento de sistemas para empresas e governos · HenaWeb';
 const description =
-  'Studio de engenharia de software em Curitiba. Desenvolvemos sistemas sob medida, ERPs, plataformas para o setor público, automações com n8n e IA e sites que convertem. Atendemos todo o Brasil.';
+  'Studio de engenharia de software em Curitiba: sistemas sob medida, ERPs, plataformas para o setor público, automação com IA e sites. Atendemos todo o Brasil.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),

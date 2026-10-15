@@ -19,14 +19,14 @@ export async function generateMetadata({ params }: PageProps<'/casos/[slug]'>): 
   const p = bySlug(slug);
   if (!p) return {};
   const title = `${p.name}: ${p.kind}`;
-  const description = `${p.challenge} ${p.built}`;
+  // the one-line summary fits a search snippet (~155 chars); challenge + built ran past 180 and got cut
   const path = `/casos/${p.slug}`;
   return {
     title,
-    description,
+    description: p.summary,
     alternates: { canonical: path },
-    openGraph: { type: 'article', url: path, title: `${title} · HenaWeb`, description, locale: 'pt_BR', siteName: 'HenaWeb' },
-    twitter: { card: 'summary_large_image', title: `${title} · HenaWeb`, description },
+    openGraph: { type: 'article', url: path, title: `${title} · HenaWeb`, description: p.summary, locale: 'pt_BR', siteName: 'HenaWeb' },
+    twitter: { card: 'summary_large_image', title: `${title} · HenaWeb`, description: p.summary },
   };
 }
 
