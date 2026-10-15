@@ -33,6 +33,9 @@ export default function Nav() {
 
   useEffect(() => {
     document.documentElement.style.overflow = open ? 'hidden' : '';
+    // lets other fixed UI (the floating WhatsApp button) step aside while the menu covers the screen
+    if (open) document.documentElement.dataset.menu = 'open';
+    else delete document.documentElement.dataset.menu;
     if (!open) return;
     // Esc closes the menu and hands focus back to the toggle
     const onKey = (e: KeyboardEvent) => {

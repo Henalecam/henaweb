@@ -53,7 +53,7 @@ export default function FloatingContact() {
       aria-hidden={!show}
       className={`toon-sm fixed right-4 z-40 flex h-11 items-center overflow-hidden rounded-full bg-[#25d366] pl-3 font-medium text-acid-ink transition-[transform,opacity,padding] duration-500 ease-[var(--ease-out-expo)] md:hidden ${compact ? 'pr-3' : 'pr-4'} ${
         show ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-6 opacity-0'
-      }`}
+      } [html[data-menu=open]_&]:pointer-events-none [html[data-menu=open]_&]:opacity-0`}
       style={{ bottom: 'max(1rem, env(safe-area-inset-bottom))' }}
     >
       <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="currentColor" aria-hidden>
