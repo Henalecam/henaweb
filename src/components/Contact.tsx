@@ -10,6 +10,28 @@ import Social from './Social';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
+/**
+ * Where the visitor came from, for the briefing e-mail: the page of this site they were reading
+ * (a case or service page), the outside site that sent them, and any campaign tags in the URL.
+ */
+function leadOrigin(): string {
+  try {
+    const parts: string[] = [];
+    const ref = document.referrer ? new URL(document.referrer) : null;
+    if (ref && ref.host === location.host) {
+      if (ref.pathname !== '/') parts.push(`página ${ref.pathname}`);
+    } else if (ref) {
+      parts.push(ref.host.replace(/^www\./, ''));
+    }
+    const q = new URLSearchParams(location.search);
+    const utm = ['utm_source', 'utm_medium', 'utm_campaign'].map((k) => q.get(k)).filter(Boolean);
+    if (utm.length) parts.push(`campanha ${utm.join(' / ')}`);
+    return parts.join(' · ') || 'acesso direto';
+  } catch {
+    return '';
+  }
+}
+
 const field =
   'w-full border-b-2 border-acid-ink/35 bg-transparent py-3 text-lg text-acid-ink placeholder:text-acid-ink/65 focus:border-acid-ink focus:outline-none user-invalid:border-[#b3122b]';
 
@@ -178,6 +200,7 @@ export default function Contact() {
           timeline,
           message: message || 'Sem detalhes adicionais.',
           company: data.get('company'),
+          origin: leadOrigin(),
         }),
       });
       if (!res.ok) throw new Error();

@@ -31,7 +31,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { name, email, whatsapp, subject, timeline, org, message, company } = body ?? {};
+    const { name, email, whatsapp, subject, timeline, org, message, company, origin } = body ?? {};
 
     // Honeypot: bots fill the hidden field. Pretend success.
     if (company) return NextResponse.json({ ok: true });
@@ -57,6 +57,7 @@ export async function POST(request: Request) {
       ['Empresa / órgão', org],
       ['Tipo', subject],
       ['Prazo', timeline],
+      ['Origem', origin],
     ]
       .filter(([, v]) => v)
       .map(([k, v]) => `<p><strong>${k}:</strong> ${escape(v)}</p>`)
