@@ -66,6 +66,7 @@ export default function FloatingContact() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Conversar com a HenaWeb pelo WhatsApp"
+      data-placement="floating"
       tabIndex={show ? 0 : -1}
       aria-hidden={!show}
       className={`toon-sm fixed right-4 z-40 flex h-11 items-center overflow-hidden rounded-full bg-[#25d366] pl-3 font-medium text-acid-ink transition-[transform,opacity,padding] duration-500 ease-[var(--ease-out-expo)] md:hidden ${compact ? 'pr-3' : 'pr-4'} ${
