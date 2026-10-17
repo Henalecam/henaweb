@@ -159,12 +159,20 @@ export default function Process() {
     () => {
       const mm = gsap.matchMedia();
       mm.add(
-        { motion: '(prefers-reduced-motion: no-preference)', reduce: '(prefers-reduced-motion: reduce)' },
+        {
+          motion: '(prefers-reduced-motion: no-preference)',
+          reduce: '(prefers-reduced-motion: reduce)',
+          stacked: '(max-width: 1023px)',
+        },
         (ctx) => {
           if (ctx.conditions?.reduce) {
             gsap.set('[data-steam]', { opacity: 1 });
             return;
           }
+          // below lg the diner sticks to the top ~half of the screen, so a step is only readable once it
+          // clears it: the layer, the highlight and the finale happen lower in the viewport there
+          const stacked = !!ctx.conditions?.stacked;
+          const at = { fillFrom: stacked ? 'top 95%' : 'top 80%', fillTo: stacked ? 'top 62%' : 'top 42%', activeTo: stacked ? 'bottom 62%' : 'bottom 55%' };
 
           gsap.fromTo(
             '[data-neon]',
@@ -181,8 +189,8 @@ export default function Process() {
           gsap.utils.toArray<HTMLElement>('[data-step]').forEach((step, i) => {
             layerTriggers.current[i] = ScrollTrigger.create({
               trigger: step,
-              start: 'top 80%',
-              end: 'top 42%',
+              start: at.fillFrom,
+              end: at.fillTo,
               // progress is read straight from the trigger, so fast scrolls and reloads land on the right frame
               onUpdate: (self) => scene.current?.setLayer(i, self.progress),
               onToggle: (self) => scene.current?.setLayer(i, self.progress),
@@ -191,8 +199,8 @@ export default function Process() {
             const burst = root.current?.querySelector(`[data-burst="${i}"]`) ?? [];
             ScrollTrigger.create({
               trigger: step,
-              start: 'top 42%',
-              end: 'bottom 55%',
+              start: at.fillTo,
+              end: at.activeTo,
               toggleClass: { targets: step, className: 'is-active' },
               onEnter: () => {
                 gsap
@@ -216,8 +224,8 @@ export default function Process() {
           const last = steps?.[steps.length - 1];
           versionTrigger.current = ScrollTrigger.create({
             trigger: last,
-            start: 'top 35%',
-            end: 'bottom 15%',
+            start: stacked ? 'top 55%' : 'top 35%',
+            end: stacked ? 'bottom 50%' : 'bottom 15%',
             onEnter: () => {
               gsap.to('[data-steam]', { opacity: 1, duration: 0.6 });
               finale.restart();
@@ -257,59 +265,63 @@ export default function Process() {
           </h2>
         </div>
 
-        <div className="relative mt-[clamp(2rem,6vw,5rem)] grid gap-6 lg:grid-cols-12 lg:gap-12">
-          {/* sticky diner */}
-          <div className="sticky top-16 z-10 h-[40svh] lg:top-[10vh] lg:col-span-6 lg:h-[80vh]">
-            <div className="toon relative mx-auto h-full max-w-[640px] overflow-hidden rounded-3xl bg-[#1e1442] p-[4%]">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_40%_at_50%_0%,rgb(60_198_180/0.25),transparent)]" />
-              <DinerBack />
-              <canvas ref={canvas} className="absolute inset-x-0 top-[12%] bottom-[8%] h-[80%] w-full" aria-hidden />
-              <DinerFront />
+        <div className="relative mt-[clamp(2rem,6vw,5rem)] grid gap-6 lg:grid-cols-12 lg:gap-x-12 lg:gap-y-0">
+          {/* below lg this wrapper bounds the sticky diner, so it lets go after the last step instead of
+              sliding under the order ticket; on lg it dissolves and the diner spans the ticket row too */}
+          <div className="grid gap-6 lg:contents">
+            {/* sticky diner */}
+            <div className="sticky top-16 z-10 h-[40svh] lg:row-span-2 lg:top-[10vh] lg:col-span-6 lg:h-[80vh]">
+              <div className="toon relative mx-auto h-full max-w-[640px] overflow-hidden rounded-3xl bg-[#1e1442] p-[4%]">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_40%_at_50%_0%,rgb(60_198_180/0.25),transparent)]" />
+                <DinerBack />
+                <canvas ref={canvas} className="absolute inset-x-0 top-[12%] bottom-[8%] h-[80%] w-full" aria-hidden />
+                <DinerFront />
+              </div>
+            </div>
+
+            {/* steps */}
+            <div className="lg:col-span-6">
+              <ol data-steps className="relative">
+                {process.map((s) => (
+                  <li
+                    key={s.n}
+                    data-step
+                    className="group/step flex min-h-[56svh] flex-col justify-center border-t-2 border-bg/10 py-10 opacity-75 transition-opacity duration-500 motion-reduce:opacity-100 [&.is-active]:opacity-100 lg:min-h-[70vh]"
+                  >
+                    {/* menu line: number, dish, dotted leader, "price" (the time it takes) */}
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2 md:flex-nowrap md:gap-4">
+                      <span className="font-groovy text-[clamp(2.6rem,5vw,4.5rem)] leading-[0.8] text-bg/20 transition-colors group-[.is-active]/step:text-[#c2410c]">
+                        {s.n}
+                      </span>
+                      <h3 className="text-[clamp(1.9rem,3.2vw,2.9rem)] leading-none font-medium tracking-[-0.04em]">{s.title}</h3>
+                      <span className="mb-1.5 hidden min-w-6 flex-1 border-b-[3px] border-dotted border-bg/25 sm:block" aria-hidden />
+                      <span className="toon-sm shrink-0 rounded-full bg-cyan px-3 py-0.5 font-mono text-[0.68rem] text-acid-ink uppercase ">
+                        {s.time}
+                      </span>
+                    </div>
+                    <p className="font-groovy mt-6 text-xl text-[#c2410c] md:text-2xl">{s.layer}</p>
+                    <p className="mt-4 max-w-xl text-lg leading-relaxed text-bg/70">{s.body}</p>
+                    <div className="mt-5 flex max-w-xl flex-wrap items-center gap-2">
+                      <span className="label !text-bg/50">Ingredientes</span>
+                      {s.ingredients.map((ing) => (
+                        <span key={ing} className="rounded-full border-2 border-bg/70 bg-paper px-3 py-0.5 text-sm text-bg">
+                          {ing}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="mt-5 flex max-w-xl flex-wrap items-baseline gap-x-3 gap-y-1 border-t-2 border-bg/10 pt-4">
+                      <span className="label shrink-0 !text-bg/50">Você recebe</span>
+                      <span className="serif text-xl">{s.deliverable}</span>
+                    </p>
+                  </li>
+                ))}
+              </ol>
             </div>
           </div>
 
-          {/* steps */}
-          <div className="lg:col-span-6">
-            <ol data-steps className="relative">
-              {process.map((s) => (
-                <li
-                  key={s.n}
-                  data-step
-                  className="group/step flex min-h-[56svh] flex-col justify-center border-t-2 border-bg/10 py-10 opacity-75 transition-opacity duration-500 motion-reduce:opacity-100 [&.is-active]:opacity-100 lg:min-h-[70vh]"
-                >
-                  {/* menu line: number, dish, dotted leader, "price" (the time it takes) */}
-                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2 md:flex-nowrap md:gap-4">
-                    <span className="font-groovy text-[clamp(2.6rem,5vw,4.5rem)] leading-[0.8] text-bg/20 transition-colors group-[.is-active]/step:text-[#c2410c]">
-                      {s.n}
-                    </span>
-                    <h3 className="text-[clamp(1.9rem,3.2vw,2.9rem)] leading-none font-medium tracking-[-0.04em]">{s.title}</h3>
-                    <span className="mb-1.5 hidden min-w-6 flex-1 border-b-[3px] border-dotted border-bg/25 sm:block" aria-hidden />
-                    <span className="toon-sm shrink-0 rounded-full bg-cyan px-3 py-0.5 font-mono text-[0.68rem] text-acid-ink uppercase ">
-                      {s.time}
-                    </span>
-                  </div>
-                  <p className="font-groovy mt-6 text-xl text-[#c2410c] md:text-2xl">{s.layer}</p>
-                  <p className="mt-4 max-w-xl text-lg leading-relaxed text-bg/70">{s.body}</p>
-                  <div className="mt-5 flex max-w-xl flex-wrap items-center gap-2">
-                    <span className="label !text-bg/50">Ingredientes</span>
-                    {s.ingredients.map((ing) => (
-                      <span key={ing} className="rounded-full border-2 border-bg/70 bg-paper px-3 py-0.5 text-sm text-bg">
-                        {ing}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="mt-5 flex max-w-xl flex-wrap items-baseline gap-x-3 gap-y-1 border-t-2 border-bg/10 pt-4">
-                    <span className="label shrink-0 !text-bg/50">Você recebe</span>
-                    <span className="serif text-xl">{s.deliverable}</span>
-                  </p>
-                </li>
-              ))}
-            </ol>
-
-            {/* order ticket */}
-            <div className="pb-24">
-              <OrderTicket />
-            </div>
+          {/* order ticket */}
+          <div className="pb-24 lg:col-span-6 lg:col-start-7">
+            <OrderTicket />
           </div>
         </div>
       </div>
