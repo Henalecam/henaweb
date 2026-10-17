@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { gsap, useGSAP } from '@/lib/gsap';
+import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { nav, projects, site, whatsappLink } from '@/lib/content';
 import { services } from '@/lib/services';
 import { CONSENT_OPEN } from '@/lib/consent';
@@ -14,6 +14,7 @@ export default function Footer() {
 
   useGSAP(
     () => {
+      if (prefersReducedMotion()) return;
       gsap.from('[data-wordmark] span', {
         yPercent: 100,
         duration: 1.4,
@@ -111,7 +112,8 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="label relative z-10 mt-2 flex flex-wrap justify-between gap-4 border-t border-line pt-6">
+      {/* the two controls get a 3rem-tall hit area (WCAG 2.5.8) without moving the line */}
+      <div className="label relative z-10 mt-2 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-6">
         <span>
           © {new Date().getFullYear()} {site.legalName}
           {site.cnpj && <> · CNPJ {site.cnpj}</>}
@@ -119,11 +121,11 @@ export default function Footer() {
         <span>
           {site.city} · <Clock />
         </span>
-        <button type="button" onClick={() => window.dispatchEvent(new Event(CONSENT_OPEN))} className="label hover:text-ink">
+        <button type="button" onClick={() => window.dispatchEvent(new Event(CONSENT_OPEN))} className="label -my-3 py-3 hover:text-ink">
           Cookies
         </button>
         {/* same-page anchor: on a case or service page "/#topo" sent the visitor to the home page */}
-        <a href="#conteudo" className="hover:text-ink">
+        <a href="#conteudo" className="-my-3 py-3 hover:text-ink">
           Voltar ao topo ↑
         </a>
       </div>
