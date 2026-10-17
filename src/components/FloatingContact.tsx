@@ -5,12 +5,24 @@ import { whatsappLink } from '@/lib/content';
 
 /**
  * Phones only: a WhatsApp button that appears once the hero has scrolled away and
- * steps aside while the FAQ, the contact section or the footer is on screen. While reading
+ * steps aside while the FAQ, the contact section, the closing CTA or the footer is on screen. While reading
  * downward it shrinks to a round icon so it covers less text; scrolling up brings the label back.
+ * On a service or case page the pre-filled message names that page, so the chat starts with context.
  */
 export default function FloatingContact() {
   const [show, setShow] = useState(false);
   const [compact, setCompact] = useState(false);
+  const [href, setHref] = useState(() => whatsappLink());
+
+  useEffect(() => {
+    // service pages already carry a tailored message in the closing CTA; case pages name the case
+    const closing = document.querySelector<HTMLAnchorElement>('#proximo-passo a[href*="api.whatsapp.com"]');
+    const caseName = location.pathname.startsWith('/casos/')
+      ? document.querySelector('main h1')?.textContent?.replace(/[.\s]+$/, '').trim()
+      : undefined;
+    if (closing) setHref(closing.href);
+    else if (caseName) setHref(whatsappLink(`Olá! Vi o caso ${caseName} no site e quero algo parecido para a minha operação.`));
+  }, []);
 
   useEffect(() => {
     let pastHero = false;
@@ -34,9 +46,12 @@ export default function FloatingContact() {
       },
       { threshold: 0.15 },
     );
-    // the FAQ toggles sit on the right edge, right where the button floats; contact and footer
-    // already show WhatsApp themselves
-    document.querySelectorAll('#perguntas, #contato, footer').forEach((el) => io.observe(el));
+    // the FAQ toggles sit on the right edge, right where the button floats (on subpages the id is on
+    // the heading, so watch its whole section); contact, the closing CTA and the footer already show
+    // WhatsApp themselves
+    const faq = document.getElementById('perguntas');
+    const watched = [faq?.closest('section') ?? faq, ...document.querySelectorAll('#contato, #proximo-passo, footer')];
+    watched.forEach((el) => el && io.observe(el));
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => {
@@ -47,7 +62,7 @@ export default function FloatingContact() {
 
   return (
     <a
-      href={whatsappLink()}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Conversar com a HenaWeb pelo WhatsApp"
