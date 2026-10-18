@@ -12,17 +12,41 @@ export const metadata: Metadata = {
   title: 'Casos e projetos de software sob medida',
   description,
   alternates: { canonical: '/casos' },
-  openGraph: { type: 'website', url: '/casos', title: 'Casos e projetos de software sob medida · HenaWeb', description, locale: 'pt_BR', siteName: 'HenaWeb', images: ['/opengraph-image'] },
+  openGraph: {
+    type: 'website',
+    url: '/casos',
+    title: 'Casos e projetos de software sob medida · HenaWeb',
+    description,
+    locale: 'pt_BR',
+    siteName: 'HenaWeb',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'HenaWeb · Casos resolvidos' }],
+  },
+  // without this, X/LinkedIn previews fell back to the home page's title and description
+  twitter: { card: 'summary_large_image', title: 'Casos e projetos de software sob medida · HenaWeb', description, images: ['/opengraph-image'] },
 };
 
 export default function CasesIndex() {
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: 'Casos e projetos',
-    url: `${site.url}/casos`,
-    description,
-    hasPart: projects.map((p) => ({ '@type': 'CreativeWork', name: p.name, url: `${site.url}/casos/${p.slug}` })),
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${site.url}/casos#page`,
+        name: 'Casos e projetos',
+        url: `${site.url}/casos`,
+        description,
+        inLanguage: 'pt-BR',
+        hasPart: projects.map((p) => ({ '@type': 'CreativeWork', name: p.name, url: `${site.url}/casos/${p.slug}` })),
+      },
+      // same trail the case pages already publish, so search shows "henaweb.com › Casos"
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Início', item: site.url },
+          { '@type': 'ListItem', position: 2, name: 'Casos', item: `${site.url}/casos` },
+        ],
+      },
+    ],
   };
 
   return (
