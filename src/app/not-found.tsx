@@ -4,6 +4,9 @@ import Footer from '@/components/Footer';
 export const metadata: Metadata = {
   title: 'Caso não encontrado',
   robots: { index: false, follow: true },
+  // the root layout points canonical and og:url at the home page; a 404 must not claim to be it
+  alternates: { canonical: null },
+  openGraph: { url: null },
 };
 
 const links = [
