@@ -11,6 +11,7 @@ import Nav from '@/components/Nav';
 import ConversionTracking from '@/components/ConversionTracking';
 import FloatingContact from '@/components/FloatingContact';
 import TabHaunt from '@/components/TabHaunt';
+import ThemeTint from '@/components/ThemeTint';
 import ScrollProgress from '@/components/ScrollProgress';
 import ConsentBanner from '@/components/ConsentBanner';
 import { analyticsLoader } from '@/lib/consent';
@@ -175,6 +176,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ConversionTracking />
         <FloatingContact />
         <TabHaunt />
+        <ThemeTint />
         <ScrollProgress />
         {children}
         <div className="grain" aria-hidden />
