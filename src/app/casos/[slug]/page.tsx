@@ -6,6 +6,7 @@ import { serviceBySlug } from '@/lib/services';
 import Footer from '@/components/Footer';
 import Stamp from '@/components/Stamp';
 import ShareCase from '@/components/ShareCase';
+import CaseKeys from '@/components/CaseKeys';
 import MockUI from '@/components/MockUI';
 
 export const dynamicParams = false;
@@ -163,8 +164,9 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             <ShareCase title={`${p.name} · caso resolvido pela HenaWeb`} text={p.summary} />
           </div>
 
+          <CaseKeys prev={`/casos/${prev.slug}`} next={`/casos/${next.slug}`} />
           <nav aria-label="Relacionados" data-print-hide className="mt-24 grid gap-4 border-t border-line pt-10 md:grid-cols-3">
-            <a href={`/casos/${prev.slug}`} rel="prev" className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6">
+            <a href={`/casos/${prev.slug}`} rel="prev" aria-keyshortcuts="ArrowLeft" className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6">
               <span className="label">Caso anterior</span>
               <span className="mt-2 block text-2xl font-medium tracking-tight">← {prev.name}</span>
             </a>
@@ -174,11 +176,14 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
                 <span className="mt-2 block text-2xl font-medium tracking-tight">{service.name} →</span>
               </a>
             )}
-            <a href={`/casos/${next.slug}`} rel="next" className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6 md:text-right">
+            <a href={`/casos/${next.slug}`} rel="next" aria-keyshortcuts="ArrowRight" className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6 md:text-right">
               <span className="label">Próximo caso</span>
               <span className="mt-2 block text-2xl font-medium tracking-tight">{next.name} →</span>
             </a>
           </nav>
+          <p className="label mt-5 hidden text-center lg:block" aria-hidden data-print-hide>
+            Dica: use <kbd className="font-mono">←</kbd> <kbd className="font-mono">→</kbd> para folhear os casos
+          </p>
         </article>
       </main>
       <Footer />
