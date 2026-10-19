@@ -129,7 +129,7 @@ export default function Nav() {
           <a href="/#topo" className="font-groovy flex items-baseline gap-1 text-2xl text-acid [text-shadow:3px_3px_0_#120626]" aria-label="HenaWeb, início">
             HenaWeb<span className="text-[0.6rem] align-super">®</span>
           </a>
-          <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
+          <nav className="hidden items-center gap-6 lg:flex xl:gap-8" aria-label="Principal">
             {nav.map((item) => (
               <a
                 key={item.href}
@@ -146,13 +146,13 @@ export default function Nav() {
               </a>
             ))}
           </nav>
-          <div className="hidden items-center gap-4 md:flex">
+          <div className="ml-auto mr-4 hidden items-center gap-4 md:flex lg:mr-0 lg:ml-0">
             <button
               type="button"
               onClick={openSearch}
               aria-label="Buscar no site"
               aria-keyshortcuts="Meta+K Control+K /"
-              className="hidden items-center gap-2 rounded-full border border-line px-3 py-2 font-mono text-xs whitespace-nowrap lg:flex text-ink/70 transition-colors hover:border-acid hover:text-acid"
+              className="hidden items-center gap-2 rounded-full border border-line px-3 py-2 font-mono text-xs whitespace-nowrap xl:flex text-ink/70 transition-colors hover:border-acid hover:text-acid"
             >
               <span aria-hidden>🔎</span>
               <kbd className="font-mono">{mac ? '⌘K' : 'Ctrl K'}</kbd>
@@ -170,7 +170,7 @@ export default function Nav() {
           <button
             ref={toggleBtn}
             type="button"
-            className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden"
+            className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5 lg:hidden"
             aria-expanded={open}
             aria-controls="menu-mobile"
             aria-label={open ? 'Fechar menu' : 'Abrir menu'}
@@ -185,7 +185,7 @@ export default function Nav() {
       <div
         id="menu-mobile"
         inert={!open}
-        className={`gutter fixed inset-0 z-40 flex flex-col justify-end bg-bg pb-10 transition-[clip-path] duration-700 ease-[var(--ease-out-expo)] md:hidden ${
+        className={`gutter fixed inset-0 z-40 flex flex-col justify-end bg-bg pb-10 transition-[clip-path] duration-700 ease-[var(--ease-out-expo)] lg:hidden ${
           open ? '[clip-path:inset(0_0_0_0)]' : 'pointer-events-none [clip-path:inset(0_0_100%_0)]'
         }`}
       >
