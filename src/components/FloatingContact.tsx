@@ -106,6 +106,7 @@ export default function FloatingContact() {
 
   return (
     <a
+      data-print-hide
       href={href}
       target="_blank"
       rel="noopener noreferrer"

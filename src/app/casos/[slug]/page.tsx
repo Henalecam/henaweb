@@ -143,7 +143,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             </ul>
           </section>
 
-          <div className="mt-16 flex flex-wrap gap-3">
+          <div className="mt-16 flex flex-wrap gap-3" data-print-hide>
             <a href={p.href} target="_blank" rel="noopener noreferrer" className="toon toon-press rounded-full bg-acid px-6 py-4 font-medium text-acid-ink">
               Visitar {p.name} ↗
             </a>
@@ -152,7 +152,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             </a>
           </div>
 
-          <nav aria-label="Relacionados" className="mt-24 grid gap-4 border-t border-line pt-10 md:grid-cols-3">
+          <nav aria-label="Relacionados" data-print-hide className="mt-24 grid gap-4 border-t border-line pt-10 md:grid-cols-3">
             <a href={`/casos/${prev.slug}`} rel="prev" className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6">
               <span className="label">Caso anterior</span>
               <span className="mt-2 block text-2xl font-medium tracking-tight">← {prev.name}</span>

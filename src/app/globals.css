@@ -417,3 +417,110 @@ details[open]::details-content {
 ::view-transition-image-pair(*.case-window) {
   overflow: hidden;
 }
+
+/* ───────────── Print: the page becomes a case dossier ─────────────
+   Prospects save case and service pages as PDF to pass around (procurement, partners). On paper the
+   night sky, the 3D scenes and the floating UI go; the cartoon outlines stay; a stamped header and
+   the contact line frame every printout. */
+@media print {
+  @page {
+    size: A4;
+    margin: 16mm 14mm;
+  }
+  html,
+  body {
+    background: #fff !important;
+    color: #140a26 !important;
+  }
+  body > header,
+  footer,
+  canvas,
+  .grain,
+  .grid-floor,
+  .sun,
+  [data-preloader],
+  [data-print-hide] {
+    display: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #140a26 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+  /* reveal-on-scroll content that the reader never scrolled to */
+  [style*='visibility: hidden'],
+  [style*='opacity: 0'] {
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  main > article,
+  main > div {
+    padding-top: 0 !important;
+  }
+  .toon,
+  .toon-sm,
+  .win {
+    border-color: #140a26 !important;
+  }
+  .win-bar {
+    border-bottom: 2px solid #140a26;
+  }
+  section,
+  .win,
+  li {
+    break-inside: avoid;
+  }
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+  img {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  /* FAQ answers print open */
+  details::details-content {
+    block-size: auto !important;
+    opacity: 1 !important;
+    content-visibility: visible !important;
+  }
+  /* external links keep their address on paper (WhatsApp links are long and the footer line covers them) */
+  main a[href^='http']:not([href*='whatsapp']):not([href*='wa.me'])::after {
+    content: ' (' attr(href) ')';
+    font-family: var(--font-mono);
+    font-size: 0.75em;
+    word-break: break-all;
+  }
+  body::before {
+    content: 'HenaWeb · Dossiê impresso de henaweb.com';
+    display: block;
+    margin-bottom: 10mm;
+    padding: 2.5mm 4mm;
+    border: 2px solid #140a26;
+    font-family: var(--font-mono);
+    font-size: 9pt;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  body::after {
+    content: 'Abra um caso com a HenaWeb: henrique@henaweb.com · WhatsApp +55 41 99915-5948 · henaweb.com/#contato';
+    display: block;
+    margin-top: 10mm;
+    padding-top: 4mm;
+    border-top: 2px solid #140a26;
+    font-family: var(--font-mono);
+    font-size: 9pt;
+    break-inside: avoid;
+  }
+}

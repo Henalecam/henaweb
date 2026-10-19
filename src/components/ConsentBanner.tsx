@@ -47,6 +47,7 @@ export default function ConsentBanner({ tools }: { tools: string[] }) {
 
   return (
     <section
+      data-print-hide
       aria-label="Cookies e medição"
       // phones: above the floating WhatsApp button
       className={`win fixed inset-x-4 z-[70] text-acid-ink transition-[transform,opacity] duration-300 ease-out motion-reduce:transition-none bottom-[calc(max(1rem,env(safe-area-inset-bottom))_+_3.75rem)] md:right-auto md:bottom-6 md:left-6 md:w-[24rem] ${
