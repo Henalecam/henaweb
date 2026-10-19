@@ -79,6 +79,10 @@ export default function Work() {
     return () => mq.removeEventListener('change', sync);
   }, []);
   const [paused, setPaused] = useState(false);
+  // an explicit stop (WCAG 2.2.2: content that changes by itself needs a way to stop it) and
+  // whether the section is on screen at all: rotating off screen only burned GSAP tweens
+  const [stopped, setStopped] = useState(false);
+  const [inView, setInView] = useState(false);
   const p = projects[active];
 
   // WAI-ARIA tabs: arrows, Home and End move between projects (focusing a tab selects it)
@@ -123,10 +127,18 @@ export default function Work() {
 
   // slow autoplay on desktop while nobody is browsing
   useEffect(() => {
-    if (paused || window.matchMedia('(max-width: 1023px), (prefers-reduced-motion: reduce)').matches) return;
+    const el = root.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.25 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const rotating = !paused && !stopped && inView;
+  useEffect(() => {
+    if (!rotating || window.matchMedia('(max-width: 1023px), (prefers-reduced-motion: reduce)').matches) return;
     const id = setInterval(() => setActive((a) => (a + 1) % projects.length), 6500);
     return () => clearInterval(id);
-  }, [paused]);
+  }, [rotating]);
 
   return (
     <section ref={root} id="projetos" className="sky relative overflow-hidden border-t-[3px] border-toon py-[clamp(5rem,9vw,8rem)]">
@@ -159,56 +171,66 @@ export default function Work() {
           onPointerLeave={() => setPaused(false)}
           onFocusCapture={() => setPaused(true)}
         >
-          <ol data-work-in className="flex flex-col lg:col-span-4" role="tablist" aria-label="Projetos">
-            {projects.map((item, i) => {
-              const on = i === active;
-              return (
-                <li key={item.name} role="presentation">
-                  <button
-                    type="button"
-                    role="tab"
-                    id={`work-tab-${i}`}
-                    aria-selected={on}
-                    aria-controls="work-panel"
-                    // roving focus: Tab enters the list once, arrows move between projects
-                    tabIndex={on ? 0 : -1}
-                    onKeyDown={onTabKey}
-                    onMouseEnter={() => setActive(i)}
-                    onFocus={() => setActive(i)}
-                    onClick={() => setActive(i)}
-                    className={`relative flex w-full items-baseline gap-4 border-b border-line py-3.5 text-left transition-colors ${
-                      on ? 'text-ink' : 'text-ink/45 hover:text-ink/80'
-                    }`}
-                  >
-                    <span className={`flex w-6 shrink-0 flex-col font-mono text-xs ${on ? 'text-acid' : ''}`}>
-                      {pad(i + 1)}
-                      {/* revealed by RevealRead for cases this visitor already opened */}
-                      <span data-read-mark={item.slug} hidden className="text-acid" title="Caso já lido">
-                        ✓<span className="sr-only"> lido</span>
-                      </span>
-                    </span>
-                    <span className="flex-1">
-                      <span className="block text-[clamp(1.5rem,2.3vw,2.25rem)] leading-none font-medium tracking-[-0.04em]">
-                        {item.name}
-                      </span>
-                      <span className={`serif mt-1 block text-base transition-opacity ${on ? 'opacity-70' : 'opacity-0'}`}>{item.kind}</span>
-                    </span>
-                    <span
-                      className={`toon-sm flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-acid text-acid-ink transition-all ${
-                        on ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+          <div className="lg:col-span-4">
+            <ol data-work-in className="flex flex-col" role="tablist" aria-label="Projetos">
+              {projects.map((item, i) => {
+                const on = i === active;
+                return (
+                  <li key={item.name} role="presentation">
+                    <button
+                      type="button"
+                      role="tab"
+                      id={`work-tab-${i}`}
+                      aria-selected={on}
+                      aria-controls="work-panel"
+                      // roving focus: Tab enters the list once, arrows move between projects
+                      tabIndex={on ? 0 : -1}
+                      onKeyDown={onTabKey}
+                      onMouseEnter={() => setActive(i)}
+                      onFocus={() => setActive(i)}
+                      onClick={() => setActive(i)}
+                      className={`relative flex w-full items-baseline gap-4 border-b border-line py-3.5 text-left transition-colors ${
+                        on ? 'text-ink' : 'text-ink/45 hover:text-ink/80'
                       }`}
-                      aria-hidden
                     >
-                      →
-                    </span>
-                    {on && !paused && (
-                      <span key={active} className="absolute bottom-[-1px] left-0 h-[2px] w-full origin-left animate-[progress_6.5s_linear] bg-acid" />
-                    )}
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
+                      <span className={`flex w-6 shrink-0 flex-col font-mono text-xs ${on ? 'text-acid' : ''}`}>
+                        {pad(i + 1)}
+                        {/* revealed by RevealRead for cases this visitor already opened */}
+                        <span data-read-mark={item.slug} hidden className="text-acid" title="Caso já lido">
+                          ✓<span className="sr-only"> lido</span>
+                        </span>
+                      </span>
+                      <span className="flex-1">
+                        <span className="block text-[clamp(1.5rem,2.3vw,2.25rem)] leading-none font-medium tracking-[-0.04em]">
+                          {item.name}
+                        </span>
+                        <span className={`serif mt-1 block text-base transition-opacity ${on ? 'opacity-70' : 'opacity-0'}`}>{item.kind}</span>
+                      </span>
+                      <span
+                        className={`toon-sm flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-acid text-acid-ink transition-all ${
+                          on ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+                        }`}
+                        aria-hidden
+                      >
+                        →
+                      </span>
+                      {on && rotating && (
+                        <span key={active} className="absolute bottom-[-1px] left-0 h-[2px] w-full origin-left animate-[progress_6.5s_linear] bg-acid" />
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+            <button
+              type="button"
+              onClick={() => setStopped((v) => !v)}
+              className="label mt-4 inline-flex min-h-8 items-center gap-2 rounded-full !text-ink/70 transition-colors hover:!text-ink motion-reduce:hidden"
+            >
+              <span aria-hidden>{stopped ? '▶' : '❚❚'}</span>
+              {stopped ? 'Retomar a troca automática' : 'Pausar a troca automática'}
+            </button>
+          </div>
 
           <div className="lg:col-span-8" role="tabpanel" id="work-panel" aria-labelledby={`work-tab-${active}`}>
             <a
