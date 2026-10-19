@@ -97,7 +97,7 @@ export default function CasesIndex() {
                   {/* the clicked card borrows the case page window's view-transition-name (CASE_MORPH) */}
                   <div
                     data-case-window={p.slug}
-                    className="win transition-transform duration-500 ease-[var(--ease-out-expo)] [view-transition-class:case-window] group-hover:-translate-y-1.5 group-hover:-rotate-[0.6deg] group-focus-visible:-translate-y-1.5"
+                    className="win transition-transform duration-500 ease-[var(--ease-out-expo)] [view-transition-class:case-window] group-hover:-translate-y-1.5 group-hover:-rotate-[0.6deg] group-focus-visible:-rotate-[0.6deg] group-focus-visible:-translate-y-1.5"
                   >
                     <div className="win-bar">
                       <span className="truncate">caso_{String(i + 1).padStart(2, '0')}.exe</span>
@@ -118,8 +118,8 @@ export default function CasesIndex() {
                           className={`object-cover object-top ${
                             // long pages scroll by slowly on hover, like browsing the real site
                             p.shot.height > 1200
-                              ? 'transition-[object-position] duration-[6000ms] ease-linear group-hover:object-bottom'
-                              : 'transition-transform duration-700 group-hover:scale-[1.03]'
+                              ? 'transition-[object-position] duration-[6000ms] ease-linear motion-safe:group-hover:object-bottom motion-safe:group-focus-visible:object-bottom'
+                              : 'transition-transform duration-700 group-hover:scale-[1.03] group-focus-visible:scale-[1.03]'
                           }`}
                         />
                       ) : (
@@ -127,7 +127,7 @@ export default function CasesIndex() {
                       )}
                     </div>
                   </div>
-                  <h2 className="mt-5 text-3xl font-medium tracking-[-0.03em] group-hover:text-acid">{p.name} →</h2>
+                  <h2 className="mt-5 text-3xl font-medium tracking-[-0.03em] group-hover:text-acid group-focus-visible:text-acid">{p.name} →</h2>
                   <p className="serif mt-1 text-lg text-ink/60">{p.kind}</p>
                   <p className="mt-2 leading-relaxed text-ink/70">{p.challenge}</p>
                 </a>

@@ -580,7 +580,7 @@ export default function Contact() {
                   className="group inline-flex items-center gap-3 rounded-full border-[3px] border-acid-ink bg-acid-ink px-8 py-4 font-medium text-acid shadow-[5px_5px_0_rgb(11_13_2/0.35)] transition-transform hover:-translate-y-0.5 disabled:opacity-60"
                 >
                   {status === 'sending' ? 'Enviando…' : 'Abrir o caso'}
-                  <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
+                  <span className="transition-transform duration-500 group-hover:translate-x-1 group-focus-visible:translate-x-1">→</span>
                 </button>
                 <p className="max-w-xs text-sm leading-snug text-acid-ink/75">
                   Usamos seus dados só para responder este caso.

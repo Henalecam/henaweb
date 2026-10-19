@@ -155,7 +155,7 @@ function FooterLink({ href, children, accent = false }: { href: string; children
         }`}
       >
         {(!accent || here) && (
-          <span aria-hidden className={`font-mono text-xs transition-colors ${here ? 'text-acid' : 'text-ink/30 group-hover:text-acid'}`}>
+          <span aria-hidden className={`font-mono text-xs transition-colors ${here ? 'text-acid' : 'text-ink/30 group-hover:text-acid group-focus-visible:text-acid'}`}>
             {here ? '●' : '›'}
           </span>
         )}

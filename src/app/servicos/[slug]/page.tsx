@@ -195,7 +195,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                             width={1440}
                             height={846}
                             sizes="(max-width: 768px) 92vw, 380px"
-                            className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+                            className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04] group-focus-visible:scale-[1.04]"
                           />
                         ) : (
                           pr.mock && <MockUI variant={pr.mock.variant} hue={pr.mock.hue} />

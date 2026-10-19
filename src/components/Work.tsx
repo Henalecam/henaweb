@@ -32,7 +32,7 @@ function Screen({ p, tall = true, images = true }: { p: Project; tall?: boolean;
                 fill
                 sizes="(max-width: 1024px) 92vw, 58vw"
                 className={`object-cover object-top ${
-                  tall && p.shot.height > 1200 ? 'transition-[object-position] duration-[6000ms] ease-linear group-hover/screen:object-bottom' : ''
+                  tall && p.shot.height > 1200 ? 'transition-[object-position] duration-[6000ms] ease-linear motion-safe:group-hover/screen:object-bottom motion-safe:group-focus-visible/screen:object-bottom' : ''
                 }`}
               />
             )

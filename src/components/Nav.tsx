@@ -161,7 +161,7 @@ export default function Nav() {
                 {item.label}
                 <span
                   className={`absolute -bottom-1 left-0 h-px w-full bg-current transition-transform duration-500 ease-[var(--ease-out-expo)] ${
-                    active === item.href ? 'origin-left scale-x-100' : 'origin-right scale-x-0 group-hover:origin-left group-hover:scale-x-100'
+                    active === item.href ? 'origin-left scale-x-100' : 'origin-right scale-x-0 group-hover:origin-left group-focus-visible:origin-left group-hover:scale-x-100 group-focus-visible:scale-x-100'
                   }`}
                 />
               </a>

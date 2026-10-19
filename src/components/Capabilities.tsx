@@ -61,7 +61,7 @@ export default function Capabilities() {
                 </span>
                 <span
                   className={`toon-sm relative col-span-2 flex h-10 w-10 items-center justify-center self-center justify-self-end rounded-full bg-acid text-2xl leading-none text-acid-ink transition-transform duration-500 md:col-span-4 md:h-12 md:w-12 md:text-3xl ${
-                    isOpen ? 'rotate-45' : 'group-hover:scale-110 group-hover:rotate-90'
+                    isOpen ? 'rotate-45' : 'group-hover:scale-110 group-focus-visible:scale-110 group-hover:rotate-90 group-focus-visible:rotate-90'
                   }`}
                   aria-hidden
                 >
