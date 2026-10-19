@@ -1,10 +1,14 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { nav } from '@/lib/content';
 import { gsap, onReady } from '@/lib/gsap';
 import Magnetic from './Magnetic';
 import Social from './Social';
+
+// the search only downloads (with its index of cases, services and FAQ) the first time it opens
+const CommandPalette = dynamic(() => import('./CommandPalette'), { ssr: false });
 
 export default function Nav() {
   const inner = useRef<HTMLDivElement>(null);
@@ -14,6 +18,32 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   // which nav section the reader is in (home only); on /casos pages the "Casos" entry stays lit
   const [active, setActive] = useState<string | null>(null);
+  const [search, setSearch] = useState(false);
+  const [searchLoaded, setSearchLoaded] = useState(false);
+  const [mac, setMac] = useState(true);
+
+  const openSearch = () => {
+    setSearchLoaded(true);
+    setOpen(false);
+    setSearch(true);
+  };
+
+  useEffect(() => {
+    setMac(/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent));
+    // ⌘K / Ctrl+K anywhere, or "/" when not typing in a field
+    const onKey = (e: KeyboardEvent) => {
+      const typing = (e.target as HTMLElement | null)?.closest?.('input, textarea, select, [contenteditable="true"]');
+      if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        openSearch();
+      } else if (e.key === '/' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        openSearch();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   useEffect(() => {
     if (window.location.pathname.startsWith('/casos')) {
@@ -116,7 +146,17 @@ export default function Nav() {
               </a>
             ))}
           </nav>
-          <div className="hidden md:block">
+          <div className="hidden items-center gap-4 md:flex">
+            <button
+              type="button"
+              onClick={openSearch}
+              aria-label="Buscar no site"
+              aria-keyshortcuts="Meta+K Control+K /"
+              className="hidden items-center gap-2 rounded-full border border-line px-3 py-2 font-mono text-xs whitespace-nowrap lg:flex text-ink/70 transition-colors hover:border-acid hover:text-acid"
+            >
+              <span aria-hidden>🔎</span>
+              <kbd className="font-mono">{mac ? '⌘K' : 'Ctrl K'}</kbd>
+            </button>
             <Magnetic>
               <a
                 href="/#contato"
@@ -169,10 +209,13 @@ export default function Nav() {
           ))}
         </nav>
         <div className="mt-8 flex items-center justify-between">
-          <span className="label">@henaweb</span>
+          <button type="button" onClick={openSearch} className="label flex min-h-11 items-center gap-2 !text-ink">
+            <span aria-hidden>🔎</span> Procurar pista
+          </button>
           <Social />
         </div>
       </div>
+      {searchLoaded && <CommandPalette open={search} onClose={() => setSearch(false)} />}
     </>
   );
 }
