@@ -23,6 +23,7 @@ function readReference(): string | null {
 }
 import { renderCaseCard, shareOrDownload } from '@/lib/caseCard';
 import { track } from '@/lib/track';
+import CopyEmail from './CopyEmail';
 import { suggestEmail } from '@/lib/emailTypos';
 import { formatPhoneBR } from '@/lib/phone';
 import Social from './Social';
@@ -284,9 +285,12 @@ export default function Contact() {
             <a href={whatsappWithCase} target="_blank" rel="noopener noreferrer" className="w-fit underline-offset-4 hover:underline">
               WhatsApp · {site.whatsappDisplay} ↗
             </a>
-            <a href={`mailto:${site.email}`} className="w-fit underline-offset-4 hover:underline">
-              {site.email}
-            </a>
+            <span className="flex flex-wrap items-baseline gap-x-3">
+              <a href={`mailto:${site.email}`} className="w-fit underline-offset-4 hover:underline">
+                {site.email}
+              </a>
+              <CopyEmail placement="contato" className="text-xs text-acid-ink/75 underline underline-offset-4 hover:text-acid-ink" />
+            </span>
             <span className="text-acid-ink/60">{site.city} · Atendemos todo o Brasil e exterior</span>
           </div>
           <Social tone="light" className="mt-6" />

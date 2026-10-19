@@ -8,6 +8,7 @@ import { CONSENT_OPEN } from '@/lib/consent';
 import Clock from './Clock';
 import Chase from './Chase';
 import Social from './Social';
+import CopyEmail from './CopyEmail';
 
 export default function Footer() {
   const root = useRef<HTMLElement>(null);
@@ -50,6 +51,10 @@ export default function Footer() {
             >
               {site.email}
             </a>
+            <CopyEmail
+              placement="footer"
+              className="toon-sm toon-press inline-flex items-center rounded-full bg-paper px-3.5 py-2.5 font-mono text-xs text-acid-ink"
+            />
           </div>
           <p className="mt-6 font-mono text-xs leading-relaxed text-ink/60">
             {site.city} · {site.coords}
