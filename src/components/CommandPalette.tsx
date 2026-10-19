@@ -59,9 +59,11 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
 
+  // cases this visitor already opened (ReadMarks, hena:read), newest first: "pick up where you left off"
+  const [recent, setRecent] = useState<Item[]>([]);
   const results = useMemo(() => {
     const words = fold(query).split(/\s+/).filter(Boolean);
-    if (!words.length) return ITEMS.filter((it) => it.group !== 'Perguntas');
+    if (!words.length) return [...recent, ...ITEMS.filter((it) => it.group !== 'Perguntas')];
     // a dropped last letter forgives gender/number: "custo" finds "custa", "sistemas" finds "sistema"
     const hit = (text: string, w: string) => text.includes(w) || (w.length >= 4 && text.includes(w.slice(0, -1)));
     const found = ITEMS.map((it, i) => ({ it, i })).filter(({ i }) => words.every((w) => hit(SEARCHABLE[i], w)));
@@ -72,7 +74,7 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
       .sort((a, b) => groupOrder.indexOf(a.it.group) - groupOrder.indexOf(b.it.group) || Number(inLabel(b)) - Number(inLabel(a)) || a.i - b.i)
       .map(({ it }) => it)
       .slice(0, 40);
-  }, [query]);
+  }, [query, recent]);
 
   useEffect(() => {
     const d = dialog.current;
@@ -80,6 +82,18 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
     if (open && !d.open) {
       setQuery(initialQuery);
       setActive(0);
+      try {
+        const read: unknown = JSON.parse(localStorage.getItem('hena:read') ?? '[]');
+        const slugs = Array.isArray(read) ? read.filter((x): x is string => typeof x === 'string') : [];
+        setRecent(
+          slugs
+            .slice(-3)
+            .reverse()
+            .map((slug) => ITEMS.find((it) => it.href === `/casos/${slug}`))
+            .filter((it): it is Item => !!it)
+            .map((it) => ({ ...it, group: 'Visto por você', hint: `${it.hint ?? ''} · ✓ lido`.replace(/^ · /, '') })),
+        );
+      } catch {}
       d.showModal();
       input.current?.focus();
     } else if (!open && d.open) d.close();
@@ -154,7 +168,7 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
             const header = it.group !== lastGroup ? it.group : null;
             lastGroup = it.group;
             return (
-              <li key={it.href + it.label} role="presentation">
+              <li key={it.group + it.href + it.label} role="presentation">
                 {header && <div className="label px-3 pt-3 pb-1 !text-acid-ink/75">{header}</div>}
                 <a
                   id={`pista-${i}`}
