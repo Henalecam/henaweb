@@ -7,6 +7,7 @@ import ClosingCta from '@/components/ClosingCta';
 import Footer from '@/components/Footer';
 import { FaqCopyLink, FaqHashOpener } from '@/components/FaqLink';
 import { faqId } from '@/lib/slug';
+import ServiceSymptoms from '@/components/ServiceSymptoms';
 import ShareCase from '@/components/ShareCase';
 import MockUI from '@/components/MockUI';
 
@@ -118,14 +119,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             <h2 id="sintomas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-groovy [text-shadow:3px_3px_0_#140a26]">
               Sintomas que resolvemos
             </h2>
-            <ul className="mt-8 grid gap-4 sm:grid-cols-2">
-              {s.problems.map((p) => (
-                <li key={p} className="toon-sm rounded-xl bg-paper p-5 text-acid-ink">
-                  <span className="mr-2 text-[#c2410c]">✦</span>
-                  {p}
-                </li>
-              ))}
-            </ul>
+            <ServiceSymptoms problems={s.problems} service={s.name} />
           </section>
 
           <section className="mt-24" aria-labelledby="entregas">
