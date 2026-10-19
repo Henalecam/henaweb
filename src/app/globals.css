@@ -139,6 +139,9 @@
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
+    /* hover lifts, tilts, slides and screenshot pans were still gliding: states now change at once */
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
   }
 }
 
