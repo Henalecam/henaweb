@@ -130,6 +130,12 @@ const jsonLd = {
       name: 'HenaWeb',
       inLanguage: 'pt-BR',
       publisher: { '@id': `${site.url}/#organization` },
+      // the site search (/?pista=) the OpenSearch description already advertises to browsers
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: `${site.url}/?pista={search_term_string}` },
+        'query-input': 'required name=search_term_string',
+      },
     },
   ],
 };
@@ -160,6 +166,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         {/* lets the browser add the site search (Chrome "tab to search", Firefox search bar); React hoists it to <head> */}
         <link rel="search" type="application/opensearchdescription+xml" title="HenaWeb" href="/opensearch.xml" />
+        {/* plain-Markdown map of the site for AI assistants (llmstxt.org) */}
+        <link rel="alternate" type="text/markdown" title="HenaWeb para assistentes de IA" href="/llms.txt" />
         <a
           href="#conteudo"
           className="toon-sm sr-only z-[200] rounded-full bg-acid px-5 py-3 font-medium text-acid-ink focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:px-5 focus:py-3"
