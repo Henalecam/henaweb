@@ -573,3 +573,8 @@ details[open]::details-content {
     background-color: #0d0820 !important;
   }
 }
+
+/* section links (#entregas, #perguntas…) land with the title below the fixed header, not under it */
+h2[id] {
+  scroll-margin-top: 6rem;
+}
