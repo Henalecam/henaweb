@@ -174,7 +174,8 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
           <ArchiveReturn />
           <CaseKeys prev={`/casos/${prev.slug}`} next={`/casos/${next.slug}`} />
           <nav aria-label="Relacionados" data-print-hide className="mt-24 grid gap-4 border-t border-line pt-10 md:grid-cols-3">
-            <a href={`/casos/${prev.slug}`} rel="prev" aria-keyshortcuts="ArrowLeft" className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6">
+            <a href={`/casos/${prev.slug}`} rel="prev" aria-keyshortcuts="ArrowLeft" className="toon-sm toon-press group rounded-2xl bg-bg-2/80 p-6">
+              <CasePeek p={prev} />
               <span className="label">Caso anterior</span>
               <span data-read-mark={prev.slug} hidden className="ml-2 align-middle font-mono text-xs text-acid">
                 ✓ lido
@@ -187,7 +188,8 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
                 <span className="mt-2 block text-2xl font-medium tracking-tight">{service.name} →</span>
               </a>
             )}
-            <a href={`/casos/${next.slug}`} rel="next" aria-keyshortcuts="ArrowRight" className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6 md:text-right">
+            <a href={`/casos/${next.slug}`} rel="next" aria-keyshortcuts="ArrowRight" className="toon-sm toon-press group rounded-2xl bg-bg-2/80 p-6 md:text-right">
+              <CasePeek p={next} />
               <span className="label">Próximo caso</span>
               <span data-read-mark={next.slug} hidden className="ml-2 align-middle font-mono text-xs text-acid">
                 ✓ lido
@@ -206,5 +208,22 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
       </main>
       <Footer />
     </>
+  );
+}
+
+/** A glimpse of the neighbouring case's screen on the prev/next links (cases without a capture show none). */
+function CasePeek({ p }: { p: (typeof projects)[number] }) {
+  if (!p.shot) return null;
+  return (
+    <span className="mb-4 block aspect-[16/8] overflow-hidden rounded-lg border-2 border-[#7d7394] bg-acid-ink" aria-hidden>
+      <Image
+        src={p.shot.desktop.replace(/\.jpg$/, '-top.jpg')}
+        alt=""
+        width={720}
+        height={360}
+        sizes="(max-width: 768px) 88vw, 340px"
+        className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04] group-focus-visible:scale-[1.04]"
+      />
+    </span>
   );
 }
