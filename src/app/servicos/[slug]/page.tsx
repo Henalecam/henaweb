@@ -45,6 +45,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
   const s = serviceBySlug(slug);
   if (!s) notFound();
   const url = `${site.url}/servicos/${s.slug}`;
+  const caseCount = projects.filter((p) => p.service === s.slug).length;
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -207,6 +208,16 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                 </span>
               ))}
             </p>
+            {/* the archive already filters by service (?servico=, CaseFilter): link straight to this service's cases */}
+            {caseCount > 0 && (
+              <a
+                href={`/casos?servico=${s.slug}`}
+                data-print-hide
+                className="mt-8 inline-flex items-center gap-2 font-medium text-acid underline-offset-4 hover:underline"
+              >
+                Ver {caseCount === 1 ? 'o caso' : `os ${caseCount} casos`} de {s.name} no arquivo →
+              </a>
+            )}
           </section>
 
           <section className="group relative mt-24" aria-labelledby="perguntas">
