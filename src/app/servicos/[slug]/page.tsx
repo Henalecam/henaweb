@@ -107,7 +107,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
               Abrir um caso →
             </a>
             <a
-              href={whatsappLink(`Olá! Quero conversar sobre ${s.name.toLowerCase()} com a HenaWeb.`)}
+              href={whatsappLink(`Olá! Quero conversar sobre ${s.name} com a HenaWeb.`)}
               target="_blank"
               rel="noopener noreferrer"
               className="toon toon-press rounded-full bg-cyan px-6 py-4 font-medium text-acid-ink"
@@ -285,7 +285,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             title="Seu caso parece com"
             accent="esse?"
             text="Marque os sintomas no formulário e receba um diagnóstico preliminar na hora, ou chame direto no WhatsApp."
-            whatsappMessage={`Olá! Quero conversar sobre ${s.name.toLowerCase()} com a HenaWeb.`}
+            whatsappMessage={`Olá! Quero conversar sobre ${s.name} com a HenaWeb.`}
           />
         </article>
       </main>

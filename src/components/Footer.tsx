@@ -10,7 +10,17 @@ import Chase from './Chase';
 import Social from './Social';
 import CopyEmail from './CopyEmail';
 
+/** The footer's WhatsApp opens with a message about the page being read (same wording as the floating button). */
+function footerMessage(path: string): string | undefined {
+  const [, kind, slug] = path.match(/^\/(casos|servicos)\/([\w-]+)/) ?? [];
+  const caseName = kind === 'casos' && projectLinks.find((x) => x.slug === slug)?.name;
+  if (caseName) return `Olá! Vi o caso ${caseName} no site e quero algo parecido para a minha operação.`;
+  const service = kind === 'servicos' && serviceLinks.find((x) => x.slug === slug)?.name;
+  if (service) return `Olá! Quero conversar sobre ${service} com a HenaWeb.`;
+}
+
 export default function Footer() {
+  const path = usePathname();
 
   return (
     <footer className="sky gutter relative z-50 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon pt-20 pb-6">
@@ -23,7 +33,7 @@ export default function Footer() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a
-              href={whatsappLink()}
+              href={whatsappLink(footerMessage(path))}
               target="_blank"
               rel="noopener noreferrer"
               className="toon-sm toon-press inline-flex items-center gap-2 rounded-full bg-[#25d366] px-4 py-2.5 text-sm font-medium text-acid-ink"
