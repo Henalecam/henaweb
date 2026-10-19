@@ -52,7 +52,7 @@ const SEARCHABLE = ITEMS.map((it) => fold(`${it.label} ${it.hint ?? ''} ${it.gro
  * contact actions. Built on <dialog> (focus trap, Esc and inert page come from the browser) with
  * the combobox + listbox pattern for screen readers.
  */
-export default function CommandPalette({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function CommandPalette({ open, onClose, initialQuery = '' }: { open: boolean; onClose: () => void; initialQuery?: string }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLUListElement>(null);
@@ -78,7 +78,7 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
     const d = dialog.current;
     if (!d) return;
     if (open && !d.open) {
-      setQuery('');
+      setQuery(initialQuery);
       setActive(0);
       d.showModal();
       input.current?.focus();

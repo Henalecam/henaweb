@@ -21,6 +21,8 @@ export default function Nav() {
   const [search, setSearch] = useState(false);
   const [searchLoaded, setSearchLoaded] = useState(false);
   const [mac, setMac] = useState(true);
+  // "?pista=…" (browser site search, app shortcut) opens the search already filled in
+  const [initialQuery, setInitialQuery] = useState('');
 
   const openSearch = () => {
     setSearchLoaded(true);
@@ -30,6 +32,14 @@ export default function Nav() {
 
   useEffect(() => {
     setMac(/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent));
+    const url = new URL(location.href);
+    const pista = url.searchParams.get('pista');
+    if (pista !== null) {
+      setInitialQuery(pista.slice(0, 80));
+      openSearch();
+      url.searchParams.delete('pista');
+      history.replaceState(history.state, '', url.pathname + url.search + url.hash);
+    }
     // ⌘K / Ctrl+K anywhere, or "/" when not typing in a field
     const onKey = (e: KeyboardEvent) => {
       const typing = (e.target as HTMLElement | null)?.closest?.('input, textarea, select, [contenteditable="true"]');
@@ -221,7 +231,14 @@ export default function Nav() {
           <Social />
         </div>
       </div>
-      {searchLoaded && <CommandPalette open={search} onClose={() => setSearch(false)} />}
+      {searchLoaded && <CommandPalette
+          open={search}
+          initialQuery={initialQuery}
+          onClose={() => {
+            setSearch(false);
+            setInitialQuery('');
+          }}
+        />}
     </>
   );
 }

@@ -158,6 +158,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <style>{'[data-preloader]{display:none!important}'}</style>
         </noscript>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        {/* lets the browser add the site search (Chrome "tab to search", Firefox search bar); React hoists it to <head> */}
+        <link rel="search" type="application/opensearchdescription+xml" title="HenaWeb" href="/opensearch.xml" />
         <a
           href="#conteudo"
           className="toon-sm sr-only z-[200] rounded-full bg-acid px-5 py-3 font-medium text-acid-ink focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:px-5 focus:py-3"
