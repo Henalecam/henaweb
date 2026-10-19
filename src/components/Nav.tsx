@@ -12,6 +12,42 @@ export default function Nav() {
   const toggleBtn = useRef<HTMLButtonElement>(null);
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  // which nav section the reader is in (home only); on /casos pages the "Casos" entry stays lit
+  const [active, setActive] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (window.location.pathname.startsWith('/casos')) {
+      setActive('/#projetos');
+      return;
+    }
+    if (window.location.pathname !== '/') return;
+    const sections = nav
+      .map((item) => ({ href: item.href, el: document.getElementById(item.href.split('#')[1]) }))
+      .filter((s): s is { href: string; el: HTMLElement } => !!s.el);
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      // the section crossing a line 40% down the screen; sections outside the menu (the mystery,
+      // FAQ, contact…) leave nothing lit
+      const line = window.innerHeight * 0.4;
+      const hit = sections.find(({ el }) => {
+        const r = el.getBoundingClientRect();
+        return r.top <= line && r.bottom > line;
+      });
+      setActive(hit ? hit.href : null);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
 
   useEffect(() => {
     let last = window.scrollY;
@@ -65,9 +101,18 @@ export default function Nav() {
           </a>
           <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
             {nav.map((item) => (
-              <a key={item.href} href={item.href} className="group relative text-sm text-ink">
+              <a
+                key={item.href}
+                href={item.href}
+                aria-current={active === item.href ? 'location' : undefined}
+                className={`group relative text-sm transition-colors duration-300 ${active === item.href ? 'text-acid' : 'text-ink'}`}
+              >
                 {item.label}
-                <span className="absolute -bottom-1 left-0 h-px w-full origin-right scale-x-0 bg-current transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:origin-left group-hover:scale-x-100" />
+                <span
+                  className={`absolute -bottom-1 left-0 h-px w-full bg-current transition-transform duration-500 ease-[var(--ease-out-expo)] ${
+                    active === item.href ? 'origin-left scale-x-100' : 'origin-right scale-x-0 group-hover:origin-left group-hover:scale-x-100'
+                  }`}
+                />
               </a>
             ))}
           </nav>
@@ -110,10 +155,16 @@ export default function Nav() {
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className="flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight"
+              aria-current={active === item.href ? 'location' : undefined}
+              className={`flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight ${active === item.href ? 'text-acid' : ''}`}
             >
               <span className="label">0{i + 1}</span>
               {item.label}
+              {active === item.href && (
+                <span className="label ml-auto shrink-0 self-center whitespace-nowrap !text-acid" aria-hidden>
+                  ● aqui
+                </span>
+              )}
             </a>
           ))}
         </nav>
