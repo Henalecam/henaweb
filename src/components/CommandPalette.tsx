@@ -110,6 +110,29 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
     list.current?.querySelector<HTMLAnchorElement>(`a[data-index="${results.indexOf(it)}"]`)?.click();
   };
 
+  // no result: carry the search into the contact form's message (same-tab draft) and land in it
+  const askUs = (q: string) => {
+    const line = `Procurei no site por "${q}" e não achei.`;
+    const box = document.getElementById('mensagem') as HTMLTextAreaElement | null;
+    onClose();
+    if (box) {
+      if (!box.value.includes(line)) box.value = [box.value, line].filter(Boolean).join('\n\n');
+      box.dispatchEvent(new Event('input', { bubbles: true }));
+      if (location.hash === '#mensagem') {
+        box.scrollIntoView({ block: 'center' });
+        box.focus({ preventScroll: true });
+      } else location.hash = 'mensagem';
+      return;
+    }
+    try {
+      const d = JSON.parse(sessionStorage.getItem('hena:draft') ?? 'null') ?? { picked: [], timeline: '', fields: {} };
+      const msg: string = d.fields?.message ?? '';
+      d.fields = { ...d.fields, message: msg.includes(line) ? msg : [msg, line].filter(Boolean).join('\n\n') };
+      sessionStorage.setItem('hena:draft', JSON.stringify(d));
+    } catch {}
+    location.href = '/#mensagem';
+  };
+
   const onKey = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -163,7 +186,6 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
           />
         </div>
         <ul ref={list} id="pistas" role="listbox" aria-label="Resultados" data-lenis-prevent className="max-h-[min(55vh,26rem)] overflow-y-auto overscroll-contain p-2">
-          {results.length === 0 && <li className="px-3 py-6 text-center font-mono text-sm text-acid-ink/75">Nenhuma pista com esse nome. Tente outra palavra.</li>}
           {results.map((it, i) => {
             const header = it.group !== lastGroup ? it.group : null;
             lastGroup = it.group;
@@ -190,6 +212,19 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
             );
           })}
         </ul>
+          {results.length === 0 && (
+            <p role="status" className="px-5 pb-6 pt-2 text-center font-mono text-sm text-acid-ink/75">
+              Nenhuma pista com esse nome. Tente outra palavra
+              {query.trim() && (
+                <>
+                  {' '}ou{' '}
+                  <button type="button" onClick={() => askUs(query.trim())} className="font-medium text-acid-ink underline underline-offset-4 hover:decoration-2">
+                    pergunte isso direto pra gente →
+                  </button>
+                </>
+              )}
+            </p>
+          )}
         <p className="hidden gap-4 border-t-2 border-[#7d7394] px-4 py-2 md:flex font-mono text-[0.68rem] text-acid-ink/75" aria-hidden>
           <span>↑↓ navegar</span>
           <span>Enter abrir</span>
