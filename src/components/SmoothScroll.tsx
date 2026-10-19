@@ -20,5 +20,33 @@ export default function SmoothScroll() {
     };
   }, []);
 
+  // Arriving with a hash (/#projetos from a subpage, a shared link, an ad to /#contato): the browser
+  // jumps to the section right away, but the pinned scenes above it are measured afterwards and add
+  // screens of scroll space, leaving the visitor far above the target. Follow the target through those
+  // re-measures for a few seconds, and stop as soon as the visitor scrolls on their own.
+  useEffect(() => {
+    const id = decodeURIComponent(location.hash.slice(1));
+    // #mensagem focuses and centres itself (Contact); FAQ answers have their own opener
+    if (!id || id === 'mensagem' || id.startsWith('pergunta-')) return;
+    const target = document.getElementById(id);
+    if (!target) return;
+    const land = () => {
+      if (Math.abs(target.getBoundingClientRect().top) > 120) target.scrollIntoView({ block: 'start' });
+    };
+    const stop = () => {
+      ScrollTrigger.removeEventListener('refresh', land);
+      window.clearTimeout(timer);
+      for (const e of ['wheel', 'touchstart', 'keydown'] as const) window.removeEventListener(e, stop);
+    };
+    ScrollTrigger.addEventListener('refresh', land);
+    const timer = window.setTimeout(stop, 4000);
+    const settle = window.setTimeout(land, 900);
+    for (const e of ['wheel', 'touchstart', 'keydown'] as const) window.addEventListener(e, stop, { passive: true });
+    return () => {
+      stop();
+      window.clearTimeout(settle);
+    };
+  }, []);
+
   return null;
 }

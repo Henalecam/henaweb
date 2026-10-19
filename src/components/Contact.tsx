@@ -144,12 +144,8 @@ export default function Contact() {
     };
     focusMessage();
     // on a fresh load the pinned sections above are still being measured and the page grows by a few
-    // screens: a link to /#contato (ads, WhatsApp, e-mail signatures) ended up far above the form.
-    // Once they settle, land again on the form (or the message box).
-    const settle = window.setTimeout(() => {
-      if (location.hash === '#contato') document.getElementById('contato')?.scrollIntoView({ block: 'start' });
-      else focusMessage();
-    }, 900);
+    // screens: centre the box again once they settle (other hashes are handled by SmoothScroll)
+    const settle = window.setTimeout(focusMessage, 900);
     window.addEventListener('hashchange', focusMessage);
     return () => {
       window.clearTimeout(settle);
