@@ -18,12 +18,15 @@ import { analyticsLoader } from '@/lib/consent';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' });
+// only the italic is ever drawn (.serif), and never above the fold: no upright cut, and no preload, so
+// pages that don't use it (cases, services) never download it and the home fetches it when it shows up
 const instrument = Instrument_Serif({
   subsets: ['latin'],
   weight: '400',
-  style: ['italic', 'normal'],
+  style: 'italic',
   variable: '--font-instrument',
   display: 'swap',
+  preload: false,
 });
 
 const groovy = Shrikhand({ subsets: ['latin'], weight: '400', variable: '--font-shrikhand', display: 'swap' });
