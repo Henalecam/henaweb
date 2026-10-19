@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ReadProgress } from '@/components/ReadMarks';
 import Image from 'next/image';
 import { projects, site } from '@/lib/content';
 import Footer from '@/components/Footer';
@@ -80,6 +81,7 @@ export default function CasesIndex() {
               .map((s) => ({ slug: s.slug, name: s.name, count: projects.filter((p) => p.service === s.slug).length }))
               .filter((o) => o.count > 0)}
           />
+          <ReadProgress slugs={projects.map((p) => p.slug)} />
           <ul className="mt-10 grid gap-6 md:grid-cols-2">
             {projects.map((p, i) => (
               <li key={p.slug} data-case-service={p.service} data-case-slug={p.slug}>
@@ -91,6 +93,9 @@ export default function CasesIndex() {
                   >
                     <div className="win-bar">
                       <span className="truncate">caso_{String(i + 1).padStart(2, '0')}.exe</span>
+                      <span data-read-mark={p.slug} hidden className="ml-auto shrink-0 rounded-sm bg-acid-ink/85 px-1.5 text-[0.65rem] text-acid">
+                        ✓ investigado
+                      </span>
                     </div>
                     <div className="relative m-1.5 aspect-[16/10] overflow-hidden border-2 border-[#7d7394] bg-acid-ink">
                       {p.shot ? (
