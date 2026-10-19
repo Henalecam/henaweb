@@ -50,6 +50,15 @@
     text-wrap: pretty;
   }
 
+  /* an open modal freezes the page behind it (Lenis is stopped in SmoothScroll); the gutter keeps the
+     layout from jumping sideways when the scrollbar goes away */
+  html {
+    scrollbar-gutter: stable;
+  }
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
   ::selection {
     background: var(--color-acid);
     color: var(--color-acid-ink);

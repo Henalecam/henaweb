@@ -14,7 +14,14 @@ export default function SmoothScroll() {
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
+    // a modal (search, shortcuts, full screenshot) freezes the page behind it: without this the
+    // wheel over the backdrop kept gliding the page underneath
+    const syncDialogs = () => (document.querySelector('dialog[open]') ? lenis.stop() : lenis.start());
+    const watch = new MutationObserver(syncDialogs);
+    watch.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['open'] });
+
     return () => {
+      watch.disconnect();
       gsap.ticker.remove(tick);
       lenis.destroy();
     };
