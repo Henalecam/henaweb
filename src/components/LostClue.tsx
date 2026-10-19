@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { nav } from '@/lib/site';
+import { nav, site } from '@/lib/site';
 import { projectLinks } from '@/lib/projectLinks';
 import { serviceLinks } from '@/lib/serviceLinks';
 
@@ -35,6 +35,8 @@ function distance(a: string, b: string) {
  */
 export default function LostClue() {
   const [guess, setGuess] = useState<{ label: string; href: string } | null>(null);
+  // arrived through a link (ours or someone else's): that link is broken, and we'd like to know
+  const [report, setReport] = useState<string | null>(null);
 
   useEffect(() => {
     const words = decodeURIComponent(location.pathname)
@@ -53,6 +55,10 @@ export default function LostClue() {
       if (best) break;
     }
     setGuess(best);
+    if (document.referrer) {
+      const body = `Encontrei um link quebrado.\n\nEndereço: ${location.href}\nCheguei a partir de: ${document.referrer}`;
+      setReport(`mailto:${site.email}?subject=${encodeURIComponent('Link quebrado no site')}&body=${encodeURIComponent(body)}`);
+    }
   }, []);
 
   return (
@@ -72,6 +78,11 @@ export default function LostClue() {
       >
         <span aria-hidden>🔎</span> Procurar no arquivo de casos
       </button>
+      {report && (
+        <a href={report} className="label flex min-h-11 items-center gap-2 self-start !text-ink/75 underline underline-offset-4 hover:!text-ink">
+          <span aria-hidden>✉</span> Avisar a gente sobre este link quebrado
+        </a>
+      )}
     </div>
   );
 }
