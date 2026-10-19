@@ -50,6 +50,17 @@ const nextConfig: NextConfig = {
       { source: '/portfolio', destination: '/#projetos', permanent: true },
       { source: '/contato', destination: '/#contato', permanent: true },
       { source: '/blog', destination: '/', permanent: false },
+      // guessable variants of real addresses (typed by hand, read aloud, half-remembered): straight to
+      // the page instead of the 404's "did you mean" (singular/plural, English, Portuguese synonyms)
+      { source: '/caso/:slug', destination: '/casos/:slug', permanent: true },
+      { source: '/caso', destination: '/casos', permanent: true },
+      { source: '/projetos', destination: '/casos', permanent: true },
+      { source: '/projeto/:slug', destination: '/casos/:slug', permanent: true },
+      { source: '/cases', destination: '/casos', permanent: true },
+      { source: '/cases/:slug', destination: '/casos/:slug', permanent: true },
+      { source: '/servico/:slug', destination: '/servicos/:slug', permanent: true },
+      { source: '/faq', destination: '/#perguntas', permanent: true },
+      { source: '/perguntas', destination: '/#perguntas', permanent: true },
       // v1 campaign pages: keep ads and indexed links alive
       { source: '/lp', destination: '/#contato', permanent: false },
       { source: '/prospecto/:path*', destination: '/#contato', permanent: false },
