@@ -1,7 +1,5 @@
 'use client';
 
-import { useRef } from 'react';
-import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { nav, site, whatsappLink } from '@/lib/site';
 import { projectLinks } from '@/lib/projectLinks';
 import { serviceLinks } from '@/lib/serviceLinks';
@@ -12,24 +10,9 @@ import Social from './Social';
 import CopyEmail from './CopyEmail';
 
 export default function Footer() {
-  const root = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      if (prefersReducedMotion()) return;
-      gsap.from('[data-wordmark] span', {
-        yPercent: 100,
-        duration: 1.4,
-        ease: 'expo.out',
-        stagger: 0.04,
-        scrollTrigger: { trigger: '[data-wordmark]', start: 'top 95%' },
-      });
-    },
-    { scope: root },
-  );
 
   return (
-    <footer ref={root} className="sky gutter relative z-50 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon pt-20 pb-6">
+    <footer className="sky gutter relative z-50 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon pt-20 pb-6">
       <div className="relative z-20 grid gap-12 lg:grid-cols-12">
         {/* who we are + the two ways to reach us */}
         <div className="lg:col-span-4">
@@ -108,7 +91,7 @@ export default function Footer() {
         <div
           data-wordmark
           aria-hidden
-          className="relative z-10 flex overflow-hidden pt-2 pb-4 font-groovy text-[clamp(3rem,16vw,19rem)] leading-[0.9] select-none"
+          className="relative z-10 flex justify-center overflow-hidden pt-2 pb-4 font-groovy text-[clamp(3rem,16vw,19rem)] leading-[0.9] select-none"
         >
           {'HenaWeb'.split('').map((c, i) => (
             <span key={i} className="chrome inline-block pr-[0.02em]">
