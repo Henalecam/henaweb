@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import Image from 'next/image';
-import { gsap, SplitText, useGSAP } from '@/lib/gsap';
+import { gsap, ScrollTrigger, SplitText, useGSAP } from '@/lib/gsap';
 import { principles } from '@/lib/content';
 
 export default function Studio() {
@@ -28,6 +28,11 @@ export default function Studio() {
           scrollTrigger: { trigger: '[data-portrait]', start: 'top 80%' },
         },
       );
+      // touch screens never hover, so the halftone used to hide the founder's face for good:
+      // there the photo develops into colour once it sits in the middle of the screen
+      if (window.matchMedia('(hover: none)').matches) {
+        ScrollTrigger.create({ trigger: '[data-portrait]', start: 'top 60%', end: 'bottom 25%', toggleClass: { targets: '[data-portrait-card]', className: 'is-developed' } });
+      }
       gsap.from('[data-principle]', {
         y: 40,
         autoAlpha: 0,
@@ -49,16 +54,16 @@ export default function Studio() {
       <div className="grid gap-14 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <span className="label">(VII) Studio</span>
-          <figure className="group toon mt-8 max-w-sm -rotate-2 rounded-sm bg-paper p-3 pb-4 transition-transform duration-500 hover:rotate-0">
+          <figure data-portrait-card className="group toon mt-8 max-w-sm -rotate-2 rounded-sm bg-paper p-3 pb-4 transition-transform duration-500 hover:rotate-0">
             <div data-portrait className="relative aspect-[4/5] overflow-hidden bg-bg-2">
               <Image
                 src="/team/henrique.png"
                 alt="Henrique Alexandre de Camargo, fundador da HenaWeb"
                 fill
                 sizes="(max-width: 1024px) 80vw, 25vw"
-                className="object-cover grayscale contrast-125 transition-[filter] duration-700 group-hover:grayscale-0 group-hover:contrast-100"
+                className="object-cover grayscale contrast-125 transition-[filter] duration-700 group-hover:grayscale-0 group-hover:contrast-100 group-[.is-developed]:grayscale-0 group-[.is-developed]:contrast-100"
               />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,transparent_1.1px,rgb(18_8_42/0.85)_1.9px)] bg-[length:6px_6px] transition-opacity duration-700 group-hover:opacity-0" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,transparent_1.1px,rgb(18_8_42/0.85)_1.9px)] bg-[length:6px_6px] transition-opacity duration-700 group-hover:opacity-0 group-[.is-developed]:opacity-0" />
             </div>
             <figcaption className="mt-3 text-center text-acid-ink">
               <span className="font-groovy block text-lg text-[#c2410c]">Fundador · Cientista da computação</span>
@@ -86,10 +91,13 @@ export default function Studio() {
                   <span>regra_{pr.n.toLowerCase()}.txt</span>
                   <span className="win-btn ml-auto" aria-hidden>×</span>
                 </div>
-                <div className="m-1.5 flex-1 border-2 border-[#7d7394] bg-paper p-6 text-acid-ink">
-                <span className="font-groovy text-5xl leading-none text-[#c2410c]">{pr.n}</span>
-                <h3 className="mt-6 text-2xl font-medium tracking-tight">{pr.title}</h3>
-                <p className="mt-3 leading-relaxed text-acid-ink/70">{pr.body}</p>
+                {/* phones: numeral beside the title instead of on a line of its own (rules list ~24% shorter) */}
+                <div className="m-1.5 flex-1 border-2 border-[#7d7394] bg-paper p-5 text-acid-ink sm:p-6">
+                  <div className="flex items-baseline gap-4 sm:block">
+                    <span className="font-groovy w-14 shrink-0 text-4xl leading-none text-[#c2410c] sm:w-auto sm:text-5xl">{pr.n}</span>
+                    <h3 className="text-xl font-medium tracking-tight sm:mt-6 sm:text-2xl">{pr.title}</h3>
+                  </div>
+                  <p className="mt-3 leading-relaxed text-acid-ink/70">{pr.body}</p>
                 </div>
               </li>
             ))}
