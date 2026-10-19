@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { nav, projects, site, whatsappLink } from '@/lib/content';
-import { services } from '@/lib/services';
+import { serviceLinks } from '@/lib/serviceLinks';
 import { CONSENT_OPEN } from '@/lib/consent';
 import Clock from './Clock';
 import Chase from './Chase';
@@ -65,7 +65,7 @@ export default function Footer() {
         {/* a little file tree, in keeping with the .exe windows: every page one click away */}
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:col-span-8">
           <FooterColumn title="serviços/">
-            {services.map((x) => (
+            {serviceLinks.map((x) => (
               <FooterLink key={x.slug} href={`/servicos/${x.slug}`}>
                 {x.name}
               </FooterLink>

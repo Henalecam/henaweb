@@ -3,14 +3,8 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { gsap, SplitText, useGSAP } from '@/lib/gsap';
 import { projects, symptoms, timelines, whatsappLink, site } from '@/lib/content';
+import { serviceLinks } from '@/lib/serviceLinks';
 
-// names of the service pages (kept here so the home bundle doesn't pull the whole services copy)
-const SERVICE_NAMES: Record<string, string> = {
-  'sistemas-sob-medida': 'Sistemas sob medida',
-  'sistemas-publicos': 'Sistemas públicos',
-  'automacao-e-ia': 'Automação & IA',
-  'sites-e-produtos': 'Sites & produtos',
-};
 
 /** The case or service page the visitor read right before arriving at the form, if any. */
 function readReference(): string | null {
@@ -22,7 +16,8 @@ function readReference(): string | null {
       const p = projects.find((x) => x.slug === slug);
       return p ? `caso ${p.name}` : null;
     }
-    if (kind === 'servicos' && SERVICE_NAMES[slug]) return `serviço ${SERVICE_NAMES[slug]}`;
+    const service = kind === 'servicos' && serviceLinks.find((x) => x.slug === slug);
+    if (service) return `serviço ${service.name}`;
   } catch {}
   return null;
 }

@@ -2,17 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { nav, projects } from '@/lib/content';
+import { serviceLinks } from '@/lib/serviceLinks';
 
-const SERVICES = [
-  { label: 'Sistemas sob medida', href: '/servicos/sistemas-sob-medida' },
-  { label: 'Sistemas públicos', href: '/servicos/sistemas-publicos' },
-  { label: 'Automação & IA', href: '/servicos/automacao-e-ia' },
-  { label: 'Sites & produtos', href: '/servicos/sites-e-produtos' },
-];
 
 const PLACES = [
   ...projects.map((p) => ({ label: `Caso ${p.name}`, href: `/casos/${p.slug}`, key: p.slug })),
-  ...SERVICES.map((s) => ({ ...s, key: s.href.split('/').pop()! })),
+  ...serviceLinks.map((s) => ({ label: s.name, href: `/servicos/${s.slug}`, key: s.slug })),
   ...nav.map((n) => ({ label: n.label, href: n.href, key: n.href.split('#')[1] })),
   { label: 'Casos resolvidos', href: '/casos', key: 'casos' },
   { label: 'Contato', href: '/#contato', key: 'contato' },
