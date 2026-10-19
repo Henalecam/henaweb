@@ -56,7 +56,8 @@ export default function Nav() {
       return;
     }
     if (window.location.pathname !== '/') return;
-    const sections = nav
+    // "Contato" only exists in the phone menu, but it lights up there too
+    const sections = [...nav, { href: '/#contato' }]
       .map((item) => ({ href: item.href, el: document.getElementById(item.href.split('#')[1]) }))
       .filter((s): s is { href: string; el: HTMLElement } => !!s.el);
     let raf = 0;
