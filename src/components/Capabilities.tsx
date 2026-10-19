@@ -39,27 +39,29 @@ export default function Capabilities() {
         {capabilities.map((c, i) => {
           const isOpen = active === i;
           return (
-            <li key={c.id} data-cap-row className="toon overflow-hidden rounded-2xl bg-paper">
+            <li key={c.id} data-cap-row className="toon relative overflow-hidden rounded-2xl bg-paper">
+              {/* the fill covers the whole open card, page link included, not just the toggle */}
+              <span
+                aria-hidden
+                className={`pointer-events-none absolute inset-0 origin-bottom bg-[linear-gradient(100deg,#f7931e,#f4b942_55%,#f9e27d)] transition-transform duration-700 ease-[var(--ease-out-expo)] ${
+                  isOpen ? 'scale-y-100' : 'scale-y-0'
+                }`}
+              />
               <button
                 type="button"
-                onMouseEnter={() => setActive(i)}
-                onFocus={() => setActive(i)}
+                // opens on click/tap only: opening on hover made every row expand and collapse under a
+                // resting pointer while the page scrolled past, shifting the whole list
                 onClick={() => setActive(i)}
                 aria-expanded={isOpen}
                 className="group relative grid w-full grid-cols-12 items-baseline gap-4 overflow-hidden px-3 py-6 text-left md:px-6 md:py-8"
               >
-                <span
-                  className={`absolute inset-0 -z-0 origin-bottom bg-[linear-gradient(100deg,#f7931e,#f4b942_55%,#f9e27d)] transition-transform duration-700 ease-[var(--ease-out-expo)] ${
-                    isOpen ? 'scale-y-100' : 'scale-y-0'
-                  }`}
-                />
                 <span className="font-groovy relative col-span-2 text-2xl text-[#c2410c] md:col-span-1 md:text-3xl">{c.id}</span>
-                <span className="relative col-span-10 text-[clamp(2rem,5.5vw,5.25rem)] leading-[0.95] font-medium tracking-[-0.045em] md:col-span-7">
+                <span className="relative col-span-8 text-[clamp(2rem,5.5vw,5.25rem)] leading-[0.95] font-medium tracking-[-0.045em] md:col-span-7">
                   {c.title}
                 </span>
                 <span
-                  className={`toon-sm relative hidden h-12 w-12 items-center justify-center self-center justify-self-end rounded-full bg-acid text-3xl leading-none text-acid-ink transition-transform duration-500 md:col-span-4 md:flex ${
-                    isOpen ? 'rotate-45' : ''
+                  className={`toon-sm relative col-span-2 flex h-10 w-10 items-center justify-center self-center justify-self-end rounded-full bg-acid text-2xl leading-none text-acid-ink transition-transform duration-500 md:col-span-4 md:h-12 md:w-12 md:text-3xl ${
+                    isOpen ? 'rotate-45' : 'group-hover:scale-110 group-hover:rotate-90'
                   }`}
                   aria-hidden
                 >
@@ -99,7 +101,7 @@ export default function Capabilities() {
               {/* the page link lives outside the toggle button (no nested interactive elements) */}
               <a
                 href={`/servicos/${c.slug}`}
-                className={`toon-sm toon-press mx-3 mb-6 w-fit items-center gap-2 rounded-full bg-acid-ink px-4 py-2 text-sm font-medium text-paper md:mx-6 md:mb-8 ${
+                className={`toon-sm toon-press relative mx-3 mb-6 w-fit items-center gap-2 rounded-full bg-acid-ink px-4 py-2 text-sm font-medium text-paper md:mx-6 md:mb-8 ${
                   isOpen ? 'inline-flex' : 'hidden'
                 }`}
               >

@@ -1,10 +1,29 @@
 'use client';
 
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { gsap, SplitText, useGSAP } from '@/lib/gsap';
-import { symptoms, timelines, whatsappLink, site } from '@/lib/content';
+import { projects, symptoms, timelines, whatsappLink, site } from '@/lib/content';
+import { serviceLinks } from '@/lib/serviceLinks';
+
+
+/** The case or service page the visitor read right before arriving at the form, if any. */
+function readReference(): string | null {
+  try {
+    const ref = document.referrer ? new URL(document.referrer) : null;
+    if (!ref || ref.host !== location.host) return null;
+    const [, kind, slug] = ref.pathname.match(/^\/(casos|servicos)\/([\w-]+)/) ?? [];
+    if (kind === 'casos') {
+      const p = projects.find((x) => x.slug === slug);
+      return p ? `caso ${p.name}` : null;
+    }
+    const service = kind === 'servicos' && serviceLinks.find((x) => x.slug === slug);
+    if (service) return `serviço ${service.name}`;
+  } catch {}
+  return null;
+}
 import { renderCaseCard, shareOrDownload } from '@/lib/caseCard';
 import { track } from '@/lib/track';
+import CopyEmail from './CopyEmail';
 import { suggestEmail } from '@/lib/emailTypos';
 import { formatPhoneBR } from '@/lib/phone';
 import Social from './Social';
@@ -33,8 +52,38 @@ function leadOrigin(): string {
   }
 }
 
+// the half-written case survives a detour to read a case study and come back (same tab only)
+const DRAFT = 'hena:draft';
+const DRAFT_FIELDS = ['name', 'email', 'whatsapp', 'org', 'message'] as const;
+type Draft = { picked: string[]; timeline: string; fields: Partial<Record<(typeof DRAFT_FIELDS)[number], string>> };
+
+function readDraft(): Draft | null {
+  try {
+    const d = JSON.parse(sessionStorage.getItem(DRAFT) ?? 'null') as Draft | null;
+    return d && (d.picked?.length || Object.values(d.fields ?? {}).some(Boolean)) ? d : null;
+  } catch {
+    return null;
+  }
+}
+
 const field =
-  'w-full border-b-2 border-acid-ink/35 bg-transparent py-3 text-lg text-acid-ink placeholder:text-acid-ink/65 focus:border-acid-ink focus:outline-none user-invalid:border-[#b3122b]';
+  'peer w-full border-b-2 border-acid-ink/35 bg-transparent pt-6 pb-2 text-lg text-acid-ink placeholder:text-transparent focus:border-acid-ink focus:outline-none user-invalid:border-[#b3122b]';
+
+/**
+ * Floating label: sits inside the empty field like a placeholder, then shrinks above it on focus or
+ * once filled, so the visitor never loses track of which line is which. The label is a real <label>.
+ * Inputs need `placeholder=" "` for the :placeholder-shown check.
+ */
+function Floating({ label, children, className = '' }: { label: string; children: ReactNode; className?: string }) {
+  return (
+    <label className={`relative block ${className}`}>
+      {children}
+      <span className="pointer-events-none absolute top-6 left-0 origin-left text-lg text-acid-ink/70 transition-all duration-200 peer-focus:top-0 peer-focus:font-mono peer-focus:text-[0.7rem] peer-focus:tracking-[0.12em] peer-focus:text-acid-ink/80 peer-focus:uppercase peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:font-mono peer-[:not(:placeholder-shown)]:text-[0.7rem] peer-[:not(:placeholder-shown)]:tracking-[0.12em] peer-[:not(:placeholder-shown)]:text-acid-ink/80 peer-[:not(:placeholder-shown)]:uppercase motion-reduce:transition-none">
+        {label}
+      </span>
+    </label>
+  );
+}
 
 // browser validation bubbles in our own words (and always in Portuguese)
 const explain = (e: FormEvent<HTMLInputElement>) => {
@@ -57,6 +106,45 @@ export default function Contact() {
   // what the visitor filled in, kept so a failed send can hand the whole case to WhatsApp or e-mail
   const [fallback, setFallback] = useState('');
   const [caseNo, setCaseNo] = useState('...');
+  // "came from the Diconta case": shown on the form and attached to the message, removable
+  const [reference, setReference] = useState<string | null>(null);
+  useEffect(() => setReference(readReference()), []);
+  const form = useRef<HTMLFormElement>(null);
+  const [draftReady, setDraftReady] = useState(false);
+  const [restored, setRestored] = useState(false);
+  useEffect(() => {
+    const d = readDraft();
+    if (d && form.current) {
+      setPicked(d.picked.filter((id) => symptoms.some((s) => s.id === id)));
+      if (timelines.includes(d.timeline)) setTimeline(d.timeline);
+      for (const k of DRAFT_FIELDS) {
+        const el = form.current.elements.namedItem(k) as HTMLInputElement | null;
+        if (el && d.fields[k]) el.value = d.fields[k];
+      }
+      setRestored(true);
+    }
+    setDraftReady(true);
+  }, []);
+  const saveDraft = () => {
+    if (!draftReady || !form.current) return;
+    const f = form.current.elements;
+    const fields = Object.fromEntries(DRAFT_FIELDS.map((k) => [k, (f.namedItem(k) as HTMLInputElement | null)?.value ?? '']));
+    try {
+      const d: Draft = { picked, timeline, fields };
+      if (picked.length || Object.values(fields).some(Boolean)) sessionStorage.setItem(DRAFT, JSON.stringify(d));
+      else sessionStorage.removeItem(DRAFT);
+    } catch {}
+  };
+  useEffect(saveDraft, [picked, timeline, draftReady]);
+  const discardDraft = () => {
+    form.current?.reset();
+    setPicked([]);
+    setTimeline(timelines[1]);
+    setRestored(false);
+    try {
+      sessionStorage.removeItem(DRAFT);
+    } catch {}
+  };
   useEffect(() => setCaseNo(`${new Date().getFullYear()}/${Math.floor(100 + Math.random() * 900)}`), []);
 
   const chosen = symptoms.filter((s) => picked.includes(s.id));
@@ -136,15 +224,15 @@ export default function Contact() {
             {lead ? (
               <dl className="mt-4 grid gap-3">
                 <div>
-                  <dt className="label !text-acid-ink/55">Suspeito principal</dt>
+                  <dt className="label !text-acid-ink/75">Suspeito principal</dt>
                   <dd className="font-groovy text-2xl text-[#c2410c]">{lead.suspect}</dd>
                 </div>
                 <div>
-                  <dt className="label !text-acid-ink/55">Especialidade indicada</dt>
+                  <dt className="label !text-acid-ink/75">Especialidade indicada</dt>
                   <dd className="text-lg font-medium">{capabilities.join(' + ')}</dd>
                 </div>
                 <div>
-                  <dt className="label !text-acid-ink/55">Primeira diligência</dt>
+                  <dt className="label !text-acid-ink/75">Primeira diligência</dt>
                   <dd className="serif text-xl leading-snug">{lead.firstStep}</dd>
                 </div>
               </dl>
@@ -175,7 +263,8 @@ export default function Contact() {
     const report = chosen.length
       ? `Sintomas: ${chosen.map((c) => c.label).join('; ')}\nDiagnóstico preliminar: ${capabilities.join(' + ')}\n\n`
       : '';
-    const message = `${report}${data.get('message') ?? ''}`.trim();
+    const refLine = reference ? `Referência: ${reference} (lido no site antes de escrever)\n\n` : '';
+    const message = `${refLine}${report}${data.get('message') ?? ''}`.trim();
     setFallback(
       [
         `Olá! Quero abrir um caso com a HenaWeb (ficha nº ${caseNo}).`,
@@ -206,6 +295,9 @@ export default function Contact() {
       });
       if (!res.ok) throw new Error();
       setStatus('sent');
+      try {
+        sessionStorage.removeItem(DRAFT);
+      } catch {}
       // the form is replaced by the confirmation: bring it on screen and move focus there
       requestAnimationFrame(() => {
         done.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -226,6 +318,7 @@ export default function Contact() {
     <section
       ref={root}
       id="contato"
+      data-tint="#f7931e"
       className="gutter relative z-40 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon bg-[linear-gradient(170deg,#f7931e_0%,#f9b25a_45%,#f4b942_100%)] py-[clamp(5rem,10vw,9rem)] text-acid-ink"
     >
       <div className="grid gap-12 lg:grid-cols-12">
@@ -245,9 +338,12 @@ export default function Contact() {
             <a href={whatsappWithCase} target="_blank" rel="noopener noreferrer" className="w-fit underline-offset-4 hover:underline">
               WhatsApp · {site.whatsappDisplay} ↗
             </a>
-            <a href={`mailto:${site.email}`} className="w-fit underline-offset-4 hover:underline">
-              {site.email}
-            </a>
+            <span className="flex flex-wrap items-baseline gap-x-3">
+              <a href={`mailto:${site.email}`} className="w-fit underline-offset-4 hover:underline">
+                {site.email}
+              </a>
+              <CopyEmail placement="contato" className="text-xs text-acid-ink/75 underline underline-offset-4 hover:text-acid-ink" />
+            </span>
             <span className="text-acid-ink/60">{site.city} · Atendemos todo o Brasil e exterior</span>
           </div>
           <Social tone="light" className="mt-6" />
@@ -285,7 +381,30 @@ export default function Contact() {
               <div>{saveButton}</div>
             </div>
           ) : (
-            <form onSubmit={submit} className="flex flex-col gap-9">
+            <form ref={form} onSubmit={submit} onInput={saveDraft} className="flex flex-col gap-9">
+              {restored && (
+                <p role="status" className="-mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 self-start font-mono text-xs text-acid-ink/80">
+                  <span>↺ Recuperamos o rascunho que você deixou nesta aba.</span>
+                  <button type="button" onClick={discardDraft} className="min-h-8 underline underline-offset-2 hover:text-acid-ink">
+                    começar do zero
+                  </button>
+                </p>
+              )}
+              {reference && (
+                <p className="toon-sm -mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 self-start rounded-xl bg-paper px-4 py-2.5 text-sm">
+                  <span aria-hidden>📎</span>
+                  <span>
+                    Pista anexada: <strong className="font-medium">{reference}</strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setReference(null)}
+                    className="label min-h-8 !text-acid-ink/70 underline underline-offset-2 hover:!text-acid-ink"
+                  >
+                    remover
+                  </button>
+                </p>
+              )}
               <fieldset>
                 <legend className="label mb-4 !text-acid-ink/60">1 · Quais sintomas você percebe?</legend>
                 <div className="grid gap-2 sm:grid-cols-2">
@@ -335,17 +454,19 @@ export default function Contact() {
               <fieldset>
                 <legend className="label mb-2 !text-acid-ink/60">3 · Quem está investigando</legend>
                 <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
-                  <input name="name" required placeholder="Seu nome" autoComplete="name" className={field} aria-label="Nome" onInvalid={explain} onInput={clear} />
+                  <Floating label="Seu nome">
+                    <input name="name" required maxLength={120} placeholder=" " autoComplete="name" className={field} onInvalid={explain} onInput={clear} />
+                  </Floating>
                   <div>
+                    <Floating label="E-mail">
                     <input
                       ref={emailRef}
                       name="email"
                       type="email"
                       required
-                      placeholder="E-mail"
+                      placeholder=" "
                       autoComplete="email"
                       className={field}
-                      aria-label="E-mail"
                       aria-describedby={emailHint ? 'email-hint' : undefined}
                       onInvalid={explain}
                       onInput={(e) => {
@@ -354,6 +475,7 @@ export default function Contact() {
                       }}
                       onBlur={(e) => setEmailHint(suggestEmail(e.currentTarget.value))}
                     />
+                    </Floating>
                     {emailHint && (
                       <p id="email-hint" className="mt-2 text-sm text-acid-ink/80">
                         Você quis dizer{' '}
@@ -372,15 +494,15 @@ export default function Contact() {
                       </p>
                     )}
                   </div>
+                  <Floating label="WhatsApp (opcional)">
                   <input
                     name="whatsapp"
                     type="tel"
                     inputMode="tel"
-                    placeholder="WhatsApp (opcional)"
+                    placeholder=" "
                     autoComplete="tel"
                     maxLength={22}
                     className={field}
-                    aria-label="WhatsApp"
                     onInput={(e) => {
                       // (41) 99999-9999 as it is typed; foreign numbers starting with + stay as typed
                       const el = e.currentTarget;
@@ -388,10 +510,15 @@ export default function Contact() {
                       if (atEnd) el.value = formatPhoneBR(el.value);
                     }}
                   />
-                  <input name="org" placeholder="Empresa ou órgão (opcional)" autoComplete="organization" className={field} aria-label="Empresa ou órgão" />
+                  </Floating>
+                  <Floating label="Empresa ou órgão (opcional)">
+                    <input name="org" placeholder=" " autoComplete="organization" className={field} />
+                  </Floating>
                 </div>
                 <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
-                <textarea name="message" rows={3} placeholder="Mais alguma pista? (opcional)" className={`${field} mt-2 resize-none`} aria-label="Mensagem" />
+                <Floating label="Mais alguma pista? (opcional)" className="mt-2">
+                  <textarea name="message" rows={3} maxLength={4000} placeholder=" " className={`${field} resize-none`} />
+                </Floating>
               </fieldset>
 
               <div className="flex flex-wrap items-center gap-6">

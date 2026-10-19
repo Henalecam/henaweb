@@ -163,7 +163,7 @@ const BASE_YAW = 0.55;
 
 export function createDavidScene(canvas: HTMLCanvasElement, { reducedMotion, onDots }: Opts): DavidScene {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, premultipliedAlpha: true, powerPreference: 'high-performance' });
-  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
   renderer.setPixelRatio(dpr);
   renderer.autoClear = true;
 
@@ -239,7 +239,11 @@ export function createDavidScene(canvas: HTMLCanvasElement, { reducedMotion, onD
     onDots?.(grid.w * grid.h);
   };
   resize();
-  window.addEventListener('resize', resize);
+  const onResize = () => {
+    resize();
+    if (state.loaded && (reducedMotion || perf.tier >= 2)) draw(reducedMotion ? start + 4000 : performance.now());
+  };
+  window.addEventListener('resize', onResize);
 
   const onMove = (e: PointerEvent) => {
     const r = canvas.getBoundingClientRect();
@@ -340,14 +344,57 @@ export function createDavidScene(canvas: HTMLCanvasElement, { reducedMotion, onD
     renderer.render(dotsScene, orthoCam);
   };
 
+  // Adaptive quality: a phone that cannot keep up first drops to 1x pixels at 30 fps, then settles
+  // on a still frame (redrawn on scroll and resize) instead of burning the main thread.
+  const perf = { tier: 0, frames: 0, slow: 0, total: 0, since: 0, prev: 0, skip: false };
+  const WINDOW = 1500; // judge the device on about a second and a half of drawn frames
+  const watch = (now: number) => {
+    const gap = perf.prev ? now - perf.prev : 0;
+    perf.prev = now;
+    if (!state.loaded || !gap || gap > 1000) {
+      perf.since = now; // still loading, first frame, or back from a hidden tab
+      return;
+    }
+    perf.frames++;
+    perf.total += gap;
+    if (gap > (perf.tier ? 50 : 34)) perf.slow++;
+    if (now - perf.since < WINDOW || perf.frames < 6) return;
+    const avg = perf.total / perf.frames;
+    const struggling = perf.slow > perf.frames * 0.5;
+    perf.frames = perf.slow = perf.total = 0;
+    perf.since = now;
+    if (!struggling) return;
+    // far too slow for a half step: straight to the still frame
+    perf.tier = avg > 120 ? 2 : perf.tier + 1;
+    if (perf.tier === 1) {
+      dpr = 1;
+      renderer.setPixelRatio(dpr);
+      resize();
+    } else if (state.revealing) {
+      // finish the reveal so the still frame shows the whole bust
+      state.reveal = 1.2;
+    }
+  };
+
   const frame = (now: number) => {
+    if (perf.tier >= 2) {
+      raf = 0;
+      draw(now); // last frame, now fully revealed, stays on screen
+      return;
+    }
     raf = requestAnimationFrame(frame);
     if (!visible || document.hidden) {
       last = now;
+      perf.prev = 0;
       return;
     }
+    // tier 1 draws every other frame
+    if (perf.tier === 1 && (perf.skip = !perf.skip)) return;
     draw(now);
+    watch(now);
   };
+
+  const still = () => perf.tier >= 2 || reducedMotion;
 
   if (reducedMotion) {
     // static frame once the model is in
@@ -360,15 +407,19 @@ export function createDavidScene(canvas: HTMLCanvasElement, { reducedMotion, onD
   return {
     setProgress: (p) => {
       state.progress = p;
-      if (reducedMotion && state.loaded) draw(start + 4000);
+      if (still() && state.loaded) draw(reducedMotion ? start + 4000 : performance.now());
     },
     reveal: () => {
       state.revealing = true;
+      if (perf.tier >= 2) {
+        state.reveal = 1.2;
+        draw(performance.now());
+      }
     },
     dispose: () => {
       cancelAnimationFrame(raf);
       io.disconnect();
-      window.removeEventListener('resize', resize);
+      window.removeEventListener('resize', onResize);
       window.removeEventListener('pointermove', onMove);
       fieldRT.dispose();
       statueRT.dispose();

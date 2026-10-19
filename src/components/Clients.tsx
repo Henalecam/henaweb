@@ -29,6 +29,8 @@ export default function Clients() {
                 <img
                   src={c.logo}
                   alt={c.name}
+                  width={c.w}
+                  height={c.h}
                   loading="lazy"
                   decoding="async"
                   className="h-full w-auto max-w-[14rem] object-contain"

@@ -1,3 +1,4 @@
+import { serviceLinks } from './serviceLinks';
 /** Landing pages per service. Each one targets a distinct search intent. */
 
 export type ServicePage = {
@@ -197,3 +198,9 @@ export const services: ServicePage[] = [
 ];
 
 export const serviceBySlug = (slug: string) => services.find((s) => s.slug === slug);
+
+if (process.env.NODE_ENV !== 'production') {
+  for (const s of services) {
+    if (serviceLinks.find((l) => l.slug === s.slug)?.name !== s.name) console.warn(`serviceLinks.ts is out of sync with services.ts for "${s.slug}"`);
+  }
+}

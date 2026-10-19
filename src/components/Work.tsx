@@ -5,11 +5,12 @@ import Image from 'next/image';
 import { gsap, useGSAP } from '@/lib/gsap';
 import { projects, type Project } from '@/lib/content';
 import MockUI from './MockUI';
+import { RevealRead } from './ReadMarks';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
 /** Win95 window with the desktop capture and a phone overlapping its corner. */
-function Screen({ p, tall = true }: { p: Project; tall?: boolean }) {
+function Screen({ p, tall = true, images = true }: { p: Project; tall?: boolean; images?: boolean }) {
   const host = new URL(p.href).hostname;
   return (
     <div className="relative h-full w-full">
@@ -24,21 +25,23 @@ function Screen({ p, tall = true }: { p: Project; tall?: boolean }) {
         </div>
         <div className="relative m-1.5 min-h-0 flex-1 overflow-hidden border-2 border-[#7d7394] bg-acid-ink">
           {p.shot ? (
-            <Image
-              src={p.shot.desktop}
-              alt={`Captura de tela de ${p.name}`}
-              fill
-              sizes="(max-width: 1024px) 92vw, 58vw"
-              className={`object-cover object-top ${
-                tall && p.shot.height > 1200 ? 'transition-[object-position] duration-[6000ms] ease-linear group-hover/screen:object-bottom' : ''
-              }`}
-            />
+            images && (
+              <Image
+                src={p.shot.desktop}
+                alt={`Captura de tela de ${p.name}`}
+                fill
+                sizes="(max-width: 1024px) 92vw, 58vw"
+                className={`object-cover object-top ${
+                  tall && p.shot.height > 1200 ? 'transition-[object-position] duration-[6000ms] ease-linear group-hover/screen:object-bottom' : ''
+                }`}
+              />
+            )
           ) : (
             p.mock && <MockUI variant={p.mock.variant} hue={p.mock.hue} />
           )}
         </div>
       </div>
-      {p.shot && (
+      {p.shot && images && (
         <div className="toon absolute -right-2 -bottom-5 aspect-[390/844] w-[22%] overflow-hidden rounded-[1.3rem] bg-black md:-right-4 md:w-[19%]">
           <Image src={p.shot.mobile} alt={`${p.name} no celular`} fill sizes="18vw" className="object-cover object-top" />
         </div>
@@ -65,8 +68,28 @@ function Story({ p }: { p: Project }) {
 export default function Work() {
   const root = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
+  // two layouts share this section (tabs from lg up, swipeable cards below) and the hidden one used
+  // to download its screenshots anyway; each layout's images mount only when it is the one on screen
+  const [cards, setCards] = useState<boolean | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023.98px)');
+    const sync = () => setCards(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
   const [paused, setPaused] = useState(false);
   const p = projects[active];
+
+  // WAI-ARIA tabs: arrows, Home and End move between projects (focusing a tab selects it)
+  const onTabKey = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    const last = projects.length - 1;
+    const next = { ArrowDown: active + 1, ArrowRight: active + 1, ArrowUp: active - 1, ArrowLeft: active - 1, Home: 0, End: last }[e.key];
+    if (next === undefined) return;
+    e.preventDefault();
+    const i = next < 0 ? last : next > last ? 0 : next;
+    document.getElementById(`work-tab-${i}`)?.focus();
+  };
 
   useGSAP(
     () => {
@@ -140,11 +163,16 @@ export default function Work() {
             {projects.map((item, i) => {
               const on = i === active;
               return (
-                <li key={item.name}>
+                <li key={item.name} role="presentation">
                   <button
                     type="button"
                     role="tab"
+                    id={`work-tab-${i}`}
                     aria-selected={on}
+                    aria-controls="work-panel"
+                    // roving focus: Tab enters the list once, arrows move between projects
+                    tabIndex={on ? 0 : -1}
+                    onKeyDown={onTabKey}
                     onMouseEnter={() => setActive(i)}
                     onFocus={() => setActive(i)}
                     onClick={() => setActive(i)}
@@ -152,7 +180,13 @@ export default function Work() {
                       on ? 'text-ink' : 'text-ink/45 hover:text-ink/80'
                     }`}
                   >
-                    <span className={`font-mono text-xs ${on ? 'text-acid' : ''}`}>{pad(i + 1)}</span>
+                    <span className={`flex w-6 shrink-0 flex-col font-mono text-xs ${on ? 'text-acid' : ''}`}>
+                      {pad(i + 1)}
+                      {/* revealed by RevealRead for cases this visitor already opened */}
+                      <span data-read-mark={item.slug} hidden className="text-acid" title="Caso já lido">
+                        ✓<span className="sr-only"> lido</span>
+                      </span>
+                    </span>
                     <span className="flex-1">
                       <span className="block text-[clamp(1.5rem,2.3vw,2.25rem)] leading-none font-medium tracking-[-0.04em]">
                         {item.name}
@@ -176,7 +210,7 @@ export default function Work() {
             })}
           </ol>
 
-          <div className="lg:col-span-8" role="tabpanel" aria-label={p.name}>
+          <div className="lg:col-span-8" role="tabpanel" id="work-panel" aria-labelledby={`work-tab-${active}`}>
             <a
               href={p.href}
               target="_blank"
@@ -185,7 +219,7 @@ export default function Work() {
               className="group/screen block aspect-[16/9.4]"
             >
               <div data-exhibit className="h-full">
-                <Screen p={p} />
+                <Screen p={p} images={cards === false} />
               </div>
             </a>
             <div data-exhibit-text className="mt-10 grid gap-5 xl:grid-cols-[1fr_auto] xl:items-start">
@@ -223,12 +257,16 @@ export default function Work() {
             {projects.map((item, i) => (
               <li key={item.name} className="w-[86%] shrink-0 snap-center sm:w-[70%]">
                 {/* the screenshot opens the case page, like the link below it, instead of leaving for the client's site */}
-                <a href={`/casos/${item.slug}`} aria-label={`Ver caso ${item.name}`} className="block aspect-[16/10.5]">
-                  <Screen p={item} tall={false} />
+                {/* same target as "Ver caso completo" below: hidden from screen readers and the tab order so it isn't announced twice */}
+                <a href={`/casos/${item.slug}`} aria-hidden tabIndex={-1} className="block aspect-[16/10.5]">
+                  <Screen p={item} tall={false} images={cards === true} />
                 </a>
                 <div className="mt-8 flex flex-col gap-3">
                   <span className="font-mono text-xs text-acid">
                     {pad(i + 1)} / {pad(projects.length)}
+                    <span data-read-mark={item.slug} hidden className="ml-3">
+                      ✓ lido
+                    </span>
                   </span>
                   <h3 className="text-3xl leading-none font-medium tracking-[-0.04em]">{item.name}</h3>
                   <span className="serif -mt-1 text-lg text-ink/60">{item.kind}</span>
@@ -241,6 +279,7 @@ export default function Work() {
             ))}
           </ol>
           <p className="label px-[clamp(1rem,4vw,3.5rem)]">Deslize para ver os outros casos →</p>
+          <RevealRead />
         </div>
       </div>
     </section>
