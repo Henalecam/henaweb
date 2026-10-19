@@ -9,7 +9,7 @@ import MockUI from './MockUI';
 const pad = (n: number) => String(n).padStart(2, '0');
 
 /** Win95 window with the desktop capture and a phone overlapping its corner. */
-function Screen({ p, tall = true }: { p: Project; tall?: boolean }) {
+function Screen({ p, tall = true, images = true }: { p: Project; tall?: boolean; images?: boolean }) {
   const host = new URL(p.href).hostname;
   return (
     <div className="relative h-full w-full">
@@ -24,21 +24,23 @@ function Screen({ p, tall = true }: { p: Project; tall?: boolean }) {
         </div>
         <div className="relative m-1.5 min-h-0 flex-1 overflow-hidden border-2 border-[#7d7394] bg-acid-ink">
           {p.shot ? (
-            <Image
-              src={p.shot.desktop}
-              alt={`Captura de tela de ${p.name}`}
-              fill
-              sizes="(max-width: 1024px) 92vw, 58vw"
-              className={`object-cover object-top ${
-                tall && p.shot.height > 1200 ? 'transition-[object-position] duration-[6000ms] ease-linear group-hover/screen:object-bottom' : ''
-              }`}
-            />
+            images && (
+              <Image
+                src={p.shot.desktop}
+                alt={`Captura de tela de ${p.name}`}
+                fill
+                sizes="(max-width: 1024px) 92vw, 58vw"
+                className={`object-cover object-top ${
+                  tall && p.shot.height > 1200 ? 'transition-[object-position] duration-[6000ms] ease-linear group-hover/screen:object-bottom' : ''
+                }`}
+              />
+            )
           ) : (
             p.mock && <MockUI variant={p.mock.variant} hue={p.mock.hue} />
           )}
         </div>
       </div>
-      {p.shot && (
+      {p.shot && images && (
         <div className="toon absolute -right-2 -bottom-5 aspect-[390/844] w-[22%] overflow-hidden rounded-[1.3rem] bg-black md:-right-4 md:w-[19%]">
           <Image src={p.shot.mobile} alt={`${p.name} no celular`} fill sizes="18vw" className="object-cover object-top" />
         </div>
@@ -65,6 +67,16 @@ function Story({ p }: { p: Project }) {
 export default function Work() {
   const root = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
+  // two layouts share this section (tabs from lg up, swipeable cards below) and the hidden one used
+  // to download its screenshots anyway; each layout's images mount only when it is the one on screen
+  const [cards, setCards] = useState<boolean | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023.98px)');
+    const sync = () => setCards(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
   const [paused, setPaused] = useState(false);
   const p = projects[active];
 
@@ -200,7 +212,7 @@ export default function Work() {
               className="group/screen block aspect-[16/9.4]"
             >
               <div data-exhibit className="h-full">
-                <Screen p={p} />
+                <Screen p={p} images={cards === false} />
               </div>
             </a>
             <div data-exhibit-text className="mt-10 grid gap-5 xl:grid-cols-[1fr_auto] xl:items-start">
@@ -240,7 +252,7 @@ export default function Work() {
                 {/* the screenshot opens the case page, like the link below it, instead of leaving for the client's site */}
                 {/* same target as "Ver caso completo" below: hidden from screen readers and the tab order so it isn't announced twice */}
                 <a href={`/casos/${item.slug}`} aria-hidden tabIndex={-1} className="block aspect-[16/10.5]">
-                  <Screen p={item} tall={false} />
+                  <Screen p={item} tall={false} images={cards === true} />
                 </a>
                 <div className="mt-8 flex flex-col gap-3">
                   <span className="font-mono text-xs text-acid">
