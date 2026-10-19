@@ -475,8 +475,9 @@ details[open]::details-content {
   .win-bar {
     border-bottom: 2px solid #140a26;
   }
-  section,
+  /* small blocks stay whole; whole sections may split, or a long one jumps to the next page and leaves a blank half */
   .win,
+  .toon,
   li {
     break-inside: avoid;
   }

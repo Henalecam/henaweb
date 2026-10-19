@@ -101,7 +101,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             <span className="font-groovy text-[0.85em] tracking-normal text-acid [text-shadow:4px_4px_0_#140a26]">{s.h1Accent}</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink/75 md:text-xl">{s.intro}</p>
-          <div className="mt-10 flex flex-wrap gap-3">
+          <div className="mt-10 flex flex-wrap gap-3" data-print-hide>
             <a href="/#contato" className="toon toon-press rounded-full bg-acid px-6 py-4 font-medium text-acid-ink">
               Abrir um caso →
             </a>
