@@ -1,9 +1,20 @@
 import { ImageResponse } from 'next/og';
 import { services, serviceBySlug } from '@/lib/services';
 
-export const alt = 'Serviço da HenaWeb';
-export const size = { width: 1200, height: 630 };
-export const contentType = 'image/png';
+const size = { width: 1200, height: 630 };
+
+// a per-service alt for link previews and screen readers (a fixed `alt` export can't see the slug)
+export function generateImageMetadata({ params }: { params: { slug: string } }) {
+  const s = serviceBySlug(params.slug);
+  return [
+    {
+      id: 'card',
+      size,
+      contentType: 'image/png',
+      alt: s ? `HenaWeb · ${s.name}: ${s.h1} ${s.h1Accent}` : 'Serviço da HenaWeb',
+    },
+  ];
+}
 
 const INK = '#140a26';
 

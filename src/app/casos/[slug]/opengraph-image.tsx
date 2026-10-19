@@ -3,9 +3,20 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { projects } from '@/lib/content';
 
-export const alt = 'Caso resolvido pela HenaWeb';
-export const size = { width: 1200, height: 630 };
-export const contentType = 'image/png';
+const size = { width: 1200, height: 630 };
+
+// a per-case alt for link previews and screen readers (a fixed `alt` export can't see the slug)
+export function generateImageMetadata({ params }: { params: { slug: string } }) {
+  const p = projects.find((x) => x.slug === params.slug);
+  return [
+    {
+      id: 'card',
+      size,
+      contentType: 'image/png',
+      alt: p ? `Caso ${p.name} (${p.kind}) resolvido pela HenaWeb${p.shot ? ', com a tela do projeto' : ''}` : 'Caso resolvido pela HenaWeb',
+    },
+  ];
+}
 
 const INK = '#140a26';
 
