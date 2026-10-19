@@ -7,11 +7,41 @@ import { whatsappLink } from '@/lib/content';
  * Phones only: a WhatsApp button that appears once the hero has scrolled away and
  * steps aside while the FAQ, the contact section, the closing CTA or the footer is on screen. While reading
  * downward it shrinks to a round icon so it covers less text; scrolling up brings the label back.
+ * If text sits under the button while reading downward, it tucks into the screen edge (a sliver stays
+ * visible) so no line is hidden; scrolling up brings it back whole.
  * On a service or case page the pre-filled message names that page, so the chat starts with context.
  */
+
+const SIZE = 44; // compact button, px
+const EDGE = 16; // right-4
+
+/** True when visible text lies under the spot the compact button occupies. */
+function textUnderButton() {
+  const bottom = 16; // bottom: max(1rem, safe area); the safe area only adds room below
+  const box = { left: innerWidth - EDGE - SIZE, right: innerWidth - EDGE, top: innerHeight - bottom - SIZE, bottom: innerHeight - bottom };
+  const seen = new Set<Element>();
+  const range = document.createRange();
+  for (const fx of [0.15, 0.5, 0.85])
+    for (const fy of [0.15, 0.5, 0.85]) {
+      const x = box.left + SIZE * fx;
+      const y = box.top + SIZE * fy;
+      for (const el of document.elementsFromPoint(x, y)) {
+        if (seen.has(el) || el.closest('[data-placement="floating"]')) continue;
+        seen.add(el);
+        for (const n of el.childNodes) {
+          if (n.nodeType !== Node.TEXT_NODE || !n.textContent?.trim()) continue;
+          range.selectNodeContents(n);
+          for (const r of range.getClientRects())
+            if (r.right > box.left && r.left < box.right && r.bottom > box.top && r.top < box.bottom) return true;
+        }
+      }
+    }
+  return false;
+}
 export default function FloatingContact() {
   const [show, setShow] = useState(false);
   const [compact, setCompact] = useState(false);
+  const [tucked, setTucked] = useState(false);
   const [href, setHref] = useState(() => whatsappLink());
 
   useEffect(() => {
@@ -30,14 +60,26 @@ export default function FloatingContact() {
     const covered = new Set<Element>();
     const update = () => setShow(pastHero && covered.size === 0);
 
+    let down = false;
+    let raf = 0;
+    let settle = 0;
+    const checkText = () => {
+      raf = 0;
+      setTucked(down && textUnderButton());
+    };
     const onScroll = () => {
       const y = window.scrollY;
       pastHero = y > window.innerHeight * 0.85;
       if (Math.abs(y - lastY) > 8) {
-        setCompact(y > lastY);
+        down = y > lastY;
+        setCompact(down);
         lastY = y;
       }
       update();
+      if (!raf) raf = requestAnimationFrame(checkText);
+      // smooth scrolling keeps moving after the last event: check again once it rests
+      clearTimeout(settle);
+      settle = window.setTimeout(checkText, 180);
     };
     const io = new IntersectionObserver(
       (entries) => {
@@ -56,6 +98,8 @@ export default function FloatingContact() {
     onScroll();
     return () => {
       io.disconnect();
+      cancelAnimationFrame(raf);
+      clearTimeout(settle);
       window.removeEventListener('scroll', onScroll);
     };
   }, []);
@@ -69,9 +113,9 @@ export default function FloatingContact() {
       data-placement="floating"
       tabIndex={show ? 0 : -1}
       aria-hidden={!show}
-      className={`toon-sm fixed right-4 z-40 flex h-11 items-center overflow-hidden rounded-full bg-[#25d366] pl-3 font-medium text-acid-ink transition-[transform,opacity,padding] duration-500 ease-[var(--ease-out-expo)] md:hidden ${compact ? 'pr-3' : 'pr-4'} ${
+      className={`toon-sm fixed right-4 z-40 flex h-11 items-center overflow-hidden rounded-full bg-[#25d366] pl-3 font-medium text-acid-ink transition-[translate,transform,opacity,padding] duration-500 ease-[var(--ease-out-expo)] md:hidden ${compact ? 'pr-3' : 'pr-4'} ${
         show ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-6 opacity-0'
-      } [html[data-menu=open]_&]:pointer-events-none [html[data-menu=open]_&]:opacity-0`}
+      } ${tucked ? 'translate-x-[calc(100%+6px)] focus-visible:translate-x-0' : 'translate-x-0'} [html[data-menu=open]_&]:pointer-events-none [html[data-menu=open]_&]:opacity-0`}
       style={{ bottom: 'max(1rem, env(safe-area-inset-bottom))' }}
     >
       <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="currentColor" aria-hidden>
