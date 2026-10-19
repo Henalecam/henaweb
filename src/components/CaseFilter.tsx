@@ -33,12 +33,17 @@ export default function CaseFilter({ options, total }: { options: Option[]; tota
     if (slug && options.some((o) => o.slug === slug)) apply(slug, false);
   }, []);
 
+  // the cards change silently for screen readers: say how many are now listed (only after a choice, not on load)
+  const [announce, setAnnounce] = useState('');
+
   const choose = (slug: string | null) => {
     const url = new URL(location.href);
     if (slug) url.searchParams.set('servico', slug);
     else url.searchParams.delete('servico');
     history.replaceState(null, '', url);
     apply(slug, true);
+    const o = options.find((x) => x.slug === slug);
+    setAnnounce(o ? `Mostrando ${o.count} ${o.count === 1 ? 'caso' : 'casos'} de ${o.name}.` : `Mostrando todos os ${total} casos.`);
   };
 
   const chip = (on: boolean) =>
@@ -54,6 +59,9 @@ export default function CaseFilter({ options, total }: { options: Option[]; tota
           {o.name} <span className="font-mono text-xs">({o.count})</span>
         </button>
       ))}
+      <p className="sr-only" aria-live="polite">
+        {announce}
+      </p>
     </div>
   );
 }
