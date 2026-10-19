@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { nav, site, whatsappLink } from '@/lib/site';
 import { projectLinks } from '@/lib/projectLinks';
 import { serviceLinks } from '@/lib/serviceLinks';
@@ -142,18 +143,24 @@ function FooterColumn({
 }
 
 function FooterLink({ href, children, accent = false }: { href: string; children: React.ReactNode; accent?: boolean }) {
+  // the file tree marks the page you are on, like an open file in an editor
+  const here = usePathname() === href;
   return (
     <li>
       <a
         href={href}
-        className={`group inline-flex items-baseline gap-2 transition-colors ${accent ? 'font-medium text-acid' : 'text-ink/75 hover:text-ink'}`}
+        aria-current={here ? 'page' : undefined}
+        className={`group inline-flex items-baseline gap-2 transition-colors ${
+          here ? 'font-medium text-ink' : accent ? 'font-medium text-acid' : 'text-ink/75 hover:text-ink'
+        }`}
       >
-        {!accent && (
-          <span aria-hidden className="font-mono text-xs text-ink/30 transition-colors group-hover:text-acid">
-            ›
+        {(!accent || here) && (
+          <span aria-hidden className={`font-mono text-xs transition-colors ${here ? 'text-acid' : 'text-ink/30 group-hover:text-acid'}`}>
+            {here ? '●' : '›'}
           </span>
         )}
         {children}
+        {here && <span aria-hidden className="font-mono text-[0.65rem] tracking-wide text-ink/55">(aberto)</span>}
       </a>
     </li>
   );
