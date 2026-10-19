@@ -270,14 +270,25 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             <h2 id="outros" className="label">
               Outras capacidades
             </h2>
-            <ul className="mt-4 flex flex-wrap gap-3">
-              {others.map((o) => (
-                <li key={o.slug}>
-                  <a href={`/servicos/${o.slug}`} className="toon-sm toon-press inline-block rounded-full bg-lemon px-4 py-2 text-acid-ink">
-                    {o.name} →
-                  </a>
-                </li>
-              ))}
+            {/* each one pitched with its own page headline, plus how many solved cases back it up */}
+            <ul className="mt-4 grid gap-4 md:grid-cols-3">
+              {others.map((o) => {
+                const n = projects.filter((p) => p.service === o.slug).length;
+                return (
+                  <li key={o.slug}>
+                    <a href={`/servicos/${o.slug}`} className="toon-sm toon-press group flex h-full flex-col rounded-2xl bg-lemon p-5 text-acid-ink">
+                      <span className="font-mono text-xs tracking-wide text-acid-ink/70 uppercase">{o.name}</span>
+                      <span className="mt-2 text-xl leading-tight font-medium tracking-tight">
+                        {o.h1} {o.h1Accent}
+                      </span>
+                      <span className="mt-auto pt-4 text-sm text-acid-ink/75">
+                        {n > 0 ? `${n} ${n === 1 ? 'caso resolvido' : 'casos resolvidos'} · ` : ''}
+                        <span className="font-medium text-acid-ink underline-offset-4 group-hover:underline group-focus-visible:underline">Ver serviço →</span>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </section>
 
