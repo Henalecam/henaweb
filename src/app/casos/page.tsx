@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { ReadProgress } from '@/components/ReadMarks';
 import { projectLinks } from '@/lib/projectLinks';
 import { getImageProps } from 'next/image';
@@ -12,10 +14,27 @@ import { services } from '@/lib/services';
 const description =
   'Casos resolvidos pela HenaWeb: ERPs, plataformas com IA, agendamento, produtos financeiros e sites. Veja o problema de cada cliente e o que construímos.';
 
+/** Width/height from a JPEG's SOF marker (dev-only check below). */
+function jpegSize(b: Buffer) {
+  for (let i = 2; i + 9 < b.length; ) {
+    if (b[i] !== 0xff) return null;
+    const marker = b[i + 1];
+    if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc)
+      return { height: b.readUInt16BE(i + 5), width: b.readUInt16BE(i + 7) };
+    i += 2 + b.readUInt16BE(i + 2);
+  }
+  return null;
+}
+
 // content.ts can't hold this check: its own `process` export shadows Node's
 if (process.env.NODE_ENV !== 'production') {
   for (const p of projects) {
     if (projectLinks.find((l) => l.slug === p.slug)?.name !== p.name) console.warn(`projectLinks.ts is out of sync with content.ts for "${p.slug}"`);
+    // `shot.height` drives the hover scroll and the full-page dialog's box: keep it equal to the real capture
+    if (p.shot) {
+      const real = jpegSize(readFileSync(join(process.cwd(), 'public', p.shot.desktop)));
+      if (real && real.height !== p.shot.height) console.warn(`content.ts: ${p.slug} shot.height is ${p.shot.height}, the capture is ${real.height} px tall`);
+    }
   }
 }
 
