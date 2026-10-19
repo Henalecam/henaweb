@@ -30,7 +30,7 @@ export default function Stamp({ children, className = '' }: { children: ReactNod
     <span
       ref={el}
       aria-hidden
-      className={`pointer-events-none absolute rounded-md border-4 px-3 py-1 font-mono text-xs font-bold tracking-[0.2em] uppercase select-none md:text-sm ${
+      className={`stamp-print pointer-events-none absolute rounded-md border-4 px-3 py-1 font-mono text-xs font-bold tracking-[0.2em] uppercase select-none md:text-sm ${
         hit ? 'stamp-in' : 'opacity-0'
       } ${className}`}
     >

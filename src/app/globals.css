@@ -489,6 +489,14 @@ details[open]::details-content {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
+  /* rubber stamps the reader never scrolled to still land on paper */
+  .stamp-print {
+    position: static !important;
+    display: inline-block !important;
+    margin-top: 4mm;
+    opacity: 1 !important;
+    transform: rotate(-4deg) !important;
+  }
   /* FAQ answers print open */
   details::details-content {
     block-size: auto !important;

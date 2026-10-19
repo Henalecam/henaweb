@@ -137,9 +137,9 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
               <p className="mt-3 text-lg leading-relaxed text-acid-ink/80">{p.challenge}</p>
             </section>
             <section className="toon relative rounded-2xl bg-lemon p-7 text-acid-ink" aria-labelledby="resolvido">
-              <Stamp className="-top-4 right-5 border-[#1f6f63] bg-lemon text-[#1f6f63]">Encerrado ✓</Stamp>
               <h2 id="resolvido" className="font-groovy text-2xl text-[#1f6f63]">Caso resolvido</h2>
               <p className="mt-3 text-lg leading-relaxed text-acid-ink/85">{p.built}</p>
+              <Stamp className="-top-4 right-5 border-[#1f6f63] bg-lemon text-[#1f6f63]">Encerrado ✓</Stamp>
             </section>
           </div>
 
