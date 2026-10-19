@@ -16,12 +16,45 @@ function readList(): string[] {
 /** On a case page: file this case as "investigated" in the visitor's own browser (nothing leaves it). */
 export function MarkRead({ slug }: { slug: string }) {
   useEffect(() => {
+    const before = readList();
+    // badges reflect what was read before this visit: the current case marking itself would be noise
+    revealMarks(before);
     try {
-      const list = readList();
-      if (!list.includes(slug)) localStorage.setItem(KEY, JSON.stringify([...list, slug]));
+      if (!before.includes(slug)) localStorage.setItem(KEY, JSON.stringify([...before, slug]));
     } catch {}
   }, [slug]);
   return null;
+}
+
+function revealMarks(list: string[]) {
+  for (const s of list) document.querySelectorAll<HTMLElement>(`[data-read-mark="${s}"]`).forEach((el) => el.removeAttribute('hidden'));
+}
+
+/**
+ * Under the prev/next links of a case: when both neighbours were already read, point at the first
+ * case still unread, so a visitor going through the archive never loops over the same two.
+ */
+export function UnreadHint({ cases, current }: { cases: { slug: string; name: string }[]; current: string }) {
+  const [hint, setHint] = useState<{ slug: string; name: string } | null>(null);
+  useEffect(() => {
+    const read = new Set([...readList(), current]);
+    const i = cases.findIndex((c) => c.slug === current);
+    const prev = cases[(i - 1 + cases.length) % cases.length];
+    const next = cases[(i + 1) % cases.length];
+    if (!read.has(prev.slug) || !read.has(next.slug)) return;
+    // the first unread one going forward, wrapping around
+    const rest = [...cases.slice(i + 1), ...cases.slice(0, i)];
+    setHint(rest.find((c) => !read.has(c.slug)) ?? null);
+  }, [cases, current]);
+  if (!hint) return null;
+  return (
+    <p className="mt-4 text-center font-mono text-sm text-ink/75" data-print-hide>
+      Ainda sem investigar:{' '}
+      <a href={`/casos/${hint.slug}`} className="text-acid underline underline-offset-4 hover:text-ink">
+        {hint.name} →
+      </a>
+    </p>
+  );
 }
 
 /**
@@ -33,7 +66,7 @@ export function ReadProgress({ slugs }: { slugs: string[] }) {
   useEffect(() => {
     const list = readList().filter((s) => slugs.includes(s));
     setRead(list);
-    for (const s of list) document.querySelector<HTMLElement>(`[data-read-mark="${s}"]`)?.removeAttribute('hidden');
+    revealMarks(list);
   }, [slugs]);
 
   if (!read.length) return null;

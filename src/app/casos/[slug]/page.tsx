@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import Stamp from '@/components/Stamp';
 import ShareCase from '@/components/ShareCase';
 import CaseKeys from '@/components/CaseKeys';
-import { MarkRead } from '@/components/ReadMarks';
+import { MarkRead, UnreadHint } from '@/components/ReadMarks';
 import FullShot, { MaximizeButton, ZoomArea } from '@/components/FullShot';
 import MockUI from '@/components/MockUI';
 
@@ -175,6 +175,9 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
           <nav aria-label="Relacionados" data-print-hide className="mt-24 grid gap-4 border-t border-line pt-10 md:grid-cols-3">
             <a href={`/casos/${prev.slug}`} rel="prev" aria-keyshortcuts="ArrowLeft" className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6">
               <span className="label">Caso anterior</span>
+              <span data-read-mark={prev.slug} hidden className="ml-2 align-middle font-mono text-xs text-acid">
+                ✓ lido
+              </span>
               <span className="mt-2 block text-2xl font-medium tracking-tight">← {prev.name}</span>
             </a>
             {service && (
@@ -185,9 +188,13 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             )}
             <a href={`/casos/${next.slug}`} rel="next" aria-keyshortcuts="ArrowRight" className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6 md:text-right">
               <span className="label">Próximo caso</span>
+              <span data-read-mark={next.slug} hidden className="ml-2 align-middle font-mono text-xs text-acid">
+                ✓ lido
+              </span>
               <span className="mt-2 block text-2xl font-medium tracking-tight">{next.name} →</span>
             </a>
           </nav>
+          <UnreadHint cases={projects.map((c) => ({ slug: c.slug, name: c.name }))} current={p.slug} />
           <p className="label mt-5 hidden text-center lg:block" aria-hidden data-print-hide>
             Dica: use <kbd className="font-mono">←</kbd> <kbd className="font-mono">→</kbd> para folhear os casos
           </p>
