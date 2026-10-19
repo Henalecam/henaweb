@@ -2,7 +2,30 @@
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { gsap, SplitText, useGSAP } from '@/lib/gsap';
-import { symptoms, timelines, whatsappLink, site } from '@/lib/content';
+import { projects, symptoms, timelines, whatsappLink, site } from '@/lib/content';
+
+// names of the service pages (kept here so the home bundle doesn't pull the whole services copy)
+const SERVICE_NAMES: Record<string, string> = {
+  'sistemas-sob-medida': 'Sistemas sob medida',
+  'sistemas-publicos': 'Sistemas públicos',
+  'automacao-e-ia': 'Automação & IA',
+  'sites-e-produtos': 'Sites & produtos',
+};
+
+/** The case or service page the visitor read right before arriving at the form, if any. */
+function readReference(): string | null {
+  try {
+    const ref = document.referrer ? new URL(document.referrer) : null;
+    if (!ref || ref.host !== location.host) return null;
+    const [, kind, slug] = ref.pathname.match(/^\/(casos|servicos)\/([\w-]+)/) ?? [];
+    if (kind === 'casos') {
+      const p = projects.find((x) => x.slug === slug);
+      return p ? `caso ${p.name}` : null;
+    }
+    if (kind === 'servicos' && SERVICE_NAMES[slug]) return `serviço ${SERVICE_NAMES[slug]}`;
+  } catch {}
+  return null;
+}
 import { renderCaseCard, shareOrDownload } from '@/lib/caseCard';
 import { track } from '@/lib/track';
 import { suggestEmail } from '@/lib/emailTypos';
@@ -73,6 +96,9 @@ export default function Contact() {
   // what the visitor filled in, kept so a failed send can hand the whole case to WhatsApp or e-mail
   const [fallback, setFallback] = useState('');
   const [caseNo, setCaseNo] = useState('...');
+  // "came from the Diconta case": shown on the form and attached to the message, removable
+  const [reference, setReference] = useState<string | null>(null);
+  useEffect(() => setReference(readReference()), []);
   useEffect(() => setCaseNo(`${new Date().getFullYear()}/${Math.floor(100 + Math.random() * 900)}`), []);
 
   const chosen = symptoms.filter((s) => picked.includes(s.id));
@@ -191,7 +217,8 @@ export default function Contact() {
     const report = chosen.length
       ? `Sintomas: ${chosen.map((c) => c.label).join('; ')}\nDiagnóstico preliminar: ${capabilities.join(' + ')}\n\n`
       : '';
-    const message = `${report}${data.get('message') ?? ''}`.trim();
+    const refLine = reference ? `Referência: ${reference} (lido no site antes de escrever)\n\n` : '';
+    const message = `${refLine}${report}${data.get('message') ?? ''}`.trim();
     setFallback(
       [
         `Olá! Quero abrir um caso com a HenaWeb (ficha nº ${caseNo}).`,
@@ -302,6 +329,21 @@ export default function Contact() {
             </div>
           ) : (
             <form onSubmit={submit} className="flex flex-col gap-9">
+              {reference && (
+                <p className="toon-sm -mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 self-start rounded-xl bg-paper px-4 py-2.5 text-sm">
+                  <span aria-hidden>📎</span>
+                  <span>
+                    Pista anexada: <strong className="font-medium">{reference}</strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setReference(null)}
+                    className="label min-h-8 !text-acid-ink/70 underline underline-offset-2 hover:!text-acid-ink"
+                  >
+                    remover
+                  </button>
+                </p>
+              )}
               <fieldset>
                 <legend className="label mb-4 !text-acid-ink/60">1 · Quais sintomas você percebe?</legend>
                 <div className="grid gap-2 sm:grid-cols-2">
