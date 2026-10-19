@@ -199,6 +199,9 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
           <p className="label mt-5 hidden text-center lg:block" aria-hidden data-print-hide>
             Dica: use <kbd className="font-mono">←</kbd> <kbd className="font-mono">→</kbd> para folhear os casos
           </p>
+          <p className="label mt-5 hidden text-center pointer-coarse:block lg:!hidden" aria-hidden data-print-hide>
+            Dica: deslize para os lados para folhear os casos
+          </p>
         </article>
       </main>
       <Footer />
