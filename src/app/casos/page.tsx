@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { ReadProgress } from '@/components/ReadMarks';
+import { projectLinks } from '@/lib/projectLinks';
 import Image from 'next/image';
 import { projects, site } from '@/lib/content';
 import Footer from '@/components/Footer';
@@ -10,6 +11,13 @@ import { services } from '@/lib/services';
 
 const description =
   'Casos resolvidos pela HenaWeb: ERPs, plataformas com IA, agendamento, produtos financeiros e sites. Veja o problema de cada cliente e o que construímos.';
+
+// content.ts can't hold this check: its own `process` export shadows Node's
+if (process.env.NODE_ENV !== 'production') {
+  for (const p of projects) {
+    if (projectLinks.find((l) => l.slug === p.slug)?.name !== p.name) console.warn(`projectLinks.ts is out of sync with content.ts for "${p.slug}"`);
+  }
+}
 
 export const metadata: Metadata = {
   title: 'Casos e projetos de software sob medida',

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { site } from '@/lib/content';
+import { site } from '@/lib/site';
 import { track } from '@/lib/track';
 
 /**

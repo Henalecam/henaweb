@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { nav } from '@/lib/content';
+import { nav } from '@/lib/site';
 import { gsap, onReady } from '@/lib/gsap';
 import Magnetic from './Magnetic';
 import Social from './Social';

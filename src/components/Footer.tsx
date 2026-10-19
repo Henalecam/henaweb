@@ -2,7 +2,8 @@
 
 import { useRef } from 'react';
 import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
-import { nav, projects, site, whatsappLink } from '@/lib/content';
+import { nav, site, whatsappLink } from '@/lib/site';
+import { projectLinks } from '@/lib/projectLinks';
 import { serviceLinks } from '@/lib/serviceLinks';
 import { CONSENT_OPEN } from '@/lib/consent';
 import Clock from './Clock';
@@ -77,7 +78,7 @@ export default function Footer() {
             ))}
           </FooterColumn>
           <FooterColumn title="casos/">
-            {projects.map((x) => (
+            {projectLinks.map((x) => (
               <FooterLink key={x.slug} href={`/casos/${x.slug}`}>
                 {x.name}
               </FooterLink>

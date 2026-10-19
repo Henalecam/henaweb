@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { nav, projects } from '@/lib/content';
+import { nav } from '@/lib/site';
+import { projectLinks } from '@/lib/projectLinks';
 import { serviceLinks } from '@/lib/serviceLinks';
 
 
 const PLACES = [
-  ...projects.map((p) => ({ label: `Caso ${p.name}`, href: `/casos/${p.slug}`, key: p.slug })),
+  ...projectLinks.map((p) => ({ label: `Caso ${p.name}`, href: `/casos/${p.slug}`, key: p.slug })),
   ...serviceLinks.map((s) => ({ label: s.name, href: `/servicos/${s.slug}`, key: s.slug })),
   ...nav.map((n) => ({ label: n.label, href: n.href, key: n.href.split('#')[1] })),
   { label: 'Casos resolvidos', href: '/casos', key: 'casos' },
