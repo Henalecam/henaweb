@@ -10,7 +10,7 @@ export default function CaseKeys({ prev, next }: { prev: string; next: string })
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
       const t = e.target as HTMLElement | null;
       if (t?.closest('input, textarea, select, [contenteditable="true"], [role="tablist"], dialog[open]')) return;
-      if (document.querySelector('dialog[open]')) return;
+      if (document.querySelector('dialog[open]') || 'konami' in document.documentElement.dataset) return;
       e.preventDefault();
       window.location.href = e.key === 'ArrowLeft' ? prev : next;
     };
