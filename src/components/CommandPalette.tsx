@@ -5,7 +5,8 @@ import { homeFaq, nav, projects, site, whatsappLink } from '@/lib/content';
 import { services } from '@/lib/services';
 import { faqId } from '@/lib/slug';
 
-type Item = { group: string; label: string; hint?: string; href: string; external?: boolean };
+// keywords are searched but not shown: a case is found by what it does, not only by its name
+type Item = { group: string; label: string; hint?: string; href: string; external?: boolean; keywords?: string };
 
 const fold = (s: string) =>
   s
@@ -17,8 +18,19 @@ const ITEMS: Item[] = [
   ...nav.map((n) => ({ group: 'Seções', label: n.label, href: n.href })),
   { group: 'Seções', label: 'Contato', hint: 'Abrir um caso', href: '/#contato' },
   { group: 'Seções', label: 'Arquivo de casos', hint: 'Todos os projetos', href: '/casos' },
-  ...projects.map((p) => ({ group: 'Casos', label: p.name, hint: p.kind, href: `/casos/${p.slug}` })),
-  ...services.map((s) => ({ group: 'Serviços', label: s.name, href: `/servicos/${s.slug}` })),
+  ...projects.map((p) => ({
+    group: 'Casos',
+    label: p.name,
+    hint: p.kind,
+    href: `/casos/${p.slug}`,
+    keywords: [...p.highlights, p.summary, p.challenge].join(' '),
+  })),
+  ...services.map((s) => ({
+    group: 'Serviços',
+    label: s.name,
+    href: `/servicos/${s.slug}`,
+    keywords: [s.intro, ...s.keywords, ...s.problems, ...s.deliverables.map((d) => `${d.title} ${d.body}`), ...s.examples.map((e) => e.name)].join(' '),
+  })),
   ...homeFaq.map((f) => ({ group: 'Perguntas', label: f.q, href: `/#${faqId(f.q)}` })),
   ...services.flatMap((s) =>
     s.faq.map((f) => ({ group: 'Perguntas', label: f.q, hint: s.name, href: `/servicos/${s.slug}#${faqId(f.q)}` })),
@@ -33,7 +45,7 @@ const ITEMS: Item[] = [
   { group: 'Ações', label: 'Mandar um e-mail', hint: site.email, href: `mailto:${site.email}` },
 ];
 
-const SEARCHABLE = ITEMS.map((it) => fold(`${it.label} ${it.hint ?? ''} ${it.group}`));
+const SEARCHABLE = ITEMS.map((it) => fold(`${it.label} ${it.hint ?? ''} ${it.group} ${it.keywords ?? ''}`));
 
 /**
  * "Arquivo de pistas": a ⌘K / Ctrl+K search over sections, cases, services, FAQ answers and the
@@ -52,7 +64,14 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
     if (!words.length) return ITEMS.filter((it) => it.group !== 'Perguntas');
     // a dropped last letter forgives gender/number: "custo" finds "custa", "sistemas" finds "sistema"
     const hit = (text: string, w: string) => text.includes(w) || (w.length >= 4 && text.includes(w.slice(0, -1)));
-    return ITEMS.filter((_, i) => words.every((w) => hit(SEARCHABLE[i], w))).slice(0, 40);
+    const found = ITEMS.map((it, i) => ({ it, i })).filter(({ i }) => words.every((w) => hit(SEARCHABLE[i], w)));
+    // what the visitor typed in the title itself ranks above a match buried in keywords; groups stay together
+    const inLabel = ({ it }: { it: Item }) => words.every((w) => hit(fold(`${it.label} ${it.hint ?? ''}`), w));
+    const groupOrder = [...new Set(ITEMS.map((it) => it.group))];
+    return found
+      .sort((a, b) => groupOrder.indexOf(a.it.group) - groupOrder.indexOf(b.it.group) || Number(inLabel(b)) - Number(inLabel(a)) || a.i - b.i)
+      .map(({ it }) => it)
+      .slice(0, 40);
   }, [query]);
 
   useEffect(() => {
