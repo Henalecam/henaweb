@@ -30,6 +30,30 @@ import Social from './Social';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
+// symptom capability → service page slug, to point a freshly opened case at a similar solved one
+const CAPABILITY_SERVICE: Record<string, string> = {
+  'Sistema sob medida': 'sistemas-sob-medida',
+  'Automação & IA': 'automacao-e-ia',
+  'Sistema público': 'sistemas-publicos',
+  'Site / produto': 'sites-e-produtos',
+};
+
+/** A solved case close to what the visitor described, preferring one they haven't read yet; else the service page. */
+function similarCase(capability: string | undefined): { label: string; href: string } | null {
+  const service = capability && CAPABILITY_SERVICE[capability];
+  if (!service) return null;
+  let read: string[] = [];
+  try {
+    const v = JSON.parse(localStorage.getItem('hena:read') ?? '[]');
+    if (Array.isArray(v)) read = v;
+  } catch {}
+  const same = projects.filter((p) => p.service === service);
+  const pick = same.find((p) => !read.includes(p.slug)) ?? same[0];
+  if (pick) return { label: `o caso ${pick.name}`, href: `/casos/${pick.slug}` };
+  const name = serviceLinks.find((x) => x.slug === service)?.name;
+  return name ? { label: `como trabalhamos com ${name}`, href: `/servicos/${service}` } : null;
+}
+
 /**
  * Where the visitor came from, for the briefing e-mail: the page of this site they were reading
  * (a case or service page), the outside site that sent them, and any campaign tags in the URL.
@@ -151,6 +175,7 @@ export default function Contact() {
   const lead = chosen[0];
   const capabilities = [...new Set(chosen.map((c) => c.capability))];
   const [saving, setSaving] = useState(false);
+  const [similar, setSimilar] = useState<{ label: string; href: string } | null>(null);
 
   async function saveCard() {
     if (!lead) return;
@@ -295,6 +320,7 @@ export default function Contact() {
       });
       if (!res.ok) throw new Error();
       setStatus('sent');
+      setSimilar(similarCase(lead?.capability));
       try {
         sessionStorage.removeItem(DRAFT);
       } catch {}
@@ -377,6 +403,14 @@ export default function Contact() {
                   Falar pelo WhatsApp
                 </a>
               </div>
+              {similar && (
+                <p className="mt-6 text-acid-ink/80">
+                  Enquanto isso, veja{' '}
+                  <a href={similar.href} className="font-medium underline underline-offset-4 hover:text-[#c2410c]">
+                    {similar.label} →
+                  </a>
+                </p>
+              )}
               <p className="mt-8 text-acid-ink/70">Quer levar o diagnóstico para o seu time? Guarde a ficha:</p>
               <div>{saveButton}</div>
             </div>
