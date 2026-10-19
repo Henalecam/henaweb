@@ -42,7 +42,12 @@ export default function Nav() {
       }
     };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    // other components (the 404 page) can open the search with this event
+    window.addEventListener('hena:search', openSearch);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('hena:search', openSearch);
+    };
   }, []);
 
   useEffect(() => {

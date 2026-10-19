@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Footer from '@/components/Footer';
+import LostClue from '@/components/LostClue';
 
 export const metadata: Metadata = {
   title: 'Caso não encontrado',
@@ -78,6 +79,7 @@ export default function NotFound() {
           <p className="mt-6 max-w-lg text-lg leading-relaxed text-ink/75">
             Vasculhamos o museu inteiro e esta página não está aqui. Mas algumas pistas levam a lugares que existem:
           </p>
+          <LostClue />
           <ul className="mt-8 flex flex-wrap gap-3">
             {links.map((l, i) => (
               <li key={l.href}>
