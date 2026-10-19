@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import Stamp from '@/components/Stamp';
 import ShareCase from '@/components/ShareCase';
 import CaseKeys from '@/components/CaseKeys';
-import FullShot, { MaximizeButton } from '@/components/FullShot';
+import FullShot, { MaximizeButton, ZoomArea } from '@/components/FullShot';
 import MockUI from '@/components/MockUI';
 
 export const dynamicParams = false;
@@ -123,6 +123,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
                 ) : (
                   p.mock && <MockUI variant={p.mock.variant} hue={p.mock.hue} />
                 )}
+                {p.shot && <ZoomArea />}
               </div>
             </div>
             {p.shot && (

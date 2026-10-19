@@ -15,6 +15,20 @@ export function MaximizeButton() {
   );
 }
 
+/** Mouse shortcut: the screenshot itself opens the full view (keyboard and screen readers use □ or the link). */
+export function ZoomArea() {
+  return (
+    <button
+      type="button"
+      onClick={open}
+      tabIndex={-1}
+      aria-hidden
+      data-cursor="Ampliar"
+      className="absolute inset-0 z-10 cursor-zoom-in"
+    />
+  );
+}
+
 /**
  * "See the whole page": the case window only shows the top of the client's site; this opens the
  * full-length desktop capture (and the phone one) in a scrollable Win95 window. Images load only on
