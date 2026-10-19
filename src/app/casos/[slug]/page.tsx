@@ -5,6 +5,7 @@ import { projects, site } from '@/lib/content';
 import { serviceBySlug } from '@/lib/services';
 import Footer from '@/components/Footer';
 import Stamp from '@/components/Stamp';
+import ShareCase from '@/components/ShareCase';
 import MockUI from '@/components/MockUI';
 
 export const dynamicParams = false;
@@ -152,6 +153,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             <a href="/#contato" className="toon toon-press rounded-full bg-cyan px-6 py-4 font-medium text-acid-ink">
               Abrir um caso parecido →
             </a>
+            <ShareCase title={`${p.name} · caso resolvido pela HenaWeb`} text={p.summary} />
           </div>
 
           <nav aria-label="Relacionados" data-print-hide className="mt-24 grid gap-4 border-t border-line pt-10 md:grid-cols-3">
