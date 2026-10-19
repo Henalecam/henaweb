@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { projects, site } from '@/lib/content';
 import { serviceBySlug } from '@/lib/services';
 import Footer from '@/components/Footer';
+import Stamp from '@/components/Stamp';
 import MockUI from '@/components/MockUI';
 
 export const dynamicParams = false;
@@ -126,7 +127,8 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
               <h2 id="misterio" className="font-groovy text-2xl text-[#c2410c]">O mistério</h2>
               <p className="mt-3 text-lg leading-relaxed text-acid-ink/80">{p.challenge}</p>
             </section>
-            <section className="toon rounded-2xl bg-lemon p-7 text-acid-ink" aria-labelledby="resolvido">
+            <section className="toon relative rounded-2xl bg-lemon p-7 text-acid-ink" aria-labelledby="resolvido">
+              <Stamp className="-top-4 right-5 border-[#1f6f63] bg-lemon text-[#1f6f63]">Encerrado ✓</Stamp>
               <h2 id="resolvido" className="font-groovy text-2xl text-[#1f6f63]">Caso resolvido</h2>
               <p className="mt-3 text-lg leading-relaxed text-acid-ink/85">{p.built}</p>
             </section>
