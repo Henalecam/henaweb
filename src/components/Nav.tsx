@@ -50,7 +50,7 @@ export default function Nav() {
   return (
     <>
       <header
-        className={`gutter fixed inset-x-0 top-0 z-50 transition-transform duration-500 ease-[var(--ease-out-expo)] ${
+        className={`gutter fixed inset-x-0 top-0 z-50 [view-transition-name:site-header] transition-transform duration-500 ease-[var(--ease-out-expo)] ${
           hidden && !open ? '-translate-y-full' : ''
         }`}
       >

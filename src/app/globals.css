@@ -373,3 +373,37 @@ details[open]::details-content {
   animation: stamp-in 0.5s 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+/* ───────────── Page-to-page transitions (cross-document View Transitions) ─────────────
+   Links between pages are plain <a>, so each click is a full navigation. Browsers that support it
+   animate the swap: the old page sinks back into the dark and the new one is wiped up from the
+   floor, like the preloader leaving. The header and the reading-progress bar stay put. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+::view-transition-old(root) {
+  animation: vt-sink 0.42s cubic-bezier(0.55, 0, 1, 0.45) both;
+}
+::view-transition-new(root) {
+  animation: vt-wipe 0.6s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+::view-transition-group(root) {
+  background: var(--color-bg);
+}
+@keyframes vt-sink {
+  to {
+    opacity: 0.25;
+    transform: translateY(-3%) scale(0.97);
+  }
+}
+@keyframes vt-wipe {
+  from {
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(6%);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+}

@@ -135,6 +135,15 @@ const jsonLd = {
 
 const SEEN_SCRIPT = "try{sessionStorage.getItem('hena:seen')==='1'&&(document.documentElement.dataset.seen='')}catch(e){}";
 
+const SPECULATION_RULES = JSON.stringify({
+  prefetch: [
+    {
+      where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/api/*' } }] },
+      eagerness: 'moderate',
+    },
+  ],
+});
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     // the inline script below flags repeat views on <html> before hydration, hence suppressHydrationWarning
@@ -157,6 +166,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* repeat views in the same tab skip the intro: hide the overlay before the first paint instead
             of holding the page under it until hydration fades it out */}
         <script dangerouslySetInnerHTML={{ __html: SEEN_SCRIPT }} />
+        {/* hovering an internal link for ~200 ms fetches that page, so the click lands on a warm cache */}
+        <script type="speculationrules" dangerouslySetInnerHTML={{ __html: SPECULATION_RULES }} />
         <Preloader />
         <SmoothScroll />
         <Cursor />
