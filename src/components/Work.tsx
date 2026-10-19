@@ -27,7 +27,8 @@ function Screen({ p, tall = true, images = true }: { p: Project; tall?: boolean;
           {p.shot ? (
             images && (
               <Image
-                src={p.shot.desktop}
+                // the swipeable cards (tall=false) never scroll the capture: the pre-cropped top of the page is enough
+                src={tall ? p.shot.desktop : p.shot.desktop.replace(/\.jpg$/, '-top.jpg')}
                 alt={`Captura de tela de ${p.name}`}
                 fill
                 sizes="(max-width: 1024px) 92vw, 58vw"
