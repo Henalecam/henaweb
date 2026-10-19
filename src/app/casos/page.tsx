@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { ReadProgress } from '@/components/ReadMarks';
 import { projectLinks } from '@/lib/projectLinks';
-import Image from 'next/image';
+import { getImageProps } from 'next/image';
 import { projects, site } from '@/lib/content';
 import Footer from '@/components/Footer';
 import MockUI from '@/components/MockUI';
@@ -44,6 +44,41 @@ const name=(el,on)=>{if(el)el.style.viewTransitionName=on?'caso-'+el.dataset.cas
 addEventListener('pageswap',(e)=>{if(!e.viewTransition)return;const el=card(e.activation&&e.activation.entry&&e.activation.entry.url);name(el,1);e.viewTransition.finished.finally(()=>name(el,0))});
 addEventListener('pagereveal',(e)=>{if(!e.viewTransition||!window.navigation)return;const f=navigation.activation&&navigation.activation.from;const el=card(f&&f.url);name(el,1);e.viewTransition.finished.finally(()=>name(el,0))});
 })();`;
+
+const cardSizes = '(max-width: 768px) 92vw, 540px';
+
+/**
+ * Card capture. Long pages scroll by slowly on hover, like browsing the real site, so pointers that can
+ * hover get the full-length capture; touch screens never see that scroll and get the pre-cropped top
+ * of the page instead (public/cases/*-top.jpg, about 2.5x lighter), which is all the card shows there.
+ */
+function CardShot({ name, shot, first }: { name: string; shot: NonNullable<(typeof projects)[number]['shot']>; first: boolean }) {
+  const tall = shot.height > 1200;
+  const common = {
+    alt: `Tela de ${name}`,
+    fill: true,
+    sizes: cardSizes,
+    // the first card is the page's LCP: fetched right away instead of lazily
+    loading: first ? ('eager' as const) : undefined,
+    fetchPriority: first ? ('high' as const) : undefined,
+  };
+  const { props: img } = getImageProps({ ...common, src: tall ? shot.desktop.replace(/\.jpg$/, '-top.jpg') : shot.desktop });
+  const full = tall ? getImageProps({ ...common, src: shot.desktop }).props.srcSet : undefined;
+  return (
+    <picture>
+      {full && <source media="(hover: hover) and (pointer: fine)" srcSet={full} sizes={cardSizes} />}
+      <img
+        {...img}
+        alt={common.alt}
+        className={`object-cover object-top ${
+          tall
+            ? 'transition-[object-position] duration-[6000ms] ease-linear group-hover:object-bottom'
+            : 'transition-transform duration-700 group-hover:scale-[1.03]'
+        }`}
+      />
+    </picture>
+  );
+}
 
 export default function CasesIndex() {
   const jsonLd = {
@@ -106,21 +141,7 @@ export default function CasesIndex() {
                     </div>
                     <div className="relative m-1.5 aspect-[16/10] overflow-hidden border-2 border-[#7d7394] bg-acid-ink">
                       {p.shot ? (
-                        <Image
-                          src={p.shot.desktop}
-                          alt={`Tela de ${p.name}`}
-                          fill
-                          // the first card is the page's LCP: fetched right away instead of lazily
-                          preload={i === 0}
-                          fetchPriority={i === 0 ? 'high' : undefined}
-                          sizes="(max-width: 768px) 92vw, 540px"
-                          className={`object-cover object-top ${
-                            // long pages scroll by slowly on hover, like browsing the real site
-                            p.shot.height > 1200
-                              ? 'transition-[object-position] duration-[6000ms] ease-linear group-hover:object-bottom'
-                              : 'transition-transform duration-700 group-hover:scale-[1.03]'
-                          }`}
-                        />
+                        <CardShot name={p.name} shot={p.shot} first={i === 0} />
                       ) : (
                         p.mock && <MockUI variant={p.mock.variant} hue={p.mock.hue} />
                       )}
