@@ -117,6 +117,30 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             <ShareCase title={`${s.name} · HenaWeb`} text={s.intro} label="Enviar para alguém ↗" placement="service-share" />
           </div>
 
+          {/* long page on a phone: a table of contents with the section count, jumping to the same ids SectionLink copies */}
+          <nav aria-label="Nesta página" className="mt-12 font-mono text-xs" data-print-hide>
+            <span className="label mr-3">Nesta página</span>
+            <ol className="mt-3 flex flex-wrap gap-2">
+              {[
+                { id: 'sintomas', label: 'Sintomas', n: s.problems.length },
+                { id: 'entregas', label: 'O que você recebe', n: s.deliverables.length },
+                { id: 'exemplos', label: 'Exemplos', n: s.examples.length },
+                { id: 'perguntas', label: 'Perguntas', n: s.faq.length },
+              ].map((t, i) => (
+                <li key={t.id}>
+                  <a
+                    href={`#${t.id}`}
+                    className="inline-flex min-h-9 items-center gap-2 rounded-full border-2 border-ink/25 px-3 text-ink/80 transition-colors hover:border-acid hover:text-ink"
+                  >
+                    <span className="text-acid">{String(i + 1).padStart(2, '0')}</span>
+                    {t.label}
+                    <span className="text-ink/60">({t.n})</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+
           <section className="group relative mt-24" aria-labelledby="sintomas">
             <h2 id="sintomas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-groovy [text-shadow:3px_3px_0_#140a26]">
               Sintomas que resolvemos
