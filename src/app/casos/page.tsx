@@ -51,6 +51,9 @@ export default function CasesIndex() {
                           src={p.shot.desktop}
                           alt={`Tela de ${p.name}`}
                           fill
+                          // the first card is the page's LCP: fetched right away instead of lazily
+                          preload={i === 0}
+                          fetchPriority={i === 0 ? 'high' : undefined}
                           sizes="(max-width: 768px) 92vw, 540px"
                           className={`object-cover object-top ${
                             // long pages scroll by slowly on hover, like browsing the real site
