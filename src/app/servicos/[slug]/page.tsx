@@ -6,6 +6,7 @@ import ClosingCta from '@/components/ClosingCta';
 import Footer from '@/components/Footer';
 import { FaqCopyLink, FaqHashOpener } from '@/components/FaqLink';
 import { faqId } from '@/lib/slug';
+import ShareCase from '@/components/ShareCase';
 
 export const dynamicParams = false;
 
@@ -108,6 +109,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             >
               WhatsApp
             </a>
+            <ShareCase title={`${s.name} · HenaWeb`} text={s.intro} label="Enviar para alguém ↗" placement="service-share" />
           </div>
 
           <section className="mt-24" aria-labelledby="sintomas">
