@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { gsap, useGSAP } from '@/lib/gsap';
 import { projects, type Project } from '@/lib/content';
 import MockUI from './MockUI';
+import { RevealRead } from './ReadMarks';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -179,7 +180,13 @@ export default function Work() {
                       on ? 'text-ink' : 'text-ink/45 hover:text-ink/80'
                     }`}
                   >
-                    <span className={`font-mono text-xs ${on ? 'text-acid' : ''}`}>{pad(i + 1)}</span>
+                    <span className={`flex w-6 shrink-0 flex-col font-mono text-xs ${on ? 'text-acid' : ''}`}>
+                      {pad(i + 1)}
+                      {/* revealed by RevealRead for cases this visitor already opened */}
+                      <span data-read-mark={item.slug} hidden className="text-acid" title="Caso já lido">
+                        ✓<span className="sr-only"> lido</span>
+                      </span>
+                    </span>
                     <span className="flex-1">
                       <span className="block text-[clamp(1.5rem,2.3vw,2.25rem)] leading-none font-medium tracking-[-0.04em]">
                         {item.name}
@@ -257,6 +264,9 @@ export default function Work() {
                 <div className="mt-8 flex flex-col gap-3">
                   <span className="font-mono text-xs text-acid">
                     {pad(i + 1)} / {pad(projects.length)}
+                    <span data-read-mark={item.slug} hidden className="ml-3">
+                      ✓ lido
+                    </span>
                   </span>
                   <h3 className="text-3xl leading-none font-medium tracking-[-0.04em]">{item.name}</h3>
                   <span className="serif -mt-1 text-lg text-ink/60">{item.kind}</span>
@@ -269,6 +279,7 @@ export default function Work() {
             ))}
           </ol>
           <p className="label px-[clamp(1rem,4vw,3.5rem)]">Deslize para ver os outros casos →</p>
+          <RevealRead />
         </div>
       </div>
     </section>

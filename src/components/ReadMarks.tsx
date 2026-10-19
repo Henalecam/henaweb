@@ -26,6 +26,12 @@ export function MarkRead({ slug }: { slug: string }) {
   return null;
 }
 
+/** Anywhere else (the home's case index): just show the "read" marks already on the page. */
+export function RevealRead() {
+  useEffect(() => revealMarks(readList()), []);
+  return null;
+}
+
 function revealMarks(list: string[]) {
   for (const s of list) document.querySelectorAll<HTMLElement>(`[data-read-mark="${s}"]`).forEach((el) => el.removeAttribute('hidden'));
 }
