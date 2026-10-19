@@ -386,7 +386,7 @@ export default function Contact() {
               {/* rubber stamp, like the diner order slip */}
               <div
                 aria-hidden
-                className="stamp-in pointer-events-none absolute top-9 right-7 rounded-md border-4 border-[#d7263d] px-3 py-1 font-mono text-sm font-bold tracking-widest text-[#d7263d] opacity-85 md:text-base"
+                className="stamp-in pointer-events-none absolute top-9 right-7 rounded-md border-4 border-[#b3122b] px-3 py-1 font-mono text-sm font-bold tracking-widest text-[#b3122b] opacity-85 md:text-base"
               >
                 CASO ABERTO · {caseNo}
               </div>

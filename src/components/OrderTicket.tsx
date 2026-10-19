@@ -119,7 +119,7 @@ export default function OrderTicket() {
           {/* rubber stamp */}
           <div
             aria-hidden
-            className="pointer-events-none absolute right-5 bottom-28 -rotate-12 rounded-md border-4 border-[#d7263d] px-3 py-1 font-bold tracking-widest text-[#d7263d] opacity-80"
+            className="pointer-events-none absolute right-5 bottom-28 -rotate-12 rounded-md border-4 border-[#b3122b] px-3 py-1 font-bold tracking-widest text-[#b3122b] opacity-80"
           >
             EM PREPARO
           </div>
