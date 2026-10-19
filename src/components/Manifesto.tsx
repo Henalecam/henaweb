@@ -10,11 +10,15 @@ export default function Manifesto() {
   useGSAP(
     () => {
       const split = SplitText.create('[data-manifesto]', { type: 'words', aria: 'none' });
+      // tween the colour, not opacity: opacity also faded each word's dark halo, leaving the
+      // unread words almost invisible where they cross the striped sun
+      const ink = getComputedStyle(split.words[0] ?? document.body).color;
+      const dim = ink.replace(/^rgba?\(([^,)]+),\s*([^,)]+),\s*([^,)]+).*$/, 'rgba($1, $2, $3, 0.38)');
       gsap.fromTo(
         split.words,
-        { opacity: 0.38 },
+        { color: dim },
         {
-          opacity: 1,
+          color: ink,
           stagger: 0.1,
           ease: 'none',
           scrollTrigger: { trigger: '[data-manifesto]', start: 'top 80%', end: 'bottom 45%', scrub: true },
@@ -40,7 +44,8 @@ export default function Manifesto() {
           <span className="label">(I) Manifesto</span>
           <p
             data-manifesto
-            className="mt-8 text-[clamp(1.75rem,3.6vw,3.75rem)] leading-[1.06] font-medium tracking-[-0.035em]"
+            // the text scrolls over the hero sun; the dark halo keeps it legible over its stripes, as in the headline
+            className="mt-8 text-[clamp(1.75rem,3.6vw,3.75rem)] leading-[1.06] font-medium tracking-[-0.035em] [text-shadow:0_0_2px_rgb(18_8_42/0.9),0_2px_10px_rgb(18_8_42/0.85),0_0_36px_rgb(18_8_42/0.9)]"
           >
             {manifesto}
           </p>
@@ -53,7 +58,8 @@ export default function Manifesto() {
         {facts.map((f) => (
           <div key={f.l} data-fact className="toon flex items-end justify-between gap-6 rounded-2xl bg-paper p-6 text-acid-ink odd:-rotate-1 even:rotate-1 md:p-8">
             <span className="font-groovy text-[clamp(3.5rem,7vw,6rem)] leading-none text-[#c2410c]">{f.n}</span>
-            <span className="label max-w-[16ch] text-right !text-acid-ink/70">{f.l}</span>
+            {/* the promise behind each number, readable at a glance (was 11px mono caps at 70%) */}
+            <span className="max-w-[18ch] text-right text-base leading-snug font-medium text-acid-ink/80 md:text-lg">{f.l}</span>
           </div>
         ))}
       </div>
