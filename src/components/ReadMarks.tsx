@@ -103,3 +103,18 @@ export function ReadProgress({ slugs }: { slugs: string[] }) {
     </p>
   );
 }
+
+/**
+ * Arriving from a filtered archive (/casos?servico=…), the "Casos" breadcrumb returns to that same
+ * filtered list instead of the full one.
+ */
+export function ArchiveReturn() {
+  useEffect(() => {
+    try {
+      const ref = document.referrer ? new URL(document.referrer) : null;
+      if (!ref || ref.origin !== location.origin || ref.pathname !== '/casos' || !ref.search) return;
+      document.querySelectorAll<HTMLAnchorElement>('a[data-archive-link]').forEach((a) => (a.href = ref.pathname + ref.search));
+    } catch {}
+  }, []);
+  return null;
+}

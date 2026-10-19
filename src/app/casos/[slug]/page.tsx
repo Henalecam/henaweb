@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import Stamp from '@/components/Stamp';
 import ShareCase from '@/components/ShareCase';
 import CaseKeys from '@/components/CaseKeys';
-import { MarkRead, UnreadHint } from '@/components/ReadMarks';
+import { ArchiveReturn, MarkRead, UnreadHint } from '@/components/ReadMarks';
 import FullShot, { MaximizeButton, ZoomArea } from '@/components/FullShot';
 import MockUI from '@/components/MockUI';
 
@@ -85,7 +85,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
               </li>
               <li aria-hidden>·</li>
               <li>
-                <a href="/casos" className="hover:text-ink">Casos</a>
+                <a href="/casos" data-archive-link className="hover:text-ink">Casos</a>
               </li>
               <li aria-hidden>·</li>
               <li aria-current="page" className="text-ink">{p.name}</li>
@@ -171,6 +171,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
           </div>
 
           <MarkRead slug={p.slug} />
+          <ArchiveReturn />
           <CaseKeys prev={`/casos/${prev.slug}`} next={`/casos/${next.slug}`} />
           <nav aria-label="Relacionados" data-print-hide className="mt-24 grid gap-4 border-t border-line pt-10 md:grid-cols-3">
             <a href={`/casos/${prev.slug}`} rel="prev" aria-keyshortcuts="ArrowLeft" className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6">
