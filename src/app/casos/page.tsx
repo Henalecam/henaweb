@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ReadProgress } from '@/components/ReadMarks';
+import { RandomCase, ReadProgress } from '@/components/ReadMarks';
 import { projectLinks } from '@/lib/projectLinks';
 import Image from 'next/image';
 import { projects, site } from '@/lib/content';
@@ -89,6 +89,7 @@ export default function CasesIndex() {
               .filter((o) => o.count > 0)}
           />
           <ReadProgress slugs={projects.map((p) => p.slug)} />
+          <RandomCase />
           <ul className="mt-10 grid gap-6 md:grid-cols-2">
             {projects.map((p, i) => (
               <li key={p.slug} data-case-service={p.service} data-case-slug={p.slug}>

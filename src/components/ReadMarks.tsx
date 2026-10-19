@@ -118,3 +118,28 @@ export function ArchiveReturn() {
   }, []);
   return null;
 }
+
+/**
+ * "Sortear um caso": opens a random case the visitor hasn't read yet (any case once all were read),
+ * picked among the ones the archive filter is currently showing.
+ */
+export function RandomCase() {
+  const go = () => {
+    const visible = [...document.querySelectorAll<HTMLElement>('li[data-case-slug]:not([hidden])')].map((li) => li.dataset.caseSlug!);
+    if (!visible.length) return;
+    const read = readList();
+    const pool = visible.filter((s) => !read.includes(s));
+    const from = pool.length ? pool : visible;
+    location.href = `/casos/${from[Math.floor(Math.random() * from.length)]}`;
+  };
+  return (
+    <button
+      type="button"
+      onClick={go}
+      data-print-hide
+      className="label mt-4 inline-flex min-h-9 items-center gap-2 !text-ink/80 underline underline-offset-4 hover:!text-acid"
+    >
+      <span aria-hidden>🎲</span> Sortear um caso que você ainda não leu
+    </button>
+  );
+}
