@@ -548,3 +548,28 @@ details[open]::details-content {
     text-underline-offset: 4px;
   }
 }
+
+/* "Increase contrast" (macOS/iOS, Windows contrast themes): the design leans on translucent text
+   (ink/45 … ink/80) for hierarchy; for visitors who asked for more contrast, every one of those goes solid. */
+@media (prefers-contrast: more) {
+  [class*='text-ink/'] {
+    color: var(--color-ink) !important;
+  }
+  [class*='text-acid-ink/'] {
+    color: var(--color-acid-ink) !important;
+  }
+}
+
+/* "Reduce transparency": frosted glass becomes solid (sticky header, government panel, dialog backdrops) */
+@media (prefers-reduced-transparency: reduce) {
+  [class*='backdrop-blur'] {
+    backdrop-filter: none !important;
+  }
+  header [class*='bg-bg/'] {
+    background-color: var(--color-bg) !important;
+  }
+  ::backdrop {
+    backdrop-filter: none !important;
+    background-color: #0d0820 !important;
+  }
+}
