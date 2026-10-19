@@ -115,7 +115,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             </div>
             {p.shot && (
               <div className="toon absolute -right-2 -bottom-8 aspect-[390/844] w-[24%] max-w-[220px] overflow-hidden rounded-[1.4rem] bg-black md:-right-6">
-                <Image src={p.shot.mobile} alt={`${p.name} no celular`} fill sizes="220px" className="object-cover object-top" />
+                <Image src={p.shot.mobile} alt={`${p.name} no celular`} fill sizes="(max-width: 1000px) 22vw, 220px" className="object-cover object-top" />
               </div>
             )}
           </div>
