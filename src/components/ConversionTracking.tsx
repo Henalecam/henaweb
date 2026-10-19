@@ -3,8 +3,10 @@
 import { useEffect } from 'react';
 import { track } from '@/lib/track';
 
-/** Where on the page a click happened, from the nearest section id (or the header/footer). */
+/** Where on the page a click happened: an explicit data-placement, else the nearest section id (or the header/footer). */
 function placementOf(el: Element) {
+  const explicit = el.closest<HTMLElement>('[data-placement]')?.dataset.placement;
+  if (explicit) return explicit;
   if (el.closest('header')) return 'header';
   if (el.closest('footer')) return 'footer';
   return el.closest('section[id]')?.id ?? (location.pathname === '/' ? 'home' : location.pathname);
