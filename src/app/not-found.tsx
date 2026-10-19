@@ -60,6 +60,8 @@ export default function NotFound() {
               </li>
             ))}
           </ul>
+          {/* on phones the witness sits under the clues (tap anywhere to startle it) */}
+          <GhostWitness className="pointer-events-none mx-auto mt-24 block w-40 lg:hidden" />
         </div>
       </main>
       <Footer />
