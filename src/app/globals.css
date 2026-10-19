@@ -346,6 +346,11 @@ html {
   .sparkle { animation: none; opacity: 0.9; transform: none; }
 }
 
+/* /casos "mostrar só os que faltam" (ReadProgress) */
+:root[data-only-unread] li[data-case-read] {
+  display: none;
+}
+
 /* FAQ: answers slide open instead of snapping (browsers without ::details-content just snap) */
 :root {
   interpolate-size: allow-keywords;

@@ -69,11 +69,21 @@ export function UnreadHint({ cases, current }: { cases: { slug: string; name: st
  */
 export function ReadProgress({ slugs }: { slugs: string[] }) {
   const [read, setRead] = useState<string[]>([]);
+  // "só os que faltam": folds away the cases already read (a CSS flag, so it composes with the service filter)
+  const [onlyUnread, setOnlyUnread] = useState(false);
   useEffect(() => {
     const list = readList().filter((s) => slugs.includes(s));
     setRead(list);
     revealMarks(list);
+    document.querySelectorAll<HTMLElement>('li[data-case-slug]').forEach((li) => {
+      if (list.includes(li.dataset.caseSlug!)) li.dataset.caseRead = '';
+      else delete li.dataset.caseRead;
+    });
   }, [slugs]);
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-only-unread', onlyUnread);
+    return () => document.documentElement.removeAttribute('data-only-unread');
+  }, [onlyUnread]);
 
   if (!read.length) return null;
   const all = read.length === slugs.length;
@@ -87,6 +97,16 @@ export function ReadProgress({ slugs }: { slugs: string[] }) {
       <span>
         {all ? 'Arquivo completo: você investigou todos os casos. Próximo passo, o seu.' : `Você já investigou ${read.length} de ${slugs.length} casos.`}
       </span>
+      {!all && (
+        <button
+          type="button"
+          aria-pressed={onlyUnread}
+          onClick={() => setOnlyUnread((v) => !v)}
+          className={`min-h-8 rounded-full border px-2.5 ${onlyUnread ? 'border-acid bg-acid text-acid-ink' : 'border-ink/30 hover:border-ink hover:text-ink'}`}
+        >
+          {onlyUnread ? '✓ só os que faltam' : 'mostrar só os que faltam'}
+        </button>
+      )}
       <button
         type="button"
         onClick={() => {
@@ -94,6 +114,8 @@ export function ReadProgress({ slugs }: { slugs: string[] }) {
             localStorage.removeItem(KEY);
           } catch {}
           document.querySelectorAll('[data-read-mark]').forEach((el) => el.setAttribute('hidden', ''));
+          document.querySelectorAll<HTMLElement>('li[data-case-read]').forEach((li) => delete li.dataset.caseRead);
+          setOnlyUnread(false);
           setRead([]);
         }}
         className="min-h-8 underline underline-offset-2 hover:text-ink"
