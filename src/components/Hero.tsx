@@ -84,7 +84,7 @@ export default function Hero() {
           <div data-hero-fade className="flex flex-col gap-3 md:col-span-3 md:items-end md:text-right">
             <Placard className="hidden md:block" />
             <span className="label">
-              {site.city} · <Clock />
+              {site.city} · <Clock stack />
             </span>
           </div>
         </div>
