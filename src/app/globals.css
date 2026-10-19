@@ -293,6 +293,11 @@
   to { transform: scaleX(1); }
 }
 
+/* repeat views: the inline script in the layout marks <html data-seen> before the first paint */
+html[data-seen] [data-preloader] {
+  display: none !important;
+}
+
 /* skip-link target: focusable for screen readers, no ring around the whole page */
 main:focus { outline: none; }
 
@@ -367,3 +372,4 @@ details[open]::details-content {
 .stamp-in {
   animation: stamp-in 0.5s 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
+

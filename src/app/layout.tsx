@@ -133,9 +133,16 @@ const jsonLd = {
   ],
 };
 
+const SEEN_SCRIPT = "try{sessionStorage.getItem('hena:seen')==='1'&&(document.documentElement.dataset.seen='')}catch(e){}";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${geist.variable} ${geistMono.variable} ${instrument.variable} ${groovy.variable}`}>
+    // the inline script below flags repeat views on <html> before hydration, hence suppressHydrationWarning
+    <html
+      lang="pt-BR"
+      className={`${geist.variable} ${geistMono.variable} ${instrument.variable} ${groovy.variable}`}
+      suppressHydrationWarning
+    >
       <body>
         <noscript>
           <style>{'[data-preloader]{display:none!important}'}</style>
@@ -147,6 +154,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Pular para o conteúdo
         </a>
+        {/* repeat views in the same tab skip the intro: hide the overlay before the first paint instead
+            of holding the page under it until hydration fades it out */}
+        <script dangerouslySetInnerHTML={{ __html: SEEN_SCRIPT }} />
         <Preloader />
         <SmoothScroll />
         <Cursor />
