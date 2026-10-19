@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /** "Copy link" for one FAQ answer, so a question can be sent straight to a partner or a client. */
 export function FaqCopyLink({ id }: { id: string }) {
@@ -48,4 +48,44 @@ export function FaqHashOpener() {
     return () => window.removeEventListener('hashchange', open);
   }, []);
   return null;
+}
+
+/**
+ * "Abrir todas / fechar todas" for a list of FAQ answers: someone comparing studios wants to skim
+ * every answer at once instead of clicking eight times. Stays in sync when answers are opened one
+ * by one (the `toggle` event doesn't bubble, so it's caught in the capture phase).
+ */
+export function FaqToggleAll() {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [allOpen, setAllOpen] = useState(false);
+
+  useEffect(() => {
+    const list = ref.current?.closest('section');
+    if (!list) return;
+    const sync = () => {
+      const items = [...list.querySelectorAll('details')];
+      setAllOpen(items.length > 0 && items.every((d) => d.open));
+    };
+    list.addEventListener('toggle', sync, true);
+    return () => list.removeEventListener('toggle', sync, true);
+  }, []);
+
+  const flip = () => {
+    const list = ref.current?.closest('section');
+    list?.querySelectorAll('details').forEach((d) => (d.open = !allOpen));
+  };
+
+  return (
+    <button
+      ref={ref}
+      type="button"
+      onClick={flip}
+      aria-expanded={allOpen}
+      data-print-hide
+      className="label inline-flex min-h-8 items-center gap-1.5 rounded-full !text-current opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100"
+    >
+      <span aria-hidden>{allOpen ? '⊟' : '⊞'}</span>
+      {allOpen ? 'Fechar todas' : 'Abrir todas'}
+    </button>
+  );
 }

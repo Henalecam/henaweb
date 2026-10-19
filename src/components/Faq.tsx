@@ -1,6 +1,6 @@
 import { homeFaq } from '@/lib/content';
 import { faqId } from '@/lib/slug';
-import { FaqCopyLink, FaqHashOpener } from './FaqLink';
+import { FaqCopyLink, FaqHashOpener, FaqToggleAll } from './FaqLink';
 
 /** Visible FAQ; the same Q&A feeds the FAQPage structured data on the home page. */
 export default function Faq() {
@@ -14,6 +14,9 @@ export default function Faq() {
           </h2>
         </div>
         <div className="flex flex-col gap-3 lg:col-span-8">
+          <div className="flex justify-end text-bg">
+            <FaqToggleAll />
+          </div>
           {homeFaq.map((f) => (
             <details key={f.q} id={faqId(f.q)} className="toon-sm group scroll-mt-28 rounded-xl bg-paper p-5 open:bg-lemon">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium md:text-xl">
@@ -26,6 +29,12 @@ export default function Faq() {
               <FaqCopyLink id={faqId(f.q)} />
             </details>
           ))}
+          <p className="mt-3 text-bg/75" data-print-hide>
+            Não achou a sua?{' '}
+            <a href="#contato" className="font-medium text-bg underline decoration-[#c2410c] decoration-2 underline-offset-4 hover:decoration-4">
+              Pergunte direto pra gente →
+            </a>
+          </p>
         </div>
       </div>
       <FaqHashOpener />
