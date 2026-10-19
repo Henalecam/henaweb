@@ -4,6 +4,8 @@ import { services, serviceBySlug } from '@/lib/services';
 import { projects, site, whatsappLink } from '@/lib/content';
 import ClosingCta from '@/components/ClosingCta';
 import Footer from '@/components/Footer';
+import { FaqCopyLink, FaqHashOpener } from '@/components/FaqLink';
+import { faqId } from '@/lib/slug';
 
 export const dynamicParams = false;
 
@@ -185,7 +187,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             </h2>
             <div className="mt-8 flex flex-col gap-3">
               {s.faq.map((f) => (
-                <details key={f.q} className="toon-sm group rounded-xl bg-paper p-5 text-acid-ink">
+                <details key={f.q} id={faqId(f.q)} className="toon-sm group scroll-mt-28 rounded-xl bg-paper p-5 text-acid-ink">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium">
                     {f.q}
                     <span className="text-2xl transition-transform group-open:rotate-45" aria-hidden>
@@ -193,9 +195,11 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                     </span>
                   </summary>
                   <p className="mt-3 leading-relaxed text-acid-ink/75">{f.a}</p>
+                  <FaqCopyLink id={faqId(f.q)} />
                 </details>
               ))}
             </div>
+            <FaqHashOpener />
           </section>
 
           <section className="mt-24" aria-labelledby="outros">
