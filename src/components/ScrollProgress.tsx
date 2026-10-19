@@ -28,7 +28,7 @@ export default function ScrollProgress() {
   }, []);
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px]">
+    <div aria-hidden data-print-hide className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px]">
       <div ref={bar} className="h-full origin-left bg-[linear-gradient(90deg,#f7931e,#f9e27d_50%,#3cc6b4)]" style={{ transform: 'scaleX(0)' }} />
     </div>
   );

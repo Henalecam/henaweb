@@ -1,33 +1,18 @@
 'use client';
 
-import { useRef } from 'react';
-import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
-import { nav, projects, site, whatsappLink } from '@/lib/content';
-import { services } from '@/lib/services';
+import { nav, site, whatsappLink } from '@/lib/site';
+import { projectLinks } from '@/lib/projectLinks';
+import { serviceLinks } from '@/lib/serviceLinks';
 import { CONSENT_OPEN } from '@/lib/consent';
 import Clock from './Clock';
 import Chase from './Chase';
 import Social from './Social';
+import CopyEmail from './CopyEmail';
 
 export default function Footer() {
-  const root = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      if (prefersReducedMotion()) return;
-      gsap.from('[data-wordmark] span', {
-        yPercent: 100,
-        duration: 1.4,
-        ease: 'expo.out',
-        stagger: 0.04,
-        scrollTrigger: { trigger: '[data-wordmark]', start: 'top 95%' },
-      });
-    },
-    { scope: root },
-  );
 
   return (
-    <footer ref={root} className="sky gutter relative z-50 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon pt-20 pb-6">
+    <footer className="sky gutter relative z-50 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon pt-20 pb-6">
       <div className="relative z-20 grid gap-12 lg:grid-cols-12">
         {/* who we are + the two ways to reach us */}
         <div className="lg:col-span-4">
@@ -50,6 +35,10 @@ export default function Footer() {
             >
               {site.email}
             </a>
+            <CopyEmail
+              placement="footer"
+              className="toon-sm toon-press inline-flex items-center rounded-full bg-paper px-3.5 py-2.5 font-mono text-xs text-acid-ink"
+            />
           </div>
           <p className="mt-6 font-mono text-xs leading-relaxed text-ink/60">
             {site.city} · {site.coords}
@@ -65,14 +54,14 @@ export default function Footer() {
         {/* a little file tree, in keeping with the .exe windows: every page one click away */}
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:col-span-8">
           <FooterColumn title="serviços/">
-            {services.map((x) => (
+            {serviceLinks.map((x) => (
               <FooterLink key={x.slug} href={`/servicos/${x.slug}`}>
                 {x.name}
               </FooterLink>
             ))}
           </FooterColumn>
           <FooterColumn title="casos/">
-            {projects.map((x) => (
+            {projectLinks.map((x) => (
               <FooterLink key={x.slug} href={`/casos/${x.slug}`}>
                 {x.name}
               </FooterLink>
@@ -102,7 +91,7 @@ export default function Footer() {
         <div
           data-wordmark
           aria-hidden
-          className="relative z-10 flex overflow-hidden pt-2 pb-4 font-groovy text-[clamp(3rem,16vw,19rem)] leading-[0.9] select-none"
+          className="relative z-10 flex justify-center overflow-hidden pt-2 pb-4 font-groovy text-[clamp(3rem,16vw,19rem)] leading-[0.9] select-none"
         >
           {'HenaWeb'.split('').map((c, i) => (
             <span key={i} className="chrome inline-block pr-[0.02em]">

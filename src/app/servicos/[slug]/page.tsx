@@ -1,9 +1,16 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import { services, serviceBySlug } from '@/lib/services';
 import { projects, site, whatsappLink } from '@/lib/content';
 import ClosingCta from '@/components/ClosingCta';
 import Footer from '@/components/Footer';
+import { FaqCopyLink, FaqHashOpener } from '@/components/FaqLink';
+import { faqId } from '@/lib/slug';
+import SectionLink from '@/components/SectionLink';
+import ServiceSymptoms from '@/components/ServiceSymptoms';
+import ShareCase from '@/components/ShareCase';
+import MockUI from '@/components/MockUI';
 
 export const dynamicParams = false;
 
@@ -106,26 +113,22 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             >
               WhatsApp
             </a>
+            <ShareCase title={`${s.name} · HenaWeb`} text={s.intro} label="Enviar para alguém ↗" placement="service-share" />
           </div>
 
-          <section className="mt-24" aria-labelledby="sintomas">
+          <section className="group relative mt-24" aria-labelledby="sintomas">
             <h2 id="sintomas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-groovy [text-shadow:3px_3px_0_#140a26]">
               Sintomas que resolvemos
             </h2>
-            <ul className="mt-8 grid gap-4 sm:grid-cols-2">
-              {s.problems.map((p) => (
-                <li key={p} className="toon-sm rounded-xl bg-paper p-5 text-acid-ink">
-                  <span className="mr-2 text-[#c2410c]">✦</span>
-                  {p}
-                </li>
-              ))}
-            </ul>
+            <SectionLink id="sintomas" title="Sintomas que resolvemos" />
+            <ServiceSymptoms problems={s.problems} service={s.name} />
           </section>
 
-          <section className="mt-24" aria-labelledby="entregas">
+          <section className="group relative mt-24" aria-labelledby="entregas">
             <h2 id="entregas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-teal [text-shadow:3px_3px_0_#140a26]">
               O que você recebe
             </h2>
+            <SectionLink id="entregas" title="O que você recebe" />
             <ol className="mt-8 grid gap-5 md:grid-cols-2">
               {s.deliverables.map((d, i) => (
                 <li key={d.title} className="win flex flex-col">
@@ -141,13 +144,40 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             </ol>
           </section>
 
-          <section className="mt-24" aria-labelledby="exemplos">
+          <section className="group relative mt-24" aria-labelledby="exemplos">
             <h2 id="exemplos" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-acid [text-shadow:3px_3px_0_#140a26]">
               Exemplos
             </h2>
+            <SectionLink id="exemplos" title="Exemplos" />
             <ul className="mt-8 grid gap-4 md:grid-cols-3">
               {s.examples.map((e) => (
-                <li key={e.name} className="toon-sm rounded-xl bg-bg-2/80 p-5">
+                <li key={e.name} className="toon-sm overflow-hidden rounded-xl bg-bg-2/80 p-5">
+                  {/* examples that are cases on this site show the top of their screenshot, like a folder tab */}
+                  {(() => {
+                    const pr = projects.find((x) => x.name === e.name);
+                    if (!pr || (!pr.shot && !pr.mock)) return null;
+                    return (
+                      <a
+                        href={`/casos/${pr.slug}`}
+                        aria-hidden
+                        tabIndex={-1}
+                        className="group -mx-5 -mt-5 mb-5 block aspect-[16/9.4] overflow-hidden border-b-2 border-toon bg-acid-ink"
+                      >
+                        {pr.shot ? (
+                          <Image
+                            src={pr.shot.desktop.replace(/\.jpg$/, '-top.jpg')}
+                            alt=""
+                            width={1440}
+                            height={846}
+                            sizes="(max-width: 768px) 92vw, 380px"
+                            className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+                          />
+                        ) : (
+                          pr.mock && <MockUI variant={pr.mock.variant} hue={pr.mock.hue} />
+                        )}
+                      </a>
+                    );
+                  })()}
                   <h3 className="text-xl font-medium tracking-tight">
                     {(() => {
                       const caseSlug = projects.find((pr) => pr.name === e.name)?.slug;
@@ -179,13 +209,14 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             </p>
           </section>
 
-          <section className="mt-24" aria-labelledby="perguntas">
+          <section className="group relative mt-24" aria-labelledby="perguntas">
             <h2 id="perguntas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-groovy [text-shadow:3px_3px_0_#140a26]">
               Perguntas frequentes
             </h2>
+            <SectionLink id="perguntas" title="Perguntas frequentes" />
             <div className="mt-8 flex flex-col gap-3">
               {s.faq.map((f) => (
-                <details key={f.q} className="toon-sm group rounded-xl bg-paper p-5 text-acid-ink">
+                <details key={f.q} id={faqId(f.q)} className="toon-sm group scroll-mt-28 rounded-xl bg-paper p-5 text-acid-ink">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium">
                     {f.q}
                     <span className="text-2xl transition-transform group-open:rotate-45" aria-hidden>
@@ -193,9 +224,11 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                     </span>
                   </summary>
                   <p className="mt-3 leading-relaxed text-acid-ink/75">{f.a}</p>
+                  <FaqCopyLink id={faqId(f.q)} />
                 </details>
               ))}
             </div>
+            <FaqHashOpener />
           </section>
 
           <section className="mt-24" aria-labelledby="outros">

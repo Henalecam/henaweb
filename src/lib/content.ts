@@ -1,33 +1,4 @@
-export const site = {
-  name: 'HenaWeb',
-  legalName: 'Henaweb Ltda',
-  /** Shown in the footer (and the Organization JSON-LD) once filled in, e.g. '00.000.000/0001-00'. */
-  cnpj: '',
-  url: 'https://henaweb.com',
-  city: 'Curitiba, PR',
-  coords: '25.4284° S · 49.2733° W',
-  whatsapp: '5541999155948',
-  whatsappDisplay: '+55 41 99915-5948',
-  email: 'henrique@henaweb.com',
-  social: [
-    { name: 'Instagram', href: 'https://www.instagram.com/henaweb/' },
-    { name: 'LinkedIn', href: 'https://www.linkedin.com/company/henaweb/' },
-    { name: 'GitHub', href: 'https://github.com/henaweb' },
-  ],
-};
-
-export const whatsappLink = (text = 'Olá! Quero conversar sobre um projeto com a HenaWeb.') =>
-  `https://api.whatsapp.com/send?phone=${site.whatsapp}&text=${encodeURIComponent(text)}`;
-
-export const nav = [
-  { label: 'Clientes', href: '/#clientes' },
-  { label: 'Capacidades', href: '/#capacidades' },
-  { label: 'Setor público', href: '/#govtech' },
-  // one entry for the cases: the home section, which links on to the full /casos archive
-  { label: 'Casos', href: '/#projetos' },
-  { label: 'Processo', href: '/#processo' },
-  { label: 'Studio', href: '/#studio' },
-];
+export { site, whatsappLink, nav } from './site';
 
 export const manifesto =
   'Todo processo confuso esconde um sistema claro. Nosso trabalho é encontrar esse sistema e dar forma a ele: arquitetura feita para durar, telas que se explicam sozinhas e código que a próxima equipe agradece.';
@@ -365,3 +336,4 @@ export const clients: { name: string; group: 'public' | 'private'; logo?: string
  * (project is optional and must match a slug in `projects`, linking the quote to its case page).
  */
 export const testimonials: { quote: string; name: string; role: string; org: string; project?: string }[] = [];
+

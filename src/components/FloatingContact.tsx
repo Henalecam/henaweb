@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { whatsappLink } from '@/lib/content';
+import { whatsappLink } from '@/lib/site';
 
 /**
  * Phones only: a WhatsApp button that appears once the hero has scrolled away and
@@ -106,6 +106,7 @@ export default function FloatingContact() {
 
   return (
     <a
+      data-print-hide
       href={href}
       target="_blank"
       rel="noopener noreferrer"

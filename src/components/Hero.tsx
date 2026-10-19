@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { gsap, SplitText, useGSAP, onReady } from '@/lib/gsap';
-import { site, whatsappLink } from '@/lib/content';
+import { site, whatsappLink } from '@/lib/site';
 import Clock from './Clock';
 import Magnetic from './Magnetic';
 import Placard from './Placard';
