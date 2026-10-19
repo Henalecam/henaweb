@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import Stamp from '@/components/Stamp';
 import ShareCase from '@/components/ShareCase';
 import CaseKeys from '@/components/CaseKeys';
+import FullShot, { MaximizeButton } from '@/components/FullShot';
 import MockUI from '@/components/MockUI';
 
 export const dynamicParams = false;
@@ -103,10 +104,10 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             <div className="win [view-transition-class:case-window]" style={{ viewTransitionName: `caso-${p.slug}` }}>
               <div className="win-bar">
                 <span className="truncate">{new URL(p.href).hostname}</span>
-                <span className="ml-auto flex shrink-0 gap-1" aria-hidden>
-                  <span className="win-btn">_</span>
-                  <span className="win-btn">□</span>
-                  <span className="win-btn">×</span>
+                <span className="ml-auto flex shrink-0 gap-1">
+                  <span className="win-btn" aria-hidden>_</span>
+                  {p.shot ? <MaximizeButton /> : <span className="win-btn" aria-hidden>□</span>}
+                  <span className="win-btn" aria-hidden>×</span>
                 </span>
               </div>
               <div className="relative m-1.5 aspect-[16/9.4] overflow-hidden border-2 border-[#7d7394] bg-acid-ink">
@@ -130,8 +131,11 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
               </div>
             )}
           </div>
+          {p.shot && (
+            <FullShot name={p.name} host={new URL(p.href).hostname} desktop={p.shot.desktop} mobile={p.shot.mobile} height={p.shot.height} />
+          )}
 
-          <div className="mt-24 grid gap-5 md:grid-cols-2">
+          <div className="mt-16 grid gap-5 md:grid-cols-2">
             <section className="toon rounded-2xl bg-paper p-7 text-acid-ink" aria-labelledby="misterio">
               <h2 id="misterio" className="font-groovy text-2xl text-[#c2410c]">O mistério</h2>
               <p className="mt-3 text-lg leading-relaxed text-acid-ink/80">{p.challenge}</p>
