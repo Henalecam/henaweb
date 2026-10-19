@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import { services, serviceBySlug } from '@/lib/services';
 import { projects, site, whatsappLink } from '@/lib/content';
 import ClosingCta from '@/components/ClosingCta';
@@ -7,6 +8,7 @@ import Footer from '@/components/Footer';
 import { FaqCopyLink, FaqHashOpener } from '@/components/FaqLink';
 import { faqId } from '@/lib/slug';
 import ShareCase from '@/components/ShareCase';
+import MockUI from '@/components/MockUI';
 
 export const dynamicParams = false;
 
@@ -151,7 +153,33 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             </h2>
             <ul className="mt-8 grid gap-4 md:grid-cols-3">
               {s.examples.map((e) => (
-                <li key={e.name} className="toon-sm rounded-xl bg-bg-2/80 p-5">
+                <li key={e.name} className="toon-sm overflow-hidden rounded-xl bg-bg-2/80 p-5">
+                  {/* examples that are cases on this site show the top of their screenshot, like a folder tab */}
+                  {(() => {
+                    const pr = projects.find((x) => x.name === e.name);
+                    if (!pr || (!pr.shot && !pr.mock)) return null;
+                    return (
+                      <a
+                        href={`/casos/${pr.slug}`}
+                        aria-hidden
+                        tabIndex={-1}
+                        className="group -mx-5 -mt-5 mb-5 block aspect-[16/9.4] overflow-hidden border-b-2 border-toon bg-acid-ink"
+                      >
+                        {pr.shot ? (
+                          <Image
+                            src={pr.shot.desktop.replace(/\.jpg$/, '-top.jpg')}
+                            alt=""
+                            width={1440}
+                            height={846}
+                            sizes="(max-width: 768px) 92vw, 380px"
+                            className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+                          />
+                        ) : (
+                          pr.mock && <MockUI variant={pr.mock.variant} hue={pr.mock.hue} />
+                        )}
+                      </a>
+                    );
+                  })()}
                   <h3 className="text-xl font-medium tracking-tight">
                     {(() => {
                       const caseSlug = projects.find((pr) => pr.name === e.name)?.slug;
