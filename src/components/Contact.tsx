@@ -52,6 +52,20 @@ function leadOrigin(): string {
   }
 }
 
+// the half-written case survives a detour to read a case study and come back (same tab only)
+const DRAFT = 'hena:draft';
+const DRAFT_FIELDS = ['name', 'email', 'whatsapp', 'org', 'message'] as const;
+type Draft = { picked: string[]; timeline: string; fields: Partial<Record<(typeof DRAFT_FIELDS)[number], string>> };
+
+function readDraft(): Draft | null {
+  try {
+    const d = JSON.parse(sessionStorage.getItem(DRAFT) ?? 'null') as Draft | null;
+    return d && (d.picked?.length || Object.values(d.fields ?? {}).some(Boolean)) ? d : null;
+  } catch {
+    return null;
+  }
+}
+
 const field =
   'peer w-full border-b-2 border-acid-ink/35 bg-transparent pt-6 pb-2 text-lg text-acid-ink placeholder:text-transparent focus:border-acid-ink focus:outline-none user-invalid:border-[#b3122b]';
 
@@ -95,6 +109,42 @@ export default function Contact() {
   // "came from the Diconta case": shown on the form and attached to the message, removable
   const [reference, setReference] = useState<string | null>(null);
   useEffect(() => setReference(readReference()), []);
+  const form = useRef<HTMLFormElement>(null);
+  const [draftReady, setDraftReady] = useState(false);
+  const [restored, setRestored] = useState(false);
+  useEffect(() => {
+    const d = readDraft();
+    if (d && form.current) {
+      setPicked(d.picked.filter((id) => symptoms.some((s) => s.id === id)));
+      if (timelines.includes(d.timeline)) setTimeline(d.timeline);
+      for (const k of DRAFT_FIELDS) {
+        const el = form.current.elements.namedItem(k) as HTMLInputElement | null;
+        if (el && d.fields[k]) el.value = d.fields[k];
+      }
+      setRestored(true);
+    }
+    setDraftReady(true);
+  }, []);
+  const saveDraft = () => {
+    if (!draftReady || !form.current) return;
+    const f = form.current.elements;
+    const fields = Object.fromEntries(DRAFT_FIELDS.map((k) => [k, (f.namedItem(k) as HTMLInputElement | null)?.value ?? '']));
+    try {
+      const d: Draft = { picked, timeline, fields };
+      if (picked.length || Object.values(fields).some(Boolean)) sessionStorage.setItem(DRAFT, JSON.stringify(d));
+      else sessionStorage.removeItem(DRAFT);
+    } catch {}
+  };
+  useEffect(saveDraft, [picked, timeline, draftReady]);
+  const discardDraft = () => {
+    form.current?.reset();
+    setPicked([]);
+    setTimeline(timelines[1]);
+    setRestored(false);
+    try {
+      sessionStorage.removeItem(DRAFT);
+    } catch {}
+  };
   useEffect(() => setCaseNo(`${new Date().getFullYear()}/${Math.floor(100 + Math.random() * 900)}`), []);
 
   const chosen = symptoms.filter((s) => picked.includes(s.id));
@@ -174,15 +224,15 @@ export default function Contact() {
             {lead ? (
               <dl className="mt-4 grid gap-3">
                 <div>
-                  <dt className="label !text-acid-ink/55">Suspeito principal</dt>
+                  <dt className="label !text-acid-ink/75">Suspeito principal</dt>
                   <dd className="font-groovy text-2xl text-[#c2410c]">{lead.suspect}</dd>
                 </div>
                 <div>
-                  <dt className="label !text-acid-ink/55">Especialidade indicada</dt>
+                  <dt className="label !text-acid-ink/75">Especialidade indicada</dt>
                   <dd className="text-lg font-medium">{capabilities.join(' + ')}</dd>
                 </div>
                 <div>
-                  <dt className="label !text-acid-ink/55">Primeira diligência</dt>
+                  <dt className="label !text-acid-ink/75">Primeira diligência</dt>
                   <dd className="serif text-xl leading-snug">{lead.firstStep}</dd>
                 </div>
               </dl>
@@ -245,6 +295,9 @@ export default function Contact() {
       });
       if (!res.ok) throw new Error();
       setStatus('sent');
+      try {
+        sessionStorage.removeItem(DRAFT);
+      } catch {}
       // the form is replaced by the confirmation: bring it on screen and move focus there
       requestAnimationFrame(() => {
         done.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -328,7 +381,15 @@ export default function Contact() {
               <div>{saveButton}</div>
             </div>
           ) : (
-            <form onSubmit={submit} className="flex flex-col gap-9">
+            <form ref={form} onSubmit={submit} onInput={saveDraft} className="flex flex-col gap-9">
+              {restored && (
+                <p role="status" className="-mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 self-start font-mono text-xs text-acid-ink/80">
+                  <span>↺ Recuperamos o rascunho que você deixou nesta aba.</span>
+                  <button type="button" onClick={discardDraft} className="min-h-8 underline underline-offset-2 hover:text-acid-ink">
+                    começar do zero
+                  </button>
+                </p>
+              )}
               {reference && (
                 <p className="toon-sm -mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 self-start rounded-xl bg-paper px-4 py-2.5 text-sm">
                   <span aria-hidden>📎</span>
