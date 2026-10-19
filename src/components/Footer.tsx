@@ -9,6 +9,7 @@ import Clock from './Clock';
 import Chase from './Chase';
 import Social from './Social';
 import CopyEmail from './CopyEmail';
+import { RevealRead } from './ReadMarks';
 
 /** The footer's WhatsApp opens with a message about the page being read (same wording as the floating button). */
 function footerMessage(path: string): string | undefined {
@@ -75,6 +76,10 @@ export default function Footer() {
             {projectLinks.map((x) => (
               <FooterLink key={x.slug} href={`/casos/${x.slug}`}>
                 {x.name}
+                {/* cases this visitor already opened (hena:read), as on /casos and the home index */}
+                <span data-read-mark={x.slug} hidden className="font-mono text-[0.7rem] text-acid" title="Caso já lido">
+                  ✓<span className="sr-only"> lido</span>
+                </span>
               </FooterLink>
             ))}
             <FooterLink href="/casos" accent>
@@ -93,6 +98,7 @@ export default function Footer() {
         </div>
       </div>
 
+      <RevealRead />
       {/* the chase, full bleed */}
       <div className="relative -mx-[clamp(1rem,4vw,3.5rem)] mt-16 border-y-[3px] border-toon">
         <Chase />
