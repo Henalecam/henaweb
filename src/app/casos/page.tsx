@@ -4,6 +4,8 @@ import { projects, site } from '@/lib/content';
 import Footer from '@/components/Footer';
 import MockUI from '@/components/MockUI';
 import ClosingCta from '@/components/ClosingCta';
+import CaseFilter from '@/components/CaseFilter';
+import { services } from '@/lib/services';
 
 const description =
   'Casos resolvidos pela HenaWeb: ERPs, plataformas com IA, agendamento, produtos financeiros e sites. Veja o problema de cada cliente e o que construímos.';
@@ -72,9 +74,15 @@ export default function CasesIndex() {
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink/75">{description}</p>
 
-          <ul className="mt-16 grid gap-6 md:grid-cols-2">
+          <CaseFilter
+            total={projects.length}
+            options={services
+              .map((s) => ({ slug: s.slug, name: s.name, count: projects.filter((p) => p.service === s.slug).length }))
+              .filter((o) => o.count > 0)}
+          />
+          <ul className="mt-10 grid gap-6 md:grid-cols-2">
             {projects.map((p, i) => (
-              <li key={p.slug}>
+              <li key={p.slug} data-case-service={p.service} data-case-slug={p.slug}>
                 <a href={`/casos/${p.slug}`} className="group block">
                   {/* the clicked card borrows the case page window's view-transition-name (CASE_MORPH) */}
                   <div
