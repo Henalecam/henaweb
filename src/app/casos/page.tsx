@@ -22,10 +22,9 @@ export const metadata: Metadata = {
     description,
     locale: 'pt_BR',
     siteName: 'HenaWeb',
-    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'HenaWeb · Casos resolvidos' }],
   },
-  // without this, X/LinkedIn previews fell back to the home page's title and description
-  twitter: { card: 'summary_large_image', title: 'Casos e projetos de software sob medida · HenaWeb', description, images: ['/opengraph-image'] },
+  // without this, X/LinkedIn previews fell back to the home page's title and description; the image is casos/opengraph-image.tsx
+  twitter: { card: 'summary_large_image', title: 'Casos e projetos de software sob medida · HenaWeb', description },
 };
 
 // Only the card of the case being opened (or the one being returned from) gets a
