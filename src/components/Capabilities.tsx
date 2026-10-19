@@ -4,7 +4,8 @@ import { useRef, useState } from 'react';
 import { gsap, useGSAP } from '@/lib/gsap';
 import { capabilities } from '@/lib/content';
 
-export default function Capabilities() {
+/** `caseCounts`: solved cases per service slug, counted on the server so the case data stays out of this bundle. */
+export default function Capabilities({ caseCounts = {} }: { caseCounts?: Record<string, number> }) {
   const root = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
 
@@ -99,14 +100,19 @@ export default function Capabilities() {
                 </span>
               </button>
               {/* the page link lives outside the toggle button (no nested interactive elements) */}
-              <a
-                href={`/servicos/${c.slug}`}
-                className={`toon-sm toon-press relative mx-3 mb-6 w-fit items-center gap-2 rounded-full bg-acid-ink px-4 py-2 text-sm font-medium text-paper md:mx-6 md:mb-8 ${
-                  isOpen ? 'inline-flex' : 'hidden'
-                }`}
-              >
-                Ver página de {c.title.toLowerCase()} →
-              </a>
+              <span className={`relative mx-3 mb-6 flex-wrap items-center gap-x-5 gap-y-3 md:mx-6 md:mb-8 ${isOpen ? 'flex' : 'hidden'}`}>
+                <a
+                  href={`/servicos/${c.slug}`}
+                  className="toon-sm toon-press inline-flex w-fit items-center gap-2 rounded-full bg-acid-ink px-4 py-2 text-sm font-medium text-paper"
+                >
+                  Ver a página de {c.title} →
+                </a>
+                {(caseCounts[c.slug] ?? 0) > 0 && (
+                  <a href={`/casos?servico=${c.slug}`} className="text-sm font-medium underline decoration-2 underline-offset-4 hover:decoration-4">
+                    {caseCounts[c.slug] === 1 ? '1 caso resolvido' : `${caseCounts[c.slug]} casos resolvidos`} no arquivo →
+                  </a>
+                )}
+              </span>
             </li>
           );
         })}
