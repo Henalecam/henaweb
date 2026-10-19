@@ -133,6 +133,29 @@ export default function Contact() {
   // "came from the Diconta case": shown on the form and attached to the message, removable
   const [reference, setReference] = useState<string | null>(null);
   useEffect(() => setReference(readReference()), []);
+  // "#mensagem" (the FAQ's "ask us directly") lands with the cursor already in the message box
+  useEffect(() => {
+    const focusMessage = () => {
+      if (location.hash !== '#mensagem') return;
+      const box = document.getElementById('mensagem') as HTMLTextAreaElement | null;
+      if (!box) return;
+      box.scrollIntoView({ block: 'center' });
+      box.focus({ preventScroll: true });
+    };
+    focusMessage();
+    // on a fresh load the pinned sections above are still being measured and the page grows by a few
+    // screens: a link to /#contato (ads, WhatsApp, e-mail signatures) ended up far above the form.
+    // Once they settle, land again on the form (or the message box).
+    const settle = window.setTimeout(() => {
+      if (location.hash === '#contato') document.getElementById('contato')?.scrollIntoView({ block: 'start' });
+      else focusMessage();
+    }, 900);
+    window.addEventListener('hashchange', focusMessage);
+    return () => {
+      window.clearTimeout(settle);
+      window.removeEventListener('hashchange', focusMessage);
+    };
+  }, []);
   const form = useRef<HTMLFormElement>(null);
   const [draftReady, setDraftReady] = useState(false);
   const [restored, setRestored] = useState(false);
@@ -552,6 +575,7 @@ export default function Contact() {
                 <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
                 <Floating label="Mais alguma pista? (opcional)" className="mt-2">
                   <textarea
+                    id="mensagem"
                     name="message"
                     rows={3}
                     maxLength={4000}

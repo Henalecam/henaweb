@@ -31,7 +31,7 @@ export default function Faq() {
           ))}
           <p className="mt-3 text-bg/75" data-print-hide>
             Não achou a sua?{' '}
-            <a href="#contato" className="font-medium text-bg underline decoration-[#c2410c] decoration-2 underline-offset-4 hover:decoration-4">
+            <a href="#mensagem" className="font-medium text-bg underline decoration-[#c2410c] decoration-2 underline-offset-4 hover:decoration-4">
               Pergunte direto pra gente →
             </a>
           </p>
