@@ -190,7 +190,7 @@ export default function Work() {
                       onFocus={() => setActive(i)}
                       onClick={() => setActive(i)}
                       className={`relative flex w-full items-baseline gap-4 border-b border-line py-3.5 text-left transition-colors ${
-                        on ? 'text-ink' : 'text-ink/45 hover:text-ink/80'
+                        on ? 'text-ink' : 'text-ink/60 hover:text-ink/85'
                       }`}
                     >
                       <span className={`flex w-6 shrink-0 flex-col font-mono text-xs ${on ? 'text-acid' : ''}`}>
