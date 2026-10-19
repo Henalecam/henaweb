@@ -266,7 +266,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             <FaqHashOpener />
           </section>
 
-          <section className="mt-24" aria-labelledby="outros">
+          <section className="mt-24" aria-labelledby="outros" data-print-hide>
             <h2 id="outros" className="label">
               Outras capacidades
             </h2>
