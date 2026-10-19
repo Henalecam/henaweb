@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { gsap, SplitText, useGSAP } from '@/lib/gsap';
 import { symptoms, timelines, whatsappLink, site } from '@/lib/content';
 import { renderCaseCard, shareOrDownload } from '@/lib/caseCard';
@@ -34,7 +34,23 @@ function leadOrigin(): string {
 }
 
 const field =
-  'w-full border-b-2 border-acid-ink/35 bg-transparent py-3 text-lg text-acid-ink placeholder:text-acid-ink/65 focus:border-acid-ink focus:outline-none user-invalid:border-[#b3122b]';
+  'peer w-full border-b-2 border-acid-ink/35 bg-transparent pt-6 pb-2 text-lg text-acid-ink placeholder:text-transparent focus:border-acid-ink focus:outline-none user-invalid:border-[#b3122b]';
+
+/**
+ * Floating label: sits inside the empty field like a placeholder, then shrinks above it on focus or
+ * once filled, so the visitor never loses track of which line is which. The label is a real <label>.
+ * Inputs need `placeholder=" "` for the :placeholder-shown check.
+ */
+function Floating({ label, children, className = '' }: { label: string; children: ReactNode; className?: string }) {
+  return (
+    <label className={`relative block ${className}`}>
+      {children}
+      <span className="pointer-events-none absolute top-6 left-0 origin-left text-lg text-acid-ink/70 transition-all duration-200 peer-focus:top-0 peer-focus:font-mono peer-focus:text-[0.7rem] peer-focus:tracking-[0.12em] peer-focus:text-acid-ink/80 peer-focus:uppercase peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:font-mono peer-[:not(:placeholder-shown)]:text-[0.7rem] peer-[:not(:placeholder-shown)]:tracking-[0.12em] peer-[:not(:placeholder-shown)]:text-acid-ink/80 peer-[:not(:placeholder-shown)]:uppercase motion-reduce:transition-none">
+        {label}
+      </span>
+    </label>
+  );
+}
 
 // browser validation bubbles in our own words (and always in Portuguese)
 const explain = (e: FormEvent<HTMLInputElement>) => {
@@ -335,17 +351,19 @@ export default function Contact() {
               <fieldset>
                 <legend className="label mb-2 !text-acid-ink/60">3 · Quem está investigando</legend>
                 <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
-                  <input name="name" required maxLength={120} placeholder="Seu nome" autoComplete="name" className={field} aria-label="Nome" onInvalid={explain} onInput={clear} />
+                  <Floating label="Seu nome">
+                    <input name="name" required maxLength={120} placeholder=" " autoComplete="name" className={field} onInvalid={explain} onInput={clear} />
+                  </Floating>
                   <div>
+                    <Floating label="E-mail">
                     <input
                       ref={emailRef}
                       name="email"
                       type="email"
                       required
-                      placeholder="E-mail"
+                      placeholder=" "
                       autoComplete="email"
                       className={field}
-                      aria-label="E-mail"
                       aria-describedby={emailHint ? 'email-hint' : undefined}
                       onInvalid={explain}
                       onInput={(e) => {
@@ -354,6 +372,7 @@ export default function Contact() {
                       }}
                       onBlur={(e) => setEmailHint(suggestEmail(e.currentTarget.value))}
                     />
+                    </Floating>
                     {emailHint && (
                       <p id="email-hint" className="mt-2 text-sm text-acid-ink/80">
                         Você quis dizer{' '}
@@ -372,15 +391,15 @@ export default function Contact() {
                       </p>
                     )}
                   </div>
+                  <Floating label="WhatsApp (opcional)">
                   <input
                     name="whatsapp"
                     type="tel"
                     inputMode="tel"
-                    placeholder="WhatsApp (opcional)"
+                    placeholder=" "
                     autoComplete="tel"
                     maxLength={22}
                     className={field}
-                    aria-label="WhatsApp"
                     onInput={(e) => {
                       // (41) 99999-9999 as it is typed; foreign numbers starting with + stay as typed
                       const el = e.currentTarget;
@@ -388,10 +407,15 @@ export default function Contact() {
                       if (atEnd) el.value = formatPhoneBR(el.value);
                     }}
                   />
-                  <input name="org" placeholder="Empresa ou órgão (opcional)" autoComplete="organization" className={field} aria-label="Empresa ou órgão" />
+                  </Floating>
+                  <Floating label="Empresa ou órgão (opcional)">
+                    <input name="org" placeholder=" " autoComplete="organization" className={field} />
+                  </Floating>
                 </div>
                 <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
-                <textarea name="message" rows={3} maxLength={4000} placeholder="Mais alguma pista? (opcional)" className={`${field} mt-2 resize-none`} aria-label="Mensagem" />
+                <Floating label="Mais alguma pista? (opcional)" className="mt-2">
+                  <textarea name="message" rows={3} maxLength={4000} placeholder=" " className={`${field} resize-none`} />
+                </Floating>
               </fieldset>
 
               <div className="flex flex-wrap items-center gap-6">
