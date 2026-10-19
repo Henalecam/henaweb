@@ -131,6 +131,14 @@ export default function CasesIndex() {
                   <p className="serif mt-1 text-lg text-ink/60">{p.kind}</p>
                   <p className="mt-2 leading-relaxed text-ink/70">{p.challenge}</p>
                 </a>
+                {/* what got built, at a glance: outside the link so its accessible name stays the case name */}
+                <ul aria-label={`Recursos de ${p.name}`} className="mt-4 flex flex-wrap gap-1.5">
+                  {p.highlights.map((h) => (
+                    <li key={h} className="rounded-full border border-ink/25 px-2.5 py-0.5 font-mono text-[0.7rem] tracking-wide text-ink/75">
+                      {h}
+                    </li>
+                  ))}
+                </ul>
               </li>
             ))}
           </ul>
