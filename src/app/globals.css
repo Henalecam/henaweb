@@ -532,3 +532,19 @@ details[open]::details-content {
     break-inside: avoid;
   }
 }
+
+/* Windows high-contrast / forced colors: backgrounds are flattened to Canvas, so states shown only by
+   fill (the chosen deadline, the active case filter, the selected tab or search result) would vanish.
+   System colors survive the override: mark those states with a Highlight outline and an underline. */
+@media (forced-colors: active) {
+  label:has(> input[type='radio']:checked),
+  label:has(> input[type='checkbox']:checked),
+  [aria-pressed='true'],
+  [role='tab'][aria-selected='true'],
+  [role='option'][aria-selected='true'] {
+    outline: 3px solid Highlight !important;
+    outline-offset: 2px;
+    text-decoration: underline 2px;
+    text-underline-offset: 4px;
+  }
+}
