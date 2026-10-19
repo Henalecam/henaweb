@@ -164,14 +164,22 @@ export default function GovTech() {
             </div>
           </div>
 
-          <div data-pillars className="mt-8 grid gap-4 sm:grid-cols-2">
+          {/* phones: one card with six rows (about a screen shorter); from sm up, six cards in a grid */}
+          <ul
+            data-pillars
+            className="mt-8 grid divide-y divide-acid-ink/15 rounded-xl border-[2.5px] border-toon bg-paper shadow-[4px_4px_0_var(--color-toon)] sm:grid-cols-2 sm:gap-4 sm:divide-y-0 sm:rounded-none sm:border-0 sm:bg-transparent sm:shadow-none"
+          >
             {govPillars.map((p) => (
-              <div key={p.k} data-pillar className="toon-sm rounded-xl bg-paper p-5 text-acid-ink">
-                <span className="font-groovy text-lg text-[#c2410c]">{p.k}</span>
-                <p className="mt-1 text-acid-ink/80">{p.v}</p>
-              </div>
+              <li
+                key={p.k}
+                data-pillar
+                className="px-5 py-3.5 text-acid-ink sm:rounded-xl sm:border-[2.5px] sm:border-toon sm:bg-paper sm:p-5 sm:shadow-[4px_4px_0_var(--color-toon)]"
+              >
+                <span className="font-groovy text-base text-[#c2410c] sm:text-lg">{p.k}</span>
+                <p className="mt-0.5 text-[0.95rem] leading-snug text-acid-ink/80 sm:mt-1 sm:text-base sm:leading-normal">{p.v}</p>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </div>
     </section>

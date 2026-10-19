@@ -1,10 +1,15 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { nav } from '@/lib/content';
+import dynamic from 'next/dynamic';
+import { nav } from '@/lib/site';
 import { gsap, onReady } from '@/lib/gsap';
 import Magnetic from './Magnetic';
 import Social from './Social';
+
+// the search only downloads (with its index of cases, services and FAQ) the first time it opens
+const CommandPalette = dynamic(() => import('./CommandPalette'), { ssr: false });
+const ShortcutsHelp = dynamic(() => import('./ShortcutsHelp'), { ssr: false });
 
 export default function Nav() {
   const inner = useRef<HTMLDivElement>(null);
@@ -12,6 +17,88 @@ export default function Nav() {
   const toggleBtn = useRef<HTMLButtonElement>(null);
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  // which nav section the reader is in (home only); on /casos pages the "Casos" entry stays lit
+  const [active, setActive] = useState<string | null>(null);
+  const [search, setSearch] = useState(false);
+  const [searchLoaded, setSearchLoaded] = useState(false);
+  const [help, setHelp] = useState(false);
+  const [mac, setMac] = useState(true);
+  // "?pista=…" (browser site search, app shortcut) opens the search already filled in
+  const [initialQuery, setInitialQuery] = useState('');
+
+  const openSearch = () => {
+    setSearchLoaded(true);
+    setOpen(false);
+    setSearch(true);
+  };
+
+  useEffect(() => {
+    setMac(/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent));
+    const url = new URL(location.href);
+    const pista = url.searchParams.get('pista');
+    if (pista !== null) {
+      setInitialQuery(pista.slice(0, 80));
+      openSearch();
+      url.searchParams.delete('pista');
+      history.replaceState(history.state, '', url.pathname + url.search + url.hash);
+    }
+    // ⌘K / Ctrl+K anywhere, or "/" when not typing in a field
+    const onKey = (e: KeyboardEvent) => {
+      const typing = (e.target as HTMLElement | null)?.closest?.('input, textarea, select, [contenteditable="true"]');
+      if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        openSearch();
+      } else if (e.key === '/' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        openSearch();      } else if (e.key === '?' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey && !document.querySelector('dialog[open]')) {
+        e.preventDefault();
+        setOpen(false);
+        setHelp(true);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    // other components (the 404 page) can open the search with this event
+    window.addEventListener('hena:search', openSearch);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('hena:search', openSearch);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (window.location.pathname.startsWith('/casos')) {
+      setActive('/#projetos');
+      return;
+    }
+    if (window.location.pathname !== '/') return;
+    // "Contato" only exists in the phone menu, but it lights up there too
+    const sections = [...nav, { href: '/#contato' }]
+      .map((item) => ({ href: item.href, el: document.getElementById(item.href.split('#')[1]) }))
+      .filter((s): s is { href: string; el: HTMLElement } => !!s.el);
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      // the section crossing a line 40% down the screen; sections outside the menu (the mystery,
+      // FAQ, contact…) leave nothing lit
+      const line = window.innerHeight * 0.4;
+      const hit = sections.find(({ el }) => {
+        const r = el.getBoundingClientRect();
+        return r.top <= line && r.bottom > line;
+      });
+      setActive(hit ? hit.href : null);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
 
   useEffect(() => {
     let last = window.scrollY;
@@ -50,7 +137,7 @@ export default function Nav() {
   return (
     <>
       <header
-        className={`gutter fixed inset-x-0 top-0 z-50 transition-transform duration-500 ease-[var(--ease-out-expo)] ${
+        className={`gutter fixed inset-x-0 top-0 z-50 [view-transition-name:site-header] transition-transform duration-500 ease-[var(--ease-out-expo)] ${
           hidden && !open ? '-translate-y-full' : ''
         }`}
       >
@@ -63,15 +150,34 @@ export default function Nav() {
           <a href="/#topo" className="font-groovy flex items-baseline gap-1 text-2xl text-acid [text-shadow:3px_3px_0_#120626]" aria-label="HenaWeb, início">
             HenaWeb<span className="text-[0.6rem] align-super">®</span>
           </a>
-          <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
+          <nav className="hidden items-center gap-6 lg:flex xl:gap-8" aria-label="Principal">
             {nav.map((item) => (
-              <a key={item.href} href={item.href} className="group relative text-sm text-ink">
+              <a
+                key={item.href}
+                href={item.href}
+                aria-current={active === item.href ? 'location' : undefined}
+                className={`group relative text-sm transition-colors duration-300 ${active === item.href ? 'text-acid' : 'text-ink'}`}
+              >
                 {item.label}
-                <span className="absolute -bottom-1 left-0 h-px w-full origin-right scale-x-0 bg-current transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:origin-left group-hover:scale-x-100" />
+                <span
+                  className={`absolute -bottom-1 left-0 h-px w-full bg-current transition-transform duration-500 ease-[var(--ease-out-expo)] ${
+                    active === item.href ? 'origin-left scale-x-100' : 'origin-right scale-x-0 group-hover:origin-left group-hover:scale-x-100'
+                  }`}
+                />
               </a>
             ))}
           </nav>
-          <div className="hidden md:block">
+          <div className="ml-auto mr-4 hidden items-center gap-4 md:flex lg:mr-0 lg:ml-0">
+            <button
+              type="button"
+              onClick={openSearch}
+              aria-label="Buscar no site"
+              aria-keyshortcuts="Meta+K Control+K /"
+              className="hidden items-center gap-2 rounded-full border border-line px-3 py-2 font-mono text-xs whitespace-nowrap xl:flex text-ink/70 transition-colors hover:border-acid hover:text-acid"
+            >
+              <span aria-hidden>🔎</span>
+              <kbd className="font-mono">{mac ? '⌘K' : 'Ctrl K'}</kbd>
+            </button>
             <Magnetic>
               <a
                 href="/#contato"
@@ -85,7 +191,7 @@ export default function Nav() {
           <button
             ref={toggleBtn}
             type="button"
-            className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden"
+            className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5 lg:hidden"
             aria-expanded={open}
             aria-controls="menu-mobile"
             aria-label={open ? 'Fechar menu' : 'Abrir menu'}
@@ -100,7 +206,7 @@ export default function Nav() {
       <div
         id="menu-mobile"
         inert={!open}
-        className={`gutter fixed inset-0 z-40 flex flex-col justify-end bg-bg pb-10 transition-[clip-path] duration-700 ease-[var(--ease-out-expo)] md:hidden ${
+        className={`gutter fixed inset-0 z-40 flex flex-col justify-end bg-bg pb-10 transition-[clip-path] duration-700 ease-[var(--ease-out-expo)] lg:hidden ${
           open ? '[clip-path:inset(0_0_0_0)]' : 'pointer-events-none [clip-path:inset(0_0_100%_0)]'
         }`}
       >
@@ -110,18 +216,35 @@ export default function Nav() {
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className="flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight"
+              aria-current={active === item.href ? 'location' : undefined}
+              className={`flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight ${active === item.href ? 'text-acid' : ''}`}
             >
               <span className="label">0{i + 1}</span>
               {item.label}
+              {active === item.href && (
+                <span className="label ml-auto shrink-0 self-center whitespace-nowrap !text-acid" aria-hidden>
+                  ● aqui
+                </span>
+              )}
             </a>
           ))}
         </nav>
         <div className="mt-8 flex items-center justify-between">
-          <span className="label">@henaweb</span>
+          <button type="button" onClick={openSearch} className="label flex min-h-11 items-center gap-2 !text-ink">
+            <span aria-hidden>🔎</span> Procurar pista
+          </button>
           <Social />
         </div>
       </div>
+      {help && <ShortcutsHelp open={help} onClose={() => setHelp(false)} />}
+      {searchLoaded && <CommandPalette
+          open={search}
+          initialQuery={initialQuery}
+          onClose={() => {
+            setSearch(false);
+            setInitialQuery('');
+          }}
+        />}
     </>
   );
 }

@@ -66,6 +66,7 @@ export default function Cursor() {
       <div
         ref={ring}
         aria-hidden
+        data-print-hide
         className="pointer-events-none fixed top-0 left-0 z-[90] -mt-6 -ml-6 flex h-12 w-12 items-center justify-center rounded-full border border-acid/60"
       >
         <span className="font-mono text-[5px] font-medium tracking-widest text-acid-ink uppercase">{label}</span>
@@ -73,6 +74,7 @@ export default function Cursor() {
       <div
         ref={dot}
         aria-hidden
+        data-print-hide
         className="pointer-events-none fixed top-0 left-0 z-[91] -mt-[3px] -ml-[3px] h-1.5 w-1.5 rounded-full bg-acid"
       />
     </>

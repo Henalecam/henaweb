@@ -11,6 +11,7 @@ import Nav from '@/components/Nav';
 import ConversionTracking from '@/components/ConversionTracking';
 import FloatingContact from '@/components/FloatingContact';
 import TabHaunt from '@/components/TabHaunt';
+import ThemeTint from '@/components/ThemeTint';
 import ScrollProgress from '@/components/ScrollProgress';
 import ConsentBanner from '@/components/ConsentBanner';
 import { analyticsLoader } from '@/lib/consent';
@@ -133,20 +134,43 @@ const jsonLd = {
   ],
 };
 
+const SEEN_SCRIPT = "try{sessionStorage.getItem('hena:seen')==='1'&&(document.documentElement.dataset.seen='')}catch(e){}";
+
+const SPECULATION_RULES = JSON.stringify({
+  prefetch: [
+    {
+      where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/api/*' } }] },
+      eagerness: 'moderate',
+    },
+  ],
+});
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${geist.variable} ${geistMono.variable} ${instrument.variable} ${groovy.variable}`}>
+    // the inline script below flags repeat views on <html> before hydration, hence suppressHydrationWarning
+    <html
+      lang="pt-BR"
+      className={`${geist.variable} ${geistMono.variable} ${instrument.variable} ${groovy.variable}`}
+      suppressHydrationWarning
+    >
       <body>
         <noscript>
           <style>{'[data-preloader]{display:none!important}'}</style>
         </noscript>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        {/* lets the browser add the site search (Chrome "tab to search", Firefox search bar); React hoists it to <head> */}
+        <link rel="search" type="application/opensearchdescription+xml" title="HenaWeb" href="/opensearch.xml" />
         <a
           href="#conteudo"
           className="toon-sm sr-only z-[200] rounded-full bg-acid px-5 py-3 font-medium text-acid-ink focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:px-5 focus:py-3"
         >
           Pular para o conteúdo
         </a>
+        {/* repeat views in the same tab skip the intro: hide the overlay before the first paint instead
+            of holding the page under it until hydration fades it out */}
+        <script dangerouslySetInnerHTML={{ __html: SEEN_SCRIPT }} />
+        {/* hovering an internal link for ~200 ms fetches that page, so the click lands on a warm cache */}
+        <script type="speculationrules" dangerouslySetInnerHTML={{ __html: SPECULATION_RULES }} />
         <Preloader />
         <SmoothScroll />
         <Cursor />
@@ -154,6 +178,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ConversionTracking />
         <FloatingContact />
         <TabHaunt />
+        <ThemeTint />
         <ScrollProgress />
         {children}
         <div className="grain" aria-hidden />
