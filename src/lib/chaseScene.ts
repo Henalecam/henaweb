@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { createToonKit } from './toon';
+import { createAdaptiveLoop } from './adaptiveLoop';
 
 /**
  * Cartoon 3D chase on a night road: the studio van running from a ghost with a lantern.
@@ -424,15 +425,15 @@ export function createChaseScene(canvas: HTMLCanvasElement, { reducedMotion }: {
     view.mobile = camera.aspect < 1.3;
     camera.fov = view.mobile ? 42 : 30;
     camera.updateProjectionMatrix();
+    loop.request(); // resizing clears the canvas, and the still frame has to reframe
   };
-  resize();
   window.addEventListener('resize', resize);
 
   const mouse = { x: 0, tx: 0 };
   const onMove = (e: PointerEvent) => {
     mouse.tx = (e.clientX / window.innerWidth - 0.5) * 2;
   };
-  window.addEventListener('pointermove', onMove);
+  if (!reducedMotion) window.addEventListener('pointermove', onMove);
 
   let visible = true;
   const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting));
@@ -442,17 +443,17 @@ export function createChaseScene(canvas: HTMLCanvasElement, { reducedMotion }: {
   const speed = 9;
   const start = performance.now();
   let last = start;
-  let raf = 0;
   const pos = sheetGeo.getAttribute('position');
 
-  const draw = (now: number) => {
+  const draw = (now: number, live: boolean) => {
     const t = (now - start) / 1000;
-    const dt = Math.min(0.05, (now - last) / 1000);
+    // a still frame redrawn later (scroll, resize) must not jump the exhaust puffs ahead
+    const dt = live ? Math.min(0.05, Math.max(0, now - last) / 1000) : 0;
     last = now;
     const travel = t * speed;
 
     // camera: three-quarter view from the roadside, drifting with the mouse
-    mouse.x += (mouse.tx - mouse.x) * 0.04;
+    if (live) mouse.x += (mouse.tx - mouse.x) * 0.04;
     const camX = view.mobile ? 0.6 : 0.4;
     camera.position.set(camX + mouse.x * 1.2, view.mobile ? 3.8 : 3.4, view.mobile ? 13.5 : 13);
     camera.lookAt(camX * 0.6, 1.4, 0);
@@ -510,20 +511,22 @@ export function createChaseScene(canvas: HTMLCanvasElement, { reducedMotion }: {
     renderer.render(scene, camera);
   };
 
-  const frame = (now: number) => {
-    raf = requestAnimationFrame(frame);
-    if (!visible || document.hidden) {
-      last = now;
-      return;
-    }
-    draw(now);
-  };
-  if (reducedMotion) draw(start + 1500);
-  else raf = requestAnimationFrame(frame);
+  const loop = createAdaptiveLoop({
+    draw,
+    visible: () => visible,
+    reducedMotion,
+    stillTime: start + 1500,
+    onTier: (tier) => {
+      if (tier === 1) renderer.setPixelRatio(1);
+      else window.removeEventListener('pointermove', onMove);
+      resize();
+    },
+  });
+  resize();
 
   return {
     dispose: () => {
-      cancelAnimationFrame(raf);
+      loop.stop();
       io.disconnect();
       window.removeEventListener('resize', resize);
       window.removeEventListener('pointermove', onMove);
