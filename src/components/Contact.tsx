@@ -551,8 +551,25 @@ export default function Contact() {
                 </div>
                 <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
                 <Floating label="Mais alguma pista? (opcional)" className="mt-2">
-                  <textarea name="message" rows={3} maxLength={4000} placeholder=" " className={`${field} resize-none`} />
+                  <textarea
+                    name="message"
+                    rows={3}
+                    maxLength={4000}
+                    placeholder=" "
+                    aria-describedby="atalho-enviar"
+                    className={`${field} resize-none`}
+                    onKeyDown={(e) => {
+                      // Ctrl/⌘ + Enter sends from the message box, like in most mail and chat apps
+                      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && status !== 'sending') {
+                        e.preventDefault();
+                        e.currentTarget.form?.requestSubmit();
+                      }
+                    }}
+                  />
                 </Floating>
+                <p id="atalho-enviar" className="hidden text-xs text-acid-ink/70 pointer-fine:block" data-print-hide>
+                  <kbd className="font-mono">Ctrl</kbd> + <kbd className="font-mono">Enter</kbd> envia direto da mensagem.
+                </p>
               </fieldset>
 
               <div className="flex flex-wrap items-center gap-6">

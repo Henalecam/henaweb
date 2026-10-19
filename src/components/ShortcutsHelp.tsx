@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 const ROWS: { keys: string[][]; what: string }[] = [
   { keys: [['⌘', 'K'], ['Ctrl', 'K'], ['/']], what: 'Procurar uma pista no site' },
   { keys: [['←'], ['→']], what: 'Folhear os casos (dentro de um caso)' },
+  { keys: [['Ctrl', 'Enter'], ['⌘', 'Enter']], what: 'Enviar o formulário de contato (na caixa de mensagem)' },
   { keys: [['Esc']], what: 'Fechar janelas e a busca' },
   { keys: [['?']], what: 'Abrir esta ajuda' },
 ];
