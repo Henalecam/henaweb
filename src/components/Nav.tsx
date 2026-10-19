@@ -9,6 +9,7 @@ import Social from './Social';
 
 // the search only downloads (with its index of cases, services and FAQ) the first time it opens
 const CommandPalette = dynamic(() => import('./CommandPalette'), { ssr: false });
+const ShortcutsHelp = dynamic(() => import('./ShortcutsHelp'), { ssr: false });
 
 export default function Nav() {
   const inner = useRef<HTMLDivElement>(null);
@@ -20,6 +21,7 @@ export default function Nav() {
   const [active, setActive] = useState<string | null>(null);
   const [search, setSearch] = useState(false);
   const [searchLoaded, setSearchLoaded] = useState(false);
+  const [help, setHelp] = useState(false);
   const [mac, setMac] = useState(true);
   // "?pista=…" (browser site search, app shortcut) opens the search already filled in
   const [initialQuery, setInitialQuery] = useState('');
@@ -48,7 +50,10 @@ export default function Nav() {
         openSearch();
       } else if (e.key === '/' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) {
         e.preventDefault();
-        openSearch();
+        openSearch();      } else if (e.key === '?' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey && !document.querySelector('dialog[open]')) {
+        e.preventDefault();
+        setOpen(false);
+        setHelp(true);
       }
     };
     window.addEventListener('keydown', onKey);
@@ -231,6 +236,7 @@ export default function Nav() {
           <Social />
         </div>
       </div>
+      {help && <ShortcutsHelp open={help} onClose={() => setHelp(false)} />}
       {searchLoaded && <CommandPalette
           open={search}
           initialQuery={initialQuery}
