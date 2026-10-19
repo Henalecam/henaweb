@@ -96,7 +96,8 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
 
           {/* screenshot in a Win95 window, phone overlapping */}
           <div className="relative mt-14">
-            <div className="win">
+            {/* arriving from /casos, the case card morphs into this window (see globals.css) */}
+            <div className="win [view-transition-class:case-window]" style={{ viewTransitionName: `caso-${p.slug}` }}>
               <div className="win-bar">
                 <span className="truncate">{new URL(p.href).hostname}</span>
                 <span className="ml-auto flex shrink-0 gap-1" aria-hidden>

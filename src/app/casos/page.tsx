@@ -25,6 +25,16 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title: 'Casos e projetos de software sob medida · HenaWeb', description, images: ['/opengraph-image'] },
 };
 
+// Only the card of the case being opened (or the one being returned from) gets a
+// view-transition-name, so it morphs into the case page window while the other cards leave with
+// the page. pageswap/pagereveal only fire in browsers with cross-document view transitions.
+const CASE_MORPH = `(()=>{
+const card=(u)=>{try{const m=new URL(u).pathname.match(/^\\/casos\\/([\\w-]+)/);return m&&document.querySelector('[data-case-window="'+m[1]+'"]')}catch(e){return null}};
+const name=(el,on)=>{if(el)el.style.viewTransitionName=on?'caso-'+el.dataset.caseWindow:''};
+addEventListener('pageswap',(e)=>{if(!e.viewTransition)return;const el=card(e.activation&&e.activation.entry&&e.activation.entry.url);name(el,1);e.viewTransition.finished.finally(()=>name(el,0))});
+addEventListener('pagereveal',(e)=>{if(!e.viewTransition||!window.navigation)return;const f=navigation.activation&&navigation.activation.from;const el=card(f&&f.url);name(el,1);e.viewTransition.finished.finally(()=>name(el,0))});
+})();`;
+
 export default function CasesIndex() {
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -52,6 +62,7 @@ export default function CasesIndex() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script dangerouslySetInnerHTML={{ __html: CASE_MORPH }} />
       <main id="conteudo" tabIndex={-1} className="sky min-h-screen text-ink">
         <div className="gutter mx-auto max-w-6xl pt-36 pb-24">
           <p className="label !text-teal">Arquivo de casos</p>
@@ -65,7 +76,11 @@ export default function CasesIndex() {
             {projects.map((p, i) => (
               <li key={p.slug}>
                 <a href={`/casos/${p.slug}`} className="group block">
-                  <div className="win transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:-translate-y-1.5 group-hover:-rotate-[0.6deg] group-focus-visible:-translate-y-1.5">
+                  {/* the clicked card borrows the case page window's view-transition-name (CASE_MORPH) */}
+                  <div
+                    data-case-window={p.slug}
+                    className="win transition-transform duration-500 ease-[var(--ease-out-expo)] [view-transition-class:case-window] group-hover:-translate-y-1.5 group-hover:-rotate-[0.6deg] group-focus-visible:-translate-y-1.5"
+                  >
                     <div className="win-bar">
                       <span className="truncate">caso_{String(i + 1).padStart(2, '0')}.exe</span>
                     </div>

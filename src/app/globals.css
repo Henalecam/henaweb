@@ -407,3 +407,13 @@ details[open]::details-content {
     transform: none;
   }
 }
+
+/* /casos ↔ /casos/[slug]: the case card and the case page window share a name, so the card grows
+   into the big window (and shrinks back on the way out) above the page wipe */
+::view-transition-group(*.case-window) {
+  animation-duration: 0.65s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+::view-transition-image-pair(*.case-window) {
+  overflow: hidden;
+}
