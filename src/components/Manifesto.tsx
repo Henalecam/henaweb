@@ -32,6 +32,9 @@ export default function Manifesto() {
         duration: 1,
         ease: 'expo.out',
         stagger: 0.1,
+        // GSAP folds the card's CSS tilt into its inline transform while it animates; once landed, hand the
+        // tilt back to CSS so the hover can straighten it (globals.css, .fact-card)
+        clearProps: 'transform',
         scrollTrigger: { trigger: '[data-facts]', start: 'top 85%' },
       });
       // the numbers roll to their value as the cards land; "0 caixa-preta" counts *down* from 99,

@@ -411,10 +411,10 @@ html {
 }
 
 /* Manifesto facts: cards pinned slightly askew; the one under the pointer straightens and lifts (its number
-   rolls again, Manifesto.tsx). !important: GSAP writes inline `rotate/translate: none` on the cards it fades
-   in, which had silently flattened the tilt (Tailwind's odd:/even:-rotate-1) whenever motion was on */
-.fact-card:nth-child(odd) { rotate: -1deg !important; }
-.fact-card:nth-child(even) { rotate: 1deg !important; }
+   rolls again, Manifesto.tsx). Not !important: while GSAP animates a card in it folds this tilt into the
+   inline transform (and writes `rotate: none`), then clearProps hands it back; forcing it doubled the tilt */
+.fact-card:nth-child(odd) { rotate: -1deg; }
+.fact-card:nth-child(even) { rotate: 1deg; }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .fact-card {
     transition: rotate 0.3s cubic-bezier(0.3, 1.6, 0.5, 1), translate 0.3s ease-out;
