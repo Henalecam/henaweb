@@ -21,7 +21,8 @@ export default function ServiceSymptoms({ problems, service }: { problems: strin
       sessionStorage.setItem(DRAFT, JSON.stringify(d));
     } catch {}
     track({ name: 'cta_click', placement: 'service-symptoms', label: `${picked.length} sintomas` });
-    location.href = '/#contato';
+    // land on the message box itself (Contact centres and focuses #mensagem), where the symptoms now are
+    location.href = '/#mensagem';
   };
 
   return (
