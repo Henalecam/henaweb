@@ -80,6 +80,8 @@ function leadOrigin(): string {
 const DRAFT = 'hena:draft';
 const DRAFT_FIELDS = ['name', 'email', 'whatsapp', 'org', 'message'] as const;
 const MSG_MAX = 4000;
+// one sign per deadline chip (shown on the chosen one): from the siren of 'para ontem' to the coffee of 'sem pressa'
+const TIMELINE_ICON: Record<string, string> = { 'Para ontem': '🚨', '1 a 3 meses': '⏱', '3 a 6 meses': '📅', 'Sem pressa': '☕' };
 type Draft = { picked: string[]; timeline: string; fields: Partial<Record<(typeof DRAFT_FIELDS)[number], string>> };
 
 function readDraft(): Draft | null {
@@ -517,6 +519,12 @@ export default function Contact() {
                       }`}
                     >
                       <input type="radio" name="timeline" value={o} checked={timeline === o} onChange={() => setTimeline(o)} className="sr-only" />
+                      {/* the chosen deadline gets its little sign, stamped in like the symptom ticks (check-pop) */}
+                      {timeline === o && (
+                        <span aria-hidden className="check-pop mr-1.5 inline-block">
+                          {TIMELINE_ICON[o] ?? '✓'}
+                        </span>
+                      )}
                       {o}
                     </label>
                   ))}
