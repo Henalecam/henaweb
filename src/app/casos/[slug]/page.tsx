@@ -79,13 +79,14 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
       <main id="conteudo" tabIndex={-1} className="sky min-h-screen text-ink">
         <article className="gutter mx-auto max-w-6xl pt-36 pb-24">
           <nav aria-label="Trilha" className="label">
-            <ol className="flex flex-wrap gap-2">
+            {/* links padded to a 27px-tall target (WCAG 2.5.8) without changing the line height */}
+            <ol className="flex flex-wrap items-center gap-2">
               <li>
-                <a href="/" className="hover:text-ink">Início</a>
+                <a href="/" className="-my-1.5 inline-block py-1.5 hover:text-ink">Início</a>
               </li>
               <li aria-hidden>·</li>
               <li>
-                <a href="/casos" data-archive-link className="hover:text-ink">Casos</a>
+                <a href="/casos" data-archive-link className="-my-1.5 inline-block py-1.5 hover:text-ink">Casos</a>
               </li>
               <li aria-hidden>·</li>
               <li aria-current="page" className="text-ink">{p.name}</li>
