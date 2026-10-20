@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { nav } from '@/lib/site';
-import { gsap, onReady } from '@/lib/gsap';
+import { gsap, onReady, prefersReducedMotion } from '@/lib/gsap';
 import Magnetic from './Magnetic';
 import Social from './Social';
 
@@ -109,9 +109,10 @@ export default function Nav() {
       last = y;
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    const off = onReady(() =>
-      gsap.from(inner.current, { yPercent: -120, duration: 1.1, ease: 'expo.out', delay: 0.5 }),
-    );
+    // reduced motion: the bar is simply there instead of sliding down
+    const off = prefersReducedMotion()
+      ? () => {}
+      : onReady(() => gsap.from(inner.current, { yPercent: -120, duration: 1.1, ease: 'expo.out', delay: 0.5 }));
     return () => {
       off();
       window.removeEventListener('scroll', onScroll);

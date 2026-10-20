@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { gsap, useGSAP } from '@/lib/gsap';
+import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { capabilities } from '@/lib/content';
 
 /** `caseCounts`: solved cases per service slug, counted on the server so the case data stays out of this bundle. */
@@ -11,6 +11,8 @@ export default function Capabilities({ caseCounts = {} }: { caseCounts?: Record<
 
   useGSAP(
     () => {
+      // reduced motion: entrances are skipped, the content just sits in place (CSS can't stop GSAP tweens)
+      if (prefersReducedMotion()) return;
       gsap.from('[data-cap-row]', {
         y: 60,
         autoAlpha: 0,

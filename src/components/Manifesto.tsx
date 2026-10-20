@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { gsap, SplitText, useGSAP } from '@/lib/gsap';
+import { gsap, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { manifesto, facts } from '@/lib/content';
 
 export default function Manifesto() {
@@ -9,6 +9,8 @@ export default function Manifesto() {
 
   useGSAP(
     () => {
+      // reduced motion: entrances are skipped, the content just sits in place (CSS can't stop GSAP tweens)
+      if (prefersReducedMotion()) return;
       const split = SplitText.create('[data-manifesto]', { type: 'words', aria: 'none' });
       // tween the colour, not opacity: opacity also faded each word's dark halo, leaving the
       // unread words almost invisible where they cross the striped sun

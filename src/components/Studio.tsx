@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import Image from 'next/image';
-import { gsap, ScrollTrigger, SplitText, useGSAP } from '@/lib/gsap';
+import { gsap, ScrollTrigger, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { principles } from '@/lib/content';
 
 export default function Studio() {
@@ -10,6 +10,13 @@ export default function Studio() {
 
   useGSAP(
     () => {
+      // touch screens never hover, so the halftone used to hide the founder's face for good:
+      // there the photo develops into colour (and straightens, like a polaroid picked up) once it sits in the middle of the screen
+      if (window.matchMedia('(hover: none)').matches) {
+        ScrollTrigger.create({ trigger: '[data-portrait]', start: 'top 60%', end: 'bottom 25%', toggleClass: { targets: '[data-portrait-card]', className: 'is-developed' } });
+      }
+      // reduced motion: entrances are skipped, the content just sits in place (CSS can't stop GSAP tweens)
+      if (prefersReducedMotion()) return;
       const split = SplitText.create('[data-studio-title]', { type: 'lines', mask: 'lines', linesClass: 'line-mask' });
       gsap.from(split.lines, {
         yPercent: 105,
@@ -28,11 +35,6 @@ export default function Studio() {
           scrollTrigger: { trigger: '[data-portrait]', start: 'top 80%' },
         },
       );
-      // touch screens never hover, so the halftone used to hide the founder's face for good:
-      // there the photo develops into colour (and straightens, like a polaroid picked up) once it sits in the middle of the screen
-      if (window.matchMedia('(hover: none)').matches) {
-        ScrollTrigger.create({ trigger: '[data-portrait]', start: 'top 60%', end: 'bottom 25%', toggleClass: { targets: '[data-portrait-card]', className: 'is-developed' } });
-      }
       gsap.from('[data-principle]', {
         y: 40,
         autoAlpha: 0,
