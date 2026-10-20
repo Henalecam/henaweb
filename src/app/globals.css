@@ -436,6 +436,19 @@ html {
     animation: evidence-swing 1.2s ease-out;
   }
 }
+/* 404: pressing the × of ERRO_404.exe — the window refuses to close */
+@media (prefers-reduced-motion: no-preference) {
+  .win[data-shake] {
+    animation: win-shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  }
+}
+@keyframes win-shake {
+  10%, 90% { translate: -2px 0; }
+  20%, 80% { translate: 4px 0; }
+  30%, 50%, 70% { translate: -7px 0; }
+  40%, 60% { translate: 7px 0; }
+}
+
 @keyframes evidence-swing {
   0%, 100% { rotate: 0deg; }
   18% { rotate: 3.5deg; }

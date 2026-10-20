@@ -3,6 +3,7 @@ import Footer from '@/components/Footer';
 import GhostWitness from '@/components/GhostWitness';
 import LostClue from '@/components/LostClue';
 import LostSuspect from '@/components/LostSuspect';
+import LostWindow from '@/components/LostWindow';
 
 export const metadata: Metadata = {
   title: 'Caso não encontrado',
@@ -27,18 +28,10 @@ export default function NotFound() {
         {/* a ghost detective sweeping the floor with a magnifier, looking for the lost page */}
         <GhostWitness />
         <div className="gutter relative mx-auto w-full max-w-5xl py-32">
-          <div className="win max-w-xl">
-            <div className="win-bar">
-              <span>ERRO_404.exe</span>
-              <span className="win-btn ml-auto" aria-hidden>
-                ×
-              </span>
-            </div>
-            <div className="m-1.5 border-2 border-[#7d7394] bg-paper p-6 font-mono text-sm text-acid-ink">
-              <p>A página que você procura sumiu sem deixar pistas.</p>
-              <LostSuspect />
-            </div>
-          </div>
+          <LostWindow>
+            <p>A página que você procura sumiu sem deixar pistas.</p>
+            <LostSuspect />
+          </LostWindow>
 
           <p className="label mt-12 !text-teal">404 · Arquivo de casos</p>
           <h1 className="mt-4 text-[clamp(3rem,9vw,8rem)] leading-[0.9] font-medium tracking-[-0.05em]">
