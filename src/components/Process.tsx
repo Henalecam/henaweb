@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type CSSProperties } from 'react';
 import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { process, stack } from '@/lib/content';
 import type { BurgerScene } from '@/lib/burgerScene';
@@ -353,8 +353,13 @@ export default function Process() {
                     <p className="mt-4 max-w-xl text-lg leading-relaxed text-bg/70">{s.body}</p>
                     <div className="mt-5 flex max-w-xl flex-wrap items-center gap-2">
                       <span className="label !text-bg/50">Ingredientes</span>
-                      {s.ingredients.map((ing) => (
-                        <span key={ing} className="rounded-full border-2 border-bg/70 bg-paper px-3 py-0.5 text-sm text-bg">
+                      {s.ingredients.map((ing, k) => (
+                        <span
+                          key={ing}
+                          data-ingredient
+                          style={{ '--i': k } as CSSProperties}
+                          className="rounded-full border-2 border-bg/70 bg-paper px-3 py-0.5 text-sm text-bg"
+                        >
                           {ing}
                         </span>
                       ))}

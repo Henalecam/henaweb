@@ -433,6 +433,20 @@ html {
   50% { translate: 0 4px; }
 }
 
+/* Processo: as a step becomes the one being cooked, its ingredients hop onto the counter one by one
+   (the class is only toggled when motion is welcome; GSAP skips it under reduced motion) */
+@media (prefers-reduced-motion: no-preference) {
+  #processo [data-step].is-active [data-ingredient] {
+    animation: ingredient-hop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+    animation-delay: calc(var(--i, 0) * 80ms + 120ms);
+  }
+}
+@keyframes ingredient-hop {
+  0% { translate: 0 0; }
+  40% { translate: 0 -7px; }
+  100% { translate: 0 0; }
+}
+
 /* burger sparkles */
 .sparkle {
   animation: sparkle 2.4s ease-in-out infinite;
