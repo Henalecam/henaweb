@@ -40,9 +40,16 @@ export default function Clock({ stack = false }: { stack?: boolean }) {
   }, []);
 
   return (
-    <span className="tabular-nums">
+    // stacked (hero, desktop): the visitor's time hangs below Curitiba's without taking layout space; as a
+    // block it appeared ~1.5 s after load (the time zone is only known in the browser) and pushed the whole
+    // hero headline up 21 px (layout shift 0.008)
+    <span className={`tabular-nums ${stack ? 'md:relative' : ''}`}>
       {time || '--:--:--'}
-      {theirs && <span className={`opacity-70 ${stack ? 'md:mt-1 md:block' : ''}`}><span className={stack ? 'md:hidden' : ''}> · </span>aí: {theirs}</span>}
+      {theirs && (
+        <span className={`opacity-70 ${stack ? 'md:absolute md:top-full md:right-0 md:mt-1 md:whitespace-nowrap' : ''}`}>
+          <span className={stack ? 'md:hidden' : ''}> · </span>aí: {theirs}
+        </span>
+      )}
     </span>
   );
 }
