@@ -170,6 +170,12 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                 <li key={d.title} data-win-item className="win flex flex-col">
                   <div className="win-bar">
                     <span aria-hidden>etapa_{String(i + 1).padStart(2, '0')}.txt</span>
+                    {/* where this step sits in the whole delivery, like a copy dialog's progress: one block per step */}
+                    <span aria-hidden className="ml-auto flex items-center gap-[3px]">
+                      {s.deliverables.map((_, j) => (
+                        <span key={j} className={`h-2.5 w-2 border border-white/85 shadow-[1px_1px_0_rgb(0_0_0/0.35)] ${j <= i ? 'bg-white' : 'bg-transparent'}`} />
+                      ))}
+                    </span>
                   </div>
                   <div className="m-1.5 flex-1 border-2 border-[#7d7394] bg-paper p-6 text-acid-ink">
                     <h3 className="text-2xl font-medium tracking-tight">{d.title}</h3>
