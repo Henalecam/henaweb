@@ -194,13 +194,34 @@ export function RandomCase() {
     return () => obs.disconnect();
   }, []);
 
+  // a real roll: the die spins and the drawn card lights up on screen for a beat before the page opens
+  // (reduced motion: straight to the case)
+  const [rolling, setRolling] = useState(false);
+  // coming back with the browser's back button restores this page as it was left: undo the roll
+  useEffect(() => {
+    const reset = (e: PageTransitionEvent) => {
+      if (!e.persisted) return;
+      setRolling(false);
+      document.querySelectorAll('li[data-picked]').forEach((li) => li.removeAttribute('data-picked'));
+    };
+    window.addEventListener('pageshow', reset);
+    return () => window.removeEventListener('pageshow', reset);
+  }, []);
   const go = () => {
+    if (rolling) return;
     const visible = [...document.querySelectorAll<HTMLElement>('li[data-case-slug]:not([hidden])')].map((li) => li.dataset.caseSlug!);
     if (!visible.length) return;
     const read = readList();
     const pool = visible.filter((s) => !read.includes(s));
     const from = pool.length ? pool : visible;
-    location.href = `/casos/${from[Math.floor(Math.random() * from.length)]}`;
+    const pick = from[Math.floor(Math.random() * from.length)];
+    const open = () => (location.href = `/casos/${pick}`);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return open();
+    setRolling(true);
+    const li = document.querySelector<HTMLElement>(`li[data-case-slug="${pick}"]`);
+    li?.setAttribute('data-picked', '');
+    li?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.setTimeout(open, 1150);
   };
   return (
     <button
@@ -209,7 +230,10 @@ export function RandomCase() {
       data-print-hide
       className="label mt-4 inline-flex min-h-9 items-center gap-2 !text-ink/80 underline underline-offset-4 hover:!text-acid"
     >
-      <span aria-hidden>🎲</span> {allRead ? 'Sortear um caso para reler' : 'Sortear um caso que você ainda não leu'}
+      <span aria-hidden className={`inline-block ${rolling ? 'animate-[dice-roll_0.8s_cubic-bezier(0.2,0.8,0.2,1)]' : ''}`}>
+        🎲
+      </span>{' '}
+      {rolling ? 'Sorteando…' : allRead ? 'Sortear um caso para reler' : 'Sortear um caso que você ainda não leu'}
     </button>
   );
 }

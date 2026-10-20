@@ -467,6 +467,18 @@ html {
   animation-play-state: paused !important;
 }
 
+/* /casos 🎲: the die spins and the drawn card lights up before its page opens (RandomCase) */
+@keyframes dice-roll {
+  0% { rotate: 0deg; scale: 1; }
+  50% { scale: 1.35; }
+  100% { rotate: 720deg; scale: 1; }
+}
+li[data-picked] .win {
+  outline: 4px solid var(--color-acid);
+  outline-offset: 6px;
+  transition: outline-offset 0.3s ease-out;
+}
+
 /* /casos: "nothing left here" notice, only when the filters leave the grid empty (CasesEmpty) */
 [data-case-empty] {
   display: none;
