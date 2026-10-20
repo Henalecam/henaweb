@@ -96,6 +96,31 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             Caso nº {String(i + 1).padStart(2, '0')}
             <span className="text-ink/60"> de {String(projects.length).padStart(2, '0')}</span> · {p.kind}
           </p>
+          {/* the whole archive at a glance: one dot per case, this one lit; each dot jumps straight to its case */}
+          <nav aria-label="Casos do arquivo" className="mt-3 -ml-1.5" data-print-hide>
+            <ol className="flex">
+              {projects.map((c, k) => (
+                <li key={c.slug}>
+                  <a
+                    href={`/casos/${c.slug}`}
+                    aria-current={c.slug === p.slug ? 'page' : undefined}
+                    title={`Caso nº ${String(k + 1).padStart(2, '0')} · ${c.name}`}
+                    className="group/dot grid h-6 w-6 place-items-center"
+                  >
+                    <span
+                      aria-hidden
+                      className={`block h-1.5 rounded-full transition-[width,background-color] duration-300 ${
+                        c.slug === p.slug ? 'w-4 bg-acid' : 'w-1.5 bg-ink/55 group-hover/dot:bg-ink/90 group-focus-visible/dot:bg-ink/90'
+                      }`}
+                    />
+                    <span className="sr-only">
+                      Caso nº {String(k + 1).padStart(2, '0')}: {c.name}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
           <h1 className="mt-4 text-[clamp(2.8rem,7vw,6.5rem)] leading-[0.9] font-medium tracking-[-0.05em]">
             {p.name}
             <span className="font-groovy text-[0.7em] tracking-normal text-acid [text-shadow:4px_4px_0_#140a26]">.</span>
