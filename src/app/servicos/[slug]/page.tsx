@@ -265,10 +265,15 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
               <FaqToggleAll />
             </div>
             <div className="mt-3 flex flex-col gap-3">
-              {s.faq.map((f) => (
+              {s.faq.map((f, i) => (
                 <details key={f.q} id={faqId(f.q)} className="toon-sm group scroll-mt-28 rounded-xl bg-paper p-5 text-acid-ink">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium">
-                    {f.q}
+                    <span className="flex items-baseline gap-3">
+                      <span aria-hidden className="shrink-0 font-mono text-xs text-acid-ink/70">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <span>{f.q}</span>
+                    </span>
                     <span className="text-2xl transition-transform group-open:rotate-45" aria-hidden>
                       +
                     </span>

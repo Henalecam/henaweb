@@ -17,10 +17,16 @@ export default function Faq() {
           <div className="flex justify-end text-bg">
             <FaqToggleAll />
           </div>
-          {homeFaq.map((f) => (
+          {homeFaq.map((f, i) => (
             <details key={f.q} id={faqId(f.q)} className="toon-sm group scroll-mt-28 rounded-xl bg-paper p-5 open:bg-lemon">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium md:text-xl">
-                {f.q}
+                {/* a file index, like the rest of the case archive: easier to say "a pergunta 04" */}
+                <span className="flex items-baseline gap-3">
+                  <span aria-hidden className="shrink-0 font-mono text-xs text-bg/70">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span>{f.q}</span>
+                </span>
                 <span className="toon-sm flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-acid text-xl transition-transform group-open:rotate-45" aria-hidden>
                   +
                 </span>

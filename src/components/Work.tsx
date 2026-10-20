@@ -224,7 +224,7 @@ export default function Work() {
                     svc === x.slug ? 'border-acid bg-acid text-acid-ink' : 'border-ink/30 text-ink/75 hover:border-ink hover:text-ink'
                   }`}
                 >
-                  {x.name} <span className="opacity-70">({x.n})</span>
+                  {x.name} <span className="opacity-80">({x.n})</span>
                 </button>
               ))}
             </div>
