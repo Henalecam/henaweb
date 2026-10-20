@@ -34,6 +34,22 @@ export default function Manifesto() {
         stagger: 0.1,
         scrollTrigger: { trigger: '[data-facts]', start: 'top 85%' },
       });
+      // the numbers roll to their value as the cards land; "0 caixa-preta" counts *down* from 99,
+      // as if the black box were being emptied. The server HTML already holds the final digits.
+      gsap.utils.toArray<HTMLElement>('[data-fact-n]').forEach((el) => {
+        const to = Number(el.dataset.factN);
+        if (!Number.isFinite(to)) return;
+        const counter = { v: to === 0 ? 99 : 0 };
+        el.textContent = String(counter.v);
+        gsap.to(counter, {
+          v: to,
+          duration: to === 0 ? 1.6 : 1.2,
+          ease: 'power3.out',
+          delay: 0.15,
+          onUpdate: () => (el.textContent = String(Math.round(counter.v))),
+          scrollTrigger: { trigger: '[data-facts]', start: 'top 85%' },
+        });
+      });
       return () => split.revert();
     },
     { scope: root },
@@ -60,7 +76,9 @@ export default function Manifesto() {
       <div data-facts className="mt-[clamp(4rem,10vw,9rem)] grid gap-5 md:grid-cols-3">
         {facts.map((f) => (
           <div key={f.l} data-fact className="toon flex items-end justify-between gap-6 rounded-2xl bg-paper p-6 text-acid-ink odd:-rotate-1 even:rotate-1 md:p-8">
-            <span className="font-groovy text-[clamp(3.5rem,7vw,6rem)] leading-none text-[#c2410c]">{f.n}</span>
+            <span data-fact-n={f.n} className="font-groovy text-[clamp(3.5rem,7vw,6rem)] leading-none text-[#c2410c] tabular-nums">
+              {f.n}
+            </span>
             {/* the promise behind each number, readable at a glance (was 11px mono caps at 70%) */}
             <span className="max-w-[18ch] text-right text-base leading-snug font-medium text-acid-ink/80 md:text-lg">{f.l}</span>
           </div>
