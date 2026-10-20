@@ -31,6 +31,13 @@ export default function Hero() {
         scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true },
       });
 
+      // the "keep scrolling" cue is gone after the first ~160px of scroll (back when you return to the top)
+      gsap.to('[data-hero-cue]', {
+        autoAlpha: 0,
+        ease: 'none',
+        scrollTrigger: { trigger: root.current, start: 'top top', end: '+=160', scrub: true },
+      });
+
       return () => {
         off();
         split?.revert();
@@ -92,6 +99,14 @@ export default function Hero() {
               {site.city} · <Clock stack />
             </span>
           </div>
+        </div>
+        {/* desktop: a quiet cue under the buttons that the story continues below (phones already show the next
+            section's edge); decorative, the bob is motion-safe only */}
+        <div data-hero-fade className="pointer-events-none absolute inset-x-0 bottom-2 hidden justify-center md:flex" aria-hidden>
+          <span data-hero-cue className="label flex items-center gap-2 !text-[0.65rem] !text-ink/70">
+            role para investigar
+            <span className="inline-block motion-safe:animate-[cue-bob_1.8s_ease-in-out_infinite]">↓</span>
+          </span>
         </div>
       </div>
     </section>

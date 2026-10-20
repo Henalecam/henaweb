@@ -402,6 +402,12 @@ html {
   75% { rotate: 5deg; }
 }
 
+/* hero: "role para investigar ↓" */
+@keyframes cue-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 4px; }
+}
+
 /* burger sparkles */
 .sparkle {
   animation: sparkle 2.4s ease-in-out infinite;
