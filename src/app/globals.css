@@ -355,6 +355,12 @@ html {
   .sparkle { animation: none; opacity: 0.9; transform: none; }
 }
 
+/* sections out of view stop their endless CSS loops (OffscreenPause) */
+[data-offscreen],
+[data-offscreen] * {
+  animation-play-state: paused !important;
+}
+
 /* /casos "mostrar só os que faltam" (ReadProgress) */
 :root[data-only-unread] li[data-case-read] {
   display: none;

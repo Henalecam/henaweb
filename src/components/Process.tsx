@@ -222,6 +222,13 @@ export default function Process() {
 
           const steps = root.current?.querySelectorAll('[data-step]');
           const last = steps?.[steps.length - 1];
+          // the steam only rises once the order is up, and only while the diner is on screen
+          // (it used to loop from page load, invisible at opacity 0)
+          const steam = gsap.to('[data-steam] path', { y: -10, opacity: 0.4, duration: 1.4, repeat: -1, yoyo: true, stagger: 0.3, ease: 'sine.inOut', paused: true });
+          let served = false;
+          let onScreen = false;
+          const syncSteam = () => (served && onScreen ? steam.play() : steam.pause());
+          ScrollTrigger.create({ trigger: root.current, start: 'top bottom', end: 'bottom top', onToggle: (self) => ((onScreen = self.isActive), syncSteam()) });
           versionTrigger.current = ScrollTrigger.create({
             trigger: last,
             start: stacked ? 'top 55%' : 'top 35%',
@@ -229,14 +236,17 @@ export default function Process() {
             onEnter: () => {
               gsap.to('[data-steam]', { opacity: 1, duration: 0.6 });
               finale.restart();
+              served = true;
+              syncSteam();
             },
             onLeaveBack: () => {
               gsap.to('[data-steam]', { opacity: 0, duration: 0.4 });
               finale.pause(0);
+              served = false;
+              syncSteam();
             },
             onUpdate: (self) => scene.current?.setVersion(versionAt(self.progress)),
           });
-          gsap.to('[data-steam] path', { y: -10, opacity: 0.4, duration: 1.4, repeat: -1, yoyo: true, stagger: 0.3, ease: 'sine.inOut' });
 
           gsap.fromTo(
             '[data-ticket]',
