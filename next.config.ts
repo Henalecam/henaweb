@@ -41,6 +41,13 @@ const nextConfig: NextConfig = {
           { key: CSP_ENFORCE ? 'Content-Security-Policy' : 'Content-Security-Policy-Report-Only', value: csp },
         ],
       },
+      // static media in public/ is served with max-age=0, so every visit re-asks for the 440 KB model and the
+      // screenshots; a day of freshness (and a week of stale-while-revalidate) skips those round trips while a
+      // replaced file (same name) still shows up within a day
+      ...['/models/:path*', '/cases/:path*', '/clients/:path*', '/team/:path*'].map((source) => ({
+        source,
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' }],
+      })),
     ];
   },
   async redirects() {
