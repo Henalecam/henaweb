@@ -307,14 +307,19 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
               {others.map((o) => {
                 const n = projects.filter((p) => p.service === o.slug).length;
                 return (
-                  <li key={o.slug}>
+                  <li key={o.slug} className="pt-3.5">
                     {/* named by the service, described by its headline and track record (the whole card was the name) */}
                     <a
                       href={`/servicos/${o.slug}`}
                       aria-labelledby={`outro-${o.slug}`}
                       aria-describedby={`outro-${o.slug}-pitch outro-${o.slug}-casos`}
-                      className="toon-sm toon-press group flex h-full flex-col rounded-2xl bg-lemon p-5 text-acid-ink"
+                      className="toon-sm toon-press group relative flex h-full flex-col rounded-2xl rounded-tl-none bg-lemon p-5 text-acid-ink"
                     >
+                      {/* each service is a manila folder in the archive: a tab on top, lifted when pointed at */}
+                      <span
+                        aria-hidden
+                        className="absolute bottom-[calc(100%-2.5px)] -left-[2.5px] h-4 w-24 rounded-t-lg border-[2.5px] border-b-0 border-toon bg-lemon transition-[height] duration-200 group-hover:h-5 group-focus-visible:h-5"
+                      />
                       <span id={`outro-${o.slug}`} className="font-mono text-xs tracking-wide text-acid-ink/70 uppercase">
                         {o.name}
                       </span>
