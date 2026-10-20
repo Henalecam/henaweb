@@ -276,6 +276,35 @@
   box-shadow: inset -1.5px -1.5px 0 #7d7394, inset 1.5px 1.5px 0 #fff;
 }
 
+/* Studio rules: like a real desktop, the window under the pointer is the focused one — it lifts
+   toward you and keeps its colour bar, the others drop to the grey "inactive" bar of Windows 95.
+   `translate` (not transform) so it stacks with GSAP's inline transform; !important because GSAP also
+   writes an inline `translate: none` on the elements it tweens */
+@media (hover: hover) {
+  [data-principle] {
+    transition: translate 0.25s ease-out, box-shadow 0.25s ease-out;
+  }
+  [data-principle] .win-bar {
+    transition: filter 0.25s ease-out;
+  }
+  [data-principles]:hover [data-principle]:not(:hover) .win-bar {
+    filter: grayscale(1) brightness(0.82);
+  }
+  [data-principle]:hover {
+    translate: -3px -3px !important;
+    box-shadow: inset -2px -2px 0 #7d7394, inset 2px 2px 0 #fff, 10px 10px 0 var(--color-toon);
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  [data-principle],
+  [data-principle] .win-bar {
+    transition: none;
+  }
+  [data-principle]:hover {
+    translate: none !important;
+  }
+}
+
 /* Crime-scene / mystery tape */
 .tape {
   border-block: 3px solid var(--color-toon);
