@@ -57,7 +57,9 @@ const nextConfig: NextConfig = {
       { source: '/projetos', destination: '/casos', permanent: true },
       { source: '/projeto/:slug', destination: '/casos/:slug', permanent: true },
       { source: '/cases', destination: '/casos', permanent: true },
-      { source: '/cases/:slug', destination: '/casos/:slug', permanent: true },
+      // slug pattern without dots: /cases/ is also the public folder of the screenshots (/cases/diconta.jpg),
+      // which a bare :slug redirected to /casos/diconta.jpg and broke every case image
+      { source: '/cases/:slug([a-z0-9-]+)', destination: '/casos/:slug', permanent: true },
       { source: '/servico/:slug', destination: '/servicos/:slug', permanent: true },
       { source: '/faq', destination: '/#perguntas', permanent: true },
       { source: '/perguntas', destination: '/#perguntas', permanent: true },
