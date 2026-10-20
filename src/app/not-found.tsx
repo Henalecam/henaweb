@@ -25,6 +25,13 @@ export default function NotFound() {
     <>
       <main id="conteudo" tabIndex={-1} className="sky relative flex min-h-[100svh] items-center overflow-hidden text-ink">
         <div className="grid-floor !h-[32%] opacity-60" aria-hidden />
+        {/* the missing page is a crime scene: the same tape that cordons off the home's mystery board */}
+        <div
+          aria-hidden
+          className="tape absolute top-24 -left-10 w-[130%] -rotate-[2deg] py-1.5 font-mono text-xs font-bold tracking-[0.25em] whitespace-nowrap uppercase"
+        >
+          {'Página desaparecida · arquivo 404 · não ultrapasse · '.repeat(10)}
+        </div>
         {/* a ghost detective sweeping the floor with a magnifier, looking for the lost page */}
         <GhostWitness />
         <div className="gutter relative mx-auto w-full max-w-5xl py-32">
