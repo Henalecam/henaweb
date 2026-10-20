@@ -79,6 +79,24 @@ export default function Work() {
     return () => mq.removeEventListener('change', sync);
   }, []);
   const [paused, setPaused] = useState(false);
+  // phones/tablets: which card of the swipe row is centred, for the dots under it
+  const strip = useRef<HTMLOListElement>(null);
+  const [card, setCard] = useState(0);
+  const onStrip = () => {
+    const ol = strip.current;
+    if (!ol) return;
+    const items = [...ol.children] as HTMLElement[];
+    const mid = ol.scrollLeft + ol.clientWidth / 2;
+    let best = 0;
+    items.forEach((li, i) => {
+      if (Math.abs(li.offsetLeft + li.offsetWidth / 2 - mid) < Math.abs(items[best].offsetLeft + items[best].offsetWidth / 2 - mid)) best = i;
+    });
+    setCard(best);
+  };
+  const goCard = (i: number) => {
+    const li = strip.current?.children[i] as HTMLElement | undefined;
+    li?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', inline: 'center', block: 'nearest' });
+  };
   // an explicit stop (WCAG 2.2.2: content that changes by itself needs a way to stop it) and
   // whether the section is on screen at all: rotating off screen only burned GSAP tweens
   const [stopped, setStopped] = useState(false);
@@ -278,7 +296,7 @@ export default function Work() {
 
         {/* mobile / tablet: swipeable cards */}
         <div className="-mx-[clamp(1rem,4vw,3.5rem)] mt-12 lg:hidden">
-          <ol className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-[clamp(1rem,4vw,3.5rem)] pb-10 [scrollbar-width:none]">
+          <ol ref={strip} onScroll={onStrip} className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-[clamp(1rem,4vw,3.5rem)] pb-10 [scrollbar-width:none]">
             {projects.map((item, i) => (
               <li key={item.name} className="w-[86%] shrink-0 snap-center sm:w-[70%]">
                 {/* the screenshot opens the case page, like the link below it, instead of leaving for the client's site */}
@@ -303,7 +321,24 @@ export default function Work() {
               </li>
             ))}
           </ol>
-          <p className="label px-[clamp(1rem,4vw,3.5rem)]">Deslize para ver os outros casos →</p>
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-[clamp(1rem,4vw,3.5rem)]">
+            <p className="label">{card === projects.length - 1 ? '← Último caso. Deslize para voltar' : 'Deslize para ver os outros casos →'}</p>
+            {/* where you are in the row; each dot jumps to its case (24px targets, the dot itself is small) */}
+            <div className="flex items-center" data-print-hide>
+              {projects.map((item, i) => (
+                <button
+                  key={item.slug}
+                  type="button"
+                  onClick={() => goCard(i)}
+                  aria-label={`Mostrar o caso ${item.name}`}
+                  aria-current={i === card ? 'true' : undefined}
+                  className="grid h-6 w-6 place-items-center"
+                >
+                  <span className={`block h-1.5 rounded-full transition-all duration-300 ${i === card ? 'w-4 bg-acid' : 'w-1.5 bg-ink/55'}`} />
+                </button>
+              ))}
+            </div>
+          </div>
           <RevealRead />
         </div>
       </div>
