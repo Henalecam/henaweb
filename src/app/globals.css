@@ -450,6 +450,20 @@ nav[aria-label='Casos do arquivo']:hover a:not(:hover) .dot-tip {
   to { opacity: 0; scale: 1.25 1.6; }
 }
 
+/* Studio: the founder's name gets signed when the polaroid develops (hover / .is-developed on touch) */
+.sig-line path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.6, 0, 0.3, 1) 0.25s;
+}
+[data-portrait-card]:hover .sig-line path,
+[data-portrait-card].is-developed .sig-line path {
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sig-line path { stroke-dashoffset: 0; }
+}
+
 /* hero: "role para investigar ↓" */
 @keyframes cue-bob {
   0%, 100% { translate: 0 0; }

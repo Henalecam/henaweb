@@ -74,7 +74,13 @@ export default function Studio() {
             </div>
             <figcaption className="mt-3 text-center text-acid-ink">
               <span className="font-groovy block text-lg text-[#c2410c]">Fundador · Cientista da computação</span>
-              <span className="serif block text-xl">Henrique Alexandre de Camargo</span>
+              <span className="serif relative block text-xl">
+                Henrique Alexandre de Camargo
+                {/* a pen stroke signs under the name when the photo develops (hover, or mid-screen on touch) */}
+                <svg aria-hidden viewBox="0 0 200 12" preserveAspectRatio="none" className="sig-line pointer-events-none absolute -bottom-2 left-[12%] h-3 w-[76%] overflow-visible">
+                  <path d="M2,8 C30,2 52,11 80,6 S130,2 150,7 S186,9 198,4" pathLength="1" fill="none" stroke="#c2410c" strokeWidth="2.2" strokeLinecap="round" />
+                </svg>
+              </span>
             </figcaption>
           </figure>
         </div>
