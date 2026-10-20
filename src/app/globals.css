@@ -329,6 +329,23 @@
   filter: drop-shadow(6px 6px 0 var(--color-toon));
 }
 
+/* The footer wordmark plays like a keyboard: the letter under the pointer is pressed into its shadow
+   (the same move as .toon-press:active), its neighbours dip halfway. Decorative, pointer-only. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  [data-wordmark] > span {
+    transition: translate 0.16s cubic-bezier(0.3, 1.6, 0.5, 1), filter 0.16s;
+  }
+  [data-wordmark] > span:hover {
+    translate: 4px 4px;
+    filter: drop-shadow(2px 2px 0 var(--color-toon));
+  }
+  [data-wordmark] > span:hover + span,
+  [data-wordmark] > span:has(+ span:hover) {
+    translate: 2px 2px;
+    filter: drop-shadow(4px 4px 0 var(--color-toon));
+  }
+}
+
 /* Comic halftone paper for the light sections */
 .paper {
   background-color: var(--color-paper);
