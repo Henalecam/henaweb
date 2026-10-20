@@ -475,7 +475,7 @@ export default function Contact() {
                         <input type="checkbox" checked={on} onChange={() => toggle(s.id)} className="sr-only" />
                         <span
                           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 text-xs ${
-                            on ? 'border-acid bg-acid text-acid-ink' : 'border-acid-ink/40'
+                            on ? 'check-pop border-acid bg-acid text-acid-ink' : 'border-acid-ink/40'
                           }`}
                           aria-hidden
                         >

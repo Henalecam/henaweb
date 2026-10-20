@@ -46,7 +46,7 @@ export default function ServiceSymptoms({ problems, service }: { problems: strin
                 />
                 <span
                   aria-hidden
-                  className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded border-2 border-acid-ink text-xs ${on ? 'bg-acid-ink text-acid' : ''}`}
+                  className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded border-2 border-acid-ink text-xs ${on ? 'check-pop bg-acid-ink text-acid' : ''}`}
                 >
                   {on ? '✓' : ''}
                 </span>
