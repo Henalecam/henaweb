@@ -184,6 +184,15 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
               <h2 id="resolvido" className="font-groovy text-2xl text-[#1f6f63]">Caso resolvido</h2>
               <p className="mt-3 text-lg leading-relaxed text-acid-ink/85">{p.built}</p>
               <Stamp className="-top-4 right-5 border-[#1f6f63] bg-lemon text-[#1f6f63]">Encerrado ✓</Stamp>
+              {/* the case file reads as a story: a badge on the seam leads from the mystery to its solution
+                  (down where the cards stack, across where they sit side by side; centred on the 20px gap) */}
+              <span
+                aria-hidden
+                className="toon-sm absolute -top-[35px] left-1/2 flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full bg-acid text-xl font-bold text-acid-ink md:top-1/2 md:-left-[35px] md:translate-x-0 md:-translate-y-1/2"
+              >
+                <span className="md:hidden">↓</span>
+                <span className="hidden md:inline">→</span>
+              </span>
             </section>
           </div>
 
