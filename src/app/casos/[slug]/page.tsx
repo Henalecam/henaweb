@@ -105,8 +105,12 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
                     href={`/casos/${c.slug}`}
                     aria-current={c.slug === p.slug ? 'page' : undefined}
                     title={`Caso nº ${String(k + 1).padStart(2, '0')} · ${c.name}`}
-                    className="group/dot grid h-6 w-6 place-items-center"
+                    className="group/dot relative grid h-6 w-6 place-items-center"
                   >
+                    {/* cases already opened get a ring (MarkRead reveals data-read-mark), so the strip doubles as a reading map */}
+                    {c.slug !== p.slug && (
+                      <span data-read-mark={c.slug} hidden aria-hidden className="pointer-events-none absolute inset-[5px] rounded-full border-[1.5px] border-acid/80" />
+                    )}
                     <span
                       aria-hidden
                       className={`block h-1.5 rounded-full transition-[width,background-color] duration-300 ${
@@ -116,6 +120,11 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
                     <span className="sr-only">
                       Caso nº {String(k + 1).padStart(2, '0')}: {c.name}
                     </span>
+                    {c.slug !== p.slug && (
+                      <span data-read-mark={c.slug} hidden className="sr-only">
+                        {' '}(já investigado)
+                      </span>
+                    )}
                   </a>
                 </li>
               ))}
