@@ -9,8 +9,12 @@ const open = () => window.dispatchEvent(new Event(EVENT));
 /** The □ (maximize) button of the case window: it really maximizes. */
 export function MaximizeButton() {
   return (
-    <button type="button" onClick={open} className="win-btn cursor-pointer hover:brightness-110" aria-label="Ver a página inteira">
-      □
+    // the bevelled square stays Win95-small (18×17) but the button around it is a 24×24 target (WCAG 2.5.8),
+    // pulled back with negative margins so the title bar doesn't grow
+    <button type="button" onClick={open} className="group -mx-[2.8px] -my-[3.6px] grid h-6 w-6 cursor-pointer place-items-center" aria-label="Ver a página inteira">
+      <span aria-hidden className="win-btn group-hover:brightness-110">
+        □
+      </span>
     </button>
   );
 }
