@@ -531,7 +531,7 @@ export default function Contact() {
                   <Floating label="Seu nome">
                     <input name="name" required maxLength={120} placeholder=" " autoComplete="name" className={field} onInvalid={explain} onInput={clear} />
                   </Floating>
-                  <div>
+                  <div className="min-w-0">
                     <Floating label="E-mail">
                     <input
                       ref={emailRef}
@@ -555,7 +555,8 @@ export default function Contact() {
                         Você quis dizer{' '}
                         <button
                           type="button"
-                          className="font-medium underline decoration-2 underline-offset-2"
+                          // a long address has no break opportunities: let it wrap anywhere instead of running off the card
+                          className="text-left font-medium underline decoration-2 underline-offset-2 [overflow-wrap:anywhere]"
                           onClick={() => {
                             if (emailRef.current) emailRef.current.value = emailHint;
                             setEmailHint(null);
