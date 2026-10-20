@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { gsap, SplitText, useGSAP } from '@/lib/gsap';
+import { gsap, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { projects, symptoms, timelines, whatsappLink, site } from '@/lib/content';
 import { serviceLinks } from '@/lib/serviceLinks';
 
@@ -228,6 +228,8 @@ export default function Contact() {
 
   useGSAP(
     () => {
+      // reduced motion: the title is simply there (CSS reduced-motion can't stop GSAP tweens)
+      if (prefersReducedMotion()) return;
       const split = SplitText.create('[data-contact-title]', { type: 'lines', mask: 'lines', linesClass: 'line-mask' });
       gsap.from(split.lines, {
         yPercent: 105,

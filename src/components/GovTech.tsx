@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { gsap, SplitText, useGSAP } from '@/lib/gsap';
+import { gsap, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { govFlow, govPillars } from '@/lib/content';
 
 const audit = [
@@ -18,18 +18,21 @@ export default function GovTech() {
 
   useGSAP(
     () => {
-      const split = SplitText.create('[data-gov-title]', { type: 'lines', mask: 'lines', linesClass: 'line-mask' });
-      gsap.from(split.lines, {
-        yPercent: 105,
-        duration: 1.2,
-        ease: 'expo.out',
-        stagger: 0.08,
-        scrollTrigger: { trigger: '[data-gov-title]', start: 'top 80%' },
-      });
+      const mm = gsap.matchMedia();
+      // reduced motion: the title is simply there (CSS reduced-motion can't stop GSAP tweens)
+      const split = prefersReducedMotion() ? null : SplitText.create('[data-gov-title]', { type: 'lines', mask: 'lines', linesClass: 'line-mask' });
+      if (split) {
+        gsap.from(split.lines, {
+          yPercent: 105,
+          duration: 1.2,
+          ease: 'expo.out',
+          stagger: 0.08,
+          scrollTrigger: { trigger: '[data-gov-title]', start: 'top 80%' },
+        });
+      }
 
       // the markup ships the finished flow, so it reads the same without JS or with reduced motion;
       // only when motion is welcome do we rewind it and let the scroll play it back
-      const mm = gsap.matchMedia();
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         const steps = gsap.utils.toArray<HTMLElement>('[data-step]');
         const logs = gsap.utils.toArray<HTMLElement>('[data-log]');
@@ -63,7 +66,7 @@ export default function GovTech() {
 
       return () => {
         mm.revert();
-        split.revert();
+        split?.revert();
       };
     },
     { scope: root },

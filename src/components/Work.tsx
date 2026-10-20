@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { gsap, useGSAP } from '@/lib/gsap';
+import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { projects, type Project } from '@/lib/content';
 import MockUI from './MockUI';
 import { RevealRead } from './ReadMarks';
@@ -97,6 +97,8 @@ export default function Work() {
 
   useGSAP(
     () => {
+      // reduced motion: no entrance and no swap wipe (CSS reduced-motion can't stop GSAP tweens)
+      if (prefersReducedMotion()) return;
       gsap.from('[data-work-in]', {
         y: 50,
         autoAlpha: 0,
@@ -112,7 +114,7 @@ export default function Work() {
   // a quick swap animation every time the exhibit changes
   useEffect(() => {
     const el = root.current;
-    if (!el) return;
+    if (!el || prefersReducedMotion()) return;
     gsap.fromTo(
       el.querySelector('[data-exhibit]'),
       { clipPath: 'inset(0% 0% 100% 0%)' },
