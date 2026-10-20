@@ -142,7 +142,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
           </nav>
 
           <section className="group relative mt-24" aria-labelledby="sintomas">
-            <h2 id="sintomas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-groovy [text-shadow:3px_3px_0_#140a26]">
+            <h2 id="sintomas" className="font-groovy pr-28 text-[clamp(1.8rem,3.5vw,3rem)] md:pr-0 text-groovy [text-shadow:3px_3px_0_#140a26]">
               Sintomas que resolvemos
             </h2>
             <SectionLink id="sintomas" title="Sintomas que resolvemos" />
@@ -150,7 +150,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
           </section>
 
           <section className="group relative mt-24" aria-labelledby="entregas">
-            <h2 id="entregas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-teal [text-shadow:3px_3px_0_#140a26]">
+            <h2 id="entregas" className="font-groovy pr-28 text-[clamp(1.8rem,3.5vw,3rem)] md:pr-0 text-teal [text-shadow:3px_3px_0_#140a26]">
               O que você recebe
             </h2>
             <SectionLink id="entregas" title="O que você recebe" />
@@ -170,7 +170,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
           </section>
 
           <section className="group relative mt-24" aria-labelledby="exemplos">
-            <h2 id="exemplos" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-acid [text-shadow:3px_3px_0_#140a26]">
+            <h2 id="exemplos" className="font-groovy pr-28 text-[clamp(1.8rem,3.5vw,3rem)] md:pr-0 text-acid [text-shadow:3px_3px_0_#140a26]">
               Exemplos
             </h2>
             <SectionLink id="exemplos" title="Exemplos" />
@@ -245,7 +245,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
           </section>
 
           <section className="group relative mt-24" aria-labelledby="perguntas">
-            <h2 id="perguntas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-groovy [text-shadow:3px_3px_0_#140a26]">
+            <h2 id="perguntas" className="font-groovy pr-28 text-[clamp(1.8rem,3.5vw,3rem)] md:pr-0 text-groovy [text-shadow:3px_3px_0_#140a26]">
               Perguntas frequentes
             </h2>
             <SectionLink id="perguntas" title="Perguntas frequentes" />
