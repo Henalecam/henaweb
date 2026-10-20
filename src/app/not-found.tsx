@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Footer from '@/components/Footer';
 import GhostWitness from '@/components/GhostWitness';
 import LostClue from '@/components/LostClue';
+import LostSuspect from '@/components/LostSuspect';
 
 export const metadata: Metadata = {
   title: 'Caso não encontrado',
@@ -35,7 +36,7 @@ export default function NotFound() {
             </div>
             <div className="m-1.5 border-2 border-[#7d7394] bg-paper p-6 font-mono text-sm text-acid-ink">
               <p>A página que você procura sumiu sem deixar pistas.</p>
-              <p className="mt-2 opacity-60">Suspeito principal: um link antigo ou digitado errado.</p>
+              <LostSuspect />
             </div>
           </div>
 
