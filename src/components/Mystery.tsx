@@ -254,7 +254,7 @@ function Board() {
 
 const copy = {
   intro: {
-    kicker: '(III) Arquivo de casos',
+    kicker: '(III) Caso em aberto',
     title: 'O Caso do Sistema Assombrado',
     body: 'Toda empresa tem um fantasma. Ele some com aprovações, duplica cadastros e aparece toda sexta-feira às 17h.',
   },
