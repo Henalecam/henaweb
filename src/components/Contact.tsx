@@ -79,6 +79,7 @@ function leadOrigin(): string {
 // the half-written case survives a detour to read a case study and come back (same tab only)
 const DRAFT = 'hena:draft';
 const DRAFT_FIELDS = ['name', 'email', 'whatsapp', 'org', 'message'] as const;
+const MSG_MAX = 4000;
 type Draft = { picked: string[]; timeline: string; fields: Partial<Record<(typeof DRAFT_FIELDS)[number], string>> };
 
 function readDraft(): Draft | null {
@@ -181,15 +182,19 @@ export default function Contact() {
   useEffect(saveDraft, [picked, timeline, draftReady]);
   // the submit button rings once the required clues (name and a valid e-mail) are in: "the file is complete"
   const [ready, setReady] = useState(false);
+  // the message box has a 4000-character cap that used to cut long pastes silently: past 80% it says how much is left
+  const [msgLen, setMsgLen] = useState(0);
   // read the fields directly: checkValidity() would fire `invalid` and stamp our custom messages on fields
   // the visitor hasn't reached yet
   const checkReady = () => {
     const required = [...(form.current?.elements ?? [])].filter((el): el is HTMLInputElement => el instanceof HTMLInputElement && el.required);
     setReady(required.length > 0 && required.every((el) => el.value.trim() !== '' && !el.validity.typeMismatch));
+    setMsgLen((form.current?.elements.namedItem('message') as HTMLTextAreaElement | null)?.value.length ?? 0);
   };
   useEffect(checkReady, [draftReady, picked]);
   const discardDraft = () => {
     form.current?.reset();
+    setMsgLen(0);
     setPicked([]);
     setTimeline(timelines[1]);
     setRestored(false);
@@ -405,7 +410,7 @@ export default function Contact() {
           <Social tone="light" className="mt-6" />
         </div>
 
-        <div className="lg:col-span-7">
+        <div className="min-w-0 lg:col-span-7">
           {status === 'sent' ? (
             <div
               ref={done}
@@ -518,7 +523,9 @@ export default function Contact() {
                 </div>
               </fieldset>
 
-              <fieldset>
+              {/* min-w-0 here and on the form column: a fieldset and a grid item are min-content wide by default,
+                  so a long unbroken paste (a URL) in the self-sizing message box stretched the column off screen */}
+              <fieldset className="min-w-0">
                 <legend className="label mb-2 !text-acid-ink/60">3 · Quem está investigando</legend>
                 <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
                   <Floating label="Seu nome">
@@ -588,7 +595,7 @@ export default function Contact() {
                     id="mensagem"
                     name="message"
                     rows={3}
-                    maxLength={4000}
+                    maxLength={MSG_MAX}
                     placeholder=" "
                     aria-describedby="atalho-enviar"
                     // grows with the story instead of scrolling inside 3 rows (field-sizing; other browsers keep the 3 rows)
@@ -602,6 +609,18 @@ export default function Contact() {
                     }}
                   />
                 </Floating>
+                {/* a live region that is always there (an inserted one may go unannounced); only the limit itself is spoken */}
+                <p
+                  role="status"
+                  className={`mt-1 text-right font-mono text-xs empty:mt-0 ${msgLen >= MSG_MAX ? 'font-medium text-[#c2410c]' : 'text-acid-ink/70'}`}
+                  data-print-hide
+                >
+                  {msgLen >= MSG_MAX ? (
+                    <>Limite de {MSG_MAX.toLocaleString('pt-BR')} caracteres. O resto da história cabe numa conversa pelo WhatsApp.</>
+                  ) : msgLen >= MSG_MAX * 0.8 ? (
+                    <span aria-hidden>{(MSG_MAX - msgLen).toLocaleString('pt-BR')} caracteres restantes</span>
+                  ) : null}
+                </p>
                 <p id="atalho-enviar" className="hidden text-xs text-acid-ink/70 pointer-fine:block" data-print-hide>
                   <kbd className="font-mono">Ctrl</kbd> + <kbd className="font-mono">Enter</kbd> envia direto da mensagem.
                 </p>
