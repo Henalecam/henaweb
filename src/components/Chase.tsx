@@ -59,9 +59,16 @@ export default function Chase() {
   useGSAP(
     () => {
       if (prefersReducedMotion()) return;
-      gsap.fromTo('[data-layer="trees"]', { xPercent: 0 }, { xPercent: -50, duration: 22, ease: 'none', repeat: -1 });
-      gsap.to('[data-window]', { opacity: 0.25, duration: 0.08, repeat: -1, yoyo: true, repeatDelay: 2.4, ease: 'none' });
-      gsap.fromTo('[data-vruum]', { scale: 0.9, rotate: 4 }, { scale: 1.06, rotate: 8, duration: 0.5, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      // the loops only run while the chase is on screen: the footer sits on every page, and these
+      // used to tick every frame (a style recalc per frame) from the first paint, footer far below
+      const loops = [
+        gsap.fromTo('[data-layer="trees"]', { xPercent: 0 }, { xPercent: -50, duration: 22, ease: 'none', repeat: -1, paused: true }),
+        gsap.to('[data-window]', { opacity: 0.25, duration: 0.08, repeat: -1, yoyo: true, repeatDelay: 2.4, ease: 'none', paused: true }),
+        gsap.fromTo('[data-vruum]', { scale: 0.9, rotate: 4 }, { scale: 1.06, rotate: 8, duration: 0.5, repeat: -1, yoyo: true, ease: 'sine.inOut', paused: true }),
+      ];
+      const io = new IntersectionObserver(([e]) => loops.forEach((t) => (e.isIntersecting ? t.play() : t.pause())));
+      if (root.current) io.observe(root.current);
+      return () => io.disconnect();
     },
     { scope: root },
   );
