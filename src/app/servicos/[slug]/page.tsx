@@ -277,14 +277,25 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                 const n = projects.filter((p) => p.service === o.slug).length;
                 return (
                   <li key={o.slug}>
-                    <a href={`/servicos/${o.slug}`} className="toon-sm toon-press group flex h-full flex-col rounded-2xl bg-lemon p-5 text-acid-ink">
-                      <span className="font-mono text-xs tracking-wide text-acid-ink/70 uppercase">{o.name}</span>
-                      <span className="mt-2 text-xl leading-tight font-medium tracking-tight">
-                        {o.h1} {o.h1Accent}
+                    {/* named by the service, described by its headline and track record (the whole card was the name) */}
+                    <a
+                      href={`/servicos/${o.slug}`}
+                      aria-labelledby={`outro-${o.slug}`}
+                      aria-describedby={`outro-${o.slug}-pitch outro-${o.slug}-casos`}
+                      className="toon-sm toon-press group flex h-full flex-col rounded-2xl bg-lemon p-5 text-acid-ink"
+                    >
+                      <span id={`outro-${o.slug}`} className="font-mono text-xs tracking-wide text-acid-ink/70 uppercase">
+                        {o.name}
+                      </span>
+                      <span id={`outro-${o.slug}-pitch`} className="mt-2 text-xl leading-tight font-medium tracking-tight">
+                        {`${o.h1} ${o.h1Accent}`}
                       </span>
                       <span className="mt-auto pt-4 text-sm text-acid-ink/75">
-                        {n > 0 ? `${n} ${n === 1 ? 'caso resolvido' : 'casos resolvidos'} · ` : ''}
-                        <span className="font-medium text-acid-ink underline-offset-4 group-hover:underline group-focus-visible:underline">Ver serviço →</span>
+                        <span id={`outro-${o.slug}-casos`}>{n > 0 ? `${n} ${n === 1 ? 'caso resolvido' : 'casos resolvidos'}` : ''}</span>
+                        {n > 0 && ' · '}
+                        <span className="font-medium text-acid-ink underline-offset-4 group-hover:underline group-focus-visible:underline">
+                          Ver serviço <span aria-hidden>→</span>
+                        </span>
                       </span>
                     </a>
                   </li>
