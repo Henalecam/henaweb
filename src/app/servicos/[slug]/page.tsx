@@ -155,9 +155,9 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
               <span data-mark>O que você recebe</span>
             </h2>
             <SectionLink id="entregas" title="O que você recebe" />
-            <ol className="mt-8 grid gap-5 md:grid-cols-2">
+            <ol data-win-group className="mt-8 grid gap-5 md:grid-cols-2">
               {s.deliverables.map((d, i) => (
-                <li key={d.title} className="win flex flex-col">
+                <li key={d.title} data-win-item className="win flex flex-col">
                   <div className="win-bar">
                     <span aria-hidden>etapa_{String(i + 1).padStart(2, '0')}.txt</span>
                   </div>
