@@ -185,7 +185,7 @@ export default function Nav() {
                 className="toon-sm toon-press flex items-center gap-2 rounded-full bg-acid px-5 py-2.5 text-sm font-medium text-acid-ink"
               >
                 <span className="h-1.5 w-1.5 animate-[blink_1.4s_infinite] rounded-full bg-acid-ink" />
-                Iniciar projeto
+                Abrir um caso
               </a>
             </Magnetic>
           </div>

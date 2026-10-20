@@ -68,7 +68,7 @@ export default function Hero() {
                 data-cursor="Vamos"
                 className="toon toon-press group inline-flex items-center gap-3 rounded-full bg-acid px-6 py-4 font-medium text-acid-ink"
               >
-                Iniciar um projeto
+                Abrir um caso
                 <span className="transition-transform duration-500 group-hover:translate-x-1 group-focus-visible:translate-x-1">→</span>
               </a>
             </Magnetic>
