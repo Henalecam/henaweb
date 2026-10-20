@@ -105,9 +105,16 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
                   <a
                     href={`/casos/${c.slug}`}
                     aria-current={c.slug === p.slug ? 'page' : undefined}
-                    title={`Caso nº ${String(k + 1).padStart(2, '0')} · ${c.name}`}
                     className="group/dot relative grid h-6 w-6 place-items-center"
                   >
+                    {/* the case's name pops above the dot on hover or keyboard focus (the native title took a
+                        second to show and never showed for keyboard users) */}
+                    <span
+                      aria-hidden
+                      className={`pointer-events-none absolute bottom-full z-10 mb-1 translate-y-1 rounded-md ${k === 0 ? 'left-0' : 'left-1/2 -translate-x-1/2'} bg-paper px-2 py-0.5 font-mono text-[0.65rem] whitespace-nowrap text-acid-ink normal-case opacity-0 shadow-[2px_2px_0_#140a26] transition-[opacity,translate] duration-150 group-hover/dot:translate-y-0 group-hover/dot:opacity-100 group-focus-visible/dot:translate-y-0 group-focus-visible/dot:opacity-100`}
+                    >
+                      {String(k + 1).padStart(2, '0')} · {c.name}
+                    </span>
                     {/* cases already opened get a ring (MarkRead reveals data-read-mark), so the strip doubles as a reading map */}
                     {c.slug !== p.slug && (
                       <span data-read-mark={c.slug} hidden aria-hidden className="pointer-events-none absolute inset-[5px] rounded-full border-[1.5px] border-acid/80" />
