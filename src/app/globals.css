@@ -370,6 +370,25 @@ html {
   background: #f9e27d;
 }
 
+/* the counter bell answers the pointer: a little shiver says "ring me"; keyboard focus gets a dashed ring.
+   `rotate` (not transform) so it doesn't fight GSAP's ringing swing */
+.diner [data-bell-ring] {
+  transition: opacity 0.2s;
+}
+.diner [data-bell-btn]:focus-visible [data-bell-ring] {
+  opacity: 1;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .diner:has([data-bell-btn]:hover) [data-bell] {
+    animation: bell-shiver 0.5s ease-in-out infinite;
+  }
+}
+@keyframes bell-shiver {
+  0%, 100% { rotate: 0deg; }
+  25% { rotate: -5deg; }
+  75% { rotate: 5deg; }
+}
+
 /* burger sparkles */
 .sparkle {
   animation: sparkle 2.4s ease-in-out infinite;
