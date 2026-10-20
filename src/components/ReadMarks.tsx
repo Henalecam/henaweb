@@ -92,6 +92,12 @@ export function ReadProgress({ slugs }: { slugs: string[] }) {
     document.documentElement.toggleAttribute('data-only-unread', onlyUnread);
     return () => document.documentElement.removeAttribute('data-only-unread');
   }, [onlyUnread]);
+  // the empty-filter notice (CasesEmpty) can switch "só os que faltam" back off
+  useEffect(() => {
+    const showAll = () => setOnlyUnread(false);
+    window.addEventListener('hena:show-read', showAll);
+    return () => window.removeEventListener('hena:show-read', showAll);
+  }, []);
 
   if (!read.length) return null;
   const all = read.length === slugs.length;
@@ -205,5 +211,24 @@ export function RandomCase() {
     >
       <span aria-hidden>🎲</span> {allRead ? 'Sortear um caso para reler' : 'Sortear um caso que você ainda não leu'}
     </button>
+  );
+}
+
+/**
+ * /casos: when "só os que faltam" and the service filter together leave no card on screen, the grid used
+ * to just vanish. This notice is shown by CSS (globals.css, `[data-case-empty]`) only in that case.
+ */
+export function CasesEmpty() {
+  return (
+    <p data-case-empty data-print-hide className="mt-10 rounded-2xl border-2 border-dashed border-ink/30 px-6 py-8 text-center font-mono text-sm text-ink/80">
+      Nada em aberto aqui: você já investigou todos os casos deste filtro.{' '}
+      <button
+        type="button"
+        onClick={() => window.dispatchEvent(new Event('hena:show-read'))}
+        className="min-h-8 font-medium text-acid underline underline-offset-2 hover:text-ink"
+      >
+        Mostrar os já lidos
+      </button>
+    </p>
   );
 }

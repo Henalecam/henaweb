@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { RandomCase, ReadProgress } from '@/components/ReadMarks';
+import { RandomCase, ReadProgress, CasesEmpty } from '@/components/ReadMarks';
 import { projectLinks } from '@/lib/projectLinks';
 import Image from 'next/image';
 import { projects, site } from '@/lib/content';
@@ -90,7 +90,7 @@ export default function CasesIndex() {
           />
           <ReadProgress slugs={projects.map((p) => p.slug)} />
           <RandomCase />
-          <ul className="mt-10 grid gap-6 md:grid-cols-2">
+          <ul data-case-list className="mt-10 grid gap-6 md:grid-cols-2">
             {projects.map((p, i) => (
               <li key={p.slug} data-case-service={p.service} data-case-slug={p.slug}>
                 {/* the link is named by the case and its kind and described by the problem: the whole card used to be
@@ -156,6 +156,7 @@ export default function CasesIndex() {
               </li>
             ))}
           </ul>
+          <CasesEmpty />
 
           <ClosingCta
             title="Reconheceu o seu problema em algum"

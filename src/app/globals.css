@@ -453,6 +453,15 @@ html {
   animation-play-state: paused !important;
 }
 
+/* /casos: "nothing left here" notice, only when the filters leave the grid empty (CasesEmpty) */
+[data-case-empty] {
+  display: none;
+}
+:root:not([data-only-unread]) main:not(:has([data-case-list] > li:not([hidden]))) [data-case-empty],
+:root[data-only-unread] main:not(:has([data-case-list] > li:not([hidden]):not([data-case-read]))) [data-case-empty] {
+  display: block;
+}
+
 /* /casos "mostrar só os que faltam" (ReadProgress) */
 :root[data-only-unread] li[data-case-read] {
   display: none;
