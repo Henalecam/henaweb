@@ -447,6 +447,16 @@ html {
   100% { translate: 0 0; }
 }
 
+/* Setor público: the audit trail ends in a blinking terminal cursor (steady with reduced motion) */
+@media (prefers-reduced-motion: no-preference) {
+  .log-cursor {
+    animation: log-cursor 1.1s steps(1, end) infinite;
+  }
+}
+@keyframes log-cursor {
+  50% { opacity: 0; }
+}
+
 /* burger sparkles */
 .sparkle {
   animation: sparkle 2.4s ease-in-out infinite;

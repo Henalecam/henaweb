@@ -174,9 +174,13 @@ export default function GovTech() {
               <div className="border-t border-line p-6 md:border-t-0 md:border-l md:p-8">
                 <span className="label">Trilha de auditoria</span>
                 <ul className="mt-5 space-y-3 font-mono text-[0.72rem] leading-snug">
-                  {audit.map(([time, entry]) => (
+                  {audit.map(([time, entry], i) => (
                     <li key={entry} data-log>
                       <span className="text-muted">{time} ·</span> <span className="text-ink/85">{entry}</span>
+                      {/* the log is live: a terminal cursor waits after the last entry */}
+                      {i === audit.length - 1 && (
+                        <span aria-hidden className="log-cursor ml-1 inline-block h-[1.05em] w-[0.55em] translate-y-[0.15em] bg-mint" />
+                      )}
                     </li>
                   ))}
                 </ul>
