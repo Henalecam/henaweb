@@ -93,7 +93,14 @@ export default function CasesIndex() {
           <ul className="mt-10 grid gap-6 md:grid-cols-2">
             {projects.map((p, i) => (
               <li key={p.slug} data-case-service={p.service} data-case-slug={p.slug}>
-                <a href={`/casos/${p.slug}`} className="group block">
+                {/* the link is named by the case and its kind and described by the problem: the whole card used to be
+                    its name (screenshot alt + title + kind + problem, 107–151 characters on every Tab) */}
+                <a
+                  href={`/casos/${p.slug}`}
+                  aria-labelledby={`caso-${p.slug} tipo-${p.slug}`}
+                  aria-describedby={`problema-${p.slug}`}
+                  className="group block"
+                >
                   {/* the clicked card borrows the case page window's view-transition-name (CASE_MORPH) */}
                   <div
                     data-case-window={p.slug}
@@ -109,7 +116,8 @@ export default function CasesIndex() {
                       {p.shot ? (
                         <Image
                           src={p.shot.desktop}
-                          alt={`Tela de ${p.name}`}
+                          // decorative inside the link: the title names the case
+                          alt=""
                           fill
                           // the first card is the page's LCP: fetched right away instead of lazily
                           preload={i === 0}
@@ -127,9 +135,15 @@ export default function CasesIndex() {
                       )}
                     </div>
                   </div>
-                  <h2 className="mt-5 text-3xl font-medium tracking-[-0.03em] group-hover:text-acid group-focus-visible:text-acid">{p.name} →</h2>
-                  <p className="serif mt-1 text-lg text-ink/60">{p.kind}</p>
-                  <p className="mt-2 leading-relaxed text-ink/70">{p.challenge}</p>
+                  <h2 id={`caso-${p.slug}`} className="mt-5 text-3xl font-medium tracking-[-0.03em] group-hover:text-acid group-focus-visible:text-acid">
+                    {p.name} <span aria-hidden>→</span>
+                  </h2>
+                  <p id={`tipo-${p.slug}`} className="serif mt-1 text-lg text-ink/60">
+                    {p.kind}
+                  </p>
+                  <p id={`problema-${p.slug}`} className="mt-2 leading-relaxed text-ink/70">
+                    {p.challenge}
+                  </p>
                 </a>
                 {/* what got built, at a glance: outside the link so its accessible name stays the case name */}
                 <ul aria-label={`Recursos de ${p.name}`} className="mt-4 flex flex-wrap gap-1.5">
