@@ -6,6 +6,7 @@ import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { projects, type Project } from '@/lib/content';
 import MockUI from './MockUI';
 import { RevealRead } from './ReadMarks';
+import { serviceLinks } from '@/lib/serviceLinks';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -102,15 +103,28 @@ export default function Work() {
   const [stopped, setStopped] = useState(false);
   const [inView, setInView] = useState(false);
   const p = projects[active];
+  // desktop index: narrow the list to one service (the archive page has the same chips); rotation and
+  // arrow keys stay inside the filtered list
+  const [svc, setSvc] = useState<string | null>(null);
+  const shown = projects.map((_, i) => i).filter((i) => !svc || projects[i].service === svc);
+  const pickService = (slug: string | null) => {
+    setSvc(slug);
+    const first = projects.findIndex((x) => !slug || x.service === slug);
+    if (first >= 0 && (slug ? projects[active].service !== slug : false)) setActive(first);
+  };
+  const services = serviceLinks
+    .map((x) => ({ ...x, n: projects.filter((pr) => pr.service === x.slug).length }))
+    .filter((x) => x.n > 0);
 
   // WAI-ARIA tabs: arrows, Home and End move between projects (focusing a tab selects it)
   const onTabKey = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    const last = projects.length - 1;
-    const next = { ArrowDown: active + 1, ArrowRight: active + 1, ArrowUp: active - 1, ArrowLeft: active - 1, Home: 0, End: last }[e.key];
+    const pos = Math.max(0, shown.indexOf(active));
+    const last = shown.length - 1;
+    const next = { ArrowDown: pos + 1, ArrowRight: pos + 1, ArrowUp: pos - 1, ArrowLeft: pos - 1, Home: 0, End: last }[e.key];
     if (next === undefined) return;
     e.preventDefault();
-    const i = next < 0 ? last : next > last ? 0 : next;
-    document.getElementById(`work-tab-${i}`)?.focus();
+    const k = next < 0 ? last : next > last ? 0 : next;
+    document.getElementById(`work-tab-${shown[k]}`)?.focus();
   };
 
   useGSAP(
@@ -156,9 +170,16 @@ export default function Work() {
   const rotating = !paused && !stopped && inView;
   useEffect(() => {
     if (!rotating || window.matchMedia('(max-width: 1023px), (prefers-reduced-motion: reduce)').matches) return;
-    const id = setInterval(() => setActive((a) => (a + 1) % projects.length), 6500);
+    const id = setInterval(
+      () =>
+        setActive((a) => {
+          const list = projects.map((_, i) => i).filter((i) => !svc || projects[i].service === svc);
+          return list[(list.indexOf(a) + 1) % list.length] ?? a;
+        }),
+      6500,
+    );
     return () => clearInterval(id);
-  }, [rotating]);
+  }, [rotating, svc]);
 
   return (
     <section ref={root} id="projetos" className="sky relative overflow-hidden border-t-[3px] border-toon py-[clamp(5rem,9vw,8rem)]">
@@ -192,9 +213,25 @@ export default function Work() {
           onFocusCapture={() => setPaused(true)}
         >
           <div className="lg:col-span-4">
+            <div role="group" aria-label="Filtrar casos por serviço" className="mb-4 flex flex-wrap gap-1.5" data-print-hide>
+              {[{ slug: null as string | null, name: 'Todos', n: projects.length }, ...services].map((x) => (
+                <button
+                  key={x.slug ?? 'todos'}
+                  type="button"
+                  aria-pressed={svc === x.slug}
+                  onClick={() => pickService(x.slug)}
+                  className={`min-h-8 rounded-full border px-3 font-mono text-[0.68rem] transition-colors ${
+                    svc === x.slug ? 'border-acid bg-acid text-acid-ink' : 'border-ink/30 text-ink/75 hover:border-ink hover:text-ink'
+                  }`}
+                >
+                  {x.name} <span className="opacity-70">({x.n})</span>
+                </button>
+              ))}
+            </div>
             <ol data-work-in className="flex flex-col" role="tablist" aria-label="Projetos">
               {projects.map((item, i) => {
                 const on = i === active;
+                if (!shown.includes(i)) return null;
                 return (
                   <li key={item.name} role="presentation">
                     <button
