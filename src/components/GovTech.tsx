@@ -36,8 +36,20 @@ export default function GovTech() {
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         const steps = gsap.utils.toArray<HTMLElement>('[data-step]');
         const logs = gsap.utils.toArray<HTMLElement>('[data-log]');
+        // the status badge follows the replay: "em andamento" while the flow fills, "concluído" once the
+        // last step lands (the server HTML, like the flow, ships finished)
+        const badge = root.current?.querySelector<HTMLElement>('[data-gov-status]');
+        const setDone = (done: boolean) => badge?.toggleAttribute('data-done', done);
+        setDone(false);
         const tl = gsap.timeline({
-          scrollTrigger: { trigger: '[data-panel]', start: 'top 70%', end: 'bottom 55%', scrub: 0.6 },
+          scrollTrigger: {
+            trigger: '[data-panel]',
+            start: 'top 70%',
+            end: 'bottom 55%',
+            scrub: 0.6,
+            onUpdate: (self) => setDone(self.progress > 0.97),
+            onRefresh: (self) => setDone(self.progress > 0.97),
+          },
         });
         steps.forEach((s, i) => {
           // each segment fills from this dot to the next one
@@ -62,6 +74,7 @@ export default function GovTech() {
           stagger: 0.06,
           scrollTrigger: { trigger: '[data-pillars]', start: 'top 85%' },
         });
+        return () => setDone(true);
       });
 
       return () => {
@@ -127,8 +140,13 @@ export default function GovTech() {
             <div className="m-1.5 border-2 border-[#7d7394] bg-acid-ink">
             <div className="flex items-center justify-between border-b border-line px-5 py-3">
               <span className="label">Gestão de projetos e verbas</span>
-              <span className="rounded-full border border-mint/50 px-2.5 py-0.5 font-mono text-[0.65rem] text-mint uppercase">
-                em andamento
+              <span
+                data-gov-status
+                data-done=""
+                className="group rounded-full border border-mint/50 px-2.5 py-0.5 font-mono text-[0.65rem] text-mint uppercase transition-colors duration-300 data-[done]:border-mint data-[done]:bg-mint data-[done]:text-acid-ink"
+              >
+                <span className="group-data-[done]:hidden">em andamento</span>
+                <span className="hidden group-data-[done]:inline">✓ concluído</span>
               </span>
             </div>
 
