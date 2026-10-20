@@ -201,12 +201,16 @@ export default function GovTech() {
             data-pillars
             className="mt-8 grid divide-y divide-acid-ink/15 rounded-xl border-[2.5px] border-toon bg-paper shadow-[4px_4px_0_var(--color-toon)] sm:grid-cols-2 sm:gap-4 sm:divide-y-0 sm:rounded-none sm:border-0 sm:bg-transparent sm:shadow-none"
           >
-            {govPillars.map((p) => (
+            {govPillars.map((p, i) => (
               <li
                 key={p.k}
                 data-pillar
                 className="px-5 py-3.5 text-acid-ink sm:rounded-xl sm:border-[2.5px] sm:border-toon sm:bg-paper sm:p-5 sm:shadow-[4px_4px_0_var(--color-toon)]"
               >
+                {/* numbered like the articles of a law: the section talks to people who read regulations for a living */}
+                <span aria-hidden className="mr-2 align-[0.12em] font-mono text-[0.7rem] tracking-wide text-acid-ink/70 uppercase">
+                  Art. {i + 1}º
+                </span>
                 <span className="font-groovy text-base text-[#c2410c] sm:text-lg">{p.k}</span>
                 <p className="mt-0.5 text-[0.95rem] leading-snug text-acid-ink/80 sm:mt-1 sm:text-base sm:leading-normal">{p.v}</p>
               </li>
