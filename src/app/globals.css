@@ -50,12 +50,14 @@
     text-wrap: pretty;
   }
 
-  /* an open modal freezes the page behind it (Lenis is stopped in SmoothScroll); the gutter keeps the
-     layout from jumping sideways when the scrollbar goes away */
+  /* an open modal freezes the page behind it (Lenis is stopped and html[data-modal] set in SmoothScroll;
+     it was `html:has(dialog[open])`, but a :has() anchored on html made every inline-style write on the
+     page restyle the whole document — ~2,200 elements, 200 times during the home's load); the gutter
+     keeps the layout from jumping sideways when the scrollbar goes away */
   html {
     scrollbar-gutter: stable;
   }
-  html:has(dialog[open]) {
+  html[data-modal] {
     overflow: hidden;
   }
 
@@ -339,8 +341,9 @@
     translate: 4px 4px;
     filter: drop-shadow(2px 2px 0 var(--color-toon));
   }
+  /* the left neighbour is marked by the footer (data-near): a `span:has(+ span:hover)` cost a restyle of the page on every write */
   [data-wordmark] > span:hover + span,
-  [data-wordmark] > span:has(+ span:hover) {
+  [data-wordmark] > span[data-near] {
     translate: 2px 2px;
     filter: drop-shadow(4px 4px 0 var(--color-toon));
   }
@@ -416,7 +419,8 @@ html {
   opacity: 1;
 }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .diner:has([data-bell-btn]:hover) [data-bell] {
+  /* data-bell-hover is set by the bell's hit area (Process); a :has() here restyled the whole diner subtree on every GSAP frame */
+  .diner[data-bell-hover] [data-bell] {
     animation: bell-shiver 0.5s ease-in-out infinite;
   }
 }
@@ -591,8 +595,10 @@ li[data-picked] .win {
 [data-case-empty] {
   display: none;
 }
-:root:not([data-only-unread]) main:not(:has([data-case-list] > li:not([hidden]))) [data-case-empty],
-:root[data-only-unread] main:not(:has([data-case-list] > li:not([hidden]):not([data-case-read]))) [data-case-empty] {
+/* anchored on [data-case-zone] (only on /casos), not on main: a :has() on every page's main made each style
+   write on the home restyle the whole page */
+:root:not([data-only-unread]) [data-case-zone]:not(:has([data-case-list] > li:not([hidden]))) [data-case-empty],
+:root[data-only-unread] [data-case-zone]:not(:has([data-case-list] > li:not([hidden]):not([data-case-read]))) [data-case-empty] {
   display: block;
 }
 

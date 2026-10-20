@@ -315,6 +315,8 @@ export default function Process() {
                     data-bell-btn
                     className="pointer-events-auto cursor-pointer outline-none"
                     onClick={ringBell}
+                    onPointerEnter={(e) => e.currentTarget.closest('.diner')?.setAttribute('data-bell-hover', '')}
+                    onPointerLeave={(e) => e.currentTarget.closest('.diner')?.removeAttribute('data-bell-hover')}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();

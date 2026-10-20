@@ -109,6 +109,14 @@ export default function Footer() {
         <div
           data-wordmark
           aria-hidden
+          // the letter left of the pointed one dips too (globals.css); marked here instead of a costly :has()
+          onPointerOver={(e) => {
+            const box = e.currentTarget;
+            box.querySelector('[data-near]')?.removeAttribute('data-near');
+            const letter = (e.target as HTMLElement).closest('[data-wordmark] > span');
+            letter?.previousElementSibling?.setAttribute('data-near', '');
+          }}
+          onPointerLeave={(e) => e.currentTarget.querySelector('[data-near]')?.removeAttribute('data-near')}
           className="relative z-10 flex justify-center overflow-hidden pt-2 pb-4 font-groovy text-[clamp(3rem,16vw,19rem)] leading-[0.9] select-none"
         >
           {'HenaWeb'.split('').map((c, i) => (

@@ -16,7 +16,12 @@ export default function SmoothScroll() {
 
     // a modal (search, shortcuts, full screenshot) freezes the page behind it: without this the
     // wheel over the backdrop kept gliding the page underneath
-    const syncDialogs = () => (document.querySelector('dialog[open]') ? lenis.stop() : lenis.start());
+    const syncDialogs = () => {
+      const open = !!document.querySelector('dialog[open]');
+      document.documentElement.toggleAttribute('data-modal', open); // html[data-modal] { overflow: hidden }
+      if (open) lenis.stop();
+      else lenis.start();
+    };
     const watch = new MutationObserver(syncDialogs);
     watch.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['open'] });
 

@@ -74,7 +74,7 @@ export default function CasesIndex() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script dangerouslySetInnerHTML={{ __html: CASE_MORPH }} />
       <main id="conteudo" tabIndex={-1} className="sky min-h-screen text-ink">
-        <div className="gutter mx-auto max-w-6xl pt-36 pb-24">
+        <div data-case-zone className="gutter mx-auto max-w-6xl pt-36 pb-24">
           <p className="label !text-teal">Arquivo de casos</p>
           <h1 className="mt-4 text-[clamp(2.8rem,7vw,6.5rem)] leading-[0.9] font-medium tracking-[-0.05em]">
             Casos{' '}
