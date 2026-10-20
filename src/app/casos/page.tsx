@@ -133,6 +133,13 @@ export default function CasesIndex() {
                       ) : (
                         p.mock && <MockUI variant={p.mock.variant} hue={p.mock.hue} />
                       )}
+                      {/* pointing at a case (or tabbing to it) thumps the archive's verdict onto its screen */}
+                      <span
+                        aria-hidden
+                        className="case-stamp pointer-events-none absolute right-4 bottom-4 z-10 rounded-md border-4 border-[#1f6f63] bg-lemon/90 px-3 py-1 font-mono text-xs font-bold tracking-[0.2em] text-[#1f6f63] uppercase select-none"
+                      >
+                        Resolvido ✓
+                      </span>
                     </div>
                   </div>
                   <h2 id={`caso-${p.slug}`} className="mt-5 text-3xl font-medium tracking-[-0.03em] group-hover:text-acid group-focus-visible:text-acid">

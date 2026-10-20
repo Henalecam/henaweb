@@ -630,6 +630,39 @@ details[open]::details-content {
   animation: ghost-bob 4.5s ease-in-out infinite;
 }
 
+/* /casos: the verdict stamp lands on a case card's screen while it is pointed at or focused */
+.case-stamp {
+  opacity: 0;
+  rotate: -12deg;
+  transition: opacity 0.2s;
+}
+a:focus-visible .case-stamp {
+  opacity: 0.92;
+}
+@media (hover: hover) {
+  a:hover .case-stamp {
+    opacity: 0.92;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  a:focus-visible .case-stamp {
+    animation: case-stamp 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  a:hover .case-stamp {
+    animation: case-stamp 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+@keyframes case-stamp {
+  0% { scale: 2.2; opacity: 0; }
+  60% { scale: 0.92; opacity: 0.92; }
+  100% { scale: 1; opacity: 0.92; }
+}
+@media print {
+  .case-stamp { display: none; }
+}
+
 /* contact: the rubber stamp thumps onto the confirmation */
 @keyframes stamp-in {
   0% { transform: scale(2.2) rotate(-12deg); opacity: 0; }
