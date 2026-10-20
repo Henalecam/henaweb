@@ -31,9 +31,10 @@ const ITEMS: Item[] = [
     href: `/servicos/${s.slug}`,
     keywords: [s.intro, ...s.keywords, ...s.problems, ...s.deliverables.map((d) => `${d.title} ${d.body}`), ...s.examples.map((e) => e.name)].join(' '),
   })),
-  ...homeFaq.map((f) => ({ group: 'Perguntas', label: f.q, href: `/#${faqId(f.q)}` })),
+  // the answer is searched too: "prazo" finds "Em quanto tempo o primeiro resultado aparece?"
+  ...homeFaq.map((f) => ({ group: 'Perguntas', label: f.q, href: `/#${faqId(f.q)}`, keywords: f.a })),
   ...services.flatMap((s) =>
-    s.faq.map((f) => ({ group: 'Perguntas', label: f.q, hint: s.name, href: `/servicos/${s.slug}#${faqId(f.q)}` })),
+    s.faq.map((f) => ({ group: 'Perguntas', label: f.q, hint: s.name, href: `/servicos/${s.slug}#${faqId(f.q)}`, keywords: f.a })),
   ),
   {
     group: 'Ações',
@@ -44,6 +45,25 @@ const ITEMS: Item[] = [
   },
   { group: 'Ações', label: 'Mandar um e-mail', hint: site.email, href: `mailto:${site.email}` },
 ];
+
+// the words visitors type for what the site says another way (folded, no accents); any of them counts as a hit
+const SYNONYMS: Record<string, string[]> = {
+  preco: ['custa', 'custo', 'investimento', 'orcamento'],
+  valor: ['custa', 'custo', 'investimento', 'orcamento'],
+  orcamento: ['custa', 'custo', 'investimento'],
+  caro: ['custa', 'custo'],
+  prazo: ['tempo', 'semanas', 'cronograma'],
+  demora: ['tempo', 'semanas', 'prazo'],
+  manutencao: ['suporte', 'evolucao', 'monitoramento'],
+  suporte: ['manutencao', 'monitoramento'],
+  dono: ['fica com', 'propriedade'],
+  governo: ['publico', 'prefeitura', 'orgao'],
+  site: ['sites', 'pagina', 'landing'],
+  app: ['aplicativo', 'mobile', 'celular'],
+  aplicativo: ['app', 'mobile'],
+  chatbot: ['agente', 'atendimento', 'whatsapp'],
+  robo: ['agente', 'automacao', 'automatica'],
+};
 
 const SEARCHABLE = ITEMS.map((it) => fold(`${it.label} ${it.hint ?? ''} ${it.group} ${it.keywords ?? ''}`));
 
@@ -65,7 +85,8 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
     const words = fold(query).split(/\s+/).filter(Boolean);
     if (!words.length) return [...recent, ...ITEMS.filter((it) => it.group !== 'Perguntas')];
     // a dropped last letter forgives gender/number: "custo" finds "custa", "sistemas" finds "sistema"
-    const hit = (text: string, w: string) => text.includes(w) || (w.length >= 4 && text.includes(w.slice(0, -1)));
+    const hitOne = (text: string, w: string) => text.includes(w) || (w.length >= 4 && text.includes(w.slice(0, -1)));
+    const hit = (text: string, w: string) => hitOne(text, w) || (SYNONYMS[w] ?? []).some((alt) => text.includes(alt));
     const found = ITEMS.map((it, i) => ({ it, i })).filter(({ i }) => words.every((w) => hit(SEARCHABLE[i], w)));
     // what the visitor typed in the title itself ranks above a match buried in keywords; groups stay together
     const inLabel = ({ it }: { it: Item }) => words.every((w) => hit(fold(`${it.label} ${it.hint ?? ''}`), w));
