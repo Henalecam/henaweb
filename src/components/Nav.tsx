@@ -177,7 +177,9 @@ export default function Nav() {
               className="hidden items-center gap-2 rounded-full border border-line px-3 py-2 font-mono text-xs whitespace-nowrap xl:flex text-ink/70 transition-colors hover:border-acid hover:text-acid"
             >
               <span aria-hidden>🔎</span>
-              <kbd className="font-mono">{mac ? '⌘K' : 'Ctrl K'}</kbd>
+              {/* fixed 6ch: the server renders "⌘K" and Windows/Linux swap in the wider "Ctrl K" after hydration,
+                  which used to push the whole menu sideways (layout shift 0.039 on desktop) */}
+              <kbd className="inline-block w-[6ch] text-center font-mono">{mac ? '⌘K' : 'Ctrl K'}</kbd>
             </button>
             <Magnetic>
               <a
