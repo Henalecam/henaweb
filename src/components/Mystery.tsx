@@ -240,8 +240,11 @@ function Board() {
 
       {boardLayout.map((e) => (
         <div key={e.id} data-evidence className={`absolute z-[2] ${e.box}`} style={{ rotate: `${e.rot}deg` }}>
-          <Pin />
-          {evidenceBodies[e.id].body}
+          {/* hanging from its pin: brushing the pointer past an evidence card sets it swinging */}
+          <div className="evidence-swing">
+            <Pin />
+            {evidenceBodies[e.id].body}
+          </div>
         </div>
       ))}
 

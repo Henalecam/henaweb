@@ -409,6 +409,24 @@ html {
   75% { rotate: 5deg; }
 }
 
+/* Mystery board: evidence hangs from its pin and swings when the pointer brushes it (desktop, motion ok).
+   `rotate`, not transform, so it adds to the scene's GSAP transforms on the card around it */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .evidence-swing {
+    transform-origin: 50% 0;
+  }
+  [data-evidence]:hover .evidence-swing {
+    animation: evidence-swing 1.2s ease-out;
+  }
+}
+@keyframes evidence-swing {
+  0%, 100% { rotate: 0deg; }
+  18% { rotate: 3.5deg; }
+  42% { rotate: -2.2deg; }
+  66% { rotate: 1deg; }
+  84% { rotate: -0.4deg; }
+}
+
 /* hero: "role para investigar ↓" */
 @keyframes cue-bob {
   0%, 100% { translate: 0 0; }
