@@ -444,6 +444,37 @@ html {
   84% { rotate: -0.4deg; }
 }
 
+/* "Principais recursos" on a case page: evidence tags, each hung a little askew with a punched hole
+   (the page's own background showing through); pointing at one straightens it */
+.evidence-tag {
+  rotate: -1.4deg;
+  transition: rotate 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.evidence-tag:nth-child(even) { rotate: 1.1deg; }
+.evidence-tag:nth-child(3n) { rotate: -0.5deg; }
+.evidence-tag:hover { rotate: 0deg; }
+.evidence-tag::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 7px;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border: 1.5px solid var(--color-toon);
+  border-radius: 50%;
+  background: var(--color-bg);
+  /* a metal grommet around the hole, so it reads as punched rather than as a bullet */
+  box-shadow: 0 0 0 2px #e3b44f;
+}
+@media (min-width: 40rem) {
+  .evidence-tag::before { left: 11px; width: 8px; height: 8px; margin-top: -4px; box-shadow: 0 0 0 2.5px #e3b44f; }
+}
+@media print {
+  .evidence-tag { rotate: none; }
+  .evidence-tag::before { background: #fff; }
+}
+
 /* case page dots: while the pointer is on the strip, only the hovered dot shows its name (a dot that
    still has keyboard focus used to keep its label up next to it) */
 nav[aria-label='Casos do arquivo']:hover a:not(:hover) .dot-tip {

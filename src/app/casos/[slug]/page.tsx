@@ -205,9 +205,10 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
 
           <section className="mt-16" aria-labelledby="recursos">
             <h2 id="recursos" className="label">Principais recursos</h2>
-            <ul className="mt-4 flex flex-wrap gap-2">
+            {/* each feature is tagged like evidence: a punched hole, hung slightly askew, straightened on hover */}
+            <ul className="mt-4 flex flex-wrap gap-x-1.5 gap-y-2 sm:gap-2">
               {p.highlights.map((h) => (
-                <li key={h} className="toon-sm rounded-full bg-paper px-4 py-1.5 text-acid-ink">
+                <li key={h} className="evidence-tag toon-sm relative rounded-full bg-paper py-1.5 pr-3 pl-[22px] sm:pr-4 sm:pl-7 text-acid-ink">
                   {h}
                 </li>
               ))}
