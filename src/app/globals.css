@@ -627,15 +627,14 @@ h2[id] {
 }
 
 /* arriving at a section from "Nesta página" or a copied #link: a marker stroke sweeps under the title
-   once the smooth scroll has landed, then fades, so the eye finds where the jump ended */
-h2[id]:target {
+   once the smooth scroll has landed, then fades, so the eye finds where the jump ended. It sits on an
+   inline span (data-mark) so it follows the words line by line instead of the whole column */
+h2[id]:target [data-mark] {
   background-image: linear-gradient(rgb(247 147 30 / 0.45), rgb(247 147 30 / 0.45));
   background-repeat: no-repeat;
   background-position: 0 92%;
-  background-origin: content-box;
-  background-clip: content-box;
-  /* hug the words (not the whole column) so the stroke stops where the title does */
-  width: fit-content;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
   animation: target-mark 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
 }
 

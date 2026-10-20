@@ -143,7 +143,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
 
           <section className="group relative mt-24" aria-labelledby="sintomas">
             <h2 id="sintomas" className="font-groovy pr-28 text-[clamp(1.8rem,3.5vw,3rem)] md:pr-0 text-groovy [text-shadow:3px_3px_0_#140a26]">
-              Sintomas que resolvemos
+              <span data-mark>Sintomas que resolvemos</span>
             </h2>
             <SectionLink id="sintomas" title="Sintomas que resolvemos" />
             <ServiceSymptoms problems={s.problems} service={s.name} />
@@ -151,7 +151,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
 
           <section className="group relative mt-24" aria-labelledby="entregas">
             <h2 id="entregas" className="font-groovy pr-28 text-[clamp(1.8rem,3.5vw,3rem)] md:pr-0 text-teal [text-shadow:3px_3px_0_#140a26]">
-              O que você recebe
+              <span data-mark>O que você recebe</span>
             </h2>
             <SectionLink id="entregas" title="O que você recebe" />
             <ol className="mt-8 grid gap-5 md:grid-cols-2">
@@ -171,7 +171,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
 
           <section className="group relative mt-24" aria-labelledby="exemplos">
             <h2 id="exemplos" className="font-groovy pr-28 text-[clamp(1.8rem,3.5vw,3rem)] md:pr-0 text-acid [text-shadow:3px_3px_0_#140a26]">
-              Exemplos
+              <span data-mark>Exemplos</span>
             </h2>
             <SectionLink id="exemplos" title="Exemplos" />
             <ul className="mt-8 grid gap-4 md:grid-cols-3">
@@ -246,7 +246,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
 
           <section className="group relative mt-24" aria-labelledby="perguntas">
             <h2 id="perguntas" className="font-groovy pr-28 text-[clamp(1.8rem,3.5vw,3rem)] md:pr-0 text-groovy [text-shadow:3px_3px_0_#140a26]">
-              Perguntas frequentes
+              <span data-mark>Perguntas frequentes</span>
             </h2>
             <SectionLink id="perguntas" title="Perguntas frequentes" />
             <div className="mt-8 flex flex-col gap-3">
