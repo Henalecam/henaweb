@@ -92,7 +92,10 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             </ol>
           </nav>
 
-          <p className="label mt-8 !text-teal">Caso nº {String(i + 1).padStart(2, '0')} · {p.kind}</p>
+          <p className="label mt-8 !text-teal">
+            Caso nº {String(i + 1).padStart(2, '0')}
+            <span className="text-ink/60"> de {String(projects.length).padStart(2, '0')}</span> · {p.kind}
+          </p>
           <h1 className="mt-4 text-[clamp(2.8rem,7vw,6.5rem)] leading-[0.9] font-medium tracking-[-0.05em]">
             {p.name}
             <span className="font-groovy text-[0.7em] tracking-normal text-acid [text-shadow:4px_4px_0_#140a26]">.</span>
