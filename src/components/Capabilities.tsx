@@ -56,6 +56,7 @@ export default function Capabilities({ caseCounts = {} }: { caseCounts?: Record<
                 // resting pointer while the page scrolled past, shifting the whole list
                 onClick={() => setActive(i)}
                 aria-expanded={isOpen}
+                aria-controls={`cap-panel-${c.id}`}
                 className="group relative grid w-full grid-cols-12 items-baseline gap-4 overflow-hidden px-3 py-6 text-left md:px-6 md:py-8"
               >
                 <span className="font-groovy relative col-span-2 text-2xl text-[#c2410c] md:col-span-1 md:text-3xl">{c.id}</span>
@@ -70,14 +71,19 @@ export default function Capabilities({ caseCounts = {} }: { caseCounts?: Record<
                 >
                   +
                 </span>
-
+              </button>
+              {/* the answer sits next to the toggle, not inside it: inside a <button> it became part of the button's
+                  name (335 characters read on every focus, closed rows included) and could not be browsed */}
+              <div className="relative grid grid-cols-12 gap-4 px-3 md:px-6">
                 <span
+                  id={`cap-panel-${c.id}`}
+                  inert={!isOpen}
                   className={`relative col-span-12 grid transition-[grid-template-rows,opacity] duration-700 ease-[var(--ease-out-expo)] md:col-span-11 md:col-start-2 ${
                     isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                   }`}
                 >
                   <span className="overflow-hidden">
-                    <span className="grid gap-8 pt-6 md:grid-cols-11">
+                    <span className="grid gap-8 pt-4 pb-6 md:grid-cols-11 md:pt-2 md:pb-8">
                       <span className="flex flex-col gap-5 md:col-span-6">
                         <span className="text-lg leading-relaxed">{c.lead}</span>
                         <span className="flex flex-wrap gap-2">
@@ -100,7 +106,7 @@ export default function Capabilities({ caseCounts = {} }: { caseCounts?: Record<
                     </span>
                   </span>
                 </span>
-              </button>
+              </div>
               {/* the page link lives outside the toggle button (no nested interactive elements) */}
               <span className={`relative mx-3 mb-6 flex-wrap items-center gap-x-5 gap-y-3 md:mx-6 md:mb-8 ${isOpen ? 'flex' : 'hidden'}`}>
                 <a
