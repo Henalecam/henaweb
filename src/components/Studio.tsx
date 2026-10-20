@@ -56,7 +56,12 @@ export default function Studio() {
       <div className="grid gap-14 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <span className="label">(VII) Studio</span>
-          <figure data-portrait-card className="group toon mt-8 max-w-sm -rotate-2 rounded-sm bg-paper p-3 pb-4 transition-transform duration-500 hover:rotate-0 [&.is-developed]:rotate-0">
+          <figure data-portrait-card className="group toon relative mt-10 max-w-sm -rotate-2 rounded-sm bg-paper p-3 pb-4 transition-transform duration-500 hover:rotate-0 [&.is-developed]:rotate-0">
+            {/* a strip of tape holds the polaroid in place, like a photo taped into a case file */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -top-3.5 left-1/2 z-10 h-7 w-28 -translate-x-1/2 rotate-[4deg] border-x border-dashed border-toon/25 bg-[repeating-linear-gradient(-45deg,rgb(249_226_125/0.88)_0_8px,rgb(255_228_92/0.88)_8px_16px)] shadow-[0_2px_0_rgb(18_8_42/0.18)]"
+            />
             <div data-portrait className="relative aspect-[4/5] overflow-hidden bg-bg-2">
               <Image
                 src="/team/henrique.png"
