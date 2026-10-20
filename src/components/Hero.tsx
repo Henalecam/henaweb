@@ -44,7 +44,12 @@ export default function Hero() {
       <div data-hero-inner className="gutter relative flex h-full flex-col justify-end pt-28 pb-8">
         <div data-hero-fade className="mb-auto hidden items-start justify-between pt-6 md:flex">
           <span className="label">(Studio de engenharia de software)</span>
-          <span className="font-mono text-sm tracking-[0.3em] text-cyan [text-shadow:0_0_12px_rgb(1_205_254/0.8)]">
+          {/* decorative echo of the h1 (fullwidth letters read as noise): hidden from screen readers; its first
+              letters cross the sun, so a dark halo under the cyan glow keeps them from melting into the yellow */}
+          <span
+            aria-hidden
+            className="font-mono text-sm tracking-[0.3em] text-cyan [text-shadow:0_0_2px_rgb(18_8_42/0.95),0_0_6px_rgb(18_8_42/0.9),0_0_12px_rgb(1_205_254/0.6)]"
+          >
             ｓｉｓｔｅｍａｓ　ｅｓｃｕｌｐｉｄｏｓ
           </span>
         </div>
