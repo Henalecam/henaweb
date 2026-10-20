@@ -29,7 +29,7 @@ export default function Studio() {
         },
       );
       // touch screens never hover, so the halftone used to hide the founder's face for good:
-      // there the photo develops into colour once it sits in the middle of the screen
+      // there the photo develops into colour (and straightens, like a polaroid picked up) once it sits in the middle of the screen
       if (window.matchMedia('(hover: none)').matches) {
         ScrollTrigger.create({ trigger: '[data-portrait]', start: 'top 60%', end: 'bottom 25%', toggleClass: { targets: '[data-portrait-card]', className: 'is-developed' } });
       }
@@ -54,7 +54,7 @@ export default function Studio() {
       <div className="grid gap-14 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <span className="label">(VII) Studio</span>
-          <figure data-portrait-card className="group toon mt-8 max-w-sm -rotate-2 rounded-sm bg-paper p-3 pb-4 transition-transform duration-500 hover:rotate-0">
+          <figure data-portrait-card className="group toon mt-8 max-w-sm -rotate-2 rounded-sm bg-paper p-3 pb-4 transition-transform duration-500 hover:rotate-0 [&.is-developed]:rotate-0">
             <div data-portrait className="relative aspect-[4/5] overflow-hidden bg-bg-2">
               <Image
                 src="/team/henrique.png"
