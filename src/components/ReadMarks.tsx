@@ -148,6 +148,23 @@ export function ArchiveReturn() {
  * picked among the ones the archive filter is currently showing.
  */
 export function RandomCase() {
+  // once every case on screen was read, "ainda não leu" would be a promise the button can't keep:
+  // it then offers a re-read (the filter and "só os que faltam" change what is on screen, so re-check then)
+  const [allRead, setAllRead] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      const visible = [...document.querySelectorAll<HTMLElement>('li[data-case-slug]:not([hidden])')].map((li) => li.dataset.caseSlug!);
+      const read = readList();
+      setAllRead(visible.length > 0 && visible.every((s) => read.includes(s)));
+    };
+    check();
+    const list = document.querySelector('li[data-case-slug]')?.parentElement;
+    if (!list) return;
+    const obs = new MutationObserver(check);
+    obs.observe(list, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
+    return () => obs.disconnect();
+  }, []);
+
   const go = () => {
     const visible = [...document.querySelectorAll<HTMLElement>('li[data-case-slug]:not([hidden])')].map((li) => li.dataset.caseSlug!);
     if (!visible.length) return;
@@ -163,7 +180,7 @@ export function RandomCase() {
       data-print-hide
       className="label mt-4 inline-flex min-h-9 items-center gap-2 !text-ink/80 underline underline-offset-4 hover:!text-acid"
     >
-      <span aria-hidden>🎲</span> Sortear um caso que você ainda não leu
+      <span aria-hidden>🎲</span> {allRead ? 'Sortear um caso para reler' : 'Sortear um caso que você ainda não leu'}
     </button>
   );
 }
