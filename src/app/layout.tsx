@@ -69,6 +69,8 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 },
   },
   icons: { icon: [{ url: '/favicon.ico', sizes: '32x32' }, { url: '/icon.png', type: 'image/png', sizes: '48x48' }, { url: '/icon-192.png', type: 'image/png', sizes: '192x192' }], apple: '/apple-icon.png' },
+  // iOS before 16.4 ignores the manifest and named the home-screen icon after the long <title> ("Desenvolvimento de sis…")
+  appleWebApp: { title: 'HenaWeb' },
 };
 
 export const viewport: Viewport = { themeColor: '#140c2e', colorScheme: 'dark' };
