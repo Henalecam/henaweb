@@ -53,6 +53,8 @@ export default function FullShot({
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [loaded, setLoaded] = useState(false);
+  // how far down the long capture the reader is, shown in the title bar like an old viewer's status
+  const [read, setRead] = useState(0);
 
   useEffect(() => {
     const show = () => {
@@ -77,11 +79,26 @@ export default function FullShot({
       >
         <div className="win-bar">
           <span className="truncate">{host} · página inteira</span>
-          <button type="button" onClick={() => dialog.current?.close()} className="win-btn ml-auto" aria-label="Fechar">
-            ×
+          <span aria-hidden className="ml-auto shrink-0 tabular-nums opacity-90">
+            {read}%
+          </span>
+          {/* 24×24 target around the Win95-sized square (WCAG 2.5.8), like the □ on the case window */}
+          <button type="button" onClick={() => dialog.current?.close()} className="group -mx-[2.8px] -my-[3.6px] grid h-6 w-6 shrink-0 place-items-center" aria-label="Fechar">
+            <span aria-hidden className="win-btn group-hover:brightness-110">
+              ×
+            </span>
           </button>
         </div>
-        <div data-lenis-prevent tabIndex={0} className="m-1.5 max-h-[82vh] overflow-y-auto overscroll-contain border-2 border-[#7d7394] bg-acid-ink p-3 md:p-5">
+        <div
+          data-lenis-prevent
+          tabIndex={0}
+          onScroll={(e) => {
+            const el = e.currentTarget;
+            const max = el.scrollHeight - el.clientHeight;
+            setRead(max > 0 ? Math.round((el.scrollTop / max) * 100) : 100);
+          }}
+          className="m-1.5 max-h-[82vh] overflow-y-auto overscroll-contain border-2 border-[#7d7394] bg-acid-ink p-3 md:p-5"
+        >
           {loaded && (
             <div className="grid items-start gap-5 md:grid-cols-[1fr_minmax(0,15rem)]">
               <Image
