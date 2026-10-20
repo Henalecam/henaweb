@@ -179,6 +179,15 @@ export default function Contact() {
     } catch {}
   };
   useEffect(saveDraft, [picked, timeline, draftReady]);
+  // the submit button rings once the required clues (name and a valid e-mail) are in: "the file is complete"
+  const [ready, setReady] = useState(false);
+  // read the fields directly: checkValidity() would fire `invalid` and stamp our custom messages on fields
+  // the visitor hasn't reached yet
+  const checkReady = () => {
+    const required = [...(form.current?.elements ?? [])].filter((el): el is HTMLInputElement => el instanceof HTMLInputElement && el.required);
+    setReady(required.length > 0 && required.every((el) => el.value.trim() !== '' && !el.validity.typeMismatch));
+  };
+  useEffect(checkReady, [draftReady, picked]);
   const discardDraft = () => {
     form.current?.reset();
     setPicked([]);
@@ -436,7 +445,10 @@ export default function Contact() {
               <div>{saveButton}</div>
             </div>
           ) : (
-            <form ref={form} onSubmit={submit} onInput={saveDraft} className="flex flex-col gap-9">
+            <form ref={form} onSubmit={submit} onInput={() => {
+              saveDraft();
+              checkReady();
+            }} className="flex flex-col gap-9">
               {restored && (
                 <p role="status" className="-mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 self-start font-mono text-xs text-acid-ink/80">
                   <span>↺ Recuperamos o rascunho que você deixou nesta aba.</span>
@@ -600,7 +612,8 @@ export default function Contact() {
                   type="submit"
                   disabled={status === 'sending'}
                   data-cursor="Enviar"
-                  className="group inline-flex items-center gap-3 rounded-full border-[3px] border-acid-ink bg-acid-ink px-8 py-4 font-medium text-acid shadow-[5px_5px_0_rgb(11_13_2/0.35)] transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                  data-ready={ready || undefined}
+                  className="group relative inline-flex items-center gap-3 rounded-full border-[3px] border-acid-ink bg-acid-ink px-8 py-4 font-medium text-acid shadow-[5px_5px_0_rgb(11_13_2/0.35)] transition-transform hover:-translate-y-0.5 disabled:opacity-60"
                 >
                   {status === 'sending' ? 'Enviando…' : 'Abrir o caso'}
                   <span className="transition-transform duration-500 group-hover:translate-x-1 group-focus-visible:translate-x-1">→</span>
