@@ -103,7 +103,17 @@ export function ReadProgress({ slugs }: { slugs: string[] }) {
         ))}
       </span>
       <span>
-        {all ? 'Arquivo completo: você investigou todos os casos. Próximo passo, o seu.' : `Você já investigou ${read.length} de ${slugs.length} casos.`}
+        {all ? (
+          <>
+            Arquivo completo: você investigou todos os casos. Próximo passo, o seu:{' '}
+            {/* the whole archive read is the warmest moment to ask: the sentence now leads straight to the form */}
+            <a href="/#contato" className="font-medium text-acid underline underline-offset-2 hover:text-ink">
+              abrir o seu caso <span aria-hidden>→</span>
+            </a>
+          </>
+        ) : (
+          `Você já investigou ${read.length} de ${slugs.length} casos.`
+        )}
       </span>
       {!all && (
         <button
