@@ -47,8 +47,15 @@ export default function LostClue() {
       .filter((w) => w.length > 2);
     let best: { label: string; href: string; d: number } | null = null;
     for (const w of words.reverse()) {
+      // a piece of a real address also counts ("/casos/next" → next-card, "/servicos/sites" → sites-e-produtos,
+      // "contacerta-site" → contacerta), unless it fits two pages equally ("sistemas" → sob medida or públicos?)
+      const partial = PLACES.filter(
+        (p) => p.key.split('-').includes(w) || (w.length >= 4 && p.key.startsWith(w)) || (p.key.length >= 4 && w.startsWith(p.key)),
+      );
+      const partialHrefs = new Set(partial.map((p) => p.href));
       for (const p of PLACES) {
-        const d = distance(w, p.key);
+        let d = distance(w, p.key);
+        if (partialHrefs.size === 1 && partial.includes(p)) d = Math.min(d, 0.5);
         // tolerate roughly one typo every four letters
         if (d <= Math.max(1, Math.floor(p.key.length / 4)) && (!best || d < best.d)) best = { ...p, d };
       }
