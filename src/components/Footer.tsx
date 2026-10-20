@@ -170,7 +170,10 @@ function BackToTop() {
       <span aria-hidden className="inline-block transition-transform duration-200 group-hover:-translate-y-1 group-focus-visible:-translate-y-1">
         ↑
       </span>
-      {screens >= 2 && <span aria-hidden> · {screens} telas</span>}
+      {/* the count arrives after the link is seen: its room is kept from the start so the footer line doesn't shift */}
+      <span aria-hidden className="inline-block min-w-[9ch] text-left">
+        {screens >= 2 ? ` · ${screens} telas` : ''}
+      </span>
     </a>
   );
 }
