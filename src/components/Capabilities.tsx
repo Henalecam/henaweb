@@ -59,12 +59,15 @@ export default function Capabilities({ caseCounts = {} }: { caseCounts?: Record<
         {capabilities.map((c, i) => {
           const isOpen = active === i;
           return (
-            <li key={c.id} data-cap-row className="toon relative overflow-hidden rounded-2xl bg-paper">
+            <li key={c.id} data-cap-row className="group/cap toon relative overflow-hidden rounded-2xl bg-paper">
               {/* the fill covers the whole open card, page link included, not just the toggle */}
               <span
                 aria-hidden
                 className={`pointer-events-none absolute inset-0 origin-bottom bg-[linear-gradient(100deg,#f7931e,#f4b942_55%,#f9e27d)] transition-transform duration-700 ease-[var(--ease-out-expo)] ${
-                  isOpen ? 'scale-y-100' : 'scale-y-0'
+                  isOpen
+                    ? 'scale-y-100'
+                    : // a closed row hints at what opening does: the colour rises a sliver from the bottom
+                      'scale-y-0 group-hover/cap:scale-y-[0.07] group-has-[:focus-visible]/cap:scale-y-[0.07]'
                 }`}
               />
               <button
