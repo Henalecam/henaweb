@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { copyText } from '@/lib/clipboard';
 import { track } from '@/lib/track';
 
 /**
@@ -32,11 +33,10 @@ export default function ShareCase({
         if ((e as DOMException)?.name === 'AbortError') return;
       }
     }
-    try {
-      await navigator.clipboard.writeText(url);
+    if (await copyText(url)) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2200);
-    } catch {}
+    }
   };
 
   return (

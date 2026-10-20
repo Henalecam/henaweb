@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { copyText } from '@/lib/clipboard';
 
 /** "Copy link" for one FAQ answer, so a question can be sent straight to a partner or a client. */
 export function FaqCopyLink({ id }: { id: string }) {
@@ -8,12 +9,11 @@ export function FaqCopyLink({ id }: { id: string }) {
 
   const copy = async () => {
     const url = `${location.origin}${location.pathname}#${id}`;
-    try {
-      await navigator.clipboard.writeText(url);
+    if (await copyText(url)) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2200);
-    } catch {
-      // no clipboard (insecure context, old browser): put the link in the address bar instead
+    } else {
+      // nothing could copy (very old browser): put the link in the address bar instead
       history.replaceState(null, '', `#${id}`);
     }
   };
