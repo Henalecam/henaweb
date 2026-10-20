@@ -648,6 +648,10 @@ details[open]::details-content {
     animation: none !important;
     transition: none !important;
   }
+  /* clip-path reveals (Manifesto quote, Studio portrait, order ticket) that never ran print uncut */
+  [style*='clip-path: inset'] {
+    clip-path: none !important;
+  }
   /* reveal-on-scroll content that the reader never scrolled to */
   [style*='visibility: hidden'],
   [style*='opacity: 0'] {

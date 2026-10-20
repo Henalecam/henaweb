@@ -50,6 +50,18 @@ export default function Manifesto() {
           scrollTrigger: { trigger: '[data-facts]', start: 'top 85%' },
         });
       });
+      // the quote is carved out left to right, like the line it quotes (negative insets keep its hard shadow)
+      gsap.fromTo(
+        '[data-quote]',
+        { clipPath: 'inset(-20% 100% -40% -4%)' },
+        {
+          clipPath: 'inset(-20% -6% -40% -4%)',
+          duration: 1.6,
+          ease: 'power2.inOut',
+          clearProps: 'clipPath',
+          scrollTrigger: { trigger: '[data-quote]', start: 'top 85%' },
+        },
+      );
       return () => split.revert();
     },
     { scope: root },
@@ -68,7 +80,7 @@ export default function Manifesto() {
           >
             {manifesto}
           </p>
-          <p className="font-groovy mt-8 text-2xl text-acid [text-shadow:3px_3px_0_#120626]">“Vi o anjo no mármore e esculpi até libertá-lo.”</p>
+          <p data-quote className="font-groovy mt-8 text-2xl text-acid [text-shadow:3px_3px_0_#120626]">“Vi o anjo no mármore e esculpi até libertá-lo.”</p>
           <span className="label mt-2 block">Frase atribuída a Michelangelo</span>
         </div>
       </div>
