@@ -221,7 +221,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
               <span className="mt-2 block text-2xl font-medium tracking-tight">← {prev.name}</span>
             </a>
             {service && (
-              <a href={`/servicos/${service.slug}`} className="toon-sm toon-press rounded-2xl bg-bg-2/80 p-6">
+              <a href={`/servicos/${service.slug}`} className="toon-sm toon-press flex flex-col justify-center rounded-2xl bg-bg-2/80 p-6">
                 <span className="label">Serviço</span>
                 <span className="mt-2 block text-2xl font-medium tracking-tight">{service.name} →</span>
               </a>
@@ -251,7 +251,13 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
 
 /** A glimpse of the neighbouring case's screen on the prev/next links (cases without a capture show none). */
 function CasePeek({ p }: { p: (typeof projects)[number] }) {
-  if (!p.shot) return null;
+  // cases without a screenshot (Dropcota) show their mock UI, so prev/next cards stay the same shape
+  if (!p.shot)
+    return p.mock ? (
+      <div className="pointer-events-none relative mb-4 aspect-[16/8] overflow-hidden rounded-lg border-2 border-[#7d7394] bg-acid-ink" aria-hidden>
+        <MockUI variant={p.mock.variant} hue={p.mock.hue} />
+      </div>
+    ) : null;
   return (
     <span className="mb-4 block aspect-[16/8] overflow-hidden rounded-lg border-2 border-[#7d7394] bg-acid-ink" aria-hidden>
       <Image
