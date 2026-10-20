@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { nav, site, whatsappLink } from '@/lib/site';
 import { projectLinks } from '@/lib/projectLinks';
@@ -130,12 +131,39 @@ export default function Footer() {
         <button type="button" onClick={() => window.dispatchEvent(new Event(CONSENT_OPEN))} className="label -my-3 py-3 hover:text-ink">
           Cookies
         </button>
-        {/* same-page anchor: on a case or service page "/#topo" sent the visitor to the home page */}
-        <a href="#conteudo" className="-my-3 py-3 hover:text-ink">
-          Voltar ao topo ↑
-        </a>
+        <BackToTop />
       </div>
     </footer>
+  );
+}
+
+/**
+ * "Back to top" also says how far up the top is, in screens ("· 19 telas"), measured when the link
+ * comes into view; the arrow lifts on hover/focus. Same-page anchor: on a case or service page "/#topo"
+ * sent the visitor to the home page.
+ */
+function BackToTop() {
+  const el = useRef<HTMLAnchorElement>(null);
+  const [screens, setScreens] = useState(0);
+
+  useEffect(() => {
+    const node = el.current;
+    if (!node || !('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) setScreens(Math.round(window.scrollY / window.innerHeight));
+    });
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <a ref={el} href="#conteudo" className="group -my-3 py-3 hover:text-ink">
+      Voltar ao topo{' '}
+      <span aria-hidden className="inline-block transition-transform duration-200 group-hover:-translate-y-1 group-focus-visible:-translate-y-1">
+        ↑
+      </span>
+      {screens >= 2 && <span aria-hidden> · {screens} telas</span>}
+    </a>
   );
 }
 
