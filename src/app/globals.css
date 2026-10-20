@@ -625,3 +625,23 @@ details[open]::details-content {
 h2[id] {
   scroll-margin-top: 6rem;
 }
+
+/* arriving at a section from "Nesta página" or a copied #link: a marker stroke sweeps under the title
+   once the smooth scroll has landed, then fades, so the eye finds where the jump ended */
+h2[id]:target {
+  background-image: linear-gradient(rgb(247 147 30 / 0.45), rgb(247 147 30 / 0.45));
+  background-repeat: no-repeat;
+  background-position: 0 92%;
+  background-origin: content-box;
+  background-clip: content-box;
+  /* hug the words (not the whole column) so the stroke stops where the title does */
+  width: fit-content;
+  animation: target-mark 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
+}
+
+@keyframes target-mark {
+  0% { background-size: 0% 0.32em; }
+  30% { background-size: 100% 0.32em; }
+  75% { background-size: 100% 0.32em; }
+  100% { background-size: 100% 0; }
+}
