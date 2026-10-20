@@ -29,7 +29,7 @@ export default function CopyEmail({ className = '', placement }: { className?: s
   };
 
   return (
-    <button type="button" onClick={copy} className={className}>
+    <button type="button" onClick={copy} className={className} data-print-hide>
       <span aria-hidden>{copied ? '✓ ' : '⧉ '}</span>
       {copied ? 'copiado' : 'copiar'}
       <span className="sr-only"> e-mail</span>

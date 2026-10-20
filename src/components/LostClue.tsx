@@ -73,6 +73,7 @@ export default function LostClue() {
       )}
       <button
         type="button"
+        data-print-hide
         onClick={() => window.dispatchEvent(new Event('hena:search'))}
         className="label flex min-h-11 items-center gap-2 self-start !text-ink underline underline-offset-4 hover:!text-acid"
       >

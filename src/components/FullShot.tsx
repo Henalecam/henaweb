@@ -61,7 +61,7 @@ export default function FullShot({
 
   return (
     <>
-      <button type="button" onClick={open} className="label mt-12 flex min-h-11 items-center gap-2 !text-ink/80 underline underline-offset-4 hover:!text-acid">
+      <button type="button" onClick={open} data-print-hide className="label mt-12 flex min-h-11 items-center gap-2 !text-ink/80 underline underline-offset-4 hover:!text-acid">
         <span aria-hidden>↕</span> Ver a página inteira de {name}
       </button>
       <dialog

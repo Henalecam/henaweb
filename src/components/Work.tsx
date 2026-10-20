@@ -226,6 +226,7 @@ export default function Work() {
             </ol>
             <button
               type="button"
+              data-print-hide
               onClick={() => setStopped((v) => !v)}
               className="label mt-4 inline-flex min-h-8 items-center gap-2 rounded-full !text-ink/70 transition-colors hover:!text-ink motion-reduce:hidden"
             >

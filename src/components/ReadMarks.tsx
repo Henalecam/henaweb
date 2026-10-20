@@ -100,6 +100,7 @@ export function ReadProgress({ slugs }: { slugs: string[] }) {
       {!all && (
         <button
           type="button"
+          data-print-hide
           aria-pressed={onlyUnread}
           onClick={() => setOnlyUnread((v) => !v)}
           className={`min-h-8 rounded-full border px-2.5 ${onlyUnread ? 'border-acid bg-acid text-acid-ink' : 'border-ink/30 hover:border-ink hover:text-ink'}`}
@@ -109,6 +110,7 @@ export function ReadProgress({ slugs }: { slugs: string[] }) {
       )}
       <button
         type="button"
+        data-print-hide
         onClick={() => {
           try {
             localStorage.removeItem(KEY);
