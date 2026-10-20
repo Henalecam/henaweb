@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { gsap, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { govFlow, govPillars } from '@/lib/content';
 
@@ -15,6 +15,13 @@ const audit = [
 
 export default function GovTech() {
   const root = useRef<HTMLElement>(null);
+  // every step leaves its line in the audit trail: pointing at one lights up its pair (mouse only)
+  const [trace, setTrace] = useState<number | null>(null);
+  const traceProps = (i: number) => ({
+    'data-on': trace === i ? '' : undefined,
+    onPointerEnter: (e: React.PointerEvent) => e.pointerType === 'mouse' && setTrace(i),
+    onPointerLeave: () => setTrace(null),
+  });
 
   useGSAP(
     () => {
@@ -153,7 +160,7 @@ export default function GovTech() {
             <div className="grid md:grid-cols-[1.1fr_1fr]">
               <ol className="p-6 md:p-8">
                 {govFlow.map((step, i) => (
-                  <li key={step} data-step className="relative flex items-center gap-5 py-3.5">
+                  <li key={step} data-step {...traceProps(i)} className="group/step relative flex items-center gap-5 py-3.5">
                     {/* rail segment anchored to this dot's center, reaching the next dot's center */}
                     {i < govFlow.length - 1 && (
                       <span aria-hidden className="absolute top-1/2 left-[6px] h-full w-[2px] bg-ink/15">
@@ -162,9 +169,9 @@ export default function GovTech() {
                     )}
                     <span
                       data-dot
-                      className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 border-mint bg-mint"
+                      className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 border-mint bg-mint transition-[scale] duration-200 group-data-[on]/step:scale-150"
                     />
-                    <span className="flex-1 text-lg tracking-tight">{step}</span>
+                    <span className="flex-1 text-lg tracking-tight transition-colors duration-200 group-data-[on]/step:text-mint">{step}</span>
                     <span data-status className="font-mono text-[0.65rem] text-mint uppercase">
                       ✓ {String(i + 1).padStart(2, '0')}
                     </span>
@@ -173,10 +180,10 @@ export default function GovTech() {
               </ol>
               <div className="border-t border-line p-6 md:border-t-0 md:border-l md:p-8">
                 <span className="label">Trilha de auditoria</span>
-                <ul className="mt-5 space-y-3 font-mono text-[0.72rem] leading-snug">
+                <ul className="mt-5 space-y-2 font-mono text-[0.72rem] leading-snug">
                   {audit.map(([time, entry], i) => (
-                    <li key={entry} data-log>
-                      <span className="text-muted">{time} ·</span> <span className="text-ink/85">{entry}</span>
+                    <li key={entry} data-log {...traceProps(i)} className="group/log -mx-2 rounded-sm px-2 py-0.5 transition-colors duration-200 data-[on]:bg-mint/20">
+                      <span className="text-muted transition-colors duration-200 group-data-[on]/log:text-mint">{time} ·</span> <span className="text-ink/85">{entry}</span>
                       {/* the log is live: a terminal cursor waits after the last entry */}
                       {i === audit.length - 1 && (
                         <span aria-hidden className="log-cursor ml-1 inline-block h-[1.05em] w-[0.55em] translate-y-[0.15em] bg-mint" />
