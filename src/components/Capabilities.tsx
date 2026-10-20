@@ -9,6 +9,23 @@ export default function Capabilities({ caseCounts = {} }: { caseCounts?: Record<
   const root = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
 
+  /**
+   * Toggle a row (clicking the open one closes it, as its ✕ promises). Opening a row below the open one
+   * collapses the one above, which used to yank the clicked title 270–520 px up the screen; the scroll
+   * follows the clicked button through the collapse so it stays where the reader tapped it.
+   */
+  const pick = (i: number, el: HTMLElement) => {
+    const before = el.getBoundingClientRect().top;
+    setActive((cur) => (cur === i ? -1 : i));
+    const t0 = performance.now();
+    const hold = () => {
+      const drift = el.getBoundingClientRect().top - before;
+      if (Math.abs(drift) > 0.5) window.scrollBy(0, drift);
+      if (performance.now() - t0 < 900) requestAnimationFrame(hold);
+    };
+    requestAnimationFrame(hold);
+  };
+
   useGSAP(
     () => {
       // reduced motion: entrances are skipped, the content just sits in place (CSS can't stop GSAP tweens)
@@ -54,7 +71,7 @@ export default function Capabilities({ caseCounts = {} }: { caseCounts?: Record<
                 type="button"
                 // opens on click/tap only: opening on hover made every row expand and collapse under a
                 // resting pointer while the page scrolled past, shifting the whole list
-                onClick={() => setActive(i)}
+                onClick={(e) => pick(i, e.currentTarget)}
                 aria-expanded={isOpen}
                 aria-controls={`cap-panel-${c.id}`}
                 className="group relative grid w-full grid-cols-12 items-baseline gap-4 overflow-hidden px-3 py-6 text-left md:px-6 md:py-8"
