@@ -218,7 +218,11 @@ export default function Nav() {
               href={item.href}
               onClick={() => setOpen(false)}
               aria-current={active === item.href ? 'location' : undefined}
-              className={`flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight ${active === item.href ? 'text-acid' : ''}`}
+              // the links rise into place one after another behind the curtain wipe (closing: all at once)
+              style={{ transitionDelay: open ? `${180 + i * 55}ms` : '0ms' }}
+              className={`flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight transition-[translate,opacity] duration-500 ease-[var(--ease-out-expo)] ${
+                open ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+              } ${active === item.href ? 'text-acid' : ''}`}
             >
               <span className="label">0{i + 1}</span>
               {item.label}
