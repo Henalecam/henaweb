@@ -100,7 +100,7 @@ export default function CasesIndex() {
                     className="win transition-transform duration-500 ease-[var(--ease-out-expo)] [view-transition-class:case-window] group-hover:-translate-y-1.5 group-hover:-rotate-[0.6deg] group-focus-visible:-rotate-[0.6deg] group-focus-visible:-translate-y-1.5"
                   >
                     <div className="win-bar">
-                      <span className="truncate">caso_{String(i + 1).padStart(2, '0')}.exe</span>
+                      <span aria-hidden className="truncate">caso_{String(i + 1).padStart(2, '0')}.exe</span>
                       <span data-read-mark={p.slug} hidden className="ml-auto shrink-0 rounded-sm bg-acid-ink/85 px-1.5 text-[0.65rem] text-acid">
                         ✓ investigado
                       </span>

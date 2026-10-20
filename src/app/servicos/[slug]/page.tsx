@@ -158,7 +158,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
               {s.deliverables.map((d, i) => (
                 <li key={d.title} className="win flex flex-col">
                   <div className="win-bar">
-                    <span>etapa_{String(i + 1).padStart(2, '0')}.txt</span>
+                    <span aria-hidden>etapa_{String(i + 1).padStart(2, '0')}.txt</span>
                   </div>
                   <div className="m-1.5 flex-1 border-2 border-[#7d7394] bg-paper p-6 text-acid-ink">
                     <h3 className="text-2xl font-medium tracking-tight">{d.title}</h3>

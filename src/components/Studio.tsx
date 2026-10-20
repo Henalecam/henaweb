@@ -88,7 +88,7 @@ export default function Studio() {
             {principles.map((pr) => (
               <li key={pr.n} data-principle className="win flex flex-col">
                 <div className="win-bar">
-                  <span>regra_{pr.n.toLowerCase()}.txt</span>
+                  <span aria-hidden>regra_{pr.n.toLowerCase()}.txt</span>
                   <span className="win-btn ml-auto" aria-hidden>×</span>
                 </div>
                 {/* phones: numeral beside the title instead of on a line of its own (rules list ~24% shorter) */}
