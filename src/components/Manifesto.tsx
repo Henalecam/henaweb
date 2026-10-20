@@ -43,7 +43,8 @@ export default function Manifesto() {
     <section ref={root} className="gutter relative py-[clamp(6rem,16vw,14rem)]">
       <div className="grid min-h-[70svh] content-center gap-8 md:grid-cols-12">
         <div className="md:col-span-7 md:col-start-6">
-          <span className="label">(I) Manifesto</span>
+          {/* the label also crosses the hero sun: a dark chip keeps it readable over the stripes (contrast fell to ~1:1) */}
+          <span className="label inline-block rounded-sm bg-[rgb(18_8_42/0.85)] px-1.5 py-0.5">(I) Manifesto</span>
           <p
             data-manifesto
             // the text scrolls over the hero sun; the dark halo keeps it legible over its stripes, as in the headline
