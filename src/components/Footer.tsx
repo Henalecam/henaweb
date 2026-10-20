@@ -21,6 +21,8 @@ function footerMessage(path: string): string | undefined {
   if (service) return `Olá! Quero conversar sobre ${service} com a HenaWeb.`;
 }
 
+const studioLinks = [...nav.filter((n) => n.label !== 'Casos'), { label: 'Perguntas', href: '/#perguntas' }, { label: 'Contato', href: '/#contato' }];
+
 export default function Footer() {
   const path = usePathname();
 
@@ -66,14 +68,14 @@ export default function Footer() {
 
         {/* a little file tree, in keeping with the .exe windows: every page one click away */}
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:col-span-8">
-          <FooterColumn title="serviços/">
+          <FooterColumn title="serviços/" count={serviceLinks.length}>
             {serviceLinks.map((x) => (
               <FooterLink key={x.slug} href={`/servicos/${x.slug}`}>
                 {x.name}
               </FooterLink>
             ))}
           </FooterColumn>
-          <FooterColumn title="casos/">
+          <FooterColumn title="casos/" count={projectLinks.length}>
             {projectLinks.map((x) => (
               <FooterLink key={x.slug} href={`/casos/${x.slug}`}>
                 {x.name}
@@ -87,14 +89,12 @@ export default function Footer() {
               Ver todos →
             </FooterLink>
           </FooterColumn>
-          <FooterColumn title="studio/" className="col-span-2 sm:col-span-1" listClassName="grid grid-cols-2 gap-x-6 sm:flex">
-            {[...nav.filter((n) => n.label !== 'Casos'), { label: 'Perguntas', href: '/#perguntas' }, { label: 'Contato', href: '/#contato' }].map(
-              (n) => (
-                <FooterLink key={n.href} href={n.href}>
-                  {n.label}
-                </FooterLink>
-              ),
-            )}
+          <FooterColumn title="studio/" count={studioLinks.length} className="col-span-2 sm:col-span-1" listClassName="grid grid-cols-2 gap-x-6 sm:flex">
+            {studioLinks.map((n) => (
+              <FooterLink key={n.href} href={n.href}>
+                {n.label}
+              </FooterLink>
+            ))}
           </FooterColumn>
         </div>
       </div>
@@ -169,18 +169,26 @@ function BackToTop() {
 
 function FooterColumn({
   title,
+  count,
   children,
   className = '',
   listClassName = 'flex',
 }: {
   title: string;
+  /** shown after the folder name, like a file manager's item count ("casos/ · 7") */
+  count: number;
   children: React.ReactNode;
   className?: string;
   listClassName?: string;
 }) {
   return (
     <nav aria-label={title.replace('/', '')} className={className}>
-      <span className="label mb-4 block font-mono !text-teal">{title}</span>
+      <span className="label mb-4 block font-mono !text-teal">
+        {title}
+        <span aria-hidden className="ml-2 !text-ink/55">
+          · {count} {count === 1 ? 'item' : 'itens'}
+        </span>
+      </span>
       <ul className={`flex-col gap-2.5 ${listClassName}`}>{children}</ul>
     </nav>
   );
