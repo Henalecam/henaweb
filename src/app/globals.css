@@ -547,6 +547,18 @@ details[open]::details-content {
     left: auto !important;
     max-height: none !important;
   }
+  /* scroll-scene heights (one process step per screen, a manifesto that fills the viewport) mean nothing
+     on paper: blocks shrink to their content; the diner stage is a 3D canvas that prints blank */
+  main * {
+    min-height: 0 !important;
+  }
+  #processo .sticky {
+    display: none !important;
+  }
+  #processo [data-step] {
+    padding-block: 1.25rem !important;
+    opacity: 1 !important;
+  }
   html,
   body {
     background: #fff !important;
