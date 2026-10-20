@@ -410,6 +410,21 @@ html {
   100% { transform: none; }
 }
 
+/* Manifesto facts: cards pinned slightly askew; the one under the pointer straightens and lifts (its number
+   rolls again, Manifesto.tsx). !important: GSAP writes inline `rotate/translate: none` on the cards it fades
+   in, which had silently flattened the tilt (Tailwind's odd:/even:-rotate-1) whenever motion was on */
+.fact-card:nth-child(odd) { rotate: -1deg !important; }
+.fact-card:nth-child(even) { rotate: 1deg !important; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .fact-card {
+    transition: rotate 0.3s cubic-bezier(0.3, 1.6, 0.5, 1), translate 0.3s ease-out;
+  }
+  .fact-card:nth-child(n):hover {
+    rotate: 0deg !important;
+    translate: 0 -4px !important;
+  }
+}
+
 /* the counter bell answers the pointer: a little shiver says "ring me"; keyboard focus gets a dashed ring.
    `rotate` (not transform) so it doesn't fight GSAP's ringing swing */
 .diner [data-bell-ring] {

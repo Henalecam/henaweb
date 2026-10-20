@@ -36,12 +36,13 @@ export default function Manifesto() {
       });
       // the numbers roll to their value as the cards land; "0 caixa-preta" counts *down* from 99,
       // as if the black box were being emptied. The server HTML already holds the final digits.
+      const offs: (() => void)[] = [];
       gsap.utils.toArray<HTMLElement>('[data-fact-n]').forEach((el) => {
         const to = Number(el.dataset.factN);
         if (!Number.isFinite(to)) return;
         const counter = { v: to === 0 ? 99 : 0 };
         el.textContent = String(counter.v);
-        gsap.to(counter, {
+        const roll = gsap.to(counter, {
           v: to,
           duration: to === 0 ? 1.6 : 1.2,
           ease: 'power3.out',
@@ -49,6 +50,14 @@ export default function Manifesto() {
           onUpdate: () => (el.textContent = String(Math.round(counter.v))),
           scrollTrigger: { trigger: '[data-facts]', start: 'top 85%' },
         });
+        // pointing at a card rolls its number again, quicker (mouse only; ignored while it is still rolling)
+        const card = el.closest<HTMLElement>('[data-fact]');
+        const again = (e: PointerEvent) => {
+          if (e.pointerType !== 'mouse' || roll.isActive() || gsap.isTweening(counter)) return;
+          gsap.fromTo(counter, { v: to === 0 ? 99 : 0 }, { v: to, duration: 0.7, ease: 'power3.out', onUpdate: roll.vars.onUpdate });
+        };
+        card?.addEventListener('pointerenter', again);
+        offs.push(() => card?.removeEventListener('pointerenter', again));
       });
       // the quote is carved out left to right, like the line it quotes (negative insets keep its hard shadow)
       gsap.fromTo(
@@ -62,7 +71,10 @@ export default function Manifesto() {
           scrollTrigger: { trigger: '[data-quote]', start: 'top 85%' },
         },
       );
-      return () => split.revert();
+      return () => {
+        split.revert();
+        offs.forEach((off) => off());
+      };
     },
     { scope: root },
   );
@@ -87,7 +99,7 @@ export default function Manifesto() {
 
       <div data-facts className="mt-[clamp(4rem,10vw,9rem)] grid gap-5 md:grid-cols-3">
         {facts.map((f) => (
-          <div key={f.l} data-fact className="toon flex items-end justify-between gap-6 rounded-2xl bg-paper p-6 text-acid-ink odd:-rotate-1 even:rotate-1 md:p-8">
+          <div key={f.l} data-fact className="fact-card toon flex items-end justify-between gap-6 rounded-2xl bg-paper p-6 text-acid-ink md:p-8">
             <span data-fact-n={f.n} className="font-groovy text-[clamp(3.5rem,7vw,6rem)] leading-none text-[#c2410c] tabular-nums">
               {f.n}
             </span>
