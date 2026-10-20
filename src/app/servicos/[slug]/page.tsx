@@ -103,6 +103,16 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             <span className="font-groovy text-[0.85em] tracking-normal text-acid [text-shadow:4px_4px_0_#140a26]">{s.h1Accent}</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink/75 md:text-xl">{s.intro}</p>
+          {/* proof above the fold: the solved cases behind this service were only linked at the end of "Exemplos" */}
+          {caseCount > 0 && (
+            <a
+              href={`/casos?servico=${s.slug}`}
+              className="mt-5 inline-flex min-h-8 items-baseline gap-2 py-1 font-mono text-sm text-ink/80 underline decoration-acid decoration-2 underline-offset-4 hover:text-ink hover:decoration-4"
+            >
+              <span aria-hidden className="text-acid">✓</span>
+              {caseCount === 1 ? '1 caso resolvido' : `${caseCount} casos resolvidos`} neste serviço, no arquivo →
+            </a>
+          )}
           <div className="mt-10 flex flex-wrap gap-3" data-print-hide>
             <a href="/#contato" className="toon toon-press rounded-full bg-acid px-6 py-4 font-medium text-acid-ink">
               Abrir um caso →
