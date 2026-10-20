@@ -1,6 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+// same as the /casos metadata title + the layout's "%s · HenaWeb" template
+const BASE_TITLE = 'Casos e projetos de software sob medida · HenaWeb';
 
 type Option = { slug: string; name: string; count: number };
 
@@ -11,6 +14,7 @@ type Option = { slug: string; name: string; count: number };
  */
 export default function CaseFilter({ options, total }: { options: Option[]; total: number }) {
   const [active, setActive] = useState<string | null>(null);
+  const wanted = useRef(BASE_TITLE);
 
   const apply = (slug: string | null, animate: boolean) => {
     const cards = [...document.querySelectorAll<HTMLElement>('[data-case-service]')];
@@ -19,6 +23,10 @@ export default function CaseFilter({ options, total }: { options: Option[]; tota
         li.hidden = !!slug && li.dataset.caseService !== slug;
       });
       setActive(slug);
+      // the tab (and bookmarks, history) name the filtered archive: "Casos de Automação & IA · HenaWeb"
+      const o = options.find((x) => x.slug === slug);
+      wanted.current = o ? `Casos de ${o.name} · HenaWeb` : BASE_TITLE;
+      document.title = wanted.current;
     };
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const doc = document as Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } };
@@ -31,6 +39,16 @@ export default function CaseFilter({ options, total }: { options: Option[]; tota
   useEffect(() => {
     const slug = new URLSearchParams(location.search).get('servico');
     if (slug && options.some((o) => o.slug === slug)) apply(slug, false);
+    // React re-asserts the metadata <title> right after hydration, which undid the filtered name on a direct
+    // load of /casos?servico=…; put it back whenever the plain archive title comes back while a filter is on
+    // (any other title means the visitor is already navigating elsewhere, so leave it alone)
+    const el = document.querySelector('title');
+    if (!el) return;
+    const obs = new MutationObserver(() => {
+      if (document.title === BASE_TITLE && wanted.current !== BASE_TITLE) document.title = wanted.current;
+    });
+    obs.observe(el, { childList: true, characterData: true, subtree: true });
+    return () => obs.disconnect();
   }, []);
 
   // the cards change silently for screen readers: say how many are now listed (only after a choice, not on load)
