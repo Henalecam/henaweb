@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { homeFaq, nav, projects, site, whatsappLink } from '@/lib/content';
 import { services } from '@/lib/services';
 import { faqId } from '@/lib/slug';
+import WinClose from './WinClose';
 
 // keywords are searched but not shown: a case is found by what it does, not only by its name
 type Item = { group: string; label: string; hint?: string; href: string; external?: boolean; keywords?: string };
@@ -180,9 +181,7 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
     >
       <div className="win-bar">
         <span>arquivo_de_pistas.exe</span>
-        <button type="button" onClick={onClose} className="win-btn ml-auto" aria-label="Fechar busca">
-          ×
-        </button>
+        <WinClose onClick={onClose} label="Fechar busca" className="ml-auto" />
       </div>
       <div className="m-1.5 border-2 border-[#7d7394] bg-paper">
         <div className="flex items-center gap-3 border-b-2 border-[#7d7394] px-4">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import WinClose from './WinClose';
 
 const ROWS: { keys: string[][]; what: string }[] = [
   { keys: [['⌘', 'K'], ['Ctrl', 'K'], ['/']], what: 'Procurar uma pista no site' },
@@ -32,9 +33,7 @@ export default function ShortcutsHelp({ open, onClose }: { open: boolean; onClos
     >
       <div className="win-bar">
         <span id="atalhos-titulo">atalhos.hlp</span>
-        <button type="button" onClick={onClose} className="win-btn ml-auto" aria-label="Fechar ajuda" autoFocus>
-          ×
-        </button>
+        <WinClose onClick={onClose} label="Fechar ajuda" className="ml-auto" autoFocus />
       </div>
       <div className="m-1.5 border-2 border-[#7d7394] bg-paper p-5">
         <p className="font-mono text-xs tracking-[0.12em] text-acid-ink/75 uppercase">Atalhos do detetive</p>
