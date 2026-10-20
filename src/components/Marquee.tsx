@@ -1,4 +1,6 @@
-import type { ReactNode } from 'react';
+'use client';
+
+import { useState, type ReactNode } from 'react';
 
 export default function Marquee({
   items,
@@ -24,11 +26,15 @@ export default function Marquee({
     </div>
   );
 
+  // hover already stops it with a mouse; a tap (phones never hover) freezes it so a logo can be read, a second tap lets it go
+  const [paused, setPaused] = useState(false);
+
   return (
-    <div className={`group relative flex overflow-hidden ${className}`}>
+    <div className={`group relative flex overflow-hidden ${className}`} onClick={() => setPaused((p) => !p)}>
       <div
-        className="flex w-max group-hover:[animation-play-state:paused]"
-        style={{ animation: `marquee ${speed}s linear infinite`, animationDirection: reverse ? 'reverse' : 'normal' }}
+        // the inline `animation` shorthand resets the play state, so hover needs !important and the tap state rides inline
+        className="flex w-max group-hover:[animation-play-state:paused]!"
+        style={{ animation: `marquee ${speed}s linear infinite ${reverse ? 'reverse' : 'normal'} ${paused ? 'paused' : 'running'}` }}
       >
         {row}
         {row}
