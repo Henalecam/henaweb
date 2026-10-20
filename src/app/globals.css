@@ -427,6 +427,12 @@ html {
   84% { rotate: -0.4deg; }
 }
 
+/* case page dots: while the pointer is on the strip, only the hovered dot shows its name (a dot that
+   still has keyboard focus used to keep its label up next to it) */
+nav[aria-label='Casos do arquivo']:hover a:not(:hover) .dot-tip {
+  opacity: 0;
+}
+
 /* hero: "role para investigar ↓" */
 @keyframes cue-bob {
   0%, 100% { translate: 0 0; }
