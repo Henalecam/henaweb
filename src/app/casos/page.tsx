@@ -108,7 +108,7 @@ export default function CasesIndex() {
                   >
                     <div className="win-bar">
                       <span aria-hidden className="truncate">caso_{String(i + 1).padStart(2, '0')}.exe</span>
-                      <span data-read-mark={p.slug} hidden className="ml-auto shrink-0 rounded-sm bg-acid-ink/85 px-1.5 text-[0.65rem] text-acid">
+                      <span id={`lido-${p.slug}`} data-read-mark={p.slug} hidden className="ml-auto shrink-0 rounded-sm bg-acid-ink/85 px-1.5 text-[0.65rem] text-acid">
                         ✓ investigado
                       </span>
                     </div>

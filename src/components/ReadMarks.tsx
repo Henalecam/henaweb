@@ -33,7 +33,15 @@ export function RevealRead() {
 }
 
 function revealMarks(list: string[]) {
-  for (const s of list) document.querySelectorAll<HTMLElement>(`[data-read-mark="${s}"]`).forEach((el) => el.removeAttribute('hidden'));
+  for (const s of list)
+    document.querySelectorAll<HTMLElement>(`[data-read-mark="${s}"]`).forEach((el) => {
+      el.removeAttribute('hidden');
+      // a link named with aria-labelledby ignores its own text, so the revealed mark joins its description
+      // (referencing it while hidden would have read "investigado" for unread cases too)
+      const link = el.closest<HTMLElement>('a[aria-describedby]');
+      if (link && el.id && !link.getAttribute('aria-describedby')!.split(' ').includes(el.id))
+        link.setAttribute('aria-describedby', `${link.getAttribute('aria-describedby')} ${el.id}`);
+    });
 }
 
 /**
@@ -115,7 +123,12 @@ export function ReadProgress({ slugs }: { slugs: string[] }) {
           try {
             localStorage.removeItem(KEY);
           } catch {}
-          document.querySelectorAll('[data-read-mark]').forEach((el) => el.setAttribute('hidden', ''));
+          document.querySelectorAll<HTMLElement>('[data-read-mark]').forEach((el) => {
+            el.setAttribute('hidden', '');
+            const link = el.closest<HTMLElement>('a[aria-describedby]');
+            if (link && el.id)
+              link.setAttribute('aria-describedby', link.getAttribute('aria-describedby')!.split(' ').filter((x) => x !== el.id).join(' '));
+          });
           document.querySelectorAll<HTMLElement>('li[data-case-read]').forEach((li) => delete li.dataset.caseRead);
           setOnlyUnread(false);
           setRead([]);
