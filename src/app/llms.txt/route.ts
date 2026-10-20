@@ -27,6 +27,15 @@ export function GET() {
     '## Perguntas frequentes',
     '',
     ...homeFaq.flatMap((f) => [`### ${f.q}`, '', f.a, '']),
+    // each service page answers its own questions (gov.br login, n8n, SEO…): an assistant asked about one
+    // service gets the specific answer, with the page to cite
+    ...services.flatMap((s) => [
+      `## Perguntas sobre ${s.name}`,
+      '',
+      `Página: ${site.url}/servicos/${s.slug}`,
+      '',
+      ...s.faq.flatMap((f) => [`### ${f.q}`, '', f.a, '']),
+    ]),
   ];
   return new Response(lines.join('\n'), {
     headers: { 'Content-Type': 'text/markdown; charset=utf-8', 'Cache-Control': 'public, max-age=3600' },
