@@ -5,7 +5,7 @@ import { services, serviceBySlug } from '@/lib/services';
 import { projects, site, whatsappLink } from '@/lib/content';
 import ClosingCta from '@/components/ClosingCta';
 import Footer from '@/components/Footer';
-import { FaqCopyLink, FaqHashOpener } from '@/components/FaqLink';
+import { FaqCopyLink, FaqHashOpener, FaqToggleAll } from '@/components/FaqLink';
 import { faqId } from '@/lib/slug';
 import SectionLink from '@/components/SectionLink';
 import ServiceSymptoms from '@/components/ServiceSymptoms';
@@ -250,7 +250,11 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
               <span data-mark>Perguntas frequentes</span>
             </h2>
             <SectionLink id="perguntas" title="Perguntas frequentes" />
-            <div className="mt-8 flex flex-col gap-3">
+            {/* same "open them all" as the home FAQ, for readers who'd rather scan every answer at once */}
+            <div className="mt-6 flex justify-end text-ink">
+              <FaqToggleAll />
+            </div>
+            <div className="mt-3 flex flex-col gap-3">
               {s.faq.map((f) => (
                 <details key={f.q} id={faqId(f.q)} className="toon-sm group scroll-mt-28 rounded-xl bg-paper p-5 text-acid-ink">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium">
@@ -264,6 +268,12 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                 </details>
               ))}
             </div>
+            <p className="mt-5 text-ink/75" data-print-hide>
+              Não achou a sua?{' '}
+              <a href="/#mensagem" className="font-medium text-ink underline decoration-acid decoration-2 underline-offset-4 hover:decoration-4">
+                Pergunte direto pra gente →
+              </a>
+            </p>
             <FaqHashOpener />
           </section>
 
