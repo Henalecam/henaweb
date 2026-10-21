@@ -187,7 +187,9 @@ export default function Process() {
         (ctx) => {
           if (ctx.conditions?.reduce) {
             gsap.set('[data-steam]', { opacity: 1 });
-            return;
+            // no scroll-played finale: the burger sits complete, so the slip says the order is up too
+            root.current?.setAttribute('data-served', '');
+            return () => root.current?.removeAttribute('data-served');
           }
           // below lg the diner sticks to the top ~half of the screen, so a step is only readable once it
           // clears it: the layer, the highlight and the finale happen lower in the viewport there
@@ -257,12 +259,14 @@ export default function Process() {
               gsap.to('[data-steam]', { opacity: 1, duration: 0.6 });
               finale.restart();
               served = true;
+              root.current?.setAttribute('data-served', ''); // the order slip's stamp turns to "pronto" (OrderTicket)
               syncSteam();
             },
             onLeaveBack: () => {
               gsap.to('[data-steam]', { opacity: 0, duration: 0.4 });
               finale.pause(0);
               served = false;
+              root.current?.removeAttribute('data-served');
               syncSteam();
             },
             onUpdate: (self) => scene.current?.setVersion(versionAt(self.progress)),
@@ -284,7 +288,7 @@ export default function Process() {
     <section
       ref={root}
       id="processo"
-      className="paper relative z-10 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon pt-[clamp(5rem,10vw,9rem)] text-bg"
+      className="group/proc paper relative z-10 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon pt-[clamp(5rem,10vw,9rem)] text-bg"
     >
       <div className="gutter">
         <div className="grid gap-6 md:grid-cols-12">

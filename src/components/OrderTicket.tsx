@@ -116,12 +116,15 @@ export default function OrderTicket() {
             <span>SISTEMA NO AR</span>
           </p>
 
-          {/* rubber stamp */}
+          {/* rubber stamp: "em preparo" while the burger is being built, re-stamped "pronto" once the order is up
+              (Process sets data-served on its section when the last step lands) */}
           <div
             aria-hidden
-            className="pointer-events-none absolute right-5 bottom-28 -rotate-12 rounded-md border-4 border-[#b3122b] px-3 py-1 font-bold tracking-widest text-[#b3122b] opacity-80"
+            data-order-stamp
+            className="pointer-events-none absolute right-5 bottom-28 -rotate-12 rounded-md border-4 border-[#b3122b] px-3 py-1 font-bold tracking-widest text-[#b3122b] opacity-80 group-data-[served]/proc:border-[#1f6f63] group-data-[served]/proc:text-[#1f6f63]"
           >
-            EM PREPARO
+            <span className="group-data-[served]/proc:hidden">EM PREPARO</span>
+            <span className="hidden group-data-[served]/proc:inline">PRONTO ✓</span>
           </div>
 
           <div className="mt-5">
