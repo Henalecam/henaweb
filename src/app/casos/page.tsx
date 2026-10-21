@@ -107,9 +107,15 @@ export default function CasesIndex() {
                     className="win transition-transform duration-500 ease-[var(--ease-out-expo)] [view-transition-class:case-window] group-hover:-translate-y-1.5 group-hover:-rotate-[0.6deg] group-focus-visible:-rotate-[0.6deg] group-focus-visible:-translate-y-1.5"
                   >
                     <div className="win-bar">
-                      <span aria-hidden className="truncate">caso_{String(i + 1).padStart(2, '0')}.exe</span>
-                      <span id={`lido-${p.slug}`} data-read-mark={p.slug} hidden className="ml-auto shrink-0 rounded-sm bg-acid-ink/85 px-1.5 text-[0.65rem] text-acid">
+                      <span aria-hidden className="mr-auto truncate">caso_{String(i + 1).padStart(2, '0')}.exe</span>
+                      <span id={`lido-${p.slug}`} data-read-mark={p.slug} hidden className="shrink-0 rounded-sm bg-acid-ink/85 px-1.5 text-[0.65rem] text-acid">
                         ✓ investigado
+                      </span>
+                      {/* the same Win95 window controls as the case page's window this card turns into (decorative) */}
+                      <span aria-hidden className="flex shrink-0 gap-1">
+                        <span className="win-btn">_</span>
+                        <span className="win-btn">□</span>
+                        <span className="win-btn">×</span>
                       </span>
                     </div>
                     <div className="relative m-1.5 aspect-[16/10] overflow-hidden border-2 border-[#7d7394] bg-acid-ink">
