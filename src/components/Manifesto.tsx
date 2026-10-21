@@ -1,14 +1,17 @@
 'use client';
 
 import { useRef } from 'react';
-import { gsap, SplitText, useGSAP } from '@/lib/gsap';
+import { gsap, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { manifesto, facts } from '@/lib/content';
+import { chisel } from '@/lib/chisel';
 
 export default function Manifesto() {
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
+      // reduced motion: entrances are skipped, the content just sits in place (CSS can't stop GSAP tweens)
+      if (prefersReducedMotion()) return;
       const split = SplitText.create('[data-manifesto]', { type: 'words', aria: 'none' });
       // tween the colour, not opacity: opacity also faded each word's dark halo, leaving the
       // unread words almost invisible where they cross the striped sun
@@ -30,9 +33,52 @@ export default function Manifesto() {
         duration: 1,
         ease: 'expo.out',
         stagger: 0.1,
+        // GSAP folds the card's CSS tilt into its inline transform while it animates; once landed, hand the
+        // tilt back to CSS so the hover can straighten it (globals.css, .fact-card)
+        clearProps: 'transform',
         scrollTrigger: { trigger: '[data-facts]', start: 'top 85%' },
       });
-      return () => split.revert();
+      // the numbers roll to their value as the cards land; "0 caixa-preta" counts *down* from 99,
+      // as if the black box were being emptied. The server HTML already holds the final digits.
+      const offs: (() => void)[] = [];
+      gsap.utils.toArray<HTMLElement>('[data-fact-n]').forEach((el) => {
+        const to = Number(el.dataset.factN);
+        if (!Number.isFinite(to)) return;
+        const counter = { v: to === 0 ? 99 : 0 };
+        el.textContent = String(counter.v);
+        const roll = gsap.to(counter, {
+          v: to,
+          duration: to === 0 ? 1.6 : 1.2,
+          ease: 'power3.out',
+          delay: 0.15,
+          onUpdate: () => (el.textContent = String(Math.round(counter.v))),
+          scrollTrigger: { trigger: '[data-facts]', start: 'top 85%' },
+        });
+        // pointing at a card rolls its number again, quicker (mouse only; ignored while it is still rolling)
+        const card = el.closest<HTMLElement>('[data-fact]');
+        const again = (e: PointerEvent) => {
+          if (e.pointerType !== 'mouse' || roll.isActive() || gsap.isTweening(counter)) return;
+          gsap.fromTo(counter, { v: to === 0 ? 99 : 0 }, { v: to, duration: 0.7, ease: 'power3.out', onUpdate: roll.vars.onUpdate });
+        };
+        card?.addEventListener('pointerenter', again);
+        offs.push(() => card?.removeEventListener('pointerenter', again));
+      });
+      // the quote is carved out left to right, like the line it quotes (negative insets keep its hard shadow)
+      gsap.fromTo(
+        '[data-quote]',
+        { clipPath: 'inset(-20% 100% -40% -4%)' },
+        {
+          clipPath: 'inset(-20% -6% -40% -4%)',
+          duration: 1.6,
+          ease: 'power2.inOut',
+          clearProps: 'clipPath',
+          scrollTrigger: { trigger: '[data-quote]', start: 'top 85%' },
+        },
+      );
+      return () => {
+        split.revert();
+        offs.forEach((off) => off());
+      };
     },
     { scope: root },
   );
@@ -41,7 +87,8 @@ export default function Manifesto() {
     <section ref={root} className="gutter relative py-[clamp(6rem,16vw,14rem)]">
       <div className="grid min-h-[70svh] content-center gap-8 md:grid-cols-12">
         <div className="md:col-span-7 md:col-start-6">
-          <span className="label">(I) Manifesto</span>
+          {/* the label also crosses the hero sun: a dark chip keeps it readable over the stripes (contrast fell to ~1:1) */}
+          <span className="label inline-block rounded-sm bg-[rgb(18_8_42/0.85)] px-1.5 py-0.5">(I) Manifesto</span>
           <p
             data-manifesto
             // the text scrolls over the hero sun; the dark halo keeps it legible over its stripes, as in the headline
@@ -49,15 +96,18 @@ export default function Manifesto() {
           >
             {manifesto}
           </p>
-          <p className="font-groovy mt-8 text-2xl text-acid [text-shadow:3px_3px_0_#120626]">“Vi o anjo no mármore e esculpi até libertá-lo.”</p>
+          {/* the quote about carving answers the chisel too: the mouse knocks marble chips off it, as on the hero's "esculpidos" */}
+          <p data-quote onPointerMove={chisel} className="font-groovy mt-8 text-2xl text-acid [text-shadow:3px_3px_0_#120626]">“Vi o anjo no mármore e esculpi até libertá-lo.”</p>
           <span className="label mt-2 block">Frase atribuída a Michelangelo</span>
         </div>
       </div>
 
       <div data-facts className="mt-[clamp(4rem,10vw,9rem)] grid gap-5 md:grid-cols-3">
         {facts.map((f) => (
-          <div key={f.l} data-fact className="toon flex items-end justify-between gap-6 rounded-2xl bg-paper p-6 text-acid-ink odd:-rotate-1 even:rotate-1 md:p-8">
-            <span className="font-groovy text-[clamp(3.5rem,7vw,6rem)] leading-none text-[#c2410c]">{f.n}</span>
+          <div key={f.l} data-fact className="fact-card toon flex items-end justify-between gap-6 rounded-2xl bg-paper p-6 text-acid-ink md:p-8">
+            <span data-fact-n={f.n} className="font-groovy text-[clamp(3.5rem,7vw,6rem)] leading-none text-[#c2410c] tabular-nums">
+              {f.n}
+            </span>
             {/* the promise behind each number, readable at a glance (was 11px mono caps at 70%) */}
             <span className="max-w-[18ch] text-right text-base leading-snug font-medium text-acid-ink/80 md:text-lg">{f.l}</span>
           </div>

@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef } from 'react';
-import { gsap, SplitText, useGSAP } from '@/lib/gsap';
+import { useRef, useState } from 'react';
+import { gsap, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { govFlow, govPillars } from '@/lib/content';
 
 const audit = [
@@ -15,26 +15,48 @@ const audit = [
 
 export default function GovTech() {
   const root = useRef<HTMLElement>(null);
+  // every step leaves its line in the audit trail: pointing at one lights up its pair (mouse only)
+  const [trace, setTrace] = useState<number | null>(null);
+  const traceProps = (i: number) => ({
+    'data-on': trace === i ? '' : undefined,
+    onPointerEnter: (e: React.PointerEvent) => e.pointerType === 'mouse' && setTrace(i),
+    onPointerLeave: () => setTrace(null),
+  });
 
   useGSAP(
     () => {
-      const split = SplitText.create('[data-gov-title]', { type: 'lines', mask: 'lines', linesClass: 'line-mask' });
-      gsap.from(split.lines, {
-        yPercent: 105,
-        duration: 1.2,
-        ease: 'expo.out',
-        stagger: 0.08,
-        scrollTrigger: { trigger: '[data-gov-title]', start: 'top 80%' },
-      });
+      const mm = gsap.matchMedia();
+      // reduced motion: the title is simply there (CSS reduced-motion can't stop GSAP tweens)
+      const split = prefersReducedMotion() ? null : SplitText.create('[data-gov-title]', { type: 'lines', mask: 'lines', linesClass: 'line-mask' });
+      if (split) {
+        gsap.from(split.lines, {
+          yPercent: 105,
+          duration: 1.2,
+          ease: 'expo.out',
+          stagger: 0.08,
+          scrollTrigger: { trigger: '[data-gov-title]', start: 'top 80%' },
+        });
+      }
 
       // the markup ships the finished flow, so it reads the same without JS or with reduced motion;
       // only when motion is welcome do we rewind it and let the scroll play it back
-      const mm = gsap.matchMedia();
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         const steps = gsap.utils.toArray<HTMLElement>('[data-step]');
         const logs = gsap.utils.toArray<HTMLElement>('[data-log]');
+        // the status badge follows the replay: "em andamento" while the flow fills, "concluído" once the
+        // last step lands (the server HTML, like the flow, ships finished)
+        const badge = root.current?.querySelector<HTMLElement>('[data-gov-status]');
+        const setDone = (done: boolean) => badge?.toggleAttribute('data-done', done);
+        setDone(false);
         const tl = gsap.timeline({
-          scrollTrigger: { trigger: '[data-panel]', start: 'top 70%', end: 'bottom 55%', scrub: 0.6 },
+          scrollTrigger: {
+            trigger: '[data-panel]',
+            start: 'top 70%',
+            end: 'bottom 55%',
+            scrub: 0.6,
+            onUpdate: (self) => setDone(self.progress > 0.97),
+            onRefresh: (self) => setDone(self.progress > 0.97),
+          },
         });
         steps.forEach((s, i) => {
           // each segment fills from this dot to the next one
@@ -59,11 +81,12 @@ export default function GovTech() {
           stagger: 0.06,
           scrollTrigger: { trigger: '[data-pillars]', start: 'top 85%' },
         });
+        return () => setDone(true);
       });
 
       return () => {
         mm.revert();
-        split.revert();
+        split?.revert();
       };
     },
     { scope: root },
@@ -124,15 +147,20 @@ export default function GovTech() {
             <div className="m-1.5 border-2 border-[#7d7394] bg-acid-ink">
             <div className="flex items-center justify-between border-b border-line px-5 py-3">
               <span className="label">Gestão de projetos e verbas</span>
-              <span className="rounded-full border border-mint/50 px-2.5 py-0.5 font-mono text-[0.65rem] text-mint uppercase">
-                em andamento
+              <span
+                data-gov-status
+                data-done=""
+                className="group rounded-full border border-mint/50 px-2.5 py-0.5 font-mono text-[0.65rem] text-mint uppercase transition-colors duration-300 data-[done]:border-mint data-[done]:bg-mint data-[done]:text-acid-ink"
+              >
+                <span className="group-data-[done]:hidden">em andamento</span>
+                <span className="hidden group-data-[done]:inline">✓ concluído</span>
               </span>
             </div>
 
             <div className="grid md:grid-cols-[1.1fr_1fr]">
               <ol className="p-6 md:p-8">
                 {govFlow.map((step, i) => (
-                  <li key={step} data-step className="relative flex items-center gap-5 py-3.5">
+                  <li key={step} data-step {...traceProps(i)} className="group/step relative flex items-center gap-5 py-3.5">
                     {/* rail segment anchored to this dot's center, reaching the next dot's center */}
                     {i < govFlow.length - 1 && (
                       <span aria-hidden className="absolute top-1/2 left-[6px] h-full w-[2px] bg-ink/15">
@@ -141,9 +169,9 @@ export default function GovTech() {
                     )}
                     <span
                       data-dot
-                      className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 border-mint bg-mint"
+                      className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 border-mint bg-mint transition-[scale] duration-200 group-data-[on]/step:scale-150"
                     />
-                    <span className="flex-1 text-lg tracking-tight">{step}</span>
+                    <span className="flex-1 text-lg tracking-tight transition-colors duration-200 group-data-[on]/step:text-mint">{step}</span>
                     <span data-status className="font-mono text-[0.65rem] text-mint uppercase">
                       ✓ {String(i + 1).padStart(2, '0')}
                     </span>
@@ -152,10 +180,14 @@ export default function GovTech() {
               </ol>
               <div className="border-t border-line p-6 md:border-t-0 md:border-l md:p-8">
                 <span className="label">Trilha de auditoria</span>
-                <ul className="mt-5 space-y-3 font-mono text-[0.72rem] leading-snug">
-                  {audit.map(([time, entry]) => (
-                    <li key={entry} data-log>
-                      <span className="text-muted">{time} ·</span> <span className="text-ink/85">{entry}</span>
+                <ul className="mt-5 space-y-2 font-mono text-[0.72rem] leading-snug">
+                  {audit.map(([time, entry], i) => (
+                    <li key={entry} data-log {...traceProps(i)} className="group/log -mx-2 rounded-sm px-2 py-0.5 transition-colors duration-200 data-[on]:bg-mint/20">
+                      <span className="text-muted transition-colors duration-200 group-data-[on]/log:text-mint">{time} ·</span> <span className="text-ink/85">{entry}</span>
+                      {/* the log is live: a terminal cursor waits after the last entry */}
+                      {i === audit.length - 1 && (
+                        <span aria-hidden className="log-cursor ml-1 inline-block h-[1.05em] w-[0.55em] translate-y-[0.15em] bg-mint" />
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -169,12 +201,16 @@ export default function GovTech() {
             data-pillars
             className="mt-8 grid divide-y divide-acid-ink/15 rounded-xl border-[2.5px] border-toon bg-paper shadow-[4px_4px_0_var(--color-toon)] sm:grid-cols-2 sm:gap-4 sm:divide-y-0 sm:rounded-none sm:border-0 sm:bg-transparent sm:shadow-none"
           >
-            {govPillars.map((p) => (
+            {govPillars.map((p, i) => (
               <li
                 key={p.k}
                 data-pillar
                 className="px-5 py-3.5 text-acid-ink sm:rounded-xl sm:border-[2.5px] sm:border-toon sm:bg-paper sm:p-5 sm:shadow-[4px_4px_0_var(--color-toon)]"
               >
+                {/* numbered like the articles of a law: the section talks to people who read regulations for a living */}
+                <span aria-hidden className="mr-2 align-[0.12em] font-mono text-[0.7rem] tracking-wide text-acid-ink/70 uppercase">
+                  Art. {i + 1}º
+                </span>
                 <span className="font-groovy text-base text-[#c2410c] sm:text-lg">{p.k}</span>
                 <p className="mt-0.5 text-[0.95rem] leading-snug text-acid-ink/80 sm:mt-1 sm:text-base sm:leading-normal">{p.v}</p>
               </li>

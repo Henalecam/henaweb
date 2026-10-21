@@ -41,6 +41,13 @@ const nextConfig: NextConfig = {
           { key: CSP_ENFORCE ? 'Content-Security-Policy' : 'Content-Security-Policy-Report-Only', value: csp },
         ],
       },
+      // static media in public/ is served with max-age=0, so every visit re-asks for the 440 KB model and the
+      // screenshots; a day of freshness (and a week of stale-while-revalidate) skips those round trips while a
+      // replaced file (same name) still shows up within a day
+      ...['/models/:path*', '/cases/:path*', '/clients/:path*', '/team/:path*'].map((source) => ({
+        source,
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' }],
+      })),
     ];
   },
   async redirects() {
@@ -50,6 +57,19 @@ const nextConfig: NextConfig = {
       { source: '/portfolio', destination: '/#projetos', permanent: true },
       { source: '/contato', destination: '/#contato', permanent: true },
       { source: '/blog', destination: '/', permanent: false },
+      // guessable variants of real addresses (typed by hand, read aloud, half-remembered): straight to
+      // the page instead of the 404's "did you mean" (singular/plural, English, Portuguese synonyms)
+      { source: '/caso/:slug', destination: '/casos/:slug', permanent: true },
+      { source: '/caso', destination: '/casos', permanent: true },
+      { source: '/projetos', destination: '/casos', permanent: true },
+      { source: '/projeto/:slug', destination: '/casos/:slug', permanent: true },
+      { source: '/cases', destination: '/casos', permanent: true },
+      // slug pattern without dots: /cases/ is also the public folder of the screenshots (/cases/diconta.jpg),
+      // which a bare :slug redirected to /casos/diconta.jpg and broke every case image
+      { source: '/cases/:slug([a-z0-9-]+)', destination: '/casos/:slug', permanent: true },
+      { source: '/servico/:slug', destination: '/servicos/:slug', permanent: true },
+      { source: '/faq', destination: '/#perguntas', permanent: true },
+      { source: '/perguntas', destination: '/#perguntas', permanent: true },
       // v1 campaign pages: keep ads and indexed links alive
       { source: '/lp', destination: '/#contato', permanent: false },
       { source: '/prospecto/:path*', destination: '/#contato', permanent: false },

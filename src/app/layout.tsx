@@ -13,17 +13,21 @@ import FloatingContact from '@/components/FloatingContact';
 import TabHaunt from '@/components/TabHaunt';
 import ThemeTint from '@/components/ThemeTint';
 import ScrollProgress from '@/components/ScrollProgress';
+import OffscreenPause from '@/components/OffscreenPause';
 import ConsentBanner from '@/components/ConsentBanner';
 import { analyticsLoader } from '@/lib/consent';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' });
+// only the italic is ever drawn (.serif), and never above the fold: no upright cut, and no preload, so
+// pages that don't use it (cases, services) never download it and the home fetches it when it shows up
 const instrument = Instrument_Serif({
   subsets: ['latin'],
   weight: '400',
-  style: ['italic', 'normal'],
+  style: 'italic',
   variable: '--font-instrument',
   display: 'swap',
+  preload: false,
 });
 
 const groovy = Shrikhand({ subsets: ['latin'], weight: '400', variable: '--font-shrikhand', display: 'swap' });
@@ -65,6 +69,8 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 },
   },
   icons: { icon: [{ url: '/favicon.ico', sizes: '32x32' }, { url: '/icon.png', type: 'image/png', sizes: '48x48' }, { url: '/icon-192.png', type: 'image/png', sizes: '192x192' }], apple: '/apple-icon.png' },
+  // iOS before 16.4 ignores the manifest and named the home-screen icon after the long <title> ("Desenvolvimento de sis…")
+  appleWebApp: { title: 'HenaWeb' },
 };
 
 export const viewport: Viewport = { themeColor: '#140c2e', colorScheme: 'dark' };
@@ -130,6 +136,12 @@ const jsonLd = {
       name: 'HenaWeb',
       inLanguage: 'pt-BR',
       publisher: { '@id': `${site.url}/#organization` },
+      // the site search (/?pista=) the OpenSearch description already advertises to browsers
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: `${site.url}/?pista={search_term_string}` },
+        'query-input': 'required name=search_term_string',
+      },
     },
   ],
 };
@@ -160,6 +172,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         {/* lets the browser add the site search (Chrome "tab to search", Firefox search bar); React hoists it to <head> */}
         <link rel="search" type="application/opensearchdescription+xml" title="HenaWeb" href="/opensearch.xml" />
+        {/* plain-Markdown map of the site for AI assistants (llmstxt.org) */}
+        <link rel="alternate" type="text/markdown" title="HenaWeb para assistentes de IA" href="/llms.txt" />
         <a
           href="#conteudo"
           className="toon-sm sr-only z-[200] rounded-full bg-acid px-5 py-3 font-medium text-acid-ink focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:px-5 focus:py-3"
@@ -180,6 +194,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <TabHaunt />
         <ThemeTint />
         <ScrollProgress />
+        <OffscreenPause />
         {children}
         <div className="grain" aria-hidden />
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type CSSProperties } from 'react';
 import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { process, stack } from '@/lib/content';
 import type { BurgerScene } from '@/lib/burgerScene';
@@ -110,6 +110,26 @@ export default function Process() {
   const layerTriggers = useRef<ScrollTrigger[]>([]);
   const versionTrigger = useRef<ScrollTrigger | null>(null);
 
+  /** The counter bell is a real bell: ring it any time for a ding (and a happy burger wobble). */
+  const ringBell = () => {
+    const el = root.current;
+    if (!el) return;
+    const ding = el.querySelector('[data-burst="4"]');
+    const bell = el.querySelector('[data-bell]');
+    if (!ding || !bell) return;
+    if (prefersReducedMotion()) {
+      // no swing, no pop: the DING just shows for a moment
+      gsap.timeline().set(ding, { opacity: 1, scale: 1 }).set(ding, { opacity: 0 }, '+=0.9');
+      return;
+    }
+    scene.current?.celebrate();
+    gsap.timeline()
+      .to(bell, { rotation: 12, duration: 0.06, repeat: 5, yoyo: true, ease: 'none', overwrite: true })
+      .set(bell, { rotation: 0 })
+      .fromTo(ding, { opacity: 1, scale: 0.2 }, { scale: 1, duration: 0.4, ease: 'back.out(3)', overwrite: true }, 0)
+      .to(ding, { opacity: 0, duration: 0.25 }, '+=0.6');
+  };
+
   const versionAt = (p: number) => versions[Math.min(versions.length - 1, Math.floor(p * versions.length))];
 
   /** Bring the scene in line with wherever the reader already is on the page. */
@@ -167,7 +187,9 @@ export default function Process() {
         (ctx) => {
           if (ctx.conditions?.reduce) {
             gsap.set('[data-steam]', { opacity: 1 });
-            return;
+            // no scroll-played finale: the burger sits complete, so the slip says the order is up too
+            root.current?.setAttribute('data-served', '');
+            return () => root.current?.removeAttribute('data-served');
           }
           // below lg the diner sticks to the top ~half of the screen, so a step is only readable once it
           // clears it: the layer, the highlight and the finale happen lower in the viewport there
@@ -222,6 +244,13 @@ export default function Process() {
 
           const steps = root.current?.querySelectorAll('[data-step]');
           const last = steps?.[steps.length - 1];
+          // the steam only rises once the order is up, and only while the diner is on screen
+          // (it used to loop from page load, invisible at opacity 0)
+          const steam = gsap.to('[data-steam] path', { y: -10, opacity: 0.4, duration: 1.4, repeat: -1, yoyo: true, stagger: 0.3, ease: 'sine.inOut', paused: true });
+          let served = false;
+          let onScreen = false;
+          const syncSteam = () => (served && onScreen ? steam.play() : steam.pause());
+          ScrollTrigger.create({ trigger: root.current, start: 'top bottom', end: 'bottom top', onToggle: (self) => ((onScreen = self.isActive), syncSteam()) });
           versionTrigger.current = ScrollTrigger.create({
             trigger: last,
             start: stacked ? 'top 55%' : 'top 35%',
@@ -229,14 +258,19 @@ export default function Process() {
             onEnter: () => {
               gsap.to('[data-steam]', { opacity: 1, duration: 0.6 });
               finale.restart();
+              served = true;
+              root.current?.setAttribute('data-served', ''); // the order slip's stamp turns to "pronto" (OrderTicket)
+              syncSteam();
             },
             onLeaveBack: () => {
               gsap.to('[data-steam]', { opacity: 0, duration: 0.4 });
               finale.pause(0);
+              served = false;
+              root.current?.removeAttribute('data-served');
+              syncSteam();
             },
             onUpdate: (self) => scene.current?.setVersion(versionAt(self.progress)),
           });
-          gsap.to('[data-steam] path', { y: -10, opacity: 0.4, duration: 1.4, repeat: -1, yoyo: true, stagger: 0.3, ease: 'sine.inOut' });
 
           gsap.fromTo(
             '[data-ticket]',
@@ -254,7 +288,7 @@ export default function Process() {
     <section
       ref={root}
       id="processo"
-      className="paper relative z-10 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon pt-[clamp(5rem,10vw,9rem)] text-bg"
+      className="group/proc paper relative z-10 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon pt-[clamp(5rem,10vw,9rem)] text-bg"
     >
       <div className="gutter">
         <div className="grid gap-6 md:grid-cols-12">
@@ -271,11 +305,33 @@ export default function Process() {
           <div className="grid gap-6 lg:contents">
             {/* sticky diner */}
             <div className="sticky top-16 z-10 h-[40svh] lg:row-span-2 lg:top-[10vh] lg:col-span-6 lg:h-[80vh]">
-              <div className="toon relative mx-auto h-full max-w-[640px] overflow-hidden rounded-3xl bg-[#1e1442] p-[4%]">
+              <div className="diner toon relative mx-auto h-full max-w-[640px] overflow-hidden rounded-3xl bg-[#1e1442] p-[4%]">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_40%_at_50%_0%,rgb(60_198_180/0.25),transparent)]" />
                 <DinerBack />
                 <canvas ref={canvas} className="absolute inset-x-0 top-[12%] bottom-[8%] h-[80%] w-full" aria-hidden />
                 <DinerFront />
+                {/* same viewBox as the drawing, so the hit area sits on the bell at any size */}
+                <svg viewBox="0 0 600 540" className="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
+                  <g
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Tocar a campainha do balcão"
+                    data-bell-btn
+                    className="pointer-events-auto cursor-pointer outline-none"
+                    onClick={ringBell}
+                    onPointerEnter={(e) => e.currentTarget.closest('.diner')?.setAttribute('data-bell-hover', '')}
+                    onPointerLeave={(e) => e.currentTarget.closest('.diner')?.removeAttribute('data-bell-hover')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        ringBell();
+                      }
+                    }}
+                  >
+                    <circle cx="62" cy="460" r="44" fill="transparent" />
+                    <circle data-bell-ring cx="62" cy="460" r="40" fill="none" stroke="#f9e27d" strokeWidth="4" strokeDasharray="8 6" opacity="0" />
+                  </g>
+                </svg>
               </div>
             </div>
 
@@ -303,8 +359,13 @@ export default function Process() {
                     <p className="mt-4 max-w-xl text-lg leading-relaxed text-bg/70">{s.body}</p>
                     <div className="mt-5 flex max-w-xl flex-wrap items-center gap-2">
                       <span className="label !text-bg/50">Ingredientes</span>
-                      {s.ingredients.map((ing) => (
-                        <span key={ing} className="rounded-full border-2 border-bg/70 bg-paper px-3 py-0.5 text-sm text-bg">
+                      {s.ingredients.map((ing, k) => (
+                        <span
+                          key={ing}
+                          data-ingredient
+                          style={{ '--i': k } as CSSProperties}
+                          className="rounded-full border-2 border-bg/70 bg-paper px-3 py-0.5 text-sm text-bg"
+                        >
                           {ing}
                         </span>
                       ))}

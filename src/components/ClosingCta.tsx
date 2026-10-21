@@ -16,7 +16,7 @@ type Props = {
  */
 export default function ClosingCta({ title, accent, text, whatsappMessage }: Props) {
   return (
-    <section id="proximo-passo" aria-labelledby="proximo-passo-titulo" className="mt-24">
+    <section id="proximo-passo" aria-labelledby="proximo-passo-titulo" className="mt-24" data-print-hide>
       <div className="win">
         <div className="win-bar">
           <span>novo_caso.exe</span>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { nav } from '@/lib/site';
+import { nav, site } from '@/lib/site';
 import { projectLinks } from '@/lib/projectLinks';
 import { serviceLinks } from '@/lib/serviceLinks';
 
@@ -35,6 +35,8 @@ function distance(a: string, b: string) {
  */
 export default function LostClue() {
   const [guess, setGuess] = useState<{ label: string; href: string } | null>(null);
+  // arrived through a link (ours or someone else's): that link is broken, and we'd like to know
+  const [report, setReport] = useState<string | null>(null);
 
   useEffect(() => {
     const words = decodeURIComponent(location.pathname)
@@ -45,14 +47,25 @@ export default function LostClue() {
       .filter((w) => w.length > 2);
     let best: { label: string; href: string; d: number } | null = null;
     for (const w of words.reverse()) {
+      // a piece of a real address also counts ("/casos/next" → next-card, "/servicos/sites" → sites-e-produtos,
+      // "contacerta-site" → contacerta), unless it fits two pages equally ("sistemas" → sob medida or públicos?)
+      const partial = PLACES.filter(
+        (p) => p.key.split('-').includes(w) || (w.length >= 4 && p.key.startsWith(w)) || (p.key.length >= 4 && w.startsWith(p.key)),
+      );
+      const partialHrefs = new Set(partial.map((p) => p.href));
       for (const p of PLACES) {
-        const d = distance(w, p.key);
+        let d = distance(w, p.key);
+        if (partialHrefs.size === 1 && partial.includes(p)) d = Math.min(d, 0.5);
         // tolerate roughly one typo every four letters
         if (d <= Math.max(1, Math.floor(p.key.length / 4)) && (!best || d < best.d)) best = { ...p, d };
       }
       if (best) break;
     }
     setGuess(best);
+    if (document.referrer) {
+      const body = `Encontrei um link quebrado.\n\nEndereço: ${location.href}\nCheguei a partir de: ${document.referrer}`;
+      setReport(`mailto:${site.email}?subject=${encodeURIComponent('Link quebrado no site')}&body=${encodeURIComponent(body)}`);
+    }
   }, []);
 
   return (
@@ -67,11 +80,17 @@ export default function LostClue() {
       )}
       <button
         type="button"
+        data-print-hide
         onClick={() => window.dispatchEvent(new Event('hena:search'))}
         className="label flex min-h-11 items-center gap-2 self-start !text-ink underline underline-offset-4 hover:!text-acid"
       >
         <span aria-hidden>🔎</span> Procurar no arquivo de casos
       </button>
+      {report && (
+        <a href={report} className="label flex min-h-11 items-center gap-2 self-start !text-ink/75 underline underline-offset-4 hover:!text-ink">
+          <span aria-hidden>✉</span> Avisar a gente sobre este link quebrado
+        </a>
+      )}
     </div>
   );
 }

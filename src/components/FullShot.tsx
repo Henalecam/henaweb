@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import WinClose from './WinClose';
 
 const EVENT = 'hena:fullshot';
 const open = () => window.dispatchEvent(new Event(EVENT));
@@ -9,8 +10,12 @@ const open = () => window.dispatchEvent(new Event(EVENT));
 /** The □ (maximize) button of the case window: it really maximizes. */
 export function MaximizeButton() {
   return (
-    <button type="button" onClick={open} className="win-btn cursor-pointer hover:brightness-110" aria-label="Ver a página inteira">
-      □
+    // the bevelled square stays Win95-small (18×17) but the button around it is a 24×24 target (WCAG 2.5.8),
+    // pulled back with negative margins so the title bar doesn't grow
+    <button type="button" onClick={open} className="group -mx-[2.8px] -my-[3.6px] grid h-6 w-6 cursor-pointer place-items-center" aria-label="Ver a página inteira">
+      <span aria-hidden className="win-btn group-hover:brightness-110">
+        □
+      </span>
     </button>
   );
 }
@@ -49,6 +54,8 @@ export default function FullShot({
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [loaded, setLoaded] = useState(false);
+  // how far down the long capture the reader is, shown in the title bar like an old viewer's status
+  const [read, setRead] = useState(0);
 
   useEffect(() => {
     const show = () => {
@@ -61,7 +68,7 @@ export default function FullShot({
 
   return (
     <>
-      <button type="button" onClick={open} className="label mt-12 flex min-h-11 items-center gap-2 !text-ink/80 underline underline-offset-4 hover:!text-acid">
+      <button type="button" onClick={open} data-print-hide className="label mt-12 flex min-h-11 items-center gap-2 !text-ink/80 underline underline-offset-4 hover:!text-acid">
         <span aria-hidden>↕</span> Ver a página inteira de {name}
       </button>
       <dialog
@@ -73,11 +80,21 @@ export default function FullShot({
       >
         <div className="win-bar">
           <span className="truncate">{host} · página inteira</span>
-          <button type="button" onClick={() => dialog.current?.close()} className="win-btn ml-auto" aria-label="Fechar">
-            ×
-          </button>
+          <span aria-hidden className="ml-auto shrink-0 tabular-nums opacity-90">
+            {read}%
+          </span>
+          <WinClose onClick={() => dialog.current?.close()} label="Fechar" />
         </div>
-        <div data-lenis-prevent tabIndex={0} className="m-1.5 max-h-[82vh] overflow-y-auto overscroll-contain border-2 border-[#7d7394] bg-acid-ink p-3 md:p-5">
+        <div
+          data-lenis-prevent
+          tabIndex={0}
+          onScroll={(e) => {
+            const el = e.currentTarget;
+            const max = el.scrollHeight - el.clientHeight;
+            setRead(max > 0 ? Math.round((el.scrollTop / max) * 100) : 100);
+          }}
+          className="m-1.5 max-h-[82vh] overflow-y-auto overscroll-contain border-2 border-[#7d7394] bg-acid-ink p-3 md:p-5"
+        >
           {loaded && (
             <div className="grid items-start gap-5 md:grid-cols-[1fr_minmax(0,15rem)]">
               <Image

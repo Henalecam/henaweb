@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { gsap, useGSAP } from '@/lib/gsap';
+import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { projects, type Project } from '@/lib/content';
 import MockUI from './MockUI';
 import { RevealRead } from './ReadMarks';
+import { serviceLinks } from '@/lib/serviceLinks';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -32,7 +33,7 @@ function Screen({ p, tall = true, images = true }: { p: Project; tall?: boolean;
                 fill
                 sizes="(max-width: 1024px) 92vw, 58vw"
                 className={`object-cover object-top ${
-                  tall && p.shot.height > 1200 ? 'transition-[object-position] duration-[6000ms] ease-linear group-hover/screen:object-bottom' : ''
+                  tall && p.shot.height > 1200 ? 'transition-[object-position] duration-[6000ms] ease-linear motion-safe:group-hover/screen:object-bottom motion-safe:group-focus-visible/screen:object-bottom' : ''
                 }`}
               />
             )
@@ -79,20 +80,57 @@ export default function Work() {
     return () => mq.removeEventListener('change', sync);
   }, []);
   const [paused, setPaused] = useState(false);
+  // phones/tablets: which card of the swipe row is centred, for the dots under it
+  const strip = useRef<HTMLOListElement>(null);
+  const [card, setCard] = useState(0);
+  const onStrip = () => {
+    const ol = strip.current;
+    if (!ol) return;
+    const items = [...ol.children] as HTMLElement[];
+    const mid = ol.scrollLeft + ol.clientWidth / 2;
+    let best = 0;
+    items.forEach((li, i) => {
+      if (Math.abs(li.offsetLeft + li.offsetWidth / 2 - mid) < Math.abs(items[best].offsetLeft + items[best].offsetWidth / 2 - mid)) best = i;
+    });
+    setCard(best);
+  };
+  const goCard = (i: number) => {
+    const li = strip.current?.children[i] as HTMLElement | undefined;
+    li?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', inline: 'center', block: 'nearest' });
+  };
+  // an explicit stop (WCAG 2.2.2: content that changes by itself needs a way to stop it) and
+  // whether the section is on screen at all: rotating off screen only burned GSAP tweens
+  const [stopped, setStopped] = useState(false);
+  const [inView, setInView] = useState(false);
   const p = projects[active];
+  // desktop index: narrow the list to one service (the archive page has the same chips); rotation and
+  // arrow keys stay inside the filtered list
+  const [svc, setSvc] = useState<string | null>(null);
+  const shown = projects.map((_, i) => i).filter((i) => !svc || projects[i].service === svc);
+  const pickService = (slug: string | null) => {
+    setSvc(slug);
+    const first = projects.findIndex((x) => !slug || x.service === slug);
+    if (first >= 0 && (slug ? projects[active].service !== slug : false)) setActive(first);
+  };
+  const services = serviceLinks
+    .map((x) => ({ ...x, n: projects.filter((pr) => pr.service === x.slug).length }))
+    .filter((x) => x.n > 0);
 
   // WAI-ARIA tabs: arrows, Home and End move between projects (focusing a tab selects it)
   const onTabKey = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    const last = projects.length - 1;
-    const next = { ArrowDown: active + 1, ArrowRight: active + 1, ArrowUp: active - 1, ArrowLeft: active - 1, Home: 0, End: last }[e.key];
+    const pos = Math.max(0, shown.indexOf(active));
+    const last = shown.length - 1;
+    const next = { ArrowDown: pos + 1, ArrowRight: pos + 1, ArrowUp: pos - 1, ArrowLeft: pos - 1, Home: 0, End: last }[e.key];
     if (next === undefined) return;
     e.preventDefault();
-    const i = next < 0 ? last : next > last ? 0 : next;
-    document.getElementById(`work-tab-${i}`)?.focus();
+    const k = next < 0 ? last : next > last ? 0 : next;
+    document.getElementById(`work-tab-${shown[k]}`)?.focus();
   };
 
   useGSAP(
     () => {
+      // reduced motion: no entrance and no swap wipe (CSS reduced-motion can't stop GSAP tweens)
+      if (prefersReducedMotion()) return;
       gsap.from('[data-work-in]', {
         y: 50,
         autoAlpha: 0,
@@ -108,7 +146,7 @@ export default function Work() {
   // a quick swap animation every time the exhibit changes
   useEffect(() => {
     const el = root.current;
-    if (!el) return;
+    if (!el || prefersReducedMotion()) return;
     gsap.fromTo(
       el.querySelector('[data-exhibit]'),
       { clipPath: 'inset(0% 0% 100% 0%)' },
@@ -123,10 +161,25 @@ export default function Work() {
 
   // slow autoplay on desktop while nobody is browsing
   useEffect(() => {
-    if (paused || window.matchMedia('(max-width: 1023px), (prefers-reduced-motion: reduce)').matches) return;
-    const id = setInterval(() => setActive((a) => (a + 1) % projects.length), 6500);
+    const el = root.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.25 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const rotating = !paused && !stopped && inView;
+  useEffect(() => {
+    if (!rotating || window.matchMedia('(max-width: 1023px), (prefers-reduced-motion: reduce)').matches) return;
+    const id = setInterval(
+      () =>
+        setActive((a) => {
+          const list = projects.map((_, i) => i).filter((i) => !svc || projects[i].service === svc);
+          return list[(list.indexOf(a) + 1) % list.length] ?? a;
+        }),
+      6500,
+    );
     return () => clearInterval(id);
-  }, [paused]);
+  }, [rotating, svc]);
 
   return (
     <section ref={root} id="projetos" className="sky relative overflow-hidden border-t-[3px] border-toon py-[clamp(5rem,9vw,8rem)]">
@@ -159,56 +212,83 @@ export default function Work() {
           onPointerLeave={() => setPaused(false)}
           onFocusCapture={() => setPaused(true)}
         >
-          <ol data-work-in className="flex flex-col lg:col-span-4" role="tablist" aria-label="Projetos">
-            {projects.map((item, i) => {
-              const on = i === active;
-              return (
-                <li key={item.name} role="presentation">
-                  <button
-                    type="button"
-                    role="tab"
-                    id={`work-tab-${i}`}
-                    aria-selected={on}
-                    aria-controls="work-panel"
-                    // roving focus: Tab enters the list once, arrows move between projects
-                    tabIndex={on ? 0 : -1}
-                    onKeyDown={onTabKey}
-                    onMouseEnter={() => setActive(i)}
-                    onFocus={() => setActive(i)}
-                    onClick={() => setActive(i)}
-                    className={`relative flex w-full items-baseline gap-4 border-b border-line py-3.5 text-left transition-colors ${
-                      on ? 'text-ink' : 'text-ink/45 hover:text-ink/80'
-                    }`}
-                  >
-                    <span className={`flex w-6 shrink-0 flex-col font-mono text-xs ${on ? 'text-acid' : ''}`}>
-                      {pad(i + 1)}
-                      {/* revealed by RevealRead for cases this visitor already opened */}
-                      <span data-read-mark={item.slug} hidden className="text-acid" title="Caso já lido">
-                        ✓<span className="sr-only"> lido</span>
-                      </span>
-                    </span>
-                    <span className="flex-1">
-                      <span className="block text-[clamp(1.5rem,2.3vw,2.25rem)] leading-none font-medium tracking-[-0.04em]">
-                        {item.name}
-                      </span>
-                      <span className={`serif mt-1 block text-base transition-opacity ${on ? 'opacity-70' : 'opacity-0'}`}>{item.kind}</span>
-                    </span>
-                    <span
-                      className={`toon-sm flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-acid text-acid-ink transition-all ${
-                        on ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+          <div className="lg:col-span-4">
+            <div role="group" aria-label="Filtrar casos por serviço" className="mb-4 flex flex-wrap gap-1.5" data-print-hide>
+              {[{ slug: null as string | null, name: 'Todos', n: projects.length }, ...services].map((x) => (
+                <button
+                  key={x.slug ?? 'todos'}
+                  type="button"
+                  aria-pressed={svc === x.slug}
+                  onClick={() => pickService(x.slug)}
+                  className={`min-h-8 rounded-full border px-3 font-mono text-[0.68rem] transition-colors ${
+                    svc === x.slug ? 'border-acid bg-acid text-acid-ink' : 'border-ink/30 text-ink/75 hover:border-ink hover:text-ink'
+                  }`}
+                >
+                  {x.name} <span className="opacity-80">({x.n})</span>
+                </button>
+              ))}
+            </div>
+            <ol data-work-in className="flex flex-col" role="tablist" aria-label="Projetos">
+              {projects.map((item, i) => {
+                const on = i === active;
+                if (!shown.includes(i)) return null;
+                return (
+                  <li key={item.name} role="presentation">
+                    <button
+                      type="button"
+                      role="tab"
+                      id={`work-tab-${i}`}
+                      aria-selected={on}
+                      aria-controls="work-panel"
+                      // roving focus: Tab enters the list once, arrows move between projects
+                      tabIndex={on ? 0 : -1}
+                      onKeyDown={onTabKey}
+                      onMouseEnter={() => setActive(i)}
+                      onFocus={() => setActive(i)}
+                      onClick={() => setActive(i)}
+                      className={`relative flex w-full items-baseline gap-4 border-b border-line py-3.5 text-left transition-colors ${
+                        on ? 'text-ink' : 'text-ink/60 hover:text-ink/85'
                       }`}
-                      aria-hidden
                     >
-                      →
-                    </span>
-                    {on && !paused && (
-                      <span key={active} className="absolute bottom-[-1px] left-0 h-[2px] w-full origin-left animate-[progress_6.5s_linear] bg-acid" />
-                    )}
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
+                      <span className={`flex w-6 shrink-0 flex-col font-mono text-xs ${on ? 'text-acid' : ''}`}>
+                        {pad(i + 1)}
+                        {/* revealed by RevealRead for cases this visitor already opened */}
+                        <span data-read-mark={item.slug} hidden className="text-acid" title="Caso já lido">
+                          ✓<span className="sr-only"> lido</span>
+                        </span>
+                      </span>
+                      <span className="flex-1">
+                        <span className="block text-[clamp(1.5rem,2.3vw,2.25rem)] leading-none font-medium tracking-[-0.04em]">
+                          {item.name}
+                        </span>
+                        <span className={`serif mt-1 block text-base transition-opacity ${on ? 'opacity-70' : 'opacity-0'}`}>{item.kind}</span>
+                      </span>
+                      <span
+                        className={`toon-sm flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-acid text-acid-ink transition-all ${
+                          on ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+                        }`}
+                        aria-hidden
+                      >
+                        →
+                      </span>
+                      {on && rotating && (
+                        <span key={active} className="absolute bottom-[-1px] left-0 h-[2px] w-full origin-left animate-[progress_6.5s_linear] bg-acid" />
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+            <button
+              type="button"
+              data-print-hide
+              onClick={() => setStopped((v) => !v)}
+              className="label mt-4 inline-flex min-h-8 items-center gap-2 rounded-full !text-ink/70 transition-colors hover:!text-ink motion-reduce:hidden"
+            >
+              <span aria-hidden>{stopped ? '▶' : '❚❚'}</span>
+              {stopped ? 'Retomar a troca automática' : 'Pausar a troca automática'}
+            </button>
+          </div>
 
           <div className="lg:col-span-8" role="tabpanel" id="work-panel" aria-labelledby={`work-tab-${active}`}>
             <a
@@ -253,7 +333,7 @@ export default function Work() {
 
         {/* mobile / tablet: swipeable cards */}
         <div className="-mx-[clamp(1rem,4vw,3.5rem)] mt-12 lg:hidden">
-          <ol className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-[clamp(1rem,4vw,3.5rem)] pb-10 [scrollbar-width:none]">
+          <ol ref={strip} onScroll={onStrip} className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-[clamp(1rem,4vw,3.5rem)] pb-10 [scrollbar-width:none]">
             {projects.map((item, i) => (
               <li key={item.name} className="w-[86%] shrink-0 snap-center sm:w-[70%]">
                 {/* the screenshot opens the case page, like the link below it, instead of leaving for the client's site */}
@@ -278,7 +358,24 @@ export default function Work() {
               </li>
             ))}
           </ol>
-          <p className="label px-[clamp(1rem,4vw,3.5rem)]">Deslize para ver os outros casos →</p>
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-[clamp(1rem,4vw,3.5rem)]">
+            <p className="label">{card === projects.length - 1 ? '← Último caso. Deslize para voltar' : 'Deslize para ver os outros casos →'}</p>
+            {/* where you are in the row; each dot jumps to its case (24px targets, the dot itself is small) */}
+            <div className="flex items-center" data-print-hide>
+              {projects.map((item, i) => (
+                <button
+                  key={item.slug}
+                  type="button"
+                  onClick={() => goCard(i)}
+                  aria-label={`Mostrar o caso ${item.name}`}
+                  aria-current={i === card ? 'true' : undefined}
+                  className="grid h-6 w-6 place-items-center"
+                >
+                  <span className={`block h-1.5 rounded-full transition-all duration-300 ${i === card ? 'w-4 bg-acid' : 'w-1.5 bg-ink/55'}`} />
+                </button>
+              ))}
+            </div>
+          </div>
           <RevealRead />
         </div>
       </div>

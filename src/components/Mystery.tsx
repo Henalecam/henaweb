@@ -240,8 +240,11 @@ function Board() {
 
       {boardLayout.map((e) => (
         <div key={e.id} data-evidence className={`absolute z-[2] ${e.box}`} style={{ rotate: `${e.rot}deg` }}>
-          <Pin />
-          {evidenceBodies[e.id].body}
+          {/* hanging from its pin: brushing the pointer past an evidence card sets it swinging */}
+          <div className="evidence-swing">
+            <Pin />
+            {evidenceBodies[e.id].body}
+          </div>
         </div>
       ))}
 
@@ -254,7 +257,7 @@ function Board() {
 
 const copy = {
   intro: {
-    kicker: '(III) Arquivo de casos',
+    kicker: '(III) Caso em aberto',
     title: 'O Caso do Sistema Assombrado',
     body: 'Toda empresa tem um fantasma. Ele some com aprovações, duplica cadastros e aparece toda sexta-feira às 17h.',
   },

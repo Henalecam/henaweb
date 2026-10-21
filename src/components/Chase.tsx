@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import type { ChaseScene } from '@/lib/chaseScene';
 
@@ -26,6 +26,8 @@ function Trees() {
 export default function Chase() {
   const root = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
+  // easter egg: clicking the moon walks it through its phases (full → gibbous → crescent → new-ish → full)
+  const [phase, setPhase] = useState(0);
 
   // the 3D chase loads only when the footer gets close
   useEffect(() => {
@@ -59,9 +61,16 @@ export default function Chase() {
   useGSAP(
     () => {
       if (prefersReducedMotion()) return;
-      gsap.fromTo('[data-layer="trees"]', { xPercent: 0 }, { xPercent: -50, duration: 22, ease: 'none', repeat: -1 });
-      gsap.to('[data-window]', { opacity: 0.25, duration: 0.08, repeat: -1, yoyo: true, repeatDelay: 2.4, ease: 'none' });
-      gsap.fromTo('[data-vruum]', { scale: 0.9, rotate: 4 }, { scale: 1.06, rotate: 8, duration: 0.5, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      // the loops only run while the chase is on screen: the footer sits on every page, and these
+      // used to tick every frame (a style recalc per frame) from the first paint, footer far below
+      const loops = [
+        gsap.fromTo('[data-layer="trees"]', { xPercent: 0 }, { xPercent: -50, duration: 22, ease: 'none', repeat: -1, paused: true }),
+        gsap.to('[data-window]', { opacity: 0.25, duration: 0.08, repeat: -1, yoyo: true, repeatDelay: 2.4, ease: 'none', paused: true }),
+        gsap.fromTo('[data-vruum]', { scale: 0.9, rotate: 4 }, { scale: 1.06, rotate: 8, duration: 0.5, repeat: -1, yoyo: true, ease: 'sine.inOut', paused: true }),
+      ];
+      const io = new IntersectionObserver(([e]) => loops.forEach((t) => (e.isIntersecting ? t.play() : t.pause())));
+      if (root.current) io.observe(root.current);
+      return () => io.disconnect();
     },
     { scope: root },
   );
@@ -70,9 +79,22 @@ export default function Chase() {
     <div ref={root} className="relative h-[clamp(340px,42vw,520px)] overflow-hidden" aria-hidden>
       {/* night sky with a big moon */}
       <div className="absolute inset-0 bg-[linear-gradient(180deg,#140c2e_0%,#2b1a58_60%,#3a2a6e_100%)]" />
-      <div className="absolute top-[7%] right-[10%] aspect-square w-[clamp(80px,12vw,170px)] rounded-full bg-[#f9e27d] shadow-[0_0_80px_rgb(249_226_125/0.5)]">
-        <span className="absolute top-[24%] left-[22%] h-[18%] w-[18%] rounded-full bg-[#e9c95a]" />
-        <span className="absolute top-[52%] left-[54%] h-[24%] w-[24%] rounded-full bg-[#e9c95a]" />
+      {/* above the 3D canvas so it can be clicked; pointer-only and decorative (the whole scene is aria-hidden) */}
+      <div
+        data-moon={phase}
+        onClick={() => setPhase((p) => (p + 1) % 4)}
+        className="absolute top-[7%] right-[10%] z-[5] aspect-square w-[clamp(80px,12vw,170px)] cursor-pointer rounded-full bg-[#f9e27d] transition-shadow duration-700"
+        style={{ boxShadow: `0 0 80px rgb(249 226 125 / ${[0.5, 0.36, 0.22, 0.08][phase]})` }}
+      >
+        <span className="absolute inset-0 overflow-hidden rounded-full">
+          <span className="absolute top-[24%] left-[22%] h-[18%] w-[18%] rounded-full bg-[#e9c95a]" />
+          <span className="absolute top-[52%] left-[54%] h-[24%] w-[24%] rounded-full bg-[#e9c95a]" />
+          {/* the earth's shadow slides across from the left */}
+          <span
+            className="absolute inset-0 rounded-full bg-[#160d33] transition-transform duration-700 ease-[var(--ease-out-expo)]"
+            style={{ transform: `translateX(${[-105, -62, -30, -8][phase]}%)` }}
+          />
+        </span>
       </div>
 
       {/* haunted mansion on the hill */}
@@ -102,7 +124,7 @@ export default function Chase() {
 
       <span
         data-vruum
-        className="toon-sm font-groovy absolute top-[16%] right-[18%] z-10 rounded-full bg-lemon px-4 py-1 text-base text-acid-ink md:top-[20%] md:right-[22%] md:text-2xl"
+        className="toon-sm font-groovy pointer-events-none absolute top-[16%] right-[18%] z-10 rounded-full bg-lemon px-4 py-1 text-base text-acid-ink md:top-[20%] md:right-[22%] md:text-2xl"
       >
         VRUUUM!
       </span>

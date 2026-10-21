@@ -12,7 +12,9 @@ import Studio from '@/components/Studio';
 import Contact from '@/components/Contact';
 import Faq from '@/components/Faq';
 import Testimonials from '@/components/Testimonials';
-import { homeFaq, projects, site } from '@/lib/content';
+import { capabilities, homeFaq, projects, site } from '@/lib/content';
+
+const capabilitySlugs = capabilities.map((c) => c.slug);
 import Footer from '@/components/Footer';
 
 const ticker = [
@@ -84,7 +86,7 @@ export default function Home() {
           <Manifesto />
         </DavidStage>
         <Clients />
-        <Capabilities />
+        <Capabilities caseCounts={Object.fromEntries(capabilitySlugs.map((slug) => [slug, projects.filter((p) => p.service === slug).length]))} />
         <Mystery />
         <GovTech />
         <Work />

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { nav } from '@/lib/site';
-import { gsap, onReady } from '@/lib/gsap';
+import { gsap, onReady, prefersReducedMotion } from '@/lib/gsap';
 import Magnetic from './Magnetic';
 import Social from './Social';
 
@@ -26,7 +26,9 @@ export default function Nav() {
   // "?pista=…" (browser site search, app shortcut) opens the search already filled in
   const [initialQuery, setInitialQuery] = useState('');
 
-  const openSearch = () => {
+  // q: the search box opens already filled in (a ?pista= link, a capability tag); plain opens start empty
+  const openSearch = (q = '') => {
+    setInitialQuery(q);
     setSearchLoaded(true);
     setOpen(false);
     setSearch(true);
@@ -37,8 +39,7 @@ export default function Nav() {
     const url = new URL(location.href);
     const pista = url.searchParams.get('pista');
     if (pista !== null) {
-      setInitialQuery(pista.slice(0, 80));
-      openSearch();
+      openSearch(pista.slice(0, 80));
       url.searchParams.delete('pista');
       history.replaceState(history.state, '', url.pathname + url.search + url.hash);
     }
@@ -57,11 +58,13 @@ export default function Nav() {
       }
     };
     window.addEventListener('keydown', onKey);
-    // other components (the 404 page) can open the search with this event
-    window.addEventListener('hena:search', openSearch);
+    // other components (the 404 page, the capability tags) can open the search with this event,
+    // optionally carrying the words to search for in its detail
+    const onSearchEvent = (e: Event) => openSearch(typeof (e as CustomEvent).detail === 'string' ? (e as CustomEvent<string>).detail.slice(0, 80) : '');
+    window.addEventListener('hena:search', onSearchEvent);
     return () => {
       window.removeEventListener('keydown', onKey);
-      window.removeEventListener('hena:search', openSearch);
+      window.removeEventListener('hena:search', onSearchEvent);
     };
   }, []);
 
@@ -109,9 +112,10 @@ export default function Nav() {
       last = y;
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    const off = onReady(() =>
-      gsap.from(inner.current, { yPercent: -120, duration: 1.1, ease: 'expo.out', delay: 0.5 }),
-    );
+    // reduced motion: the bar is simply there instead of sliding down
+    const off = prefersReducedMotion()
+      ? () => {}
+      : onReady(() => gsap.from(inner.current, { yPercent: -120, duration: 1.1, ease: 'expo.out', delay: 0.5 }));
     return () => {
       off();
       window.removeEventListener('scroll', onScroll);
@@ -161,7 +165,7 @@ export default function Nav() {
                 {item.label}
                 <span
                   className={`absolute -bottom-1 left-0 h-px w-full bg-current transition-transform duration-500 ease-[var(--ease-out-expo)] ${
-                    active === item.href ? 'origin-left scale-x-100' : 'origin-right scale-x-0 group-hover:origin-left group-hover:scale-x-100'
+                    active === item.href ? 'origin-left scale-x-100' : 'origin-right scale-x-0 group-hover:origin-left group-focus-visible:origin-left group-hover:scale-x-100 group-focus-visible:scale-x-100'
                   }`}
                 />
               </a>
@@ -170,13 +174,15 @@ export default function Nav() {
           <div className="ml-auto mr-4 hidden items-center gap-4 md:flex lg:mr-0 lg:ml-0">
             <button
               type="button"
-              onClick={openSearch}
+              onClick={() => openSearch()}
               aria-label="Buscar no site"
               aria-keyshortcuts="Meta+K Control+K /"
               className="hidden items-center gap-2 rounded-full border border-line px-3 py-2 font-mono text-xs whitespace-nowrap xl:flex text-ink/70 transition-colors hover:border-acid hover:text-acid"
             >
               <span aria-hidden>🔎</span>
-              <kbd className="font-mono">{mac ? '⌘K' : 'Ctrl K'}</kbd>
+              {/* fixed 6ch: the server renders "⌘K" and Windows/Linux swap in the wider "Ctrl K" after hydration,
+                  which used to push the whole menu sideways (layout shift 0.039 on desktop) */}
+              <kbd className="inline-block w-[6ch] text-center font-mono">{mac ? '⌘K' : 'Ctrl K'}</kbd>
             </button>
             <Magnetic>
               <a
@@ -184,7 +190,7 @@ export default function Nav() {
                 className="toon-sm toon-press flex items-center gap-2 rounded-full bg-acid px-5 py-2.5 text-sm font-medium text-acid-ink"
               >
                 <span className="h-1.5 w-1.5 animate-[blink_1.4s_infinite] rounded-full bg-acid-ink" />
-                Iniciar projeto
+                Abrir um caso
               </a>
             </Magnetic>
           </div>
@@ -217,7 +223,11 @@ export default function Nav() {
               href={item.href}
               onClick={() => setOpen(false)}
               aria-current={active === item.href ? 'location' : undefined}
-              className={`flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight ${active === item.href ? 'text-acid' : ''}`}
+              // the links rise into place one after another behind the curtain wipe (closing: all at once)
+              style={{ transitionDelay: open ? `${180 + i * 55}ms` : '0ms' }}
+              className={`flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight transition-[translate,opacity] duration-500 ease-[var(--ease-out-expo)] ${
+                open ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+              } ${active === item.href ? 'text-acid' : ''}`}
             >
               <span className="label">0{i + 1}</span>
               {item.label}
@@ -230,7 +240,7 @@ export default function Nav() {
           ))}
         </nav>
         <div className="mt-8 flex items-center justify-between">
-          <button type="button" onClick={openSearch} className="label flex min-h-11 items-center gap-2 !text-ink">
+          <button type="button" onClick={() => openSearch()} className="label flex min-h-11 items-center gap-2 !text-ink">
             <span aria-hidden>🔎</span> Procurar pista
           </button>
           <Social />

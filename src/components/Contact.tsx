@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { gsap, SplitText, useGSAP } from '@/lib/gsap';
+import { gsap, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { projects, symptoms, timelines, whatsappLink, site } from '@/lib/content';
 import { serviceLinks } from '@/lib/serviceLinks';
 
@@ -30,6 +30,30 @@ import Social from './Social';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
+// symptom capability → service page slug, to point a freshly opened case at a similar solved one
+const CAPABILITY_SERVICE: Record<string, string> = {
+  'Sistema sob medida': 'sistemas-sob-medida',
+  'Automação & IA': 'automacao-e-ia',
+  'Sistema público': 'sistemas-publicos',
+  'Site / produto': 'sites-e-produtos',
+};
+
+/** A solved case close to what the visitor described, preferring one they haven't read yet; else the service page. */
+function similarCase(capability: string | undefined): { label: string; href: string } | null {
+  const service = capability && CAPABILITY_SERVICE[capability];
+  if (!service) return null;
+  let read: string[] = [];
+  try {
+    const v = JSON.parse(localStorage.getItem('hena:read') ?? '[]');
+    if (Array.isArray(v)) read = v;
+  } catch {}
+  const same = projects.filter((p) => p.service === service);
+  const pick = same.find((p) => !read.includes(p.slug)) ?? same[0];
+  if (pick) return { label: `o caso ${pick.name}`, href: `/casos/${pick.slug}` };
+  const name = serviceLinks.find((x) => x.slug === service)?.name;
+  return name ? { label: `como trabalhamos com ${name}`, href: `/servicos/${service}` } : null;
+}
+
 /**
  * Where the visitor came from, for the briefing e-mail: the page of this site they were reading
  * (a case or service page), the outside site that sent them, and any campaign tags in the URL.
@@ -55,6 +79,9 @@ function leadOrigin(): string {
 // the half-written case survives a detour to read a case study and come back (same tab only)
 const DRAFT = 'hena:draft';
 const DRAFT_FIELDS = ['name', 'email', 'whatsapp', 'org', 'message'] as const;
+const MSG_MAX = 4000;
+// one sign per deadline chip (shown on the chosen one): from the siren of 'para ontem' to the coffee of 'sem pressa'
+const TIMELINE_ICON: Record<string, string> = { 'Para ontem': '🚨', '1 a 3 meses': '⏱', '3 a 6 meses': '📅', 'Sem pressa': '☕' };
 type Draft = { picked: string[]; timeline: string; fields: Partial<Record<(typeof DRAFT_FIELDS)[number], string>> };
 
 function readDraft(): Draft | null {
@@ -109,6 +136,25 @@ export default function Contact() {
   // "came from the Diconta case": shown on the form and attached to the message, removable
   const [reference, setReference] = useState<string | null>(null);
   useEffect(() => setReference(readReference()), []);
+  // "#mensagem" (the FAQ's "ask us directly") lands with the cursor already in the message box
+  useEffect(() => {
+    const focusMessage = () => {
+      if (location.hash !== '#mensagem') return;
+      const box = document.getElementById('mensagem') as HTMLTextAreaElement | null;
+      if (!box) return;
+      box.scrollIntoView({ block: 'center' });
+      box.focus({ preventScroll: true });
+    };
+    focusMessage();
+    // on a fresh load the pinned sections above are still being measured and the page grows by a few
+    // screens: centre the box again once they settle (other hashes are handled by SmoothScroll)
+    const settle = window.setTimeout(focusMessage, 900);
+    window.addEventListener('hashchange', focusMessage);
+    return () => {
+      window.clearTimeout(settle);
+      window.removeEventListener('hashchange', focusMessage);
+    };
+  }, []);
   const form = useRef<HTMLFormElement>(null);
   const [draftReady, setDraftReady] = useState(false);
   const [restored, setRestored] = useState(false);
@@ -136,8 +182,21 @@ export default function Contact() {
     } catch {}
   };
   useEffect(saveDraft, [picked, timeline, draftReady]);
+  // the submit button rings once the required clues (name and a valid e-mail) are in: "the file is complete"
+  const [ready, setReady] = useState(false);
+  // the message box has a 4000-character cap that used to cut long pastes silently: past 80% it says how much is left
+  const [msgLen, setMsgLen] = useState(0);
+  // read the fields directly: checkValidity() would fire `invalid` and stamp our custom messages on fields
+  // the visitor hasn't reached yet
+  const checkReady = () => {
+    const required = [...(form.current?.elements ?? [])].filter((el): el is HTMLInputElement => el instanceof HTMLInputElement && el.required);
+    setReady(required.length > 0 && required.every((el) => el.value.trim() !== '' && !el.validity.typeMismatch));
+    setMsgLen((form.current?.elements.namedItem('message') as HTMLTextAreaElement | null)?.value.length ?? 0);
+  };
+  useEffect(checkReady, [draftReady, picked]);
   const discardDraft = () => {
     form.current?.reset();
+    setMsgLen(0);
     setPicked([]);
     setTimeline(timelines[1]);
     setRestored(false);
@@ -151,6 +210,7 @@ export default function Contact() {
   const lead = chosen[0];
   const capabilities = [...new Set(chosen.map((c) => c.capability))];
   const [saving, setSaving] = useState(false);
+  const [similar, setSimilar] = useState<{ label: string; href: string } | null>(null);
 
   async function saveCard() {
     if (!lead) return;
@@ -184,6 +244,8 @@ export default function Contact() {
 
   useGSAP(
     () => {
+      // reduced motion: the title is simply there (CSS reduced-motion can't stop GSAP tweens)
+      if (prefersReducedMotion()) return;
       const split = SplitText.create('[data-contact-title]', { type: 'lines', mask: 'lines', linesClass: 'line-mask' });
       gsap.from(split.lines, {
         yPercent: 105,
@@ -295,6 +357,7 @@ export default function Contact() {
       });
       if (!res.ok) throw new Error();
       setStatus('sent');
+      setSimilar(similarCase(lead?.capability));
       try {
         sessionStorage.removeItem(DRAFT);
       } catch {}
@@ -349,7 +412,7 @@ export default function Contact() {
           <Social tone="light" className="mt-6" />
         </div>
 
-        <div className="lg:col-span-7">
+        <div className="min-w-0 lg:col-span-7">
           {status === 'sent' ? (
             <div
               ref={done}
@@ -360,7 +423,7 @@ export default function Contact() {
               {/* rubber stamp, like the diner order slip */}
               <div
                 aria-hidden
-                className="stamp-in pointer-events-none absolute top-9 right-7 rounded-md border-4 border-[#d7263d] px-3 py-1 font-mono text-sm font-bold tracking-widest text-[#d7263d] opacity-85 md:text-base"
+                className="stamp-in pointer-events-none absolute top-9 right-7 rounded-md border-4 border-[#b3122b] px-3 py-1 font-mono text-sm font-bold tracking-widest text-[#b3122b] opacity-85 md:text-base"
               >
                 CASO ABERTO · {caseNo}
               </div>
@@ -377,11 +440,22 @@ export default function Contact() {
                   Falar pelo WhatsApp
                 </a>
               </div>
+              {similar && (
+                <p className="mt-6 text-acid-ink/80">
+                  Enquanto isso, veja{' '}
+                  <a href={similar.href} className="font-medium underline underline-offset-4 hover:text-[#c2410c]">
+                    {similar.label} →
+                  </a>
+                </p>
+              )}
               <p className="mt-8 text-acid-ink/70">Quer levar o diagnóstico para o seu time? Guarde a ficha:</p>
               <div>{saveButton}</div>
             </div>
           ) : (
-            <form ref={form} onSubmit={submit} onInput={saveDraft} className="flex flex-col gap-9">
+            <form ref={form} onSubmit={submit} onInput={() => {
+              saveDraft();
+              checkReady();
+            }} className="flex flex-col gap-9">
               {restored && (
                 <p role="status" className="-mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 self-start font-mono text-xs text-acid-ink/80">
                   <span>↺ Recuperamos o rascunho que você deixou nesta aba.</span>
@@ -420,7 +494,7 @@ export default function Contact() {
                         <input type="checkbox" checked={on} onChange={() => toggle(s.id)} className="sr-only" />
                         <span
                           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 text-xs ${
-                            on ? 'border-acid bg-acid text-acid-ink' : 'border-acid-ink/40'
+                            on ? 'check-pop border-acid bg-acid text-acid-ink' : 'border-acid-ink/40'
                           }`}
                           aria-hidden
                         >
@@ -445,19 +519,27 @@ export default function Contact() {
                       }`}
                     >
                       <input type="radio" name="timeline" value={o} checked={timeline === o} onChange={() => setTimeline(o)} className="sr-only" />
+                      {/* the chosen deadline gets its little sign, stamped in like the symptom ticks (check-pop) */}
+                      {timeline === o && (
+                        <span aria-hidden className="check-pop mr-1.5 inline-block">
+                          {TIMELINE_ICON[o] ?? '✓'}
+                        </span>
+                      )}
                       {o}
                     </label>
                   ))}
                 </div>
               </fieldset>
 
-              <fieldset>
+              {/* min-w-0 here and on the form column: a fieldset and a grid item are min-content wide by default,
+                  so a long unbroken paste (a URL) in the self-sizing message box stretched the column off screen */}
+              <fieldset className="min-w-0">
                 <legend className="label mb-2 !text-acid-ink/60">3 · Quem está investigando</legend>
                 <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
                   <Floating label="Seu nome">
                     <input name="name" required maxLength={120} placeholder=" " autoComplete="name" className={field} onInvalid={explain} onInput={clear} />
                   </Floating>
-                  <div>
+                  <div className="min-w-0">
                     <Floating label="E-mail">
                     <input
                       ref={emailRef}
@@ -481,7 +563,8 @@ export default function Contact() {
                         Você quis dizer{' '}
                         <button
                           type="button"
-                          className="font-medium underline decoration-2 underline-offset-2"
+                          // a long address has no break opportunities: let it wrap anywhere instead of running off the card
+                          className="text-left font-medium underline decoration-2 underline-offset-2 [overflow-wrap:anywhere]"
                           onClick={() => {
                             if (emailRef.current) emailRef.current.value = emailHint;
                             setEmailHint(null);
@@ -517,8 +600,39 @@ export default function Contact() {
                 </div>
                 <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
                 <Floating label="Mais alguma pista? (opcional)" className="mt-2">
-                  <textarea name="message" rows={3} maxLength={4000} placeholder=" " className={`${field} resize-none`} />
+                  <textarea
+                    id="mensagem"
+                    name="message"
+                    rows={3}
+                    maxLength={MSG_MAX}
+                    placeholder=" "
+                    aria-describedby="atalho-enviar"
+                    // grows with the story instead of scrolling inside 3 rows (field-sizing; other browsers keep the 3 rows)
+                    className={`${field} min-h-[7.375rem] max-h-[22rem] resize-none [field-sizing:content]`}
+                    onKeyDown={(e) => {
+                      // Ctrl/⌘ + Enter sends from the message box, like in most mail and chat apps
+                      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && status !== 'sending') {
+                        e.preventDefault();
+                        e.currentTarget.form?.requestSubmit();
+                      }
+                    }}
+                  />
                 </Floating>
+                {/* a live region that is always there (an inserted one may go unannounced); only the limit itself is spoken */}
+                <p
+                  role="status"
+                  className={`mt-1 text-right font-mono text-xs empty:mt-0 ${msgLen >= MSG_MAX ? 'font-medium text-[#c2410c]' : 'text-acid-ink/70'}`}
+                  data-print-hide
+                >
+                  {msgLen >= MSG_MAX ? (
+                    <>Limite de {MSG_MAX.toLocaleString('pt-BR')} caracteres. O resto da história cabe numa conversa pelo WhatsApp.</>
+                  ) : msgLen >= MSG_MAX * 0.8 ? (
+                    <span aria-hidden>{(MSG_MAX - msgLen).toLocaleString('pt-BR')} caracteres restantes</span>
+                  ) : null}
+                </p>
+                <p id="atalho-enviar" className="hidden text-xs text-acid-ink/70 pointer-fine:block" data-print-hide>
+                  <kbd className="font-mono">Ctrl</kbd> + <kbd className="font-mono">Enter</kbd> envia direto da mensagem.
+                </p>
               </fieldset>
 
               <div className="flex flex-wrap items-center gap-6">
@@ -526,10 +640,11 @@ export default function Contact() {
                   type="submit"
                   disabled={status === 'sending'}
                   data-cursor="Enviar"
-                  className="group inline-flex items-center gap-3 rounded-full border-[3px] border-acid-ink bg-acid-ink px-8 py-4 font-medium text-acid shadow-[5px_5px_0_rgb(11_13_2/0.35)] transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                  data-ready={ready || undefined}
+                  className="group relative inline-flex items-center gap-3 rounded-full border-[3px] border-acid-ink bg-acid-ink px-8 py-4 font-medium text-acid shadow-[5px_5px_0_rgb(11_13_2/0.35)] transition-transform hover:-translate-y-0.5 disabled:opacity-60"
                 >
                   {status === 'sending' ? 'Enviando…' : 'Abrir o caso'}
-                  <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
+                  <span className="transition-transform duration-500 group-hover:translate-x-1 group-focus-visible:translate-x-1">→</span>
                 </button>
                 <p className="max-w-xs text-sm leading-snug text-acid-ink/75">
                   Usamos seus dados só para responder este caso.
