@@ -107,10 +107,17 @@ export default function Capabilities({ caseCounts = {} }: { caseCounts?: Record<
                       <span className="flex flex-col gap-5 md:col-span-6">
                         <span className="text-lg leading-relaxed">{c.lead}</span>
                         <span className="flex flex-wrap gap-2">
+                          {/* each tag is a lead: it opens the site search already looking for it (cases, services, answers) */}
                           {c.tags.map((t) => (
-                            <span key={t} className="rounded-full border-2 border-bg/70 bg-paper/60 px-3 py-0.5 font-mono text-xs uppercase">
-                              {t}
-                            </span>
+                            <button
+                              key={t}
+                              type="button"
+                              onClick={() => window.dispatchEvent(new CustomEvent('hena:search', { detail: t }))}
+                              aria-label={`Procurar “${t}” no site`}
+                              className="rounded-full border-2 border-bg/70 bg-paper/60 px-3 py-1 font-mono text-xs uppercase transition-colors hover:bg-bg hover:text-paper focus-visible:bg-bg focus-visible:text-paper"
+                            >
+                              {t} <span aria-hidden className="opacity-60">🔎</span>
+                            </button>
                           ))}
                         </span>
                       </span>

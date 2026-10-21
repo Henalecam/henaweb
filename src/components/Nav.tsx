@@ -26,7 +26,9 @@ export default function Nav() {
   // "?pista=…" (browser site search, app shortcut) opens the search already filled in
   const [initialQuery, setInitialQuery] = useState('');
 
-  const openSearch = () => {
+  // q: the search box opens already filled in (a ?pista= link, a capability tag); plain opens start empty
+  const openSearch = (q = '') => {
+    setInitialQuery(q);
     setSearchLoaded(true);
     setOpen(false);
     setSearch(true);
@@ -37,8 +39,7 @@ export default function Nav() {
     const url = new URL(location.href);
     const pista = url.searchParams.get('pista');
     if (pista !== null) {
-      setInitialQuery(pista.slice(0, 80));
-      openSearch();
+      openSearch(pista.slice(0, 80));
       url.searchParams.delete('pista');
       history.replaceState(history.state, '', url.pathname + url.search + url.hash);
     }
@@ -57,11 +58,13 @@ export default function Nav() {
       }
     };
     window.addEventListener('keydown', onKey);
-    // other components (the 404 page) can open the search with this event
-    window.addEventListener('hena:search', openSearch);
+    // other components (the 404 page, the capability tags) can open the search with this event,
+    // optionally carrying the words to search for in its detail
+    const onSearchEvent = (e: Event) => openSearch(typeof (e as CustomEvent).detail === 'string' ? (e as CustomEvent<string>).detail.slice(0, 80) : '');
+    window.addEventListener('hena:search', onSearchEvent);
     return () => {
       window.removeEventListener('keydown', onKey);
-      window.removeEventListener('hena:search', openSearch);
+      window.removeEventListener('hena:search', onSearchEvent);
     };
   }, []);
 
@@ -171,7 +174,7 @@ export default function Nav() {
           <div className="ml-auto mr-4 hidden items-center gap-4 md:flex lg:mr-0 lg:ml-0">
             <button
               type="button"
-              onClick={openSearch}
+              onClick={() => openSearch()}
               aria-label="Buscar no site"
               aria-keyshortcuts="Meta+K Control+K /"
               className="hidden items-center gap-2 rounded-full border border-line px-3 py-2 font-mono text-xs whitespace-nowrap xl:flex text-ink/70 transition-colors hover:border-acid hover:text-acid"
@@ -237,7 +240,7 @@ export default function Nav() {
           ))}
         </nav>
         <div className="mt-8 flex items-center justify-between">
-          <button type="button" onClick={openSearch} className="label flex min-h-11 items-center gap-2 !text-ink">
+          <button type="button" onClick={() => openSearch()} className="label flex min-h-11 items-center gap-2 !text-ink">
             <span aria-hidden>🔎</span> Procurar pista
           </button>
           <Social />
