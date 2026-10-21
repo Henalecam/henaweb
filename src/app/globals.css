@@ -690,8 +690,10 @@ a:focus-visible .case-stamp {
     animation: order-stamp 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
 }
+/* starts at 1.3, not ~2: the slip sits at the screen's right edge on phones, and a bigger first frame
+   (held while the section is off screen) made the page 13px wider than a 390px viewport */
 @keyframes order-stamp {
-  0% { scale: 1.9; opacity: 0; }
+  0% { scale: 1.3; opacity: 0; }
   60% { scale: 0.94; opacity: 0.85; }
   100% { scale: 1; opacity: 0.8; }
 }
