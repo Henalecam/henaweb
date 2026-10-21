@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { homeFaq, nav, projects, site, whatsappLink } from '@/lib/content';
+import { capabilities, homeFaq, nav, projects, site, whatsappLink } from '@/lib/content';
 import { services } from '@/lib/services';
 import { faqId } from '@/lib/slug';
 import WinClose from './WinClose';
@@ -30,7 +30,16 @@ const ITEMS: Item[] = [
     group: 'Serviços',
     label: s.name,
     href: `/servicos/${s.slug}`,
-    keywords: [s.intro, ...s.keywords, ...s.problems, ...s.deliverables.map((d) => `${d.title} ${d.body}`), ...s.examples.map((e) => e.name)].join(' '),
+    keywords: [
+      s.intro,
+      ...s.keywords,
+      ...s.problems,
+      ...s.deliverables.map((d) => `${d.title} ${d.body}`),
+      ...s.examples.map((e) => e.name),
+      // the home's capability card for this service: its tags open this search (Capabilities), so each one must find it
+      ...(capabilities.find((c) => c.slug === s.slug)?.tags ?? []),
+      capabilities.find((c) => c.slug === s.slug)?.lead ?? '',
+    ].join(' '),
   })),
   // the answer is searched too: "prazo" finds "Em quanto tempo o primeiro resultado aparece?"
   ...homeFaq.map((f) => ({ group: 'Perguntas', label: f.q, href: `/#${faqId(f.q)}`, keywords: f.a })),
