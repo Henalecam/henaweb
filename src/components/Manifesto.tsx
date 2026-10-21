@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { gsap, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { manifesto, facts } from '@/lib/content';
+import { chisel } from '@/lib/chisel';
 
 export default function Manifesto() {
   const root = useRef<HTMLElement>(null);
@@ -95,7 +96,8 @@ export default function Manifesto() {
           >
             {manifesto}
           </p>
-          <p data-quote className="font-groovy mt-8 text-2xl text-acid [text-shadow:3px_3px_0_#120626]">“Vi o anjo no mármore e esculpi até libertá-lo.”</p>
+          {/* the quote about carving answers the chisel too: the mouse knocks marble chips off it, as on the hero's "esculpidos" */}
+          <p data-quote onPointerMove={chisel} className="font-groovy mt-8 text-2xl text-acid [text-shadow:3px_3px_0_#120626]">“Vi o anjo no mármore e esculpi até libertá-lo.”</p>
           <span className="label mt-2 block">Frase atribuída a Michelangelo</span>
         </div>
       </div>
