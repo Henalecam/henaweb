@@ -112,6 +112,14 @@ export default function Studio() {
                   </div>
                   <p className="mt-3 leading-relaxed text-acid-ink/70">{pr.body}</p>
                 </div>
+                {/* a Notepad status bar: house rules open read-only (they are not up for editing) */}
+                <div
+                  aria-hidden
+                  className="mx-1.5 mb-1.5 flex justify-between gap-3 border border-[#7d7394] bg-[#c9c3d8] px-2 py-0.5 font-mono text-[0.62rem] text-[#12082a] shadow-[inset_1px_1px_0_#fff]"
+                >
+                  <span>🔒 somente leitura</span>
+                  <span className="tabular-nums">{pr.body.length} caracteres</span>
+                </div>
               </li>
             ))}
           </ol>
