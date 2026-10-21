@@ -77,7 +77,9 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <main id="conteudo" tabIndex={-1} className="sky min-h-screen text-ink">
+      {/* overflow-x-clip: the "Encerrado ✓" stamp thumps in at 2.2× near the right edge, which made the page
+          ~33px wider than a phone for a moment (a sideways wobble); clip doesn't break the sticky parts */}
+      <main id="conteudo" tabIndex={-1} className="sky min-h-screen overflow-x-clip text-ink">
         <article className="gutter mx-auto max-w-6xl pt-36 pb-24">
           <nav aria-label="Trilha" className="label">
             {/* links padded to a 27px-tall target (WCAG 2.5.8) without changing the line height */}
