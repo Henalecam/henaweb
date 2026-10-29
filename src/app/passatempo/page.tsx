@@ -66,10 +66,10 @@ export default function Passatempo() {
                     >
                       {/* attract screen: a sunset grid, the title in the marquee font and a blinking prompt */}
                       <div
-                        className="absolute inset-x-0 bottom-0 h-[45%] opacity-60 [background:linear-gradient(transparent_0_calc(100%-2px),var(--g)_0)_0_0/100%_22px,linear-gradient(90deg,transparent_0_calc(100%-2px),var(--g)_0)_0_0/36px_100%] [transform:perspective(220px)_rotateX(55deg)] origin-bottom"
+                        className="arcade-floor absolute inset-x-0 bottom-0 h-[45%] opacity-60 [background:linear-gradient(transparent_0_calc(100%-2px),var(--g)_0)_0_0/100%_22px,linear-gradient(90deg,transparent_0_calc(100%-2px),var(--g)_0)_0_0/36px_100%] [transform:perspective(220px)_rotateX(55deg)] origin-bottom"
                         style={{ '--g': p.accent } as React.CSSProperties}
                       />
-                      <div className="absolute top-[18%] left-1/2 h-24 w-24 -translate-x-1/2 rounded-full opacity-90 [background:repeating-linear-gradient(180deg,var(--s)_0_9px,transparent_9px_13px)]" style={{ '--s': p.accent } as React.CSSProperties} />
+                      <div className="arcade-sun absolute top-[18%] left-1/2 h-24 w-24 -translate-x-1/2 rounded-full opacity-90 [background:repeating-linear-gradient(180deg,var(--s)_0_9px,transparent_9px_13px)]" style={{ '--s': p.accent } as React.CSSProperties} />
                       <p className="font-groovy absolute inset-x-0 top-[42%] text-center text-[clamp(2.4rem,5vw,3.4rem)] leading-none text-paper [text-shadow:4px_4px_0_#140a26] transition-transform duration-300 group-hover:scale-105">
                         {p.name}
                       </p>

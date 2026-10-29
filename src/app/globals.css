@@ -698,6 +698,25 @@ a:focus-visible .case-stamp {
   100% { scale: 1; opacity: 0.8; }
 }
 
+/* /passatempo: pointing at a cabinet "inserts a coin" — the sunset grid starts rolling toward you and the sun rises */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .arcade-sun {
+    transition: translate 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  a:hover .arcade-sun,
+  a:focus-visible .arcade-sun {
+    translate: -50% -10px; /* keeps the -translate-x-1/2 centring */
+  }
+  a:hover .arcade-floor,
+  a:focus-visible .arcade-floor {
+    animation: arcade-roll 0.6s linear infinite;
+  }
+}
+@keyframes arcade-roll {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 0 22px, 0 0; }
+}
+
 /* contact: the rubber stamp thumps onto the confirmation */
 @keyframes stamp-in {
   0% { transform: scale(2.2) rotate(-12deg); opacity: 0; }
