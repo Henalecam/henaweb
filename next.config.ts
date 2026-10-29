@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { pastimes } from './src/lib/pastimes';
 
 // Content-Security-Policy. Scripts stay 'unsafe-inline' because the pages are static (a nonce would
 // force dynamic rendering) and Next/JSON-LD/analytics bootstraps are inline; the policy still pins
@@ -70,6 +71,14 @@ const nextConfig: NextConfig = {
       { source: '/servico/:slug', destination: '/servicos/:slug', permanent: true },
       { source: '/faq', destination: '/#perguntas', permanent: true },
       { source: '/perguntas', destination: '/#perguntas', permanent: true },
+      // the side projects: spoken-aloud names for the arcade page, and short links to each game
+      // (henaweb.com/fortrex) that can go on a story or a chat; temporary, since a game may move
+      ...['/passa-tempo', '/passatempos', '/jogos', '/games', '/fliperama', '/arcade'].map((source) => ({
+        source,
+        destination: '/passatempo',
+        permanent: true,
+      })),
+      ...pastimes.map((p) => ({ source: `/${p.slug}`, destination: p.url, permanent: false })),
       // v1 campaign pages: keep ads and indexed links alive
       { source: '/lp', destination: '/#contato', permanent: false },
       { source: '/prospecto/:path*', destination: '/#contato', permanent: false },
