@@ -80,6 +80,24 @@ export default function Passatempo() {
                       <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,rgb(0_0_0/0.22)_0_1px,transparent_1px_3px)]" />
                       <span className="absolute top-2 left-2 font-mono text-[0.6rem] tracking-widest text-paper/80">P{i + 1} · 1 crédito</span>
                     </div>
+                    {/* control deck: joystick, two buttons and a coin slot — pointing at the cabinet drops the coin in */}
+                    <div aria-hidden className="arcade-deck mx-1.5 mb-1.5 flex h-10 items-center gap-3 border-2 border-[#7d7394] bg-[#2a2140] px-3" style={{ '--a': p.accent } as React.CSSProperties}>
+                      <span className="arcade-stick relative h-6 w-4">
+                        <span className="absolute bottom-0 left-1/2 h-1.5 w-4 -translate-x-1/2 rounded-full bg-black/60" />
+                        <span className="absolute bottom-1 left-1/2 h-4 w-1 -translate-x-1/2 bg-[#c9c3d6]" />
+                        <span className="absolute top-0 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-[var(--a)] shadow-[inset_-1px_-1px_0_rgb(0_0_0/0.35)]" />
+                      </span>
+                      <span className="arcade-btn h-3.5 w-3.5 rounded-full bg-[var(--a)] shadow-[0_2px_0_rgb(0_0_0/0.55)]" />
+                      <span className="arcade-btn h-3.5 w-3.5 rounded-full bg-paper/85 shadow-[0_2px_0_rgb(0_0_0/0.55)]" />
+                      <span className="ml-auto flex items-center gap-2 font-mono text-[0.6rem] tracking-widest text-paper/70 uppercase">
+                        <span className="arcade-credit">insert coin</span>
+                        <span className="relative h-6 w-3 rounded-[2px] border border-black/60 bg-[#140a26]">
+                          <span className="absolute top-0.5 bottom-0.5 left-[calc(50%-1px)] w-0.5 bg-black" />
+                          {/* positioned with left/top only: the drop animates `translate`, which Tailwind's centring would share */}
+                          <span className="arcade-coin absolute -top-5 left-[calc(50%-2px)] h-4 w-1 rounded-full bg-[#f9e27d]" />
+                        </span>
+                      </span>
+                    </div>
                   </div>
                   <div className="mt-5 flex items-baseline justify-between gap-4">
                     <span>

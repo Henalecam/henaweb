@@ -712,6 +712,33 @@ a:focus-visible .case-stamp {
     animation: arcade-roll 0.6s linear infinite;
   }
 }
+/* the control deck under each cabinet: the coin drops through the slot, the stick leans, the buttons press,
+   and the marquee text flips to a credit — the text swap also runs with reduced motion, since nothing moves */
+.arcade-coin { opacity: 0; }
+a:hover .arcade-credit,
+a:focus-visible .arcade-credit { color: var(--a); }
+a:hover .arcade-credit::after,
+a:focus-visible .arcade-credit::after { content: ' · 01'; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .arcade-stick { transition: rotate 0.25s cubic-bezier(0.3, 1.6, 0.5, 1); transform-origin: 50% 100%; }
+  a:hover .arcade-stick,
+  a:focus-visible .arcade-stick { rotate: -14deg; }
+  a:hover .arcade-btn,
+  a:focus-visible .arcade-btn { animation: arcade-tap 0.9s steps(1, end) infinite; }
+  a:hover .arcade-btn + .arcade-btn,
+  a:focus-visible .arcade-btn + .arcade-btn { animation-delay: 0.45s; }
+  a:hover .arcade-coin,
+  a:focus-visible .arcade-coin { animation: arcade-coin 0.55s cubic-bezier(0.5, 0, 0.9, 0.6) both; }
+}
+@keyframes arcade-tap {
+  0% { translate: 0 2px; box-shadow: 0 0 0 rgb(0 0 0 / 0.55); }
+  30% { translate: 0 0; box-shadow: 0 2px 0 rgb(0 0 0 / 0.55); }
+}
+@keyframes arcade-coin {
+  0% { opacity: 1; translate: 0 0; }
+  70% { opacity: 1; }
+  100% { opacity: 0; translate: 0 22px; }
+}
 @keyframes arcade-roll {
   from { background-position: 0 0, 0 0; }
   to { background-position: 0 22px, 0 0; }
