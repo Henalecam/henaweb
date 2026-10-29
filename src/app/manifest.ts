@@ -18,6 +18,7 @@ export default function manifest(): MetadataRoute.Manifest {
     shortcuts: [
       { name: 'Abrir um caso', short_name: 'Contato', description: 'Formulário de contato com diagnóstico', url: '/#contato', icons: [{ src: '/icon-192.png', sizes: '192x192' }] },
       { name: 'Casos resolvidos', short_name: 'Casos', description: 'Projetos entregues pela HenaWeb', url: '/casos', icons: [{ src: '/icon-192.png', sizes: '192x192' }] },
+      { name: 'Passa tempo', short_name: 'Jogos', description: 'Jogos e experimentos das horas vagas', url: '/passatempo', icons: [{ src: '/icon-192.png', sizes: '192x192' }] },
       { name: 'Procurar pista', short_name: 'Buscar', description: 'Busca no site: casos, serviços e perguntas', url: '/?pista=', icons: [{ src: '/icon-192.png', sizes: '192x192' }] },
     ],
     icons: [

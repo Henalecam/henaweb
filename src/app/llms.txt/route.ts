@@ -1,5 +1,6 @@
 import { homeFaq, projects, site } from '@/lib/content';
 import { services } from '@/lib/services';
+import { pastimes } from '@/lib/pastimes';
 
 /**
  * /llms.txt: a plain Markdown map of the site for AI assistants and answer engines (llmstxt.org).
@@ -23,6 +24,13 @@ export function GET() {
     '',
     ...projects.map((p) => `- [${p.name}](${site.url}/casos/${p.slug}) (${p.kind}): ${p.summary}`),
     `- [Arquivo completo de casos](${site.url}/casos)`,
+    '',
+    // side projects, kept apart from client work so an assistant never presents them as delivered cases
+    '## Passa tempo (projetos pessoais, fora dos casos de clientes)',
+    '',
+    `Página: ${site.url}/passatempo`,
+    '',
+    ...pastimes.map((p) => `- [${p.name}](${p.url})${p.action === 'Jogar' ? ' (jogo)' : ''}`),
     '',
     '## Perguntas frequentes',
     '',
