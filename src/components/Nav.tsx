@@ -73,6 +73,10 @@ export default function Nav() {
       setActive('/#projetos');
       return;
     }
+    if (window.location.pathname.startsWith('/passatempo')) {
+      setActive('/passatempo');
+      return;
+    }
     if (window.location.pathname !== '/') return;
     // "Contato" only exists in the phone menu, but it lights up there too
     const sections = [...nav, { href: '/#contato' }]
@@ -154,7 +158,7 @@ export default function Nav() {
           <a href="/#topo" className="font-groovy flex items-baseline gap-1 text-2xl text-acid [text-shadow:3px_3px_0_#120626]" aria-label="HenaWeb, início">
             HenaWeb<span className="text-[0.6rem] align-super">®</span>
           </a>
-          <nav className="hidden items-center gap-6 lg:flex xl:gap-8" aria-label="Principal">
+          <nav className="hidden items-center gap-5 lg:flex xl:gap-8" aria-label="Principal">
             {nav.map((item) => (
               <a
                 key={item.href}
@@ -170,6 +174,19 @@ export default function Nav() {
                 />
               </a>
             ))}
+            {/* the side projects get their own door, set apart from the studio's sections: a small arcade token */}
+            <a
+              href="/passatempo"
+              aria-current={active === '/passatempo' ? 'page' : undefined}
+              className={`inline-flex items-center gap-1.5 rounded-full border-2 px-2.5 py-1 text-sm whitespace-nowrap xl:px-3 transition-colors duration-300 ${
+                active === '/passatempo'
+                  ? 'border-acid bg-acid text-acid-ink'
+                  : 'border-acid/60 text-acid hover:border-acid hover:bg-acid hover:text-acid-ink focus-visible:bg-acid focus-visible:text-acid-ink'
+              }`}
+            >
+              <span aria-hidden>🕹</span>
+              Passa tempo
+            </a>
           </nav>
           <div className="ml-auto mr-4 hidden items-center gap-4 md:flex lg:mr-0 lg:ml-0">
             <button
@@ -217,7 +234,7 @@ export default function Nav() {
         }`}
       >
         <nav className="flex flex-col gap-2" aria-label="Menu mobile">
-          {[...nav, { label: 'Contato', href: '/#contato' }].map((item, i) => (
+          {[...nav, { label: 'Contato', href: '/#contato' }, { label: 'Passa tempo', href: '/passatempo' }].map((item, i) => (
             <a
               key={item.href}
               href={item.href}
@@ -227,7 +244,7 @@ export default function Nav() {
               style={{ transitionDelay: open ? `${180 + i * 55}ms` : '0ms' }}
               className={`flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight transition-[translate,opacity] duration-500 ease-[var(--ease-out-expo)] ${
                 open ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
-              } ${active === item.href ? 'text-acid' : ''}`}
+              } ${active === item.href || item.href === '/passatempo' ? 'text-acid' : ''}`}
             >
               <span className="label">0{i + 1}</span>
               {item.label}

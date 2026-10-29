@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { capabilities, homeFaq, nav, projects, site, whatsappLink } from '@/lib/content';
 import { services } from '@/lib/services';
 import { faqId } from '@/lib/slug';
+import { pastimes } from '@/lib/pastimes';
 import WinClose from './WinClose';
 
 // keywords are searched but not shown: a case is found by what it does, not only by its name
@@ -19,6 +20,7 @@ const ITEMS: Item[] = [
   ...nav.map((n) => ({ group: 'Seções', label: n.label, href: n.href })),
   { group: 'Seções', label: 'Contato', hint: 'Abrir um caso', href: '/#contato' },
   { group: 'Seções', label: 'Arquivo de casos', hint: 'Todos os projetos', href: '/casos' },
+  { group: 'Seções', label: 'Passa tempo', hint: 'Jogos e experimentos', href: '/passatempo', keywords: `jogos jogo games fliperama ${pastimes.map((p) => p.name).join(' ')}` },
   ...projects.map((p) => ({
     group: 'Casos',
     label: p.name,

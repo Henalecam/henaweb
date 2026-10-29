@@ -21,7 +21,7 @@ function footerMessage(path: string): string | undefined {
   if (service) return `Olá! Quero conversar sobre ${service} com a HenaWeb.`;
 }
 
-const studioLinks = [...nav.filter((n) => n.label !== 'Casos'), { label: 'Perguntas', href: '/#perguntas' }, { label: 'Contato', href: '/#contato' }];
+const studioLinks = [...nav.filter((n) => n.label !== 'Casos'), { label: 'Perguntas', href: '/#perguntas' }, { label: 'Contato', href: '/#contato' }, { label: 'Passa tempo', href: '/passatempo' }];
 
 export default function Footer() {
   const path = usePathname();
