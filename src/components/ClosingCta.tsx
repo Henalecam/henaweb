@@ -1,4 +1,7 @@
-import { whatsappLink } from '@/lib/content';
+import { projects, whatsappLink } from '@/lib/content';
+
+// the file this conversation would open: the next number after the solved cases, so it follows the archive
+const nextCase = String(projects.length + 1).padStart(2, '0');
 
 type Props = {
   /** Plain part of the headline; the accent closes it in the groovy face. */
@@ -19,7 +22,7 @@ export default function ClosingCta({ title, accent, text, whatsappMessage }: Pro
     <section id="proximo-passo" aria-labelledby="proximo-passo-titulo" className="mt-24" data-print-hide>
       <div className="win">
         <div className="win-bar">
-          <span>novo_caso.exe</span>
+          <span>caso_{nextCase}.exe</span>
           <span className="ml-auto flex gap-1" aria-hidden>
             <span className="win-btn">_</span>
             <span className="win-btn">×</span>
@@ -27,6 +30,11 @@ export default function ClosingCta({ title, accent, text, whatsappMessage }: Pro
         </div>
         <div className="paper m-1.5 grid gap-8 p-6 text-acid-ink md:grid-cols-[1.4fr_1fr] md:items-end md:p-10">
           <div>
+            {/* a blank case file waiting for the visitor: the number continues the archive, the caret waits */}
+            <p className="mb-4 font-mono text-xs tracking-[0.2em] text-acid-ink/60 uppercase">
+              Caso nº {nextCase} · em aberto · cliente: você
+              <span aria-hidden className="ml-1 inline-block h-[1em] w-[0.55em] translate-y-[0.15em] bg-acid-ink/60 motion-safe:animate-[blink_1.1s_steps(1,end)_infinite]" />
+            </p>
             <h2 id="proximo-passo-titulo" className="text-[clamp(2rem,4.2vw,3.4rem)] leading-[0.95] font-medium tracking-[-0.04em]">
               {title}{' '}
               <span className="font-groovy text-[0.9em] tracking-normal text-[#c2410c]">{accent}</span>
