@@ -56,6 +56,15 @@ const ITEMS: Item[] = [
     external: true,
   },
   { group: 'Ações', label: 'Mandar um e-mail', hint: site.email, href: `mailto:${site.email}` },
+  // the side projects, last: "arena" in the search opens the game itself (new tab), not just the arcade page
+  ...pastimes.map((p) => ({
+    group: 'Passa tempo',
+    label: `${p.action} ${p.name}`,
+    hint: p.url.replace('https://', ''),
+    href: p.url,
+    external: true,
+    keywords: p.action === 'Jogar' ? 'jogo jogos games fliperama passa tempo' : 'passa tempo experimento',
+  })),
 ];
 
 // the words visitors type for what the site says another way (folded, no accents); any of them counts as a hit
@@ -236,7 +245,15 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
                   onClick={onClose}
                   className={`flex items-baseline justify-between gap-4 rounded-md px-3 py-2.5 ${i === active ? 'bg-acid' : ''}`}
                 >
-                  <span className="font-medium">{it.label}</span>
+                  <span className="font-medium">
+                    {it.label}
+                    {it.external && (
+                      <>
+                        <span aria-hidden> ↗</span>
+                        <span className="sr-only"> (abre em nova aba)</span>
+                      </>
+                    )}
+                  </span>
                   {it.hint && <span className={`shrink-0 truncate font-mono text-xs ${i === active ? 'text-acid-ink' : 'text-acid-ink/70'}`}>{it.hint}</span>}
                 </a>
               </li>
