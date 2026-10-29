@@ -58,6 +58,9 @@ export function FaqHashOpener() {
 export function FaqToggleAll() {
   const ref = useRef<HTMLButtonElement>(null);
   const [allOpen, setAllOpen] = useState(false);
+  // how many answers this visit has opened at least once: each keeps a ✓ by its number (data-seen),
+  // so a reader skimming the list knows which they still haven't read. In memory only.
+  const [seen, setSeen] = useState({ n: 0, of: 0 });
 
   useEffect(() => {
     const list = ref.current?.closest('section');
@@ -65,6 +68,8 @@ export function FaqToggleAll() {
     const sync = () => {
       const items = [...list.querySelectorAll('details')];
       setAllOpen(items.length > 0 && items.every((d) => d.open));
+      items.forEach((d) => d.open && d.setAttribute('data-seen', ''));
+      setSeen({ n: items.filter((d) => d.hasAttribute('data-seen')).length, of: items.length });
     };
     list.addEventListener('toggle', sync, true);
     return () => list.removeEventListener('toggle', sync, true);
@@ -76,16 +81,24 @@ export function FaqToggleAll() {
   };
 
   return (
-    <button
-      ref={ref}
-      type="button"
-      onClick={flip}
-      aria-expanded={allOpen}
-      data-print-hide
-      className="label inline-flex min-h-8 items-center gap-1.5 rounded-full !text-current opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100"
-    >
-      <span aria-hidden>{allOpen ? '⊟' : '⊞'}</span>
-      {allOpen ? 'Fechar todas' : 'Abrir todas'}
-    </button>
+    <span className="inline-flex items-center gap-3">
+      {seen.n > 0 && (
+        // visual only: screen readers already hear each answer's expanded state
+        <span aria-hidden className="font-mono text-xs tracking-wider opacity-70">
+          <span className="text-[#15803d]">✓</span> {seen.n === seen.of ? `todas as ${seen.of} lidas` : `${seen.n} de ${seen.of} lidas`}
+        </span>
+      )}
+      <button
+        ref={ref}
+        type="button"
+        onClick={flip}
+        aria-expanded={allOpen}
+        data-print-hide
+        className="label inline-flex min-h-8 items-center gap-1.5 rounded-full !text-current opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100"
+      >
+        <span aria-hidden>{allOpen ? '⊟' : '⊞'}</span>
+        {allOpen ? 'Fechar todas' : 'Abrir todas'}
+      </button>
+    </span>
   );
 }
