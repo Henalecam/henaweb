@@ -61,6 +61,13 @@ export default function NotFound() {
               </li>
             ))}
           </ul>
+          {/* a lost visitor is a bored visitor: the side projects make a fair consolation prize */}
+          <p className="mt-6 text-ink/75">
+            Já que se perdeu, que tal uma partida?{' '}
+            <a href="/passatempo" className="font-medium text-acid underline decoration-2 underline-offset-4 hover:text-ink">
+              <span aria-hidden>🕹</span> Passa tempo →
+            </a>
+          </p>
           {/* on phones the witness sits under the clues (tap anywhere to startle it) */}
           <GhostWitness className="pointer-events-none mx-auto mt-24 block w-40 lg:hidden" />
         </div>
