@@ -799,6 +799,19 @@ a:focus-visible .arcade-credit::after { content: ' · 01'; }
   overflow: hidden;
 }
 
+/* scroll progress: chapter notches where each home section starts (ScrollProgress) */
+.progress-mark {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  translate: -1px 0;
+  background: rgb(125 115 148 / 0.6); /* the window-border lilac: visible on the night sky and on paper */
+}
+.progress-mark[data-on] {
+  background: rgb(20 10 38 / 0.7);
+}
+
 /* ───────────── Print: the page becomes a case dossier ─────────────
    Prospects save case and service pages as PDF to pass around (procurement, partners). On paper the
    night sky, the 3D scenes and the floating UI go; the cartoon outlines stay; a stamped header and
