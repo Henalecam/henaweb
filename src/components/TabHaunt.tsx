@@ -62,8 +62,10 @@ function scatterClues() {
   return box;
 }
 
-function toggleFlashlight() {
+function toggleFlashlight(force?: boolean) {
   const existing = document.getElementById('lanterna');
+  if (force === true && existing) return;
+  if (force === false && !existing) return;
   if (existing) {
     existing.remove();
     document.getElementById('lanterna-pistas')?.remove();
@@ -92,11 +94,14 @@ function toggleFlashlight() {
     clues.remove();
   };
   window.addEventListener('pointermove', move, { passive: true });
+  // touch screens have no hover: the beam jumps to wherever the finger lands
+  window.addEventListener('pointerdown', move, { passive: true });
   window.addEventListener('keydown', off);
   new MutationObserver((_, obs) => {
     if (el.isConnected) return;
     clues.remove();
     window.removeEventListener('pointermove', move);
+    window.removeEventListener('pointerdown', move);
     window.removeEventListener('keydown', off);
     obs.disconnect();
   }).observe(document.body, { childList: true });
@@ -133,6 +138,9 @@ export default function TabHaunt() {
       }
     };
     window.addEventListener('keydown', onKey);
+    // the other way in, for phones without a keyboard: darkening the footer moon (Chase) puts the lights out
+    const onLantern = (e: Event) => toggleFlashlight((e as CustomEvent<boolean>).detail);
+    window.addEventListener('hena:lanterna', onLantern);
 
     console.log(
       '%cHenaWeb%c\nInvestigando o código? A gente gosta de gente curiosa.\nhenrique@henaweb.com\n\nPista: ↑ ↑ ↓ ↓ ← → ← → B A apaga as luzes.',
@@ -143,6 +151,7 @@ export default function TabHaunt() {
     return () => {
       document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('keydown', onKey);
+      window.removeEventListener('hena:lanterna', onLantern);
     };
   }, []);
 

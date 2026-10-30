@@ -83,7 +83,13 @@ export default function Chase() {
       {/* above the 3D canvas so it can be clicked; pointer-only and decorative (the whole scene is aria-hidden) */}
       <div
         data-moon={phase}
-        onClick={() => setPhase((p) => (p + 1) % 4)}
+        onClick={() => {
+          const next = (phase + 1) % 4;
+          setPhase(next);
+          // the new moon puts the lights out (flashlight mode, TabHaunt); the full moon brings them back
+          if (next === 3) window.dispatchEvent(new CustomEvent('hena:lanterna', { detail: true }));
+          if (next === 0) window.dispatchEvent(new CustomEvent('hena:lanterna', { detail: false }));
+        }}
         className="absolute top-[7%] right-[10%] z-[5] aspect-square w-[clamp(80px,12vw,170px)] cursor-pointer rounded-full bg-[#f9e27d] transition-shadow duration-700"
         style={{ boxShadow: `0 0 80px rgb(249 226 125 / ${[0.5, 0.36, 0.22, 0.08][phase]})` }}
       >

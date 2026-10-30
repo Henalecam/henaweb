@@ -79,7 +79,7 @@ export default function ShortcutsHelp({ open, onClose }: { open: boolean; onClos
             </div>
           ))}
         </dl>
-        <p className="serif mt-5 text-sm text-acid-ink/75 italic">Dizem que um código antigo de videogame acende uma lanterna por aqui…</p>
+        <p className="serif mt-5 text-sm text-acid-ink/75 italic">Dizem que um código antigo de videogame (ou uma lua nova, lá no rodapé) acende uma lanterna por aqui…</p>
       </div>
     </dialog>
   );
