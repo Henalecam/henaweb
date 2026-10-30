@@ -440,6 +440,10 @@ export default function Contact() {
                 >
                   Falar pelo WhatsApp
                 </a>
+                {/* the reply comes from this number and address: saved, it isn't mistaken for spam */}
+                <a href="/henaweb.vcf" download className="toon-sm toon-press rounded-full bg-white px-5 py-2.5 text-sm font-medium">
+                  <span aria-hidden>＋ </span>Salvar nosso contato
+                </a>
               </div>
               {similar && (
                 <p className="mt-6 text-acid-ink/80">
