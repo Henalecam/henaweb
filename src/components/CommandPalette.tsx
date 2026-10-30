@@ -38,6 +38,8 @@ const ITEMS: Item[] = [
       ...s.problems,
       ...s.deliverables.map((d) => `${d.title} ${d.body}`),
       ...s.examples.map((e) => e.name),
+      // the stack chips on the service page open this search with one technology (StackChip)
+      ...s.stack,
       // the home's capability card for this service: its tags open this search (Capabilities), so each one must find it
       ...(capabilities.find((c) => c.slug === s.slug)?.tags ?? []),
       capabilities.find((c) => c.slug === s.slug)?.lead ?? '',

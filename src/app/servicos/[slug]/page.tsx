@@ -12,6 +12,7 @@ import ServiceSymptoms from '@/components/ServiceSymptoms';
 import ShareCase from '@/components/ShareCase';
 import PrintDossier from '@/components/PrintDossier';
 import TocSeen from '@/components/TocSeen';
+import StackChip from '@/components/StackChip';
 import MockUI from '@/components/MockUI';
 
 export const dynamicParams = false;
@@ -250,9 +251,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             </ul>
             <p className="mt-6 flex flex-wrap gap-2">
               {s.stack.map((t) => (
-                <span key={t} className="rounded-full border-2 border-ink/25 px-3 py-0.5 font-mono text-xs text-ink/75 uppercase">
-                  {t}
-                </span>
+                <StackChip key={t} tech={t} />
               ))}
             </p>
             {/* the archive already filters by service (?servico=, CaseFilter): link straight to this service's cases */}
