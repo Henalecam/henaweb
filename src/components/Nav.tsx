@@ -51,7 +51,8 @@ export default function Nav() {
         openSearch();
       } else if (e.key === '/' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) {
         e.preventDefault();
-        openSearch();      } else if (e.key === '?' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey && !document.querySelector('dialog[open]')) {
+        openSearch();
+      } else if (e.key === '?' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey && !document.querySelector('dialog[open]')) {
         e.preventDefault();
         setOpen(false);
         setHelp(true);

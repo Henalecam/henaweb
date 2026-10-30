@@ -7,6 +7,8 @@ const ROWS: { keys: string[][]; what: string }[] = [
   { keys: [['⌘', 'K'], ['Ctrl', 'K'], ['/']], what: 'Procurar uma pista no site' },
   { keys: [['←'], ['→']], what: 'Folhear os casos (dentro de um caso)' },
   { keys: [['Ctrl', 'Enter'], ['⌘', 'Enter']], what: 'Enviar o formulário de contato (na caixa de mensagem)' },
+  // the browser's own print, listed because case and service pages print as a clean dossier (or a PDF)
+  { keys: [['Ctrl', 'P'], ['⌘', 'P']], what: 'Salvar um caso ou serviço como dossiê em PDF' },
   { keys: [['Esc']], what: 'Fechar janelas e a busca' },
   { keys: [['?']], what: 'Abrir esta ajuda' },
 ];
@@ -20,6 +22,27 @@ export default function ShortcutsHelp({ open, onClose }: { open: boolean; onClos
     if (!d) return;
     if (open && !d.open) d.showModal();
     else if (!open && d.open) d.close();
+  }, [open]);
+
+  // try a key while the help is open and its keycap presses down, like a real keyboard
+  useEffect(() => {
+    if (!open) return;
+    const NAMES: Record<string, string> = { Control: 'Ctrl', Meta: '⌘', Escape: 'Esc', ArrowLeft: '←', ArrowRight: '→' };
+    const press = (e: KeyboardEvent, down: boolean) => {
+      const name = NAMES[e.key] ?? (e.key.length === 1 ? e.key.toUpperCase() : e.key);
+      dialog.current?.querySelectorAll('kbd').forEach((k) => {
+        if (k.textContent?.toUpperCase() === name.toUpperCase()) k.toggleAttribute('data-down', down);
+      });
+    };
+    const onDown = (e: KeyboardEvent) => press(e, true);
+    const onUp = (e: KeyboardEvent) => press(e, false);
+    window.addEventListener('keydown', onDown);
+    window.addEventListener('keyup', onUp);
+    return () => {
+      window.removeEventListener('keydown', onDown);
+      window.removeEventListener('keyup', onUp);
+      dialog.current?.querySelectorAll('kbd[data-down]').forEach((k) => k.removeAttribute('data-down'));
+    };
   }, [open]);
 
   return (
@@ -45,7 +68,7 @@ export default function ShortcutsHelp({ open, onClose }: { open: boolean; onClos
                   <span key={i} className="flex items-center gap-1">
                     {i > 0 && <span className="mx-1 font-mono text-xs text-acid-ink/60">ou</span>}
                     {combo.map((k) => (
-                      <kbd key={k} className="min-w-7 rounded-md border-2 border-acid-ink border-b-4 bg-white px-1.5 py-0.5 text-center font-mono text-xs">
+                      <kbd key={k} className="min-w-7 rounded-md border-2 border-acid-ink border-b-4 bg-white px-1.5 py-0.5 text-center font-mono text-xs data-down:mt-0.5 data-down:border-b-2 data-down:bg-lemon">
                         {k}
                       </kbd>
                     ))}
