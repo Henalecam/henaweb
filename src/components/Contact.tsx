@@ -188,17 +188,22 @@ export default function Contact() {
   const [ready, setReady] = useState(false);
   // the message box has a 4000-character cap that used to cut long pastes silently: past 80% it says how much is left
   const [msgLen, setMsgLen] = useState(0);
+  // who signs the case file: the name (and company) typed below show up on the ficha as they are written
+  const [client, setClient] = useState('');
   // read the fields directly: checkValidity() would fire `invalid` and stamp our custom messages on fields
   // the visitor hasn't reached yet
   const checkReady = () => {
     const required = [...(form.current?.elements ?? [])].filter((el): el is HTMLInputElement => el instanceof HTMLInputElement && el.required);
     setReady(required.length > 0 && required.every((el) => el.value.trim() !== '' && !el.validity.typeMismatch));
     setMsgLen((form.current?.elements.namedItem('message') as HTMLTextAreaElement | null)?.value.length ?? 0);
+    const field = (n: string) => ((form.current?.elements.namedItem(n) as HTMLInputElement | null)?.value ?? '').trim().slice(0, 60);
+    setClient([field('name'), field('org')].filter(Boolean).join(' · '));
   };
   useEffect(checkReady, [draftReady, picked]);
   const discardDraft = () => {
     form.current?.reset();
     setMsgLen(0);
+    setClient('');
     setPicked([]);
     setTimeline(timelines[1]);
     setRestored(false);
@@ -303,6 +308,12 @@ export default function Contact() {
                     {timeline}
                   </dd>
                 </div>
+                {client && (
+                  <div>
+                    <dt className="label !text-acid-ink/75">Cliente</dt>
+                    <dd className="text-lg font-medium break-words">{client}</dd>
+                  </div>
+                )}
                 <div>
                   <dt className="label !text-acid-ink/75">Primeira diligência</dt>
                   <dd className="serif text-xl leading-snug">{lead.firstStep}</dd>
