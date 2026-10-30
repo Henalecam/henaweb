@@ -294,6 +294,14 @@ export default function Contact() {
                   <dt className="label !text-acid-ink/75">Especialidade indicada</dt>
                   <dd className="text-lg font-medium">{capabilities.join(' + ')}</dd>
                 </div>
+                {/* the deadline chosen below goes on the file too, so the whole case reads in one place */}
+                <div>
+                  <dt className="label !text-acid-ink/75">Prazo</dt>
+                  <dd className="text-lg font-medium">
+                    <span aria-hidden>{TIMELINE_ICON[timeline] ?? ''} </span>
+                    {timeline}
+                  </dd>
+                </div>
                 <div>
                   <dt className="label !text-acid-ink/75">Primeira diligência</dt>
                   <dd className="serif text-xl leading-snug">{lead.firstStep}</dd>
