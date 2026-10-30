@@ -11,6 +11,7 @@ import SectionLink from '@/components/SectionLink';
 import ServiceSymptoms from '@/components/ServiceSymptoms';
 import ShareCase from '@/components/ShareCase';
 import PrintDossier from '@/components/PrintDossier';
+import TocSeen from '@/components/TocSeen';
 import MockUI from '@/components/MockUI';
 
 export const dynamicParams = false;
@@ -143,15 +144,18 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                 <li key={t.id}>
                   <a
                     href={`#${t.id}`}
-                    className="inline-flex min-h-9 items-center gap-2 rounded-full border-2 border-ink/25 px-3 text-ink/80 transition-colors hover:border-acid hover:text-ink"
+                    className="group inline-flex min-h-9 items-center gap-2 rounded-full border-2 border-ink/25 px-3 text-ink/80 transition-colors hover:border-acid hover:text-ink data-seen:border-acid/60"
                   >
-                    <span className="text-acid">{String(i + 1).padStart(2, '0')}</span>
+                    {/* the number turns into a ✓ once the section has been read (TocSeen); same width, nothing moves */}
+                    <span className="text-acid group-data-seen:hidden">{String(i + 1).padStart(2, '0')}</span>
+                    <span aria-hidden className="hidden w-[2ch] text-center text-acid group-data-seen:inline">✓</span>
                     {t.label}
                     <span className="text-ink/60">({t.n})</span>
                   </a>
                 </li>
               ))}
             </ol>
+            <TocSeen nav="Nesta página" />
           </nav>
 
           <section className="group relative mt-24" aria-labelledby="sintomas">
