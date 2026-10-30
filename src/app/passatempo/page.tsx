@@ -31,9 +31,9 @@ export default function Passatempo() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <main id="conteudo" tabIndex={-1} className="sky relative min-h-screen overflow-x-clip text-ink">
+      <main id="conteudo" tabIndex={-1} className="sky relative min-h-screen overflow-x-clip text-ink print:min-h-0">
         <div className="grid-floor !h-[30%] opacity-50" aria-hidden />
-        <div className="gutter relative mx-auto max-w-6xl pt-36 pb-28">
+        <div className="gutter relative mx-auto max-w-6xl pt-36 pb-28 print:pt-6 print:pb-6">
           <p className="label !text-teal">Fliperama da casa</p>
           <h1 className="mt-4 text-[clamp(2.8rem,7vw,6.5rem)] leading-[0.9] font-medium tracking-[-0.05em]">
             Passa{' '}
@@ -47,7 +47,8 @@ export default function Passatempo() {
           <LastPlayed />
           <PastimeKeys />
 
-          <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {/* on paper the three machines share one row (one A4 page instead of two); the control deck stays on screen */}
+          <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 print:gap-5">
             {pastimes.map((p, i) => (
               <li key={p.slug} data-pastime={p.name} data-pastime-slug={p.slug} data-action={p.action} className="pastime-slot rounded-sm">
                 {/* an arcade cabinet in a Win95 window: the whole card is the link, named by the game */}
@@ -93,7 +94,7 @@ export default function Passatempo() {
                       <span className="arcade-1up absolute top-2 right-2 font-mono text-[0.6rem] tracking-widest">1UP · último jogo</span>
                     </div>
                     {/* control deck: joystick, two buttons and a coin slot — pointing at the cabinet drops the coin in */}
-                    <div aria-hidden className="arcade-deck mx-1.5 mb-1.5 flex h-10 items-center gap-3 border-2 border-[#7d7394] bg-[#2a2140] px-3" style={{ '--a': p.accent } as React.CSSProperties}>
+                    <div aria-hidden className="arcade-deck mx-1.5 mb-1.5 flex h-10 print:hidden items-center gap-3 border-2 border-[#7d7394] bg-[#2a2140] px-3" style={{ '--a': p.accent } as React.CSSProperties}>
                       <span className="arcade-stick relative h-6 w-4">
                         <span className="absolute bottom-0 left-1/2 h-1.5 w-4 -translate-x-1/2 rounded-full bg-black/60" />
                         <span className="absolute bottom-1 left-1/2 h-4 w-1 -translate-x-1/2 bg-[#c9c3d6]" />
@@ -116,7 +117,7 @@ export default function Passatempo() {
                       <span className="block text-3xl font-medium tracking-[-0.03em] group-hover:text-acid group-focus-visible:text-acid">{p.name}</span>
                       <span className="mt-1 block font-mono text-sm text-ink/65">{p.url.replace('https://', '')}</span>
                     </span>
-                    <span className="toon-sm toon-press shrink-0 rounded-full bg-acid px-5 py-2.5 font-medium text-acid-ink">
+                    <span className="toon-sm toon-press shrink-0 rounded-full bg-acid px-5 py-2.5 print:hidden font-medium text-acid-ink">
                       {p.action} <span aria-hidden>↗</span>
                     </span>
                   </div>
