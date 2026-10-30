@@ -72,7 +72,8 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           </div>
           <div style={{ display: 'flex', fontSize: 26, letterSpacing: 5, color: '#3cc6b4' }}>HENAWEB</div>
         </div>
-        <div style={{ display: 'flex', fontSize: 80, fontWeight: 700, lineHeight: 1.02, letterSpacing: -3, maxWidth: 900 }}>{headline}</div>
+        {/* stops short of the sun (its left edge sits at x≈910): the headline used to run across its stripes */}
+        <div style={{ display: 'flex', fontSize: 80, fontWeight: 700, lineHeight: 1.02, letterSpacing: -3, maxWidth: 820 }}>{headline}</div>
         <div style={{ display: 'flex', gap: 14 }}>
           {tags.map((t) => (
             <div
