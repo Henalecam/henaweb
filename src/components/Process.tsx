@@ -103,6 +103,34 @@ function DinerFront() {
   );
 }
 
+/** The 2D stand-in for the 3D burger, in the same toon outline as the diner drawing. */
+function FlatBurger() {
+  const ink = '#140a26';
+  return (
+    <svg viewBox="0 0 240 200" aria-hidden className="absolute left-1/2 top-[34%] h-[42%] -translate-x-1/2">
+      <g stroke={ink} strokeWidth="5" strokeLinejoin="round">
+        {/* top bun with sesame */}
+        <path d="M30 92 C30 40 210 40 210 92 Z" fill="#f4a23a" />
+        <g fill="#fdf3e1" stroke="none">
+          <ellipse cx="82" cy="68" rx="6" ry="3.5" transform="rotate(-20 82 68)" />
+          <ellipse cx="118" cy="60" rx="6" ry="3.5" />
+          <ellipse cx="154" cy="68" rx="6" ry="3.5" transform="rotate(20 154 68)" />
+          <ellipse cx="100" cy="76" rx="5" ry="3" transform="rotate(10 100 76)" />
+          <ellipse cx="140" cy="76" rx="5" ry="3" transform="rotate(-10 140 76)" />
+        </g>
+        {/* lettuce */}
+        <path d="M24 98 q12 14 24 0 q12 14 24 0 q12 14 24 0 q12 14 24 0 q12 14 24 0 q12 14 24 0 q12 14 24 0 q12 14 24 0 L216 94 L24 94 Z" fill="#a6d64b" />
+        {/* patty */}
+        <rect x="26" y="104" width="188" height="30" rx="14" fill="#6b3a1f" />
+        {/* cheese, dripping */}
+        <path d="M28 104 L212 104 L204 116 L184 108 L160 130 L140 110 L74 110 L58 124 L46 110 Z" fill="#f9e27d" />
+        {/* bottom bun */}
+        <path d="M32 140 L208 140 C208 170 196 176 120 176 C44 176 32 170 32 146 Z" fill="#f4a23a" />
+      </g>
+    </svg>
+  );
+}
+
 export default function Process() {
   const root = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -117,6 +145,8 @@ export default function Process() {
   const replyN = useRef(0);
   const replyTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [reply, setReply] = useState('');
+  // no 3D burger (data saver on, or no WebGL): a flat cartoon one is served instead
+  const [flatBurger, setFlatBurger] = useState(false);
 
   /** The counter bell is a real bell: ring it any time for a ding (and a happy burger wobble). */
   const ringBell = () => {
@@ -163,7 +193,11 @@ export default function Process() {
   // the 3D burger loads lazily, only when the section gets close
   useEffect(() => {
     const el = canvas.current;
-    if (!el || saveData()) return;
+    if (!el) return;
+    if (saveData()) {
+      setFlatBurger(true);
+      return;
+    }
     let cancelled = false;
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -176,7 +210,8 @@ export default function Process() {
             ScrollTrigger.refresh();
             syncScene();
           } catch {
-            // no WebGL: the menu still tells the story
+            // no WebGL: the flat burger takes the plate
+            setFlatBurger(true);
           }
         });
       },
@@ -325,6 +360,7 @@ export default function Process() {
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_40%_at_50%_0%,rgb(60_198_180/0.25),transparent)]" />
                 <DinerBack />
                 <canvas ref={canvas} className="absolute inset-x-0 top-[12%] bottom-[8%] h-[80%] w-full" aria-hidden />
+                {flatBurger && <FlatBurger />}
                 <DinerFront />
                 {/* same viewBox as the drawing, so the hit area sits on the bell at any size */}
                 <svg viewBox="0 0 600 540" className="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
