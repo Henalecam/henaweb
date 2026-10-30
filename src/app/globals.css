@@ -858,6 +858,39 @@ a:focus-visible .arcade-credit::after { content: ' · 01'; }
   }
 }
 
+/* case → next / previous case: the swap slides sideways, the way the reader walks the archive (the type is
+   set on pagereveal by the case page, see caseStepScript); the case windows ride along with the page */
+html:active-view-transition-type(case-next)::view-transition-old(root),
+html:active-view-transition-type(case-next)::view-transition-old(*.case-window) {
+  animation: vt-off-left 0.42s cubic-bezier(0.55, 0, 1, 0.45) both;
+}
+html:active-view-transition-type(case-next)::view-transition-new(root),
+html:active-view-transition-type(case-next)::view-transition-new(*.case-window) {
+  animation: vt-on-right 0.6s 0.06s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+html:active-view-transition-type(case-prev)::view-transition-old(root),
+html:active-view-transition-type(case-prev)::view-transition-old(*.case-window) {
+  animation: vt-off-right 0.42s cubic-bezier(0.55, 0, 1, 0.45) both;
+}
+html:active-view-transition-type(case-prev)::view-transition-new(root),
+html:active-view-transition-type(case-prev)::view-transition-new(*.case-window) {
+  animation: vt-on-left 0.6s 0.06s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes vt-off-left {
+  to { opacity: 0.2; transform: translateX(-6%) scale(0.98); }
+}
+@keyframes vt-off-right {
+  to { opacity: 0.2; transform: translateX(6%) scale(0.98); }
+}
+@keyframes vt-on-right {
+  from { opacity: 0; transform: translateX(9%); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes vt-on-left {
+  from { opacity: 0; transform: translateX(-9%); }
+  to { opacity: 1; transform: none; }
+}
+
 /* /casos ↔ /casos/[slug]: the case card and the case page window share a name, so the card grows
    into the big window (and shrinks back on the way out) above the page wipe */
 ::view-transition-group(*.case-window) {

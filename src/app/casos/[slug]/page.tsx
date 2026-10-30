@@ -78,6 +78,9 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {/* case → next/previous case (→/←, the peeks at the foot): the page swap slides the way the reader is
+          walking through the archive instead of the generic wipe from the floor (globals.css, case-next/prev) */}
+      <script dangerouslySetInnerHTML={{ __html: caseStepScript(projects.map((c) => c.slug)) }} />
       {/* overflow-x-clip: the "Encerrado ✓" stamp thumps in at 2.2× near the right edge, which made the page
           ~33px wider than a phone for a moment (a sideways wobble); clip doesn't break the sticky parts */}
       <main id="conteudo" tabIndex={-1} className="sky min-h-screen overflow-x-clip text-ink">
@@ -297,4 +300,13 @@ function CasePeek({ p }: { p: (typeof projects)[number] }) {
       />
     </span>
   );
+}
+
+/**
+ * Tags the incoming cross-document view transition with the direction of travel between two case pages
+ * (the archive's order wraps around, like the ←/→ keys). pagereveal fires before the first frame, so the
+ * type is set in time; browsers without view-transition types simply keep the default wipe.
+ */
+function caseStepScript(order: string[]) {
+  return `(()=>{const O=${JSON.stringify(order)};addEventListener('pagereveal',(e)=>{const t=e.viewTransition;if(!t||!t.types||!window.navigation)return;const f=navigation.activation&&navigation.activation.from;const s=(u)=>{try{const m=new URL(u).pathname.match(/^\\/casos\\/([\\w-]+)/);return m?O.indexOf(m[1]):-1}catch(_){return -1}};const a=f?s(f.url):-1,b=s(location.href),n=O.length;if(a<0||b<0||a===b)return;if((a+1)%n===b)t.types.add('case-next');else if((b+1)%n===a)t.types.add('case-prev')},{once:true})})();`;
 }
