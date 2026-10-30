@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { pastimes } from '@/lib/pastimes';
 
 /**
  * "Can't decide?": a roulette over the arcade cabinets. The highlight hops from machine to machine,
@@ -46,6 +47,16 @@ export default function PickPastime() {
       </button>
       <p role="status" className="font-mono text-sm text-ink/80">
         {label}
+      </p>
+      {/* PastimeKeys: the number keys step up to P1, P2, P3 (only worth saying where there is a keyboard) */}
+      <p aria-hidden className="hidden font-mono text-xs text-ink/65 pointer-fine:block sm:ml-auto">
+        ou aperte{' '}
+        {pastimes.map((p, i) => (
+          <kbd key={p.slug} className="mr-1 rounded border border-ink/40 px-1">
+            {i + 1}
+          </kbd>
+        ))}
+        no teclado
       </p>
     </div>
   );

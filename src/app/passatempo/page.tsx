@@ -4,6 +4,7 @@ import { pastimes } from '@/lib/pastimes';
 import PickPastime from '@/components/PickPastime';
 import CopyShortLink from '@/components/CopyShortLink';
 import LastPlayed from '@/components/LastPlayed';
+import PastimeKeys from '@/components/PastimeKeys';
 import { site } from '@/lib/site';
 
 const description = 'Passa tempo: jogos e experimentos que o Henrique, da HenaWeb, faz nas horas vagas. Fortrex, Arena e Forno, cada um no seu endereço.';
@@ -44,6 +45,7 @@ export default function Passatempo() {
 
           <PickPastime />
           <LastPlayed />
+          <PastimeKeys />
 
           <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {pastimes.map((p, i) => (
@@ -54,6 +56,7 @@ export default function Passatempo() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`${p.action} ${p.name} (abre em nova aba)`}
+                  aria-keyshortcuts={String(i + 1)}
                   className="group block"
                 >
                   <div className="win transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:-translate-y-1.5 group-hover:-rotate-[0.6deg] group-focus-visible:-translate-y-1.5">
