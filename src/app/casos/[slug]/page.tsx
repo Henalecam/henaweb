@@ -290,7 +290,9 @@ function CasePeek({ p }: { p: (typeof projects)[number] }) {
         alt=""
         width={720}
         height={360}
-        sizes="(max-width: 768px) 88vw, 340px"
+        /* px, not vw: next/image drops every candidate below 0.88 × 640 px when sizes mentions vw, so a 1x desktop
+           showing this at ~300 px fetched the 640-px file; with px breakpoints it gets 384 (phones still 1080) */
+        sizes="(max-width: 480px) 360px, (max-width: 767px) 680px, 340px"
         className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04] group-focus-visible:scale-[1.04]"
       />
     </span>
