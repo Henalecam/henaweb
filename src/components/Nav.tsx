@@ -49,9 +49,23 @@ export default function Nav() {
       url.searchParams.delete('pista');
       history.replaceState(history.state, '', url.pathname + url.search + url.hash);
     }
+    // "g" then a letter jumps somewhere, like a mail client's go-to keys: g h home, g c cases, g j games,
+    // g o contact (open a case). The second key must come within a second; anything else cancels.
+    const GO: Record<string, string> = { h: '/', c: '/casos', j: '/passatempo', o: '/#contato' };
+    let goAt = 0;
     // ⌘K / Ctrl+K anywhere, or "/" when not typing in a field
     const onKey = (e: KeyboardEvent) => {
       const typing = (e.target as HTMLElement | null)?.closest?.('input, textarea, select, [contenteditable="true"]');
+      if (!typing && !e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.repeat && !document.querySelector('dialog[open]')) {
+        const k = e.key.toLowerCase();
+        if (goAt && e.timeStamp - goAt < 1000 && GO[k]) {
+          goAt = 0;
+          e.preventDefault();
+          location.href = GO[k];
+          return;
+        }
+        goAt = k === 'g' ? e.timeStamp : 0;
+      }
       if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         openSearch();

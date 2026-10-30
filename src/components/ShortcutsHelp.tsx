@@ -6,6 +6,8 @@ import WinClose from './WinClose';
 const ROWS: { keys: string[][]; what: string }[] = [
   { keys: [['⌘', 'K'], ['Ctrl', 'K'], ['/']], what: 'Procurar uma pista no site' },
   { keys: [['←'], ['→']], what: 'Folhear os casos ou serviços (dentro de um deles)' },
+  { keys: [['G', 'H'], ['G', 'C']], what: 'G, depois H ou C: ir para o início ou para os casos' },
+  { keys: [['G', 'J'], ['G', 'O']], what: 'G, depois J ou O: ir para os jogos ou abrir um caso' },
   { keys: [['1'], ['2'], ['3']], what: 'Escolher uma máquina do fliperama (no Passa tempo)' },
   { keys: [['Ctrl', 'Enter'], ['⌘', 'Enter']], what: 'Enviar o formulário de contato (na caixa de mensagem)' },
   // the browser's own print, listed because case and service pages print as a clean dossier (or a PDF)
