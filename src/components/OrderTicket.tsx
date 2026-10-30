@@ -127,10 +127,20 @@ export default function OrderTicket() {
             <span className="hidden group-data-[served]/proc:inline">PRONTO ✓</span>
           </div>
 
-          <div className="mt-5">
-            <Barcode />
-            <p className="mt-1 text-center text-[0.65rem] tracking-[0.4em]">0142 {new Date().getFullYear()} HENA</p>
-          </div>
+          {/* the barcode is the order button: pointing at it passes the scanner's red line over the bars,
+              and following it goes to the form, where the visitor's own order is placed */}
+          <a href="#contato" className="scan group/scan relative mt-5 block rounded-sm outline-offset-4">
+            <span className="relative block overflow-hidden">
+              <Barcode />
+              <span aria-hidden className="scan-laser pointer-events-none absolute inset-y-0 w-[3px] bg-[#e11d48] opacity-0 shadow-[0_0_8px_2px_rgb(225_29_72/0.6)]" />
+            </span>
+            <span aria-hidden className="mt-1 block text-center text-[0.65rem] tracking-[0.4em]">
+              0142 {new Date().getFullYear()} HENA
+            </span>
+            <span className="mt-1 block text-center text-[0.65rem] font-bold tracking-[0.2em] underline-offset-2 group-hover/scan:underline group-focus-visible/scan:underline">
+              <span aria-hidden>▸ </span>ESCANEIE PARA FAZER O SEU PEDIDO
+            </span>
+          </a>
           <p className="mt-4 text-center text-[0.68rem] tracking-[0.2em]">*** VOLTE SEMPRE: TEMOS ROADMAP ***</p>
           <p className="mt-1 text-center text-[0.65rem] text-acid-ink/70">henrique@henaweb.com</p>
         </div>
