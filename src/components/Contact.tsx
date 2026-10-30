@@ -122,6 +122,17 @@ const explain = (e: FormEvent<HTMLInputElement>) => {
 };
 const clear = (e: FormEvent<HTMLInputElement>) => e.currentTarget.setCustomValidity('');
 
+/** WhatsApp is optional, but a half-typed number ("(41) 999") can't be called back: needs DDD + number. */
+const checkPhone = (el: HTMLInputElement) => {
+  const v = el.value.trimStart();
+  const digits = v.replace(/\D/g, '');
+  const foreign = v.startsWith('+') && !v.startsWith('+55');
+  const local = v.startsWith('+55') ? digits.slice(2) : digits;
+  el.setCustomValidity(
+    !digits || (foreign ? digits.length >= 8 : local.length >= 10) ? '' : 'Faltam dígitos: DDD + número, como (41) 99999-9999. Ou deixe em branco.',
+  );
+};
+
 export default function Contact() {
   const root = useRef<HTMLElement>(null);
   const done = useRef<HTMLDivElement>(null);
@@ -169,6 +180,9 @@ export default function Contact() {
         const el = form.current.elements.namedItem(k) as HTMLInputElement | null;
         if (el && d.fields[k]) el.value = d.fields[k];
       }
+      // a restored half-typed number is checked too (setting .value fires no input event)
+      const phone = form.current.elements.namedItem('whatsapp') as HTMLInputElement | null;
+      if (phone) checkPhone(phone);
       setRestored(true);
     }
     setDraftReady(true);
@@ -636,15 +650,7 @@ export default function Contact() {
                       const el = e.currentTarget;
                       const atEnd = el.selectionStart === el.value.length;
                       if (atEnd) el.value = formatPhoneBR(el.value);
-                      // optional, but a half-typed number ("(41) 999") went through and couldn't be called back
-                      const digits = el.value.replace(/\D/g, '');
-                      const foreign = el.value.trimStart().startsWith('+') && !el.value.trimStart().startsWith('+55');
-                      const local = el.value.trimStart().startsWith('+55') ? digits.slice(2) : digits;
-                      el.setCustomValidity(
-                        !digits || (foreign ? digits.length >= 8 : local.length >= 10)
-                          ? ''
-                          : 'Faltam dígitos: DDD + número, como (41) 99999-9999. Ou deixe em branco.',
-                      );
+                      checkPhone(el);
                     }}
                   />
                   </Floating>
