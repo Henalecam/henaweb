@@ -472,7 +472,19 @@ export default function Contact() {
               onSubmit={submit} onInput={() => {
               saveDraft();
               checkReady();
-            }} className="flex flex-col gap-9">
+            }}
+              // Enter in a one-line field used to submit the half-filled form (and pop "preencha este campo" on
+              // the next one); like the phone keyboard's "next" key, it now moves to the next field instead
+              onKeyDown={(e) => {
+                const t = e.target as HTMLInputElement;
+                if (e.key !== 'Enter' || e.nativeEvent.isComposing || t.tagName !== 'INPUT' || !/^(text|email|tel)$/.test(t.type)) return;
+                const fields = [...e.currentTarget.querySelectorAll<HTMLElement>('input[name]:not([tabindex="-1"]):is([type=text],[type=email],[type=tel],:not([type])), textarea[name]')];
+                const next = fields[fields.indexOf(t) + 1];
+                if (!next) return;
+                e.preventDefault();
+                next.focus();
+              }}
+              className="flex flex-col gap-9">
               {restored && (
                 <p role="status" className="-mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 self-start font-mono text-xs text-acid-ink/80">
                   <span>↺ Recuperamos o rascunho que você deixou nesta aba.</span>
@@ -554,13 +566,13 @@ export default function Contact() {
                 <legend className="label mb-2 !text-acid-ink/60">3 · Quem está investigando</legend>
                 <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
                   <Floating label="Seu nome">
-                    <input name="name" required maxLength={120} placeholder=" " autoComplete="name" className={field} onInvalid={explain} onInput={clear} />
+                    <input name="name" enterKeyHint="next" required maxLength={120} placeholder=" " autoComplete="name" className={field} onInvalid={explain} onInput={clear} />
                   </Floating>
                   <div className="min-w-0">
                     <Floating label="E-mail">
                     <input
                       ref={emailRef}
-                      name="email"
+                      name="email" enterKeyHint="next"
                       type="email"
                       required
                       placeholder=" "
@@ -596,7 +608,7 @@ export default function Contact() {
                   </div>
                   <Floating label="WhatsApp (opcional)">
                   <input
-                    name="whatsapp"
+                    name="whatsapp" enterKeyHint="next"
                     type="tel"
                     inputMode="tel"
                     placeholder=" "
@@ -612,7 +624,7 @@ export default function Contact() {
                   />
                   </Floating>
                   <Floating label="Empresa ou órgão (opcional)">
-                    <input name="org" placeholder=" " autoComplete="organization" className={field} />
+                    <input name="org" enterKeyHint="next" placeholder=" " autoComplete="organization" className={field} />
                   </Floating>
                 </div>
                 <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
