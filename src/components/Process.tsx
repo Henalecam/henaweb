@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { process, stack } from '@/lib/content';
 import type { BurgerScene } from '@/lib/burgerScene';
@@ -110,10 +110,25 @@ export default function Process() {
   const layerTriggers = useRef<ScrollTrigger[]>([]);
   const versionTrigger = useRef<ScrollTrigger | null>(null);
 
+  // ring it again and again and the kitchen answers back (a few rings inside a couple of seconds)
+  const KITCHEN = ['Já vai, já vai!', 'Calma, tá na chapa! 🍳', 'O que é bom leva tempo.', 'Sai em instantes, chef.'];
+  const rings = useRef<number[]>([]);
+  const replyN = useRef(0);
+  const replyTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [reply, setReply] = useState('');
+
   /** The counter bell is a real bell: ring it any time for a ding (and a happy burger wobble). */
   const ringBell = () => {
     const el = root.current;
     if (!el) return;
+    const now = performance.now();
+    rings.current = [...rings.current.filter((t) => now - t < 2500), now];
+    if (rings.current.length >= 4) {
+      rings.current = [];
+      setReply(KITCHEN[replyN.current++ % KITCHEN.length]);
+      clearTimeout(replyTimer.current);
+      replyTimer.current = setTimeout(() => setReply(''), 2400);
+    }
     const ding = el.querySelector('[data-burst="4"]');
     const bell = el.querySelector('[data-bell]');
     if (!ding || !bell) return;
@@ -332,6 +347,13 @@ export default function Process() {
                     <circle data-bell-ring cx="62" cy="460" r="40" fill="none" stroke="#f9e27d" strokeWidth="4" strokeDasharray="8 6" opacity="0" />
                   </g>
                 </svg>
+                {/* the kitchen talking back through the pass (role=status, so keyboard ringers hear it too) */}
+                <p
+                  role="status"
+                  className={`kitchen-reply toon-sm pointer-events-none absolute top-[30%] right-[5%] md:top-[7%] max-w-[60%] rounded-2xl rounded-br-sm bg-paper px-3 py-1.5 text-sm font-medium text-acid-ink ${reply ? 'is-on' : ''}`}
+                >
+                  {reply}
+                </p>
               </div>
             </div>
 

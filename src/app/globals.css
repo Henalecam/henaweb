@@ -799,6 +799,26 @@ a:focus-visible .arcade-credit::after { content: ' · 01'; }
   overflow: hidden;
 }
 
+/* Process: the kitchen's reply bubble when the bell is rung over and over */
+.kitchen-reply {
+  opacity: 0;
+  translate: 0 6px;
+  transition: opacity 0.2s, translate 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.kitchen-reply:empty {
+  visibility: hidden;
+}
+.kitchen-reply.is-on {
+  opacity: 1;
+  translate: 0 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kitchen-reply {
+    translate: none;
+    transition: none;
+  }
+}
+
 /* scroll progress: chapter notches where each home section starts (ScrollProgress) */
 .progress-mark {
   position: absolute;
