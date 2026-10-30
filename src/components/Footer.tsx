@@ -23,6 +23,11 @@ function footerMessage(path: string): string | undefined {
 
 const studioLinks = [...nav.filter((n) => n.label !== 'Casos'), { label: 'Perguntas', href: '/#perguntas' }, { label: 'Contato', href: '/#contato' }, { label: 'Passa tempo', href: '/passatempo' }];
 
+// the last change to the site (next.config bakes the last commit's date in at build), in Curitiba's calendar
+const UPDATED = process.env.NEXT_PUBLIC_UPDATED
+  ? new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'America/Sao_Paulo' }).format(new Date(process.env.NEXT_PUBLIC_UPDATED))
+  : '';
+
 export default function Footer() {
   const path = usePathname();
   const wordmark = useRef<HTMLDivElement>(null);
@@ -190,6 +195,11 @@ export default function Footer() {
         <span>
           © {new Date().getFullYear()} {site.legalName}
           {site.cnpj && <> · CNPJ {site.cnpj}</>}
+          {UPDATED && (
+            <>
+              {' '}· atualizado em <time dateTime={process.env.NEXT_PUBLIC_UPDATED}>{UPDATED}</time>
+            </>
+          )}
         </span>
         <span>
           {site.city} · <Clock />

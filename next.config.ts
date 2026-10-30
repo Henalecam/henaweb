@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { execFileSync } from 'node:child_process';
 import { pastimes } from './src/lib/pastimes';
 
 // Content-Security-Policy. Scripts stay 'unsafe-inline' because the pages are static (a nonce would
@@ -27,7 +28,18 @@ const csp = [
   ...(CSP_ENFORCE ? ['upgrade-insecure-requests'] : []),
 ].join('; ');
 
+// date of the last commit, baked in at build: the footer says when the site last changed (a shallow clone
+// without history falls back to the build date)
+function lastUpdate() {
+  try {
+    const iso = execFileSync('git', ['log', '-1', '--format=%cI'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    if (iso) return iso;
+  } catch {}
+  return new Date().toISOString();
+}
+
 const nextConfig: NextConfig = {
+  env: { NEXT_PUBLIC_UPDATED: lastUpdate() },
   poweredByHeader: false,
   images: { formats: ['image/avif', 'image/webp'] },
   async headers() {
