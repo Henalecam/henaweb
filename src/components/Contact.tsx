@@ -93,8 +93,9 @@ function readDraft(): Draft | null {
   }
 }
 
+// focus: the underline goes from a faint 2px to a solid 4px (border + a 2px shadow below, so nothing shifts)
 const field =
-  'peer w-full border-b-2 border-acid-ink/35 bg-transparent pt-6 pb-2 text-lg text-acid-ink placeholder:text-transparent focus:border-acid-ink focus:outline-none user-invalid:border-[#b3122b]';
+  'peer w-full border-b-2 border-acid-ink/35 bg-transparent pt-6 pb-2 text-lg text-acid-ink placeholder:text-transparent focus:border-acid-ink focus:shadow-[0_2px_0_var(--color-acid-ink)] focus:outline-none user-invalid:border-[#b3122b] user-invalid:focus:shadow-[0_2px_0_#b3122b]';
 
 /**
  * Floating label: sits inside the empty field like a placeholder, then shrinks above it on focus or
