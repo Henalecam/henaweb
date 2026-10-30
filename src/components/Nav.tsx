@@ -264,11 +264,16 @@ export default function Nav() {
       <div
         id="menu-mobile"
         inert={!open}
-        className={`gutter fixed inset-0 z-40 flex flex-col justify-end bg-bg pb-10 transition-[clip-path] duration-700 ease-[var(--ease-out-expo)] lg:hidden ${
+        // on a short screen (a 375×667 phone under the browser's bars, any phone held sideways) seven 2.25rem links
+        // and the footer row are taller than the window: pinned to the bottom with justify-end, the first ones sat
+        // above the screen, out of reach. Now the list still rests at the bottom (mt-auto) but starts below the
+        // header and the curtain scrolls on its own (data-lenis-prevent: the smooth scroller leaves it alone)
+        data-lenis-prevent
+        className={`gutter fixed inset-0 z-40 flex flex-col overflow-y-auto overscroll-contain bg-bg pt-24 pb-10 transition-[clip-path] duration-700 ease-[var(--ease-out-expo)] lg:hidden ${
           open ? '[clip-path:inset(0_0_0_0)]' : 'pointer-events-none [clip-path:inset(0_0_100%_0)]'
         }`}
       >
-        <nav className="flex flex-col gap-2" aria-label="Menu mobile">
+        <nav className="mt-auto flex flex-col gap-2 [@media(max-height:640px)]:gap-0" aria-label="Menu mobile">
           {[...nav, { label: 'Contato', href: '/#contato' }, { label: 'Passa tempo', href: '/passatempo' }].map((item, i) => (
             <a
               key={item.href}
@@ -277,7 +282,7 @@ export default function Nav() {
               aria-current={active === item.href ? 'location' : undefined}
               // the links rise into place one after another behind the curtain wipe (closing: all at once)
               style={{ transitionDelay: open ? `${180 + i * 55}ms` : '0ms' }}
-              className={`flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight transition-[translate,opacity] duration-500 ease-[var(--ease-out-expo)] ${
+              className={`flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight [@media(max-height:640px)]:py-2 [@media(max-height:640px)]:text-3xl transition-[translate,opacity] duration-500 ease-[var(--ease-out-expo)] ${
                 open ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
               } ${active === item.href ? 'text-acid' : ''}`}
             >
