@@ -740,6 +740,17 @@ a:focus-visible .case-stamp {
 .pastime-slot[data-picked] {
   box-shadow: 0 0 0 4px var(--color-acid), 0 0 48px rgb(247 147 30 / 0.7);
 }
+/* the cabinet opened last (LastPlayed): CONTINUE? instead of PRESS START, and a 1UP badge in the corner */
+.arcade-continue,
+.arcade-1up { display: none; }
+li[data-played] .arcade-start { display: none; }
+li[data-played] .arcade-continue { display: inline; }
+li[data-played] .arcade-1up {
+  display: inline;
+  padding: 0 0.35em;
+  background: var(--color-acid);
+  color: var(--color-acid-ink);
+}
 
 /* the control deck under each cabinet: the coin drops through the slot, the stick leans, the buttons press,
    and the marquee text flips to a credit — the text swap also runs with reduced motion, since nothing moves */

@@ -3,6 +3,7 @@ import Footer from '@/components/Footer';
 import { pastimes } from '@/lib/pastimes';
 import PickPastime from '@/components/PickPastime';
 import CopyShortLink from '@/components/CopyShortLink';
+import LastPlayed from '@/components/LastPlayed';
 import { site } from '@/lib/site';
 
 const description = 'Passa tempo: jogos e experimentos que o Henrique, da HenaWeb, faz nas horas vagas. Fortrex, Arena e Forno, cada um no seu endereço.';
@@ -42,10 +43,11 @@ export default function Passatempo() {
           </p>
 
           <PickPastime />
+          <LastPlayed />
 
           <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {pastimes.map((p, i) => (
-              <li key={p.slug} data-pastime={p.name} data-action={p.action} className="pastime-slot rounded-sm">
+              <li key={p.slug} data-pastime={p.name} data-pastime-slug={p.slug} data-action={p.action} className="pastime-slot rounded-sm">
                 {/* an arcade cabinet in a Win95 window: the whole card is the link, named by the game */}
                 <a
                   href={p.url}
@@ -78,11 +80,14 @@ export default function Passatempo() {
                         {p.name}
                       </p>
                       <p className="absolute inset-x-0 bottom-4 text-center font-mono text-xs tracking-[0.3em] text-paper uppercase">
-                        <span className="motion-safe:animate-[blink_1.2s_steps(1,end)_infinite]">▸ press start</span>
+                        <span className="arcade-start motion-safe:animate-[blink_1.2s_steps(1,end)_infinite]">▸ press start</span>
+                        {/* shown instead on the cabinet this visitor opened last (LastPlayed) */}
+                        <span className="arcade-continue motion-safe:animate-[blink_1.2s_steps(1,end)_infinite]">▸ continue?</span>
                       </p>
                       {/* CRT scanlines */}
                       <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,rgb(0_0_0/0.22)_0_1px,transparent_1px_3px)]" />
                       <span className="absolute top-2 left-2 font-mono text-[0.6rem] tracking-widest text-paper/80">P{i + 1} · 1 crédito</span>
+                      <span className="arcade-1up absolute top-2 right-2 font-mono text-[0.6rem] tracking-widest">1UP · último jogo</span>
                     </div>
                     {/* control deck: joystick, two buttons and a coin slot — pointing at the cabinet drops the coin in */}
                     <div aria-hidden className="arcade-deck mx-1.5 mb-1.5 flex h-10 items-center gap-3 border-2 border-[#7d7394] bg-[#2a2140] px-3" style={{ '--a': p.accent } as React.CSSProperties}>
