@@ -597,7 +597,9 @@ export default function Contact() {
                 <legend className="label mb-2 !text-acid-ink/60">3 · Quem está investigando</legend>
                 <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
                   <Floating label="Seu nome">
-                    <input name="name" enterKeyHint="next" required maxLength={120} placeholder=" " autoComplete="name" className={field} onInvalid={explain} onInput={clear} />
+                    {/* names and company names aren't dictionary words: no red squiggle under "Henrique" or "Neodent", and
+                        phones start each word capitalised */}
+                    <input name="name" enterKeyHint="next" required maxLength={120} placeholder=" " autoComplete="name" autoCapitalize="words" spellCheck={false} className={field} onInvalid={explain} onInput={clear} />
                   </Floating>
                   <div className="min-w-0">
                     <Floating label="E-mail">
@@ -608,6 +610,10 @@ export default function Contact() {
                       required
                       placeholder=" "
                       autoComplete="email"
+                      // the API keeps 254 characters (the longest valid address); spell-check flagged every address
+                      maxLength={254}
+                      spellCheck={false}
+                      autoCapitalize="none"
                       className={field}
                       aria-describedby={emailHint ? 'email-hint' : undefined}
                       onInvalid={explain}
@@ -656,7 +662,7 @@ export default function Contact() {
                   />
                   </Floating>
                   <Floating label="Empresa ou órgão (opcional)">
-                    <input name="org" enterKeyHint="next" placeholder=" " autoComplete="organization" className={field} />
+                    <input name="org" enterKeyHint="next" maxLength={160} placeholder=" " autoComplete="organization" autoCapitalize="words" spellCheck={false} className={field} />
                   </Floating>
                 </div>
                 <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
