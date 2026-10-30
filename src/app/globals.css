@@ -874,27 +874,6 @@ a:focus-visible .arcade-credit::after { content: ' · 01'; }
   background: rgb(20 10 38 / 0.7);
 }
 
-/* "Increase contrast" in the OS (prefers-contrast: more): the softened text tints (ink/60, acid-ink/70…)
-   go back to full strength, the muted lilac labels lighten, hairlines firm up and the film grain goes */
-@media (prefers-contrast: more) {
-  :root {
-    --color-muted: #d6d0ea;
-    --color-line: rgb(253 243 225 / 0.4);
-  }
-  [class*='text-ink/'] {
-    color: var(--color-ink) !important;
-  }
-  [class*='text-acid-ink/'] {
-    color: var(--color-acid-ink) !important;
-  }
-  [class*='text-bg/'] {
-    color: var(--color-bg) !important;
-  }
-  .grain {
-    display: none;
-  }
-}
-
 /* ───────────── Print: the page becomes a case dossier ─────────────
    Prospects save case and service pages as PDF to pass around (procurement, partners). On paper the
    night sky, the 3D scenes and the floating UI go; the cartoon outlines stay; a stamped header and
@@ -1058,13 +1037,24 @@ a:focus-visible .arcade-credit::after { content: ' · 01'; }
 }
 
 /* "Increase contrast" (macOS/iOS, Windows contrast themes): the design leans on translucent text
-   (ink/45 … ink/80) for hierarchy; for visitors who asked for more contrast, every one of those goes solid. */
+   (ink/45 … ink/80) for hierarchy; for visitors who asked for more contrast, every one of those goes solid,
+   the muted lilac labels lighten, hairlines firm up and the film grain goes. */
 @media (prefers-contrast: more) {
+  :root {
+    --color-muted: #d6d0ea;
+    --color-line: rgb(253 243 225 / 0.4);
+  }
   [class*='text-ink/'] {
     color: var(--color-ink) !important;
   }
   [class*='text-acid-ink/'] {
     color: var(--color-acid-ink) !important;
+  }
+  [class*='text-bg/'] {
+    color: var(--color-bg) !important;
+  }
+  .grain {
+    display: none;
   }
 }
 
