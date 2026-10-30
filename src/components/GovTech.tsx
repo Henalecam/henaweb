@@ -18,7 +18,7 @@ const audit = [
 
 export default function GovTech() {
   const root = useRef<HTMLElement>(null);
-  // every step leaves its line in the audit trail: pointing at one lights up its pair (mouse only)
+  // every step leaves its line in the audit trail: pointing at one (or tapping it) lights up its pair
   const [trace, setTrace] = useState<number | null>(null);
   // the × on the case file doesn't close it: public processes don't vanish, so the attempt itself is
   // logged in the audit trail (with Curitiba's time) and the window shakes (WinClose-style gag, 404)
@@ -36,7 +36,11 @@ export default function GovTech() {
   const traceProps = (i: number) => ({
     'data-on': trace === i ? '' : undefined,
     onPointerEnter: (e: React.PointerEvent) => e.pointerType === 'mouse' && setTrace(i),
-    onPointerLeave: () => setTrace(null),
+    onPointerLeave: (e: React.PointerEvent) => e.pointerType === 'mouse' && setTrace(null),
+    // touch has no hover: a tap lights the pair (a second tap on it turns it off). A touch pointer "leaves"
+    // right after lifting, which is why leave only clears for the mouse; a scroll gesture ends in
+    // pointercancel, never pointerup, so scrolling across the list lights nothing
+    onPointerUp: (e: React.PointerEvent) => e.pointerType !== 'mouse' && setTrace((t) => (t === i ? null : i)),
   });
 
   useGSAP(
