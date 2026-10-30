@@ -20,6 +20,19 @@ export default function GovTech() {
   const root = useRef<HTMLElement>(null);
   // every step leaves its line in the audit trail: pointing at one lights up its pair (mouse only)
   const [trace, setTrace] = useState<number | null>(null);
+  // the × on the case file doesn't close it: public processes don't vanish, so the attempt itself is
+  // logged in the audit trail (with Curitiba's time) and the window shakes (WinClose-style gag, 404)
+  const panel = useRef<HTMLDivElement>(null);
+  const [attempts, setAttempts] = useState<string[]>([]);
+  const tryClose = () => {
+    const now = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }).format(new Date());
+    setAttempts((a) => [...a, now].slice(-3));
+    const el = panel.current;
+    if (!el) return;
+    el.removeAttribute('data-shake');
+    void el.offsetWidth;
+    el.setAttribute('data-shake', '');
+  };
   const traceProps = (i: number) => ({
     'data-on': trace === i ? '' : undefined,
     onPointerEnter: (e: React.PointerEvent) => e.pointerType === 'mouse' && setTrace(i),
@@ -138,13 +151,15 @@ export default function GovTech() {
 
         <div className="lg:col-span-7">
           {/* Illustrative case-file panel, dressed as a Windows 95 window */}
-          <div data-panel className="win">
+          <div data-panel ref={panel} className="win" onAnimationEnd={(e) => e.target === e.currentTarget && e.currentTarget.removeAttribute('data-shake')}>
             <div className="win-bar">
               <span className="truncate">PROCESSO_{YEAR}-0142.exe</span>
-              <span className="ml-auto flex gap-1" aria-hidden>
-                <span className="win-btn">_</span>
-                <span className="win-btn">□</span>
-                <span className="win-btn">×</span>
+              <span className="ml-auto flex gap-1">
+                <span className="win-btn" aria-hidden>_</span>
+                <span className="win-btn" aria-hidden>□</span>
+                <button type="button" onClick={tryClose} className="win-btn cursor-pointer" aria-label="Fechar o processo (não fecha: fica registrado)">
+                  ×
+                </button>
               </span>
             </div>
             <div className="m-1.5 border-2 border-[#7d7394] bg-acid-ink">
@@ -188,12 +203,23 @@ export default function GovTech() {
                     <li key={entry} data-log {...traceProps(i)} className="group/log -mx-2 rounded-sm px-2 py-0.5 transition-colors duration-200 data-[on]:bg-mint/20">
                       <span className="text-muted transition-colors duration-200 group-data-[on]/log:text-mint">{time} ·</span> <span className="text-ink/85">{entry}</span>
                       {/* the log is live: a terminal cursor waits after the last entry */}
-                      {i === audit.length - 1 && (
+                      {i === audit.length - 1 && attempts.length === 0 && (
                         <span aria-hidden className="log-cursor ml-1 inline-block h-[1.05em] w-[0.55em] translate-y-[0.15em] bg-mint" />
                       )}
                     </li>
                   ))}
+                  {attempts.map((time, i) => (
+                    <li key={i} className="-mx-2 rounded-sm px-2 py-0.5 text-acid">
+                      <span className="text-acid/70">{time} ·</span> tentativa de fechar o processo registrada
+                      {i === attempts.length - 1 && (
+                        <span aria-hidden className="log-cursor ml-1 inline-block h-[1.05em] w-[0.55em] translate-y-[0.15em] bg-acid" />
+                      )}
+                    </li>
+                  ))}
                 </ul>
+                <p className="sr-only" aria-live="polite">
+                  {attempts.length > 0 && 'Processos públicos não se fecham: a tentativa ficou registrada na trilha de auditoria.'}
+                </p>
               </div>
             </div>
             </div>
