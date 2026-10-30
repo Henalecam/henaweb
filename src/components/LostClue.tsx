@@ -44,6 +44,17 @@ export default function LostClue() {
   const [report, setReport] = useState<string | null>(null);
 
   useEffect(() => {
+    // the same address in other letters ("/Casos/Diconta", "/PASSATEMPO", "/passatempo/") is no mystery:
+    // go straight to the real page instead of showing the 404 (exact matches only; typos still get a guess)
+    const exact = decodeURIComponent(location.pathname)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/\/+$/, '');
+    if (exact !== location.pathname && PLACES.some((p) => p.href === exact)) {
+      location.replace(exact + location.search + location.hash);
+      return;
+    }
     const words = decodeURIComponent(location.pathname)
       .toLowerCase()
       .normalize('NFD')
