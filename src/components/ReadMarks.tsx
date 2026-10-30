@@ -26,9 +26,16 @@ export function MarkRead({ slug }: { slug: string }) {
   return null;
 }
 
-/** Anywhere else (the home's case index): just show the "read" marks already on the page. */
+/**
+ * Anywhere else (the home's case index, the footer): just show the "read" marks already on the page.
+ * On a case page the footer runs this right after MarkRead has filed the open case, which ticked that
+ * case "lido" on a first visit; the case being read is left out (MarkRead decides about it).
+ */
 export function RevealRead() {
-  useEffect(() => revealMarks(readList()), []);
+  useEffect(() => {
+    const open = location.pathname.match(/^\/casos\/([\w-]+)/)?.[1];
+    revealMarks(readList().filter((s) => s !== open));
+  }, []);
   return null;
 }
 
