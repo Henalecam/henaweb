@@ -473,6 +473,13 @@ html {
     animation: evidence-swing 1.2s ease-out;
   }
 }
+/* the phone file has no hover: a tap sets one card swinging (Mystery adds data-swing) */
+@media (prefers-reduced-motion: no-preference) {
+  .evidence-swing[data-swing] {
+    transform-origin: 50% 0;
+    animation: evidence-swing 1.2s ease-out;
+  }
+}
 /* 404: pressing the × of ERRO_404.exe — the window refuses to close */
 @media (prefers-reduced-motion: no-preference) {
   .win[data-shake] {

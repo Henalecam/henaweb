@@ -345,7 +345,17 @@ function MobileFile() {
               >
                 Evidência {String(i + 1).padStart(2, '0')} · {evidenceBodies[e.id].label}
               </span>
-              <div className="relative clear-both">
+              {/* a tap sets the evidence swinging on its pin, like the pointer does on the desktop board */}
+              <div
+                className="evidence-swing relative clear-both"
+                onClick={(ev) => {
+                  const el = ev.currentTarget;
+                  el.removeAttribute('data-swing');
+                  void el.offsetWidth; // restart on every tap
+                  el.setAttribute('data-swing', '');
+                }}
+                onAnimationEnd={(ev) => ev.animationName === 'evidence-swing' && ev.currentTarget.removeAttribute('data-swing')}
+              >
                 <Pin />
                 {evidenceBodies[e.id].body}
               </div>
