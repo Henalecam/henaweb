@@ -90,7 +90,9 @@ export default function Passatempo() {
                       </p>
                       {/* CRT scanlines */}
                       <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,rgb(0_0_0/0.22)_0_1px,transparent_1px_3px)]" />
-                      <span className="absolute top-2 left-2 font-mono text-[0.6rem] tracking-widest text-paper/80">P{i + 1} · 1 crédito</span>
+                      <span className="absolute top-2 left-2 font-mono text-[0.6rem] tracking-widest text-paper/80">
+                        P{i + 1} · <span data-credits>1 crédito</span>
+                      </span>
                       <span className="arcade-1up absolute top-2 right-2 font-mono text-[0.6rem] tracking-widest">1UP · último jogo</span>
                     </div>
                     {/* control deck: joystick, two buttons and a coin slot — pointing at the cabinet drops the coin in */}

@@ -11,6 +11,22 @@ const KEY = 'hena:played';
  */
 export default function LastPlayed() {
   useEffect(() => {
+    // each cabinet keeps a coin count, like an arcade's credit counter: "P2 · 3 fichas" after three games
+    const counts = (): Record<string, number> => {
+      try {
+        const v = JSON.parse(localStorage.getItem(KEY) ?? 'null');
+        return v && typeof v.counts === 'object' && v.counts ? v.counts : {};
+      } catch {
+        return {};
+      }
+    };
+    const showCounts = (c: Record<string, number>) =>
+      document.querySelectorAll<HTMLElement>('li[data-pastime-slug]').forEach((li) => {
+        const n = c[li.dataset.pastimeSlug!] ?? 0;
+        const el = li.querySelector('[data-credits]');
+        if (el && n > 0) el.textContent = `${n} ${n === 1 ? 'ficha' : 'fichas'}`;
+      });
+    showCounts(counts());
     const mark = (slug: string | null) => {
       document.querySelectorAll<HTMLElement>('li[data-pastime-slug]').forEach((li) => {
         const a = li.querySelector<HTMLAnchorElement>('a[aria-label]');
@@ -36,7 +52,10 @@ export default function LastPlayed() {
       if (!li || !(e.target as HTMLElement).closest('a[target="_blank"]')) return;
       const slug = li.dataset.pastimeSlug!;
       try {
-        localStorage.setItem(KEY, JSON.stringify({ slug, at: Date.now() }));
+        const c = counts();
+        c[slug] = Math.min(99, (c[slug] ?? 0) + 1);
+        localStorage.setItem(KEY, JSON.stringify({ slug, at: Date.now(), counts: c }));
+        showCounts(c);
       } catch {}
       mark(slug);
     };
