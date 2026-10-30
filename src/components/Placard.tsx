@@ -24,7 +24,11 @@ export default function Placard({ className = '' }: { className?: string }) {
         <span className="label block !text-[#c2410c]">Nº I · O Detetive</span>
         <span className="serif block text-lg leading-tight">Mármore, autor anônimo, séc. XXI</span>
         <span className="mt-0.5 block font-mono text-[0.62rem] text-acid-ink/70 uppercase">
-          Mármore → {dots ? dots.toLocaleString('pt-BR') : '...'} pontos de luz
+          {dots === -1
+            ? 'Mármore em repouso · economia de dados'
+            : dots === 0
+              ? 'Mármore em repouso · sem 3D neste navegador'
+              : `Mármore → ${dots ? dots.toLocaleString('pt-BR') : '...'} pontos de luz`}
         </span>
       </div>
     </figure>

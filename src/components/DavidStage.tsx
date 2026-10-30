@@ -36,7 +36,9 @@ export default function DavidStage({ children }: { children: ReactNode }) {
       else window.addEventListener('load', idle, { once: true });
     };
 
-    if (!saveData()) whenIdle(() => import('@/lib/davidScene').then(({ createDavidScene }) => {
+    // the placard under the hero counts the render's dots; with no render it says why (0: no WebGL, -1: data saver)
+    if (saveData()) window.dispatchEvent(new CustomEvent('hena:dots', { detail: -1 }));
+    else whenIdle(() => import('@/lib/davidScene').then(({ createDavidScene }) => {
       if (cancelled || !canvas.current) return;
       try {
         scene = createDavidScene(canvas.current, {
@@ -44,6 +46,7 @@ export default function DavidStage({ children }: { children: ReactNode }) {
           onDots: (n) => window.dispatchEvent(new CustomEvent('hena:dots', { detail: n })),
         });
       } catch {
+        window.dispatchEvent(new CustomEvent('hena:dots', { detail: 0 }));
         return; // no WebGL: the sunset still carries the stage
       }
       trigger = ScrollTrigger.create({
