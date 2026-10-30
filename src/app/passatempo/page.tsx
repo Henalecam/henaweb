@@ -20,12 +20,28 @@ export const metadata: Metadata = {
 export default function Passatempo() {
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: 'Passa tempo',
-    url: `${site.url}/passatempo`,
-    description,
-    inLanguage: 'pt-BR',
-    hasPart: pastimes.map((p) => ({ '@type': p.action === 'Jogar' ? 'VideoGame' : 'WebSite', name: p.name, url: p.url })),
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${site.url}/passatempo#page`,
+        name: 'Passa tempo',
+        url: `${site.url}/passatempo`,
+        description,
+        inLanguage: 'pt-BR',
+        // tied to the site and studio the root layout already describes, instead of floating on its own
+        isPartOf: { '@id': `${site.url}/#website` },
+        author: { '@id': `${site.url}/#organization` },
+        hasPart: pastimes.map((p) => ({ '@type': p.action === 'Jogar' ? 'VideoGame' : 'WebSite', name: p.name, url: p.url })),
+      },
+      // the same trail /casos publishes, so search shows "henaweb.com › Passa tempo"
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Início', item: site.url },
+          { '@type': 'ListItem', position: 2, name: 'Passa tempo', item: `${site.url}/passatempo` },
+        ],
+      },
+    ],
   };
 
   return (
