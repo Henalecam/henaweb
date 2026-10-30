@@ -295,8 +295,9 @@ function FooterLink({ href, children, accent = false }: { href: string; children
         {/* one inline run: a name that wraps ("Sistemas / públicos") used to leave "(aberto)" stranded beside
             its first line; now the tag follows the last word */}
         <span>
-          {children}
-          {here && <span aria-hidden className="ml-2 font-mono text-[0.65rem] tracking-wide whitespace-nowrap text-ink/55">(aberto)</span>}
+          {/* short accent labels ("Ver todos →") stay whole; a narrow column breaks before the tag instead */}
+          <span className={accent ? 'whitespace-nowrap' : ''}>{children}</span>
+          {here && <span aria-hidden className="ml-2 inline-block font-mono text-[0.65rem] tracking-wide whitespace-nowrap text-ink/55">(aberto)</span>}
         </span>
       </a>
     </li>
