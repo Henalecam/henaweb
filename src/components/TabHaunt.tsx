@@ -20,12 +20,56 @@ const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'Ar
  * radial mask over a dark layer, pointer-events none, so the page stays fully usable. Esc or the
  * code again turns the lights back on.
  */
+// in the dark, the flashlight finds notes the lights hid: real tips, scattered around the screen
+const CLUES = [
+  'Pista nº 1: a tecla / abre a busca do site.',
+  'Pista nº 2: aperte ? e veja todos os atalhos.',
+  'Pista nº 3: lá no rodapé, digite henaweb.',
+  'Pista nº 4: a campainha do balcão não gosta de pressa.',
+];
+
+function scatterClues() {
+  const box = document.createElement('div');
+  box.id = 'lanterna-pistas';
+  box.setAttribute('aria-hidden', 'true');
+  box.dataset.printHide = '';
+  Object.assign(box.style, { position: 'fixed', inset: '0', zIndex: '94', pointerEvents: 'none' });
+  // one clue per screen quarter, at a random spot inside it, so they never pile up
+  CLUES.forEach((text, i) => {
+    const el = document.createElement('p');
+    el.textContent = text;
+    // wide screens: a 2×2 grid, the left column anchored by its left edge and the right one by its right
+    // edge; phones: one column, a row each. Nothing runs off screen and no two notes overlap
+    const narrow = innerWidth < 640;
+    const side = 4 + Math.random() * (narrow ? 20 : 14);
+    const top = narrow ? i * 23 + 8 + Math.random() * 8 : Math.floor(i / 2) * 50 + 10 + Math.random() * 25;
+    Object.assign(el.style, {
+      position: 'absolute',
+      [!narrow && i % 2 ? 'right' : 'left']: `${side}%`,
+      top: `${top}%`,
+      maxWidth: narrow ? '70vw' : '42vw',
+      rotate: `${Math.random() * 10 - 5}deg`,
+      font: '600 14px/1.3 ui-monospace, monospace',
+      color: '#140a26',
+      background: '#f9e27d',
+      padding: '6px 10px',
+      borderRadius: '4px',
+      boxShadow: '3px 3px 0 #140a26',
+    });
+    box.appendChild(el);
+  });
+  document.body.appendChild(box);
+  return box;
+}
+
 function toggleFlashlight() {
   const existing = document.getElementById('lanterna');
   if (existing) {
     existing.remove();
+    document.getElementById('lanterna-pistas')?.remove();
     return;
   }
+  const clues = scatterClues();
   const el = document.createElement('div');
   el.id = 'lanterna';
   el.setAttribute('aria-hidden', 'true');
@@ -45,11 +89,13 @@ function toggleFlashlight() {
   const off = (e: KeyboardEvent) => {
     if (e.key !== 'Escape') return;
     el.remove();
+    clues.remove();
   };
   window.addEventListener('pointermove', move, { passive: true });
   window.addEventListener('keydown', off);
   new MutationObserver((_, obs) => {
     if (el.isConnected) return;
+    clues.remove();
     window.removeEventListener('pointermove', move);
     window.removeEventListener('keydown', off);
     obs.disconnect();
