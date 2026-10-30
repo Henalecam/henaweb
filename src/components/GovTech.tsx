@@ -4,8 +4,11 @@ import { useRef, useState } from 'react';
 import { gsap, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { govFlow, govPillars } from '@/lib/content';
 
+// the sample case file is numbered in the current year, so the demo never looks a year old
+const YEAR = new Date().getFullYear();
+
 const audit = [
-  ['09:12', 'solicitação #2026/0142 registrada'],
+  ['09:12', `solicitação #${YEAR}/0142 registrada`],
   ['09:13', 'documentos validados automaticamente'],
   ['11:40', 'parecer técnico anexado · v2'],
   ['14:02', 'aprovação em alçada 2 · assinatura digital'],
@@ -137,7 +140,7 @@ export default function GovTech() {
           {/* Illustrative case-file panel, dressed as a Windows 95 window */}
           <div data-panel className="win">
             <div className="win-bar">
-              <span className="truncate">PROCESSO_2026-0142.exe</span>
+              <span className="truncate">PROCESSO_{YEAR}-0142.exe</span>
               <span className="ml-auto flex gap-1" aria-hidden>
                 <span className="win-btn">_</span>
                 <span className="win-btn">□</span>

@@ -129,7 +129,7 @@ export default function OrderTicket() {
 
           <div className="mt-5">
             <Barcode />
-            <p className="mt-1 text-center text-[0.65rem] tracking-[0.4em]">0142 2026 HENA</p>
+            <p className="mt-1 text-center text-[0.65rem] tracking-[0.4em]">0142 {new Date().getFullYear()} HENA</p>
           </div>
           <p className="mt-4 text-center text-[0.68rem] tracking-[0.2em]">*** VOLTE SEMPRE: TEMOS ROADMAP ***</p>
           <p className="mt-1 text-center text-[0.65rem] text-acid-ink/70">henrique@henaweb.com</p>
