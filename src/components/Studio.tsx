@@ -1,12 +1,26 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { gsap, ScrollTrigger, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { principles } from '@/lib/content';
 
 export default function Studio() {
   const root = useRef<HTMLElement>(null);
+  // the Notepad status bars count a selection like the real one: select part of a rule and its bar reads
+  // "Sel: 23 de 97" (which rule, and how many characters of its body are selected)
+  const [sel, setSel] = useState<{ n: string; len: number } | null>(null);
+  useEffect(() => {
+    const onChange = () => {
+      const s = window.getSelection();
+      const body = s && !s.isCollapsed ? s.anchorNode?.parentElement?.closest<HTMLElement>('[data-rule-body]') : null;
+      if (!s || !body || !body.contains(s.focusNode)) return setSel((v) => (v ? null : v));
+      const len = s.toString().replace(/\s+/g, ' ').trim().length;
+      setSel(len ? { n: body.dataset.ruleBody!, len } : null);
+    };
+    document.addEventListener('selectionchange', onChange);
+    return () => document.removeEventListener('selectionchange', onChange);
+  }, []);
 
   useGSAP(
     () => {
@@ -124,7 +138,7 @@ export default function Studio() {
                     <span className="font-groovy w-14 shrink-0 text-4xl leading-none text-[#c2410c] sm:w-auto sm:text-5xl">{pr.n}</span>
                     <h3 className="text-xl font-medium tracking-tight sm:mt-6 sm:text-2xl">{pr.title}</h3>
                   </div>
-                  <p className="mt-3 leading-relaxed text-acid-ink/70">{pr.body}</p>
+                  <p data-rule-body={pr.n} className="mt-3 leading-relaxed text-acid-ink/70">{pr.body}</p>
                 </div>
                 {/* a Notepad status bar: house rules open read-only (they are not up for editing) */}
                 <div
@@ -132,7 +146,7 @@ export default function Studio() {
                   className="mx-1.5 mb-1.5 flex justify-between gap-3 border border-[#7d7394] bg-[#c9c3d8] px-2 py-0.5 font-mono text-[0.62rem] text-[#12082a] shadow-[inset_1px_1px_0_#fff]"
                 >
                   <span>🔒 somente leitura</span>
-                  <span className="tabular-nums">{pr.body.length} caracteres</span>
+                  <span className="tabular-nums">{sel?.n === pr.n ? `Sel: ${sel.len} de ${pr.body.length}` : `${pr.body.length} caracteres`}</span>
                 </div>
               </li>
             ))}
