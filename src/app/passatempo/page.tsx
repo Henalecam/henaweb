@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Footer from '@/components/Footer';
 import { pastimes } from '@/lib/pastimes';
 import PickPastime from '@/components/PickPastime';
+import CopyShortLink from '@/components/CopyShortLink';
 import { site } from '@/lib/site';
 
 const description = 'Passa tempo: jogos e experimentos que o Henrique, da HenaWeb, faz nas horas vagas. Fortrex, Arena e Forno, cada um no seu endereço.';
@@ -112,6 +113,7 @@ export default function Passatempo() {
                     </span>
                   </div>
                 </a>
+                <CopyShortLink path={`/${p.slug}`} name={p.name} />
               </li>
             ))}
           </ul>
