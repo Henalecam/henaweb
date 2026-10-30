@@ -25,6 +25,37 @@ const studioLinks = [...nav.filter((n) => n.label !== 'Casos'), { label: 'Pergun
 
 export default function Footer() {
   const path = usePathname();
+  const wordmark = useRef<HTMLDivElement>(null);
+
+  // the wordmark is a keyboard for real keys too: typing H, E, N, A, W or B presses those letters, and
+  // typing the whole name sends a wave across it (never while the visitor is typing in a field)
+  useEffect(() => {
+    let typed = '';
+    const letters = (k: string) =>
+      [...(wordmark.current?.children ?? [])].filter((el) => el.textContent?.toLowerCase() === k) as HTMLElement[];
+    const onDown = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey || e.key.length !== 1) return;
+      if ((e.target as HTMLElement | null)?.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+      const k = e.key.toLowerCase();
+      letters(k).forEach((el) => el.setAttribute('data-key', ''));
+      typed = (typed + k).slice(-7);
+      if (typed === 'henaweb' && wordmark.current && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const box = wordmark.current;
+        box.classList.remove('is-wave');
+        void box.offsetWidth;
+        box.classList.add('is-wave');
+      }
+    };
+    const onUp = (e: KeyboardEvent) => {
+      if (e.key.length === 1) letters(e.key.toLowerCase()).forEach((el) => el.removeAttribute('data-key'));
+    };
+    window.addEventListener('keydown', onDown);
+    window.addEventListener('keyup', onUp);
+    return () => {
+      window.removeEventListener('keydown', onDown);
+      window.removeEventListener('keyup', onUp);
+    };
+  }, []);
 
   return (
     <footer className="sky gutter relative z-50 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon pt-20 pb-6">
@@ -132,8 +163,10 @@ export default function Footer() {
 
       <div className="relative">
         <div
+          ref={wordmark}
           data-wordmark
           aria-hidden
+          onAnimationEnd={(e) => e.currentTarget.lastElementChild === e.target && e.currentTarget.classList.remove('is-wave')}
           // the letter left of the pointed one dips too (globals.css); marked here instead of a costly :has()
           onPointerOver={(e) => {
             const box = e.currentTarget;
@@ -145,7 +178,7 @@ export default function Footer() {
           className="relative z-10 flex justify-center overflow-hidden pt-2 pb-4 font-groovy text-[clamp(3rem,16vw,19rem)] leading-[0.9] select-none"
         >
           {'HenaWeb'.split('').map((c, i) => (
-            <span key={i} className="chrome inline-block pr-[0.02em]">
+            <span key={i} className="chrome inline-block pr-[0.02em]" style={{ '--i': i } as React.CSSProperties}>
               {c}
             </span>
           ))}
