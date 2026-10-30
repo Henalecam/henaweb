@@ -928,6 +928,14 @@ a:focus-visible .arcade-credit::after { content: ' · 01'; }
   #processo .sticky {
     display: none !important;
   }
+  /* the hero is one viewport tall on screen (h-[100svh], not a min-height): on paper that was a whole
+     page with the headline pushed to its foot; it now takes only its content */
+  #topo {
+    height: auto !important;
+  }
+  #topo [data-hero-inner] {
+    padding-top: 0 !important;
+  }
   #processo [data-step] {
     padding-block: 1.25rem !important;
     opacity: 1 !important;
