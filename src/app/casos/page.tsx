@@ -87,6 +87,7 @@ export default function CasesIndex() {
             options={services
               .map((s) => ({ slug: s.slug, name: s.name, count: projects.filter((p) => p.service === s.slug).length }))
               .filter((o) => o.count > 0)}
+            empty={services.filter((s) => !projects.some((p) => p.service === s.slug)).map((s) => ({ slug: s.slug, name: s.name }))}
           />
           <ReadProgress slugs={projects.map((p) => p.slug)} />
           <RandomCase />
