@@ -397,9 +397,10 @@ export default function Process() {
             {/* steps */}
             <div className="lg:col-span-6">
               <ol data-steps className="relative">
-                {process.map((s) => (
+                {process.map((s, i) => (
                   <li
                     key={s.n}
+                    id={`etapa-${i + 1}`}
                     data-step
                     className="group/step flex min-h-[56svh] flex-col justify-center border-t-2 border-bg/10 py-10 opacity-75 transition-opacity duration-500 motion-reduce:opacity-100 [&.is-active]:opacity-100 lg:min-h-[70vh]"
                   >

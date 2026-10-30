@@ -89,11 +89,27 @@ export default function OrderTicket() {
             <span>PRAZO</span>
           </div>
           <ul className="mt-2 flex flex-col gap-3">
-            {process.map((s) => (
+            {process.map((s, i) => (
               <li key={s.n}>
                 <div className="flex items-baseline gap-2 font-bold">
                   <span className="shrink-0">1×</span>
-                  <span className="shrink-0">{s.title.toUpperCase()}</span>
+                  {/* each line of the order is also its table of contents: it leads back to that step of the menu */}
+                  <a
+                    href={`#etapa-${i + 1}`}
+                    // the smooth scroller's own anchor glide overshot this step by ~370 px on desktop (the stage
+                    // above re-measures mid-flight); an immediate jump lands it at the top of the screen
+                    onClick={(e) => {
+                      const step = document.getElementById(`etapa-${i + 1}`);
+                      if (!step) return;
+                      e.preventDefault();
+                      // with the smooth scroller on, it makes the jump (see SmoothScroll); reduced motion has none
+                      const handled = !window.dispatchEvent(new CustomEvent('hena:jump', { detail: step.id, cancelable: true }));
+                      if (!handled) step.scrollIntoView({ block: 'start' });
+                      history.replaceState(history.state, '', `#etapa-${i + 1}`);
+                    }}
+                    className="shrink-0 underline decoration-acid-ink/30 decoration-dotted underline-offset-4 hover:decoration-solid">
+                    {s.title.toUpperCase()}
+                  </a>
                   <span aria-hidden className="mb-1 min-w-4 flex-1 border-b-2 border-dotted border-acid-ink/30" />
                   <span className="shrink-0 text-right">{s.time.toUpperCase()}</span>
                 </div>

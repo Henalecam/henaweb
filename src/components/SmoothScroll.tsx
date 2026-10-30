@@ -25,7 +25,19 @@ export default function SmoothScroll() {
     const watch = new MutationObserver(syncDialogs);
     watch.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['open'] });
 
+    // a jump requested by the page (the order ticket's lines → their step): Lenis owns the scroll position,
+    // so a plain scrollIntoView was pulled straight back; an immediate Lenis jump lands where asked. Cancelling
+    // the event tells the caller it was handled.
+    const jump = (e: Event) => {
+      const el = document.getElementById((e as CustomEvent<string>).detail);
+      if (!el) return;
+      e.preventDefault();
+      lenis.scrollTo(el, { immediate: true, force: true });
+    };
+    window.addEventListener('hena:jump', jump);
+
     return () => {
+      window.removeEventListener('hena:jump', jump);
       watch.disconnect();
       gsap.ticker.remove(tick);
       lenis.destroy();
