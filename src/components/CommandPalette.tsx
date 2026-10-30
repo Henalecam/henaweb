@@ -228,7 +228,10 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
             spellCheck={false}
           />
         </div>
-        <ul ref={list} id="pistas" role="listbox" aria-label="Resultados" data-lenis-prevent className="max-h-[min(55vh,26rem)] overflow-y-auto overscroll-contain p-2">
+        {/* the list also yields to the window's height (minus the top gap and the bar, field and hint row around it):
+            on a phone held sideways (844×390) the palette ran 9 px past the screen and the whole window scrolled,
+            carrying the search field out of sight with the results */}
+        <ul ref={list} id="pistas" role="listbox" aria-label="Resultados" data-lenis-prevent className="max-h-[min(55vh,26rem,calc(100svh-12vh-9.5rem))] overflow-y-auto overscroll-contain p-2">
           {results.map((it, i) => {
             const header = it.group !== lastGroup ? it.group : null;
             lastGroup = it.group;
