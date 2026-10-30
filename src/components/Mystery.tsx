@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { gsap, useGSAP } from '@/lib/gsap';
 
 const INK = '#140a26';
@@ -12,6 +12,28 @@ const INK = '#140a26';
 const u = (n: number) => `calc(var(--u)*${n})`;
 
 type EvidenceId = 'sheet' | 'mail' | 'note' | 'cal' | 'news';
+
+/**
+ * The "Sexta, 17h" calendar page notices when it is Friday where the visitor is (their office is the
+ * haunted one): before five it warns "é hoje", from five to six "é agora", later "foi hoje". Any other
+ * day it says nothing more. Client clock only, after mount (the server HTML is the plain "SEXTA").
+ */
+function FridayNote() {
+  const [note, setNote] = useState('');
+  useEffect(() => {
+    const tick = () => {
+      const d = new Date();
+      if (d.getDay() !== 5) return setNote('');
+      const h = d.getHours();
+      setNote(h < 17 ? 'é hoje' : h < 18 ? 'é agora' : 'foi hoje');
+    };
+    tick();
+    const id = window.setInterval(tick, 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+  if (!note) return null;
+  return <span data-friday={note} className="uppercase"> · {note}</span>;
+}
 
 const evidenceBodies: Record<EvidenceId, { label: string; body: ReactNode }> = {
   sheet: {
@@ -73,6 +95,7 @@ const evidenceBodies: Record<EvidenceId, { label: string; body: ReactNode }> = {
       >
         <div className="bg-[#d7263d] font-mono font-bold text-white" style={{ padding: `${u(0.5)} 0`, fontSize: u(1.5) }}>
           SEXTA
+          <FridayNote />
         </div>
         <div className="leading-none font-semibold" style={{ fontSize: u(5) }}>
           17h
