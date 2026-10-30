@@ -457,7 +457,11 @@ export default function Contact() {
               <div>{saveButton}</div>
             </div>
           ) : (
-            <form ref={form} onSubmit={submit} onInput={() => {
+            <form
+              ref={form}
+              // on paper a form can't be filled in: the printout's own footer carries the contact line instead
+              data-print-hide
+              onSubmit={submit} onInput={() => {
               saveDraft();
               checkReady();
             }} className="flex flex-col gap-9">
