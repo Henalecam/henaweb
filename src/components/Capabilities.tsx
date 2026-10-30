@@ -156,7 +156,7 @@ export default function Capabilities({ caseCounts = {}, caseSlugs = {} }: { case
                   Ver a página de {c.title} →
                 </a>
                 {(caseCounts[c.slug] ?? 0) > 0 && (
-                  <a href={`/casos?servico=${c.slug}`} className="text-sm font-medium underline decoration-2 underline-offset-4 hover:decoration-4">
+                  <a href={`/casos?servico=${c.slug}`} className="-my-0.5 py-0.5 text-sm font-medium underline decoration-2 underline-offset-4 hover:decoration-4">
                     {caseCounts[c.slug] === 1 ? '1 caso resolvido' : `${caseCounts[c.slug]} casos resolvidos`} no arquivo →
                   </a>
                 )}

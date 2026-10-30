@@ -277,6 +277,16 @@
   text-shadow: none;
   box-shadow: inset -1.5px -1.5px 0 #7d7394, inset 1.5px 1.5px 0 #fff;
 }
+/* the one title-bar button that does something (GovTech's ×) is a ~18 px square: an invisible ring lifts its
+   target past 24 px (WCAG 2.5.8); its neighbours are decorative, so nothing else is covered */
+button.win-btn {
+  position: relative;
+}
+button.win-btn::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
 
 /* Studio rules and service-page steps: like a real desktop, the window under the pointer is the focused one — it lifts
    toward you and keeps its colour bar, the others drop to the grey "inactive" bar of Windows 95.

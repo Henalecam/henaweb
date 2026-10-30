@@ -107,7 +107,7 @@ export default function OrderTicket() {
                       if (!handled) step.scrollIntoView({ block: 'start' });
                       history.replaceState(history.state, '', `#etapa-${i + 1}`);
                     }}
-                    className="shrink-0 underline decoration-acid-ink/30 decoration-dotted underline-offset-4 hover:decoration-solid">
+                    className="-my-px shrink-0 py-px underline decoration-acid-ink/30 decoration-dotted underline-offset-4 hover:decoration-solid">
                     {s.title.toUpperCase()}
                   </a>
                   <span aria-hidden className="mb-1 min-w-4 flex-1 border-b-2 border-dotted border-acid-ink/30" />
