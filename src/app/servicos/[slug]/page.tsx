@@ -16,6 +16,7 @@ import TocSeen from '@/components/TocSeen';
 import StackChip from '@/components/StackChip';
 import MockUI from '@/components/MockUI';
 import CaseKeys from '@/components/CaseKeys';
+import { stepTransitionScript } from '@/lib/stepTransition';
 import NewTab from '@/components/NewTab';
 
 export const dynamicParams = false;
@@ -92,6 +93,8 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {/* service → next/previous service (←/→, the folder cards): the swap slides the way the reader is walking */}
+      <script dangerouslySetInnerHTML={{ __html: stepTransitionScript('servicos', services.map((o) => o.slug)) }} />
       <main id="conteudo" tabIndex={-1} className="sky min-h-screen text-ink">
         <article className="gutter mx-auto max-w-6xl pt-36 pb-24">
           <nav aria-label="Trilha" className="label">
