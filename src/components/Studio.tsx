@@ -21,6 +21,33 @@ export default function Studio() {
     document.addEventListener('selectionchange', onChange);
     return () => document.removeEventListener('selectionchange', onChange);
   }, []);
+  // and like the real one, typing over a selection in a read-only file is refused: the window shudders
+  // and the status bar says so for a moment (the text never changes; it isn't editable anyway)
+  const [denied, setDenied] = useState<string | null>(null);
+  useEffect(() => {
+    if (!sel) return;
+    let t = 0;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || (e.key.length !== 1 && e.key !== 'Backspace' && e.key !== 'Delete')) return;
+      // the selection may have just been cleared (a click elsewhere) before React caught up
+      const live = window.getSelection();
+      if (!live || live.isCollapsed || !live.anchorNode?.parentElement?.closest(`[data-rule-body="${sel.n}"]`)) return;
+      setDenied(sel.n);
+      const li = document.querySelector<HTMLElement>(`[data-principle][data-rule="${sel.n}"]`);
+      if (li && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        li.removeAttribute('data-shake');
+        void li.offsetWidth;
+        li.setAttribute('data-shake', '');
+      }
+      window.clearTimeout(t);
+      t = window.setTimeout(() => setDenied(null), 1600);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.clearTimeout(t);
+    };
+  }, [sel]);
 
   useGSAP(
     () => {
@@ -127,7 +154,7 @@ export default function Studio() {
 
           <ol data-principles className="mt-14 grid gap-5 sm:grid-cols-2">
             {principles.map((pr) => (
-              <li key={pr.n} data-principle className="win flex flex-col">
+              <li key={pr.n} data-principle data-rule={pr.n} className="win flex flex-col" onAnimationEnd={(e) => e.animationName === 'win-shake' && e.currentTarget.removeAttribute('data-shake')}>
                 <div className="win-bar">
                   <span aria-hidden>regra_{pr.n.toLowerCase()}.txt</span>
                   <span className="win-btn ml-auto" aria-hidden>×</span>
@@ -145,7 +172,7 @@ export default function Studio() {
                   aria-hidden
                   className="mx-1.5 mb-1.5 flex justify-between gap-3 border border-[#7d7394] bg-[#c9c3d8] px-2 py-0.5 font-mono text-[0.62rem] text-[#12082a] shadow-[inset_1px_1px_0_#fff]"
                 >
-                  <span>🔒 somente leitura</span>
+                  {denied === pr.n ? <span className="font-bold text-[#b3122b]">⚠ arquivo somente leitura</span> : <span>🔒 somente leitura</span>}
                   <span className="tabular-nums">{sel?.n === pr.n ? `Sel: ${sel.len} de ${pr.body.length}` : `${pr.body.length} caracteres`}</span>
                 </div>
               </li>
