@@ -230,6 +230,7 @@ export default function Contact() {
         capability: capabilities.join(' + '),
         firstStep: lead.firstStep,
         timeline,
+        client,
       });
       await shareOrDownload(blob, `ficha-do-caso-${caseNo.replace('/', '-')}.png`);
       track({ name: 'case_card_download' });
@@ -269,7 +270,7 @@ export default function Contact() {
   // visitors who prefer WhatsApp over the form keep the diagnosis they just built
   const whatsappWithCase = lead
     ? whatsappLink(
-        `Olá! Montei a ficha nº ${caseNo} no site da HenaWeb.\nSintomas: ${chosen.map((c) => c.label).join('; ')}\nEspecialidade indicada: ${capabilities.join(' + ')}\nPrazo: ${timeline}`,
+        `Olá! Montei a ficha nº ${caseNo} no site da HenaWeb.\nSintomas: ${chosen.map((c) => c.label).join('; ')}\nEspecialidade indicada: ${capabilities.join(' + ')}\nPrazo: ${timeline}${client ? `\nCliente: ${client}` : ''}`,
       )
     : whatsappLink();
 
