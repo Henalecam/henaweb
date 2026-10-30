@@ -730,6 +730,17 @@ a:focus-visible .case-stamp {
     animation: arcade-roll 0.6s linear infinite;
   }
 }
+/* /passatempo roulette (PickPastime): the hop lights a cabinet, the pick keeps a marquee glow */
+.pastime-slot {
+  transition: box-shadow 0.12s;
+}
+.pastime-slot[data-spin] {
+  box-shadow: 0 0 0 4px var(--color-acid), 0 0 32px rgb(247 147 30 / 0.55);
+}
+.pastime-slot[data-picked] {
+  box-shadow: 0 0 0 4px var(--color-acid), 0 0 48px rgb(247 147 30 / 0.7);
+}
+
 /* the control deck under each cabinet: the coin drops through the slot, the stick leans, the buttons press,
    and the marquee text flips to a credit — the text swap also runs with reduced motion, since nothing moves */
 .arcade-coin { opacity: 0; }

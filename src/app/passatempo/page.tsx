@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Footer from '@/components/Footer';
 import { pastimes } from '@/lib/pastimes';
+import PickPastime from '@/components/PickPastime';
 import { site } from '@/lib/site';
 
 const description = 'Passa tempo: jogos e experimentos que o Henrique, da HenaWeb, faz nas horas vagas. Fortrex, Arena e Forno, cada um no seu endereço.';
@@ -39,9 +40,11 @@ export default function Passatempo() {
             Jogos e experimentos que o Henrique faz nas horas vagas, fora dos projetos de clientes. Escolha uma máquina: cada uma abre em outra aba.
           </p>
 
-          <ul className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <PickPastime />
+
+          <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {pastimes.map((p, i) => (
-              <li key={p.slug}>
+              <li key={p.slug} data-pastime={p.name} data-action={p.action} className="pastime-slot rounded-sm">
                 {/* an arcade cabinet in a Win95 window: the whole card is the link, named by the game */}
                 <a
                   href={p.url}
