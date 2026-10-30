@@ -1073,6 +1073,22 @@ a:focus-visible .arcade-credit::after { content: ' · 01'; }
   [data-dot='on'] {
     background: Highlight !important;
   }
+  /* other fill-only marks: the reading bar at the top (a gradient, dropped entirely) and its chapter notches,
+     the rail joining the public-process steps, and the step ↔ audit-line pair lit by pointing or tapping */
+  [data-progress-bar] {
+    background: Highlight !important;
+  }
+  .progress-mark {
+    background: CanvasText !important;
+  }
+  [data-seg] {
+    background: CanvasText !important;
+  }
+  [data-step][data-on],
+  [data-log][data-on] {
+    outline: 2px solid Highlight !important;
+    outline-offset: 2px;
+  }
 }
 
 /* "Increase contrast" (macOS/iOS, Windows contrast themes): the design leans on translucent text
