@@ -256,3 +256,28 @@ export function CasesEmpty() {
     </p>
   );
 }
+
+/**
+ * Home case index, for a returning visitor: "Você já investigou 3 de 7 · próximo sem ler: Scheduly →".
+ * Nothing for a first visit, and nothing once every case was read (the archive page congratulates then).
+ */
+export function ResumeReading({ cases }: { cases: { slug: string; name: string }[] }) {
+  const [state, setState] = useState<{ n: number; next: { slug: string; name: string } } | null>(null);
+  useEffect(() => {
+    const read = new Set(readList());
+    const n = cases.filter((c) => read.has(c.slug)).length;
+    const next = cases.find((c) => !read.has(c.slug));
+    if (n > 0 && next) setState({ n, next });
+    // the list is static (built from the case data); a new array on each parent render must not re-run this
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cases.length]);
+  if (!state) return null;
+  return (
+    <p className="mt-3 font-mono text-sm text-ink/75" data-print-hide>
+      Você já investigou {state.n} de {cases.length}. Próximo sem ler:{' '}
+      <a href={`/casos/${state.next.slug}`} className="text-acid underline underline-offset-4 hover:text-ink">
+        {state.next.name} →
+      </a>
+    </p>
+  );
+}

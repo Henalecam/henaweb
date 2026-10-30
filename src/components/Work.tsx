@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { projects, type Project } from '@/lib/content';
 import MockUI from './MockUI';
-import { RevealRead } from './ReadMarks';
+import { RevealRead, ResumeReading } from './ReadMarks';
 import { serviceLinks } from '@/lib/serviceLinks';
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -202,6 +202,7 @@ export default function Work() {
             <a href="/casos" className="mt-4 inline-block font-medium text-acid underline-offset-4 hover:underline">
               Ver o arquivo completo →
             </a>
+            <ResumeReading cases={projects.map((x) => ({ slug: x.slug, name: x.name }))} />
           </div>
         </div>
 
