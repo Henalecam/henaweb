@@ -1,6 +1,7 @@
 import { homeFaq } from '@/lib/content';
 import { faqId } from '@/lib/slug';
 import { FaqCopyLink, FaqHashOpener, FaqToggleAll } from './FaqLink';
+import FaqAsk from './FaqAsk';
 
 /** Visible FAQ; the same Q&A feeds the FAQPage structured data on the home page. */
 export default function Faq() {
@@ -33,7 +34,10 @@ export default function Faq() {
                 </span>
               </summary>
               <p className="mt-3 max-w-2xl leading-relaxed text-bg/75">{f.a}</p>
-              <FaqCopyLink id={faqId(f.q)} />
+              <div className="flex flex-wrap items-center gap-x-5">
+                <FaqCopyLink id={faqId(f.q)} />
+                <FaqAsk q={f.q} />
+              </div>
             </details>
           ))}
           <p className="mt-3 text-bg/75" data-print-hide>

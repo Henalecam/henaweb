@@ -6,6 +6,7 @@ import { projects, site, whatsappLink } from '@/lib/content';
 import ClosingCta from '@/components/ClosingCta';
 import Footer from '@/components/Footer';
 import { FaqCopyLink, FaqHashOpener, FaqToggleAll } from '@/components/FaqLink';
+import FaqAsk from '@/components/FaqAsk';
 import { faqId } from '@/lib/slug';
 import SectionLink from '@/components/SectionLink';
 import ServiceSymptoms from '@/components/ServiceSymptoms';
@@ -297,7 +298,10 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                     </span>
                   </summary>
                   <p className="mt-3 leading-relaxed text-acid-ink/75">{f.a}</p>
-                  <FaqCopyLink id={faqId(f.q)} />
+                  <div className="flex flex-wrap items-center gap-x-5">
+                    <FaqCopyLink id={faqId(f.q)} />
+                    <FaqAsk q={f.q} />
+                  </div>
                 </details>
               ))}
             </div>
