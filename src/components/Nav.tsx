@@ -245,10 +245,17 @@ export default function Nav() {
               style={{ transitionDelay: open ? `${180 + i * 55}ms` : '0ms' }}
               className={`flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight transition-[translate,opacity] duration-500 ease-[var(--ease-out-expo)] ${
                 open ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
-              } ${active === item.href || item.href === '/passatempo' ? 'text-acid' : ''}`}
+              } ${active === item.href ? 'text-acid' : ''}`}
             >
               <span className="label">0{i + 1}</span>
               {item.label}
+              {/* the side projects stand apart from the studio's sections with their own tag, not with the
+                  orange that marks the page you're on (two orange items read as two "you are here") */}
+              {item.href === '/passatempo' && active !== item.href && (
+                <span className="ml-auto shrink-0 self-center rounded-full border-2 border-acid/70 px-2 py-0.5 font-mono text-xs whitespace-nowrap text-acid" aria-hidden>
+                  🕹 jogos
+                </span>
+              )}
               {active === item.href && (
                 <span className="label ml-auto shrink-0 self-center whitespace-nowrap !text-acid" aria-hidden>
                   ● aqui
