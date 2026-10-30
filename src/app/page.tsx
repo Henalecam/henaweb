@@ -86,7 +86,10 @@ export default function Home() {
           <Manifesto />
         </DavidStage>
         <Clients />
-        <Capabilities caseCounts={Object.fromEntries(capabilitySlugs.map((slug) => [slug, projects.filter((p) => p.service === slug).length]))} />
+        <Capabilities
+          caseCounts={Object.fromEntries(capabilitySlugs.map((slug) => [slug, projects.filter((p) => p.service === slug).length]))}
+          caseSlugs={Object.fromEntries(projects.map((p) => [p.name, p.slug]))}
+        />
         <Mystery />
         <GovTech />
         <Work />

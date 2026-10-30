@@ -4,8 +4,11 @@ import { useRef, useState } from 'react';
 import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { capabilities } from '@/lib/content';
 
-/** `caseCounts`: solved cases per service slug, counted on the server so the case data stays out of this bundle. */
-export default function Capabilities({ caseCounts = {} }: { caseCounts?: Record<string, number> }) {
+/**
+ * `caseCounts`: solved cases per service slug, counted on the server so the case data stays out of this bundle.
+ * `caseSlugs`: case name → slug, so an example that names a solved case ("Diconta: ERP contábil…") links to it.
+ */
+export default function Capabilities({ caseCounts = {}, caseSlugs = {} }: { caseCounts?: Record<string, number>; caseSlugs?: Record<string, string> }) {
   const root = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
 
@@ -123,12 +126,22 @@ export default function Capabilities({ caseCounts = {} }: { caseCounts?: Record<
                       </span>
                       <span className="flex flex-col md:col-span-5">
                         <span className="label mb-2 !text-bg/60">Exemplos</span>
-                        {c.examples.map((ex) => (
-                          <span key={ex} className="flex items-baseline gap-3 border-t border-bg/15 py-2.5 text-[0.95rem]">
-                            <span className="serif text-bg/50">→</span>
-                            {ex}
-                          </span>
-                        ))}
+                        {c.examples.map((ex) => {
+                          const slug = caseSlugs[ex.split(':')[0].trim()];
+                          return (
+                            <span key={ex} className="flex items-baseline gap-3 border-t border-bg/15 py-2.5 text-[0.95rem]">
+                              <span className="serif text-bg/50">→</span>
+                              {/* a real case in the archive: the example opens its file */}
+                              {slug ? (
+                                <a href={`/casos/${slug}`} className="-my-1.5 inline-block py-1.5 underline decoration-bg/30 decoration-1 underline-offset-4 hover:decoration-[#c2410c] hover:decoration-2">
+                                  {ex}
+                                </a>
+                              ) : (
+                                ex
+                              )}
+                            </span>
+                          );
+                        })}
                       </span>
                     </span>
                   </span>
