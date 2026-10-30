@@ -65,6 +65,17 @@ export default function Nav() {
           return;
         }
         goAt = k === 'g' ? e.timeStamp : 0;
+        // the case archive (/casos): j / k step through the case files on screen, Enter opens one
+        if (k === 'j' || k === 'k') {
+          const links = [...document.querySelectorAll<HTMLAnchorElement>('li[data-case-slug]:not([hidden]) > a')].filter((a) => a.offsetParent);
+          if (links.length) {
+            e.preventDefault();
+            const at = links.indexOf(document.activeElement as HTMLAnchorElement);
+            const to = links[at < 0 ? (k === 'j' ? 0 : links.length - 1) : Math.min(links.length - 1, Math.max(0, at + (k === 'j' ? 1 : -1)))];
+            to.focus({ preventScroll: true });
+            to.scrollIntoView({ block: 'center', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+          }
+        }
       }
       if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
