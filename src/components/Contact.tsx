@@ -636,6 +636,15 @@ export default function Contact() {
                       const el = e.currentTarget;
                       const atEnd = el.selectionStart === el.value.length;
                       if (atEnd) el.value = formatPhoneBR(el.value);
+                      // optional, but a half-typed number ("(41) 999") went through and couldn't be called back
+                      const digits = el.value.replace(/\D/g, '');
+                      const foreign = el.value.trimStart().startsWith('+') && !el.value.trimStart().startsWith('+55');
+                      const local = el.value.trimStart().startsWith('+55') ? digits.slice(2) : digits;
+                      el.setCustomValidity(
+                        !digits || (foreign ? digits.length >= 8 : local.length >= 10)
+                          ? ''
+                          : 'Faltam dígitos: DDD + número, como (41) 99999-9999. Ou deixe em branco.',
+                      );
                     }}
                   />
                   </Floating>
