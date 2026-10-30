@@ -56,7 +56,21 @@ export default function Studio() {
       <div className="grid gap-14 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <span className="label">(VII) Studio</span>
-          <figure data-portrait-card className="group toon relative mt-10 max-w-sm -rotate-2 rounded-sm bg-paper p-3 pb-4 transition-transform duration-500 hover:rotate-0 [&.is-developed]:rotate-0">
+          {/* shake it like a Polaroid picture: a click (or tap) wobbles the photo and develops it at once */}
+          <figure
+            data-portrait-card
+            data-cursor="Chacoalhar"
+            onClick={(e) => {
+              const card = e.currentTarget;
+              card.classList.add('is-developed');
+              if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+              card.classList.remove('is-shaking');
+              void card.offsetWidth; // restart the wobble on every click
+              card.classList.add('is-shaking');
+            }}
+            onAnimationEnd={(e) => e.animationName === 'polaroid-shake' && e.currentTarget.classList.remove('is-shaking')}
+            className="group toon relative mt-10 max-w-sm -rotate-2 cursor-pointer rounded-sm bg-paper p-3 pb-4 transition-transform duration-500 hover:rotate-0 [&.is-developed]:rotate-0"
+          >
             {/* a strip of tape holds the polaroid in place, like a photo taped into a case file */}
             <span
               aria-hidden
