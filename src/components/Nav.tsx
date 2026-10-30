@@ -1,15 +1,20 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
 import { nav } from '@/lib/site';
 import { gsap, onReady, prefersReducedMotion } from '@/lib/gsap';
 import Magnetic from './Magnetic';
 import Social from './Social';
 
-// the search only downloads (with its index of cases, services and FAQ) the first time it opens
-const CommandPalette = dynamic(() => import('./CommandPalette'), { ssr: false });
-const ShortcutsHelp = dynamic(() => import('./ShortcutsHelp'), { ssr: false });
+// the search (with its index of cases, services and FAQ) and the shortcuts help download the first time
+// they open, with a plain import() rather than next/dynamic: a lazy component suspends, and React holds a
+// revealed Suspense boundary back ~300 ms, so the first ⌘K took ~345 ms to appear (now ~75 ms)
+type PaletteType = typeof import('./CommandPalette').default;
+let paletteModule: Promise<PaletteType> | null = null;
+const loadPalette = () => (paletteModule ??= import('./CommandPalette').then((m) => m.default));
+type HelpType = typeof import('./ShortcutsHelp').default;
+let helpModule: Promise<HelpType> | null = null;
+const loadHelp = () => (helpModule ??= import('./ShortcutsHelp').then((m) => m.default));
 
 export default function Nav() {
   const inner = useRef<HTMLDivElement>(null);
@@ -20,8 +25,9 @@ export default function Nav() {
   // which nav section the reader is in (home only); on /casos pages the "Casos" entry stays lit
   const [active, setActive] = useState<string | null>(null);
   const [search, setSearch] = useState(false);
-  const [searchLoaded, setSearchLoaded] = useState(false);
+  const [CommandPalette, setCommandPalette] = useState<PaletteType | null>(null);
   const [help, setHelp] = useState(false);
+  const [ShortcutsHelp, setShortcutsHelp] = useState<HelpType | null>(null);
   const [mac, setMac] = useState(true);
   // "?pista=…" (browser site search, app shortcut) opens the search already filled in
   const [initialQuery, setInitialQuery] = useState('');
@@ -29,7 +35,7 @@ export default function Nav() {
   // q: the search box opens already filled in (a ?pista= link, a capability tag); plain opens start empty
   const openSearch = (q = '') => {
     setInitialQuery(q);
-    setSearchLoaded(true);
+    loadPalette().then((C) => setCommandPalette(() => C));
     setOpen(false);
     setSearch(true);
   };
@@ -55,7 +61,10 @@ export default function Nav() {
       } else if (e.key === '?' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey && !document.querySelector('dialog[open]')) {
         e.preventDefault();
         setOpen(false);
-        setHelp(true);
+        loadHelp().then((C) => {
+          setShortcutsHelp(() => C);
+          setHelp(true);
+        });
       }
     };
     window.addEventListener('keydown', onKey);
@@ -271,8 +280,8 @@ export default function Nav() {
           <Social />
         </div>
       </div>
-      {help && <ShortcutsHelp open={help} onClose={() => setHelp(false)} />}
-      {searchLoaded && <CommandPalette
+      {help && ShortcutsHelp && <ShortcutsHelp open={help} onClose={() => setHelp(false)} />}
+      {CommandPalette && <CommandPalette
           open={search}
           initialQuery={initialQuery}
           onClose={() => {
