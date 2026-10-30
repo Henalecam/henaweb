@@ -54,6 +54,15 @@ export default function Footer() {
               placement="footer"
               className="toon-sm toon-press inline-flex items-center rounded-full bg-paper px-3.5 py-2.5 font-mono text-xs text-acid-ink"
             />
+            {/* the studio as a phone contact (WhatsApp, e-mail, site in one tap) */}
+            <a
+              href="/henaweb.vcf"
+              download
+              data-print-hide
+              className="toon-sm toon-press inline-flex items-center rounded-full bg-paper px-3.5 py-2.5 font-mono text-xs text-acid-ink"
+            >
+              <span aria-hidden>＋&nbsp;</span>salvar contato
+            </a>
           </div>
           <p className="mt-6 font-mono text-xs leading-relaxed text-ink/60">
             {site.city} · {site.coords}

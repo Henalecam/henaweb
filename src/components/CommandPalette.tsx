@@ -56,6 +56,7 @@ const ITEMS: Item[] = [
     external: true,
   },
   { group: 'Ações', label: 'Mandar um e-mail', hint: site.email, href: `mailto:${site.email}` },
+  { group: 'Ações', label: 'Salvar contato no celular', hint: 'henaweb.vcf', href: '/henaweb.vcf', keywords: 'vcard agenda contatos telefone' },
   // the side projects, last: "arena" in the search opens the game itself (new tab), not just the arcade page
   ...pastimes.map((p) => ({
     group: 'Passa tempo',
