@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { nav, site } from '@/lib/site';
 import { projectLinks } from '@/lib/projectLinks';
 import { serviceLinks } from '@/lib/serviceLinks';
+import { pastimes } from '@/lib/pastimes';
 
 
 const PLACES = [
@@ -12,6 +13,10 @@ const PLACES = [
   ...nav.map((n) => ({ label: n.label, href: n.href, key: n.href.split('#')[1] })),
   { label: 'Casos resolvidos', href: '/casos', key: 'casos' },
   { label: 'Contato', href: '/#contato', key: 'contato' },
+  // the arcade and each game's short link (/fortrex → its subdomain): "/fortex" or "/passatemp" still land
+  { label: 'Passa tempo', href: '/passatempo', key: 'passatempo' },
+  { label: 'Passa tempo', href: '/passatempo', key: 'jogos' },
+  ...pastimes.map((p) => ({ label: `${p.action} ${p.name}`, href: `/${p.slug}`, key: p.slug })),
 ];
 
 /** Edit distance, for "did you mean /casos/diconta?" on mistyped links. */
