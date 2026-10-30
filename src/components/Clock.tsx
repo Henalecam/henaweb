@@ -12,6 +12,7 @@ const HQ = 'America/Sao_Paulo';
 export default function Clock({ stack = false }: { stack?: boolean }) {
   const [time, setTime] = useState('');
   const [theirs, setTheirs] = useState('');
+  const [gap, setGap] = useState('');
   // day or night in Curitiba right now, from the same clock: a sun or a moon before the time
   const [sky, setSky] = useState('');
 
@@ -28,7 +29,13 @@ export default function Clock({ stack = false }: { stack?: boolean }) {
       const h = Number(hour.format(now));
       setSky(h >= 6 && h < 18 ? '☀' : '☾');
       const mine = local.format(now);
-      setTheirs(mine !== hqShort.format(now) ? mine : '');
+      if (mine === hqShort.format(now)) return setTheirs('');
+      // how far ahead (or behind) the visitor is, so "aí" reads as a difference too: "+3h", "-1h30"
+      const wall = (tz?: string) => new Date(now.toLocaleString('en-US', { timeZone: tz })).getTime();
+      const diff = Math.round((wall() - wall(HQ)) / 900_000) * 15;
+      const abs = Math.abs(diff);
+      setGap(diff ? ` (${diff > 0 ? '+' : '−'}${Math.floor(abs / 60)}h${abs % 60 ? String(abs % 60).padStart(2, '0') : ''})` : '');
+      setTheirs(mine);
     };
     const start = () => {
       window.clearInterval(id);
@@ -57,6 +64,8 @@ export default function Clock({ stack = false }: { stack?: boolean }) {
       {theirs && (
         <span className={`opacity-70 ${stack ? 'md:absolute md:top-full md:right-0 md:mt-1 md:whitespace-nowrap' : ''}`}>
           <span className={stack ? 'md:hidden' : ''}> · </span>aí: {theirs}
+          {/* in the phone hero the line is already near full width: the difference would wrap it to two */}
+          {gap && <span className={stack ? 'hidden md:inline' : ''}>{gap}</span>}
         </span>
       )}
     </span>
