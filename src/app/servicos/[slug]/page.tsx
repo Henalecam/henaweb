@@ -14,6 +14,7 @@ import PrintDossier from '@/components/PrintDossier';
 import TocSeen from '@/components/TocSeen';
 import StackChip from '@/components/StackChip';
 import MockUI from '@/components/MockUI';
+import CaseKeys from '@/components/CaseKeys';
 
 export const dynamicParams = false;
 
@@ -79,7 +80,12 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
     ],
   };
 
-  const others = services.filter((o) => o.slug !== s.slug);
+  // the other services, in catalogue order starting right after this one: the first card is the
+  // "next" folder and the last the "previous", which is where ← / → (and a swipe) take you
+  const at = services.findIndex((o) => o.slug === s.slug);
+  const others = services.map((_, k) => services[(at + 1 + k) % services.length]).filter((o) => o.slug !== s.slug);
+  const nextSvc = others[0];
+  const prevSvc = others[others.length - 1];
 
   return (
     <>
@@ -309,9 +315,11 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
               Outras capacidades
             </h2>
             {/* each one pitched with its own page headline, plus how many solved cases back it up */}
+            <CaseKeys prev={`/servicos/${prevSvc.slug}`} next={`/servicos/${nextSvc.slug}`} />
             <ul className="mt-4 grid gap-4 md:grid-cols-3">
               {others.map((o) => {
                 const n = projects.filter((p) => p.service === o.slug).length;
+                const key = o === nextSvc ? '→' : o === prevSvc ? '←' : null;
                 return (
                   <li key={o.slug} className="pt-3.5">
                     {/* named by the service, described by its headline and track record (the whole card was the name) */}
@@ -319,6 +327,8 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                       href={`/servicos/${o.slug}`}
                       aria-labelledby={`outro-${o.slug}`}
                       aria-describedby={`outro-${o.slug}-pitch outro-${o.slug}-casos`}
+                      aria-keyshortcuts={key ? (key === '→' ? 'ArrowRight' : 'ArrowLeft') : undefined}
+                      rel={key ? (key === '→' ? 'next' : 'prev') : undefined}
                       className="toon-sm toon-press group relative flex h-full flex-col rounded-2xl rounded-tl-none bg-lemon p-5 text-acid-ink"
                     >
                       {/* each service is a manila folder in the archive: a tab on top, lifted when pointed at */}
@@ -329,6 +339,16 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                       <span id={`outro-${o.slug}`} className="font-mono text-xs tracking-wide text-acid-ink/70 uppercase">
                         {o.name}
                       </span>
+                      {/* keyboard hint on the folder tab: only where there is a keyboard-ish pointer */}
+                      {key && (
+                        <kbd
+                          aria-hidden
+                          title={key === '→' ? 'Próximo serviço (tecla →)' : 'Serviço anterior (tecla ←)'}
+                          className="absolute top-3 right-3 hidden min-w-6 rounded-md border-[1.5px] border-b-[3px] border-toon bg-paper px-1.5 text-center font-mono text-xs leading-5 text-acid-ink pointer-fine:inline-block"
+                        >
+                          {key}
+                        </kbd>
+                      )}
                       <span id={`outro-${o.slug}-pitch`} className="mt-2 text-xl leading-tight font-medium tracking-tight">
                         {`${o.h1} ${o.h1Accent}`}
                       </span>
