@@ -110,7 +110,7 @@ export default function FloatingContact() {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Conversar com a HenaWeb pelo WhatsApp"
+      aria-label="Conversar com a HenaWeb pelo WhatsApp (abre em nova aba)"
       data-placement="floating"
       tabIndex={show ? 0 : -1}
       aria-hidden={!show}

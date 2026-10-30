@@ -27,6 +27,7 @@ import CopyEmail from './CopyEmail';
 import { suggestEmail } from '@/lib/emailTypos';
 import { formatPhoneBR } from '@/lib/phone';
 import Social from './Social';
+import NewTab from './NewTab';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
@@ -320,6 +321,7 @@ export default function Contact() {
                   className="toon-sm toon-press mt-5 inline-flex items-center gap-2 rounded-full bg-[#25d366] px-4 py-2 text-sm font-medium text-acid-ink"
                 >
                   Mandar a ficha pelo WhatsApp
+                  <NewTab />
                 </a>
               </div>
             )}
@@ -409,6 +411,7 @@ export default function Contact() {
           <div className="mt-8 flex flex-col gap-2 font-mono text-sm">
             <a href={whatsappWithCase} target="_blank" rel="noopener noreferrer" className="w-fit underline-offset-4 hover:underline">
               WhatsApp · {site.whatsappDisplay} ↗
+              <NewTab />
             </a>
             <span className="flex flex-wrap items-baseline gap-x-3">
               <a href={`mailto:${site.email}`} className="w-fit underline-offset-4 hover:underline">
@@ -447,6 +450,7 @@ export default function Contact() {
                   className="toon-sm toon-press rounded-full bg-[#25d366] px-5 py-2.5 text-sm font-medium"
                 >
                   Falar pelo WhatsApp
+                  <NewTab />
                 </a>
                 {/* the reply comes from this number and address: saved, it isn't mistaken for spam */}
                 <a href="/henaweb.vcf" download className="toon-sm toon-press rounded-full bg-white px-5 py-2.5 text-sm font-medium">
@@ -694,6 +698,7 @@ export default function Contact() {
                         className="toon-sm rounded-full bg-[#25d366] px-5 py-2.5 text-sm font-medium"
                       >
                         Enviar pelo WhatsApp
+                        <NewTab />
                       </a>
                       <a
                         href={`mailto:${site.email}?subject=${encodeURIComponent(`Caso nº ${caseNo}`)}&body=${encodeURIComponent(fallback)}`}

@@ -7,6 +7,7 @@ import Clock from './Clock';
 import Magnetic from './Magnetic';
 import Placard from './Placard';
 import { chisel } from '@/lib/chisel';
+import NewTab from './NewTab';
 
 export default function Hero() {
   const root = useRef<HTMLElement>(null);
@@ -94,6 +95,7 @@ export default function Hero() {
               className="toon toon-press rounded-full bg-cyan px-6 py-4 font-medium text-acid-ink"
             >
               WhatsApp
+              <NewTab />
             </a>
           </div>
           <div data-hero-fade className="flex flex-col gap-3 md:col-span-3 md:items-end md:text-right">

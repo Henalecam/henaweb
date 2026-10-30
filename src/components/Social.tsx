@@ -31,7 +31,7 @@ export default function Social({ className = '', tone = 'dark' }: { className?: 
             href={s.href}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`${s.name} @henaweb`}
+            aria-label={`${s.name} @henaweb (abre em nova aba)`}
             data-cursor={s.name}
             className={`toon-sm toon-press flex h-11 w-11 items-center justify-center rounded-full transition-colors ${color}`}
           >

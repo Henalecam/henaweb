@@ -1,4 +1,5 @@
 import { projects, whatsappLink } from '@/lib/content';
+import NewTab from './NewTab';
 
 // the file this conversation would open: the next number after the solved cases, so it follows the archive
 const nextCase = String(projects.length + 1).padStart(2, '0');
@@ -52,6 +53,7 @@ export default function ClosingCta({ title, accent, text, whatsappMessage }: Pro
               className="toon toon-press rounded-full bg-[#25d366] px-6 py-4 font-medium text-acid-ink"
             >
               WhatsApp
+              <NewTab />
             </a>
           </div>
         </div>

@@ -11,6 +11,7 @@ import Chase from './Chase';
 import Social from './Social';
 import CopyEmail from './CopyEmail';
 import { RevealRead } from './ReadMarks';
+import NewTab from './NewTab';
 
 /** The footer's WhatsApp opens with a message about the page being read (same wording as the floating button). */
 function footerMessage(path: string): string | undefined {
@@ -79,6 +80,7 @@ export default function Footer() {
               className="toon-sm toon-press inline-flex items-center gap-2 rounded-full bg-[#25d366] px-4 py-2.5 text-sm font-medium text-acid-ink"
             >
               WhatsApp · {site.whatsappDisplay}
+              <NewTab />
             </a>
             <a
               href={`mailto:${site.email}`}

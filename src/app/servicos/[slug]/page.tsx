@@ -16,6 +16,7 @@ import TocSeen from '@/components/TocSeen';
 import StackChip from '@/components/StackChip';
 import MockUI from '@/components/MockUI';
 import CaseKeys from '@/components/CaseKeys';
+import NewTab from '@/components/NewTab';
 
 export const dynamicParams = false;
 
@@ -134,6 +135,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
               className="toon toon-press rounded-full bg-cyan px-6 py-4 font-medium text-acid-ink"
             >
               WhatsApp
+              <NewTab />
             </a>
             <ShareCase title={`${s.name} · HenaWeb`} text={s.intro} label="Enviar para alguém ↗" placement="service-share" />
           </div>
