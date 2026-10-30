@@ -22,7 +22,9 @@ export default function ShareCase({
   const [copied, setCopied] = useState(false);
 
   const share = async () => {
-    const url = location.href.split('#')[0];
+    // the page itself, without whatever brought this visitor here (?utm_…, ?fbclid=…, a filter): the person
+    // receiving it gets a clean address, and the campaign that reached the sender isn't credited twice
+    const url = location.origin + location.pathname;
     track({ name: 'cta_click', placement, label: title });
     if (navigator.share) {
       try {
