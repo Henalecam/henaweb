@@ -3,6 +3,16 @@
 import { useEffect } from 'react';
 
 const AWAY = '👻 Volte! O caso ainda não acabou';
+// a contact form left half-filled (Contact's same-tab draft, cleared on send) gets a more specific nudge
+const AWAY_DRAFT = '✉ Seu caso ficou pela metade';
+const hasDraft = () => {
+  try {
+    const d = JSON.parse(sessionStorage.getItem('hena:draft') ?? 'null');
+    return !!d && (d.picked?.length > 0 || Object.values(d.fields ?? {}).some((v) => typeof v === 'string' && v.trim() !== ''));
+  } catch {
+    return false;
+  }
+};
 const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
 /**
@@ -53,8 +63,8 @@ export default function TabHaunt() {
     const onVisibility = () => {
       if (document.hidden) {
         original = document.title;
-        document.title = AWAY;
-      } else if (document.title === AWAY) {
+        document.title = hasDraft() ? AWAY_DRAFT : AWAY;
+      } else if (document.title === AWAY || document.title === AWAY_DRAFT) {
         document.title = original;
       }
     };
