@@ -1032,6 +1032,27 @@ a:focus-visible .arcade-credit::after { content: ' · 01'; }
     opacity: 1 !important;
     transform: rotate(-4deg) !important;
   }
+  /* service and case pages: the screen's 6rem breathing room between sections (and under the article) is
+     wasted paper; headings still keep their content with them */
+  main > article > section {
+    margin-top: 9mm !important;
+  }
+  main > article {
+    padding-bottom: 0 !important;
+  }
+  /* the deliverable windows ("O que você recebe") keep their screen padding and 1.5rem titles on paper: with the
+     heading held to its first row, that pushed the section, then "Exemplos", a page down. Tighter, every
+     service page prints on 3 A4 pages instead of 4 */
+  main > article [data-win-item] > div:last-child {
+    padding: 4mm !important;
+  }
+  main > article [data-win-item] h3 {
+    font-size: 1.25rem !important;
+  }
+  /* the FAQ's open/close "+" is a control; on paper every answer is already open */
+  summary > [aria-hidden]:last-child {
+    display: none !important;
+  }
   /* FAQ answers print open */
   details::details-content {
     block-size: auto !important;
