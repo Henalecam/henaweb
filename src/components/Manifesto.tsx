@@ -54,14 +54,21 @@ export default function Manifesto() {
           onUpdate: () => (el.textContent = String(Math.round(counter.v))),
           scrollTrigger: { trigger: '[data-facts]', start: 'top 85%' },
         });
-        // pointing at a card rolls its number again, quicker (mouse only; ignored while it is still rolling)
+        // pointing at a card rolls its number again, quicker (ignored while it is still rolling). The mouse
+        // does it on entering; on touch, where there is no hover, a tap on the card does the same
         const card = el.closest<HTMLElement>('[data-fact]');
-        const again = (e: PointerEvent) => {
-          if (e.pointerType !== 'mouse' || roll.isActive() || gsap.isTweening(counter)) return;
+        const replay = () => {
+          if (roll.isActive() || gsap.isTweening(counter)) return;
           gsap.fromTo(counter, { v: to === 0 ? 99 : 0 }, { v: to, duration: 0.7, ease: 'power3.out', onUpdate: roll.vars.onUpdate });
         };
-        card?.addEventListener('pointerenter', again);
-        offs.push(() => card?.removeEventListener('pointerenter', again));
+        const onEnter = (e: PointerEvent) => e.pointerType === 'mouse' && replay();
+        const onTap = (e: PointerEvent) => e.pointerType !== 'mouse' && replay();
+        card?.addEventListener('pointerenter', onEnter);
+        card?.addEventListener('pointerup', onTap);
+        offs.push(() => {
+          card?.removeEventListener('pointerenter', onEnter);
+          card?.removeEventListener('pointerup', onTap);
+        });
       });
       // the quote is carved out left to right, like the line it quotes (negative insets keep its hard shadow)
       gsap.fromTo(
