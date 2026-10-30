@@ -29,11 +29,17 @@ export default function Chase() {
   const canvas = useRef<HTMLCanvasElement>(null);
   // easter egg: clicking the moon walks it through its phases (full → gibbous → crescent → new-ish → full)
   const [phase, setPhase] = useState(0);
+  // no 3D van (data saver, no WebGL): its "VRUUUM!" would be shouting from an empty road
+  const [noVan, setNoVan] = useState(false);
 
   // the 3D chase loads only when the footer gets close
   useEffect(() => {
     const el = canvas.current;
-    if (!el || saveData()) return;
+    if (!el) return;
+    if (saveData()) {
+      setNoVan(true);
+      return;
+    }
     let scene: ChaseScene | null = null;
     let cancelled = false;
     const io = new IntersectionObserver(
@@ -46,6 +52,7 @@ export default function Chase() {
             scene = createChaseScene(el, { reducedMotion: prefersReducedMotion() });
           } catch {
             // no WebGL: the night backdrop stays
+            setNoVan(true);
           }
         });
       },
@@ -129,12 +136,12 @@ export default function Chase() {
       {/* the 3D chase */}
       <canvas ref={canvas} className="absolute inset-0 h-full w-full" />
 
-      <span
+      {!noVan && <span
         data-vruum
         className="toon-sm font-groovy pointer-events-none absolute top-[16%] right-[18%] z-10 rounded-full bg-lemon px-4 py-1 text-base text-acid-ink md:top-[20%] md:right-[22%] md:text-2xl"
       >
         VRUUUM!
-      </span>
+      </span>}
     </div>
   );
 }
