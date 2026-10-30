@@ -79,7 +79,7 @@ export const projects: Project[] = [
     challenge: 'Escritórios contábeis controlam clientes, notas, documentos e obrigações em ferramentas espalhadas.',
     built: 'Um ERP único com financeiro, notas fiscais, documentos, tarefas, multi-CNPJ e histórico de auditoria.',
     highlights: ['Multi-CNPJ', 'Assinatura digital', 'Histórico de auditoria', 'Integrações'],
-    shot: { desktop: '/cases/diconta.jpg', mobile: '/cases/diconta-m.jpg', height: 2700 },
+    shot: { desktop: '/cases/diconta.jpg', mobile: '/cases/diconta-m.jpg', height: 2132 },
   },
   {
     slug: 'scheduly',
@@ -91,7 +91,7 @@ export const projects: Project[] = [
     challenge: 'Agendar por mensagem vira um vai-e-vem de horários que consome a equipe.',
     built: 'O cliente escreve como fala; a IA entende o pedido, sugere horários livres e confirma sozinha.',
     highlights: ['Linguagem natural', 'Sugestão de horários', 'Painel admin'],
-    shot: { desktop: '/cases/scheduly.jpg', mobile: '/cases/scheduly-m.jpg', height: 900 },
+    shot: { desktop: '/cases/scheduly.jpg', mobile: '/cases/scheduly-m.jpg', height: 2326 },
   },
   {
     slug: 'ecobrain',
