@@ -40,7 +40,7 @@ export default function PickPastime() {
   };
 
   return (
-    <div className="mt-10 flex flex-wrap items-center gap-4">
+    <div className="mt-10 flex flex-wrap items-center gap-4" data-print-hide>
       <button type="button" onClick={spin} className="toon-sm toon-press rounded-full bg-paper px-5 py-2.5 font-medium text-acid-ink">
         <span aria-hidden>🎲 </span>Não sabe qual? Sorteia pra mim
       </button>
