@@ -95,7 +95,7 @@ export default function Studio() {
                 src="/team/henrique.png"
                 alt="Henrique Alexandre de Camargo, fundador da HenaWeb"
                 fill
-                sizes="(max-width: 1024px) 80vw, 25vw"
+                sizes="(max-width: 767px) 80vw, (max-width: 1024px) 48vw, 25vw"
                 className="object-cover grayscale contrast-125 transition-[filter] duration-700 group-hover:grayscale-0 group-hover:contrast-100 group-[.is-developed]:grayscale-0 group-[.is-developed]:contrast-100"
               />
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,transparent_1.1px,rgb(18_8_42/0.85)_1.9px)] bg-[length:6px_6px] transition-opacity duration-700 group-hover:opacity-0 group-[.is-developed]:opacity-0" />

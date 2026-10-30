@@ -31,7 +31,7 @@ function Screen({ p, tall = true, images = true }: { p: Project; tall?: boolean;
                 src={p.shot.desktop}
                 alt={`Captura de tela de ${p.name}`}
                 fill
-                sizes="(max-width: 1024px) 92vw, 58vw"
+                sizes="(max-width: 767px) 92vw, (max-width: 1024px) 62vw, 58vw"
                 className={`object-cover object-top ${
                   tall && p.shot.height > 1200 ? 'transition-[object-position] duration-[6000ms] ease-linear motion-safe:group-hover/screen:object-bottom motion-safe:group-focus-visible/screen:object-bottom' : ''
                 }`}

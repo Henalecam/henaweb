@@ -110,7 +110,7 @@ export default function FullShot({
                 alt={`${name} no celular`}
                 width={780}
                 height={1688}
-                sizes="(max-width: 768px) 90vw, 240px"
+                sizes="(max-width: 480px) 360px, (max-width: 767px) 690px, 240px"
                 className="toon-sm h-auto w-full rounded-[1.2rem]"
               />
             </div>
