@@ -372,7 +372,7 @@ export default function Work() {
                   aria-current={i === card ? 'true' : undefined}
                   className="grid h-6 w-6 place-items-center"
                 >
-                  <span className={`block h-1.5 rounded-full transition-all duration-300 ${i === card ? 'w-4 bg-acid' : 'w-1.5 bg-ink/55'}`} />
+                  <span data-dot={i === card ? 'on' : ''} className={`block h-1.5 rounded-full transition-all duration-300 ${i === card ? 'w-4 bg-acid' : 'w-1.5 bg-ink/55'}`} />
                 </button>
               ))}
             </div>

@@ -125,6 +125,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
                     )}
                     <span
                       aria-hidden
+                      data-dot={c.slug === p.slug ? 'on' : ''}
                       className={`block h-1.5 rounded-full transition-[width,background-color] duration-300 ${
                         c.slug === p.slug ? 'w-4 bg-acid' : 'w-1.5 bg-ink/55 group-hover/dot:bg-ink/90 group-focus-visible/dot:bg-ink/90'
                       }`}

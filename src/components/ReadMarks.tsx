@@ -105,7 +105,7 @@ export function ReadProgress({ slugs }: { slugs: string[] }) {
     <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-ink/75">
       <span aria-hidden className="inline-flex gap-1">
         {slugs.map((s) => (
-          <span key={s} className={`inline-block size-2 rounded-full ${read.includes(s) ? 'bg-acid' : 'bg-ink/25'}`} />
+          <span key={s} data-dot={read.includes(s) ? 'on' : ''} className={`inline-block size-2 rounded-full ${read.includes(s) ? 'bg-acid' : 'bg-ink/25'}`} />
         ))}
       </span>
       <span>

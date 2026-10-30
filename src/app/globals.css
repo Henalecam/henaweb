@@ -1065,6 +1065,14 @@ a:focus-visible .arcade-credit::after { content: ' · 01'; }
     text-decoration: underline 2px;
     text-underline-offset: 4px;
   }
+  /* position dots (case strip, carousel, reading progress) are drawn only with a fill: flattened, they vanished.
+     Plain dots take the text color; the current / read one the highlight color */
+  [data-dot] {
+    background: CanvasText !important;
+  }
+  [data-dot='on'] {
+    background: Highlight !important;
+  }
 }
 
 /* "Increase contrast" (macOS/iOS, Windows contrast themes): the design leans on translucent text
