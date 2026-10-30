@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { gsap, ScrollTrigger, onReady, prefersReducedMotion } from '@/lib/gsap';
 import type { DavidScene } from '@/lib/davidScene';
+import { saveData } from '@/lib/saveData';
 
 /**
  * The vaporwave sunset stage: striped sun, neon floor and the halftone David,
@@ -35,7 +36,7 @@ export default function DavidStage({ children }: { children: ReactNode }) {
       else window.addEventListener('load', idle, { once: true });
     };
 
-    whenIdle(() => import('@/lib/davidScene').then(({ createDavidScene }) => {
+    if (!saveData()) whenIdle(() => import('@/lib/davidScene').then(({ createDavidScene }) => {
       if (cancelled || !canvas.current) return;
       try {
         scene = createDavidScene(canvas.current, {

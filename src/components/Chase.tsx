@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import type { ChaseScene } from '@/lib/chaseScene';
+import { saveData } from '@/lib/saveData';
 
 
 /** One tile of roadside scenery; two copies side by side loop seamlessly. */
@@ -32,7 +33,7 @@ export default function Chase() {
   // the 3D chase loads only when the footer gets close
   useEffect(() => {
     const el = canvas.current;
-    if (!el) return;
+    if (!el || saveData()) return;
     let scene: ChaseScene | null = null;
     let cancelled = false;
     const io = new IntersectionObserver(

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { process, stack } from '@/lib/content';
 import type { BurgerScene } from '@/lib/burgerScene';
+import { saveData } from '@/lib/saveData';
 import Marquee from './Marquee';
 import OrderTicket from './OrderTicket';
 
@@ -162,7 +163,7 @@ export default function Process() {
   // the 3D burger loads lazily, only when the section gets close
   useEffect(() => {
     const el = canvas.current;
-    if (!el) return;
+    if (!el || saveData()) return;
     let cancelled = false;
     const io = new IntersectionObserver(
       ([entry]) => {
