@@ -54,15 +54,31 @@ export default function Footer() {
               placement="footer"
               className="toon-sm toon-press inline-flex items-center rounded-full bg-paper px-3.5 py-2.5 font-mono text-xs text-acid-ink"
             />
-            {/* the studio as a phone contact (WhatsApp, e-mail, site in one tap) */}
-            <a
-              href="/henaweb.vcf"
-              download
-              data-print-hide
-              className="toon-sm toon-press inline-flex items-center rounded-full bg-paper px-3.5 py-2.5 font-mono text-xs text-acid-ink"
-            >
-              <span aria-hidden>＋&nbsp;</span>salvar contato
-            </a>
+            {/* the studio as a phone contact (WhatsApp, e-mail, site in one tap). On a desktop the file would
+                land on the wrong device, so pointing at it shows a QR of the same address for the phone's camera
+                (public/contato-qr.svg encodes https://henaweb.com/henaweb.vcf; regenerate it if that changes) */}
+            <span className="group/qr relative inline-flex" data-print-hide>
+              <a
+                href="/henaweb.vcf"
+                download
+                className="toon-sm toon-press inline-flex items-center rounded-full bg-paper px-3.5 py-2.5 font-mono text-xs text-acid-ink"
+              >
+                <span aria-hidden>＋&nbsp;</span>salvar contato
+              </a>
+              <span
+                aria-hidden
+                className="win pointer-events-none absolute bottom-full left-1/2 z-10 mb-3 hidden w-40 -translate-x-1/2 translate-y-1 opacity-0 transition-[opacity,translate] duration-200 group-focus-within/qr:translate-y-0 group-focus-within/qr:opacity-100 group-hover/qr:translate-y-0 group-hover/qr:opacity-100 pointer-fine:block motion-reduce:transition-none"
+              >
+                <span className="win-bar">
+                  <span>contato.qr</span>
+                </span>
+                <span className="m-1.5 block bg-paper p-2 text-center text-acid-ink">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- a 6 KB static SVG, nothing to optimise */}
+                  <img src="/contato-qr.svg" alt="" width={132} height={132} className="mx-auto block h-auto w-full" loading="lazy" />
+                  <span className="mt-1.5 block font-mono text-[0.62rem] leading-snug">aponte a câmera do celular</span>
+                </span>
+              </span>
+            </span>
           </div>
           <p className="mt-6 font-mono text-xs leading-relaxed text-ink/60">
             {site.city} · {site.coords}
