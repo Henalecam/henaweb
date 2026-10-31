@@ -49,7 +49,7 @@ export default function Capabilities({ caseCounts = {}, caseSlugs = {} }: { case
     <section
       ref={root}
       id="capacidades"
-      className="paper gutter relative z-10 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon pt-[clamp(5rem,10vw,9rem)] pb-[clamp(5rem,10vw,9rem)] text-bg"
+      data-sheet className="paper gutter relative z-10 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon pt-[clamp(5rem,10vw,9rem)] pb-[clamp(5rem,10vw,9rem)] text-bg"
     >
       <div className="mb-[clamp(3rem,7vw,6rem)] grid gap-8 md:grid-cols-12">
         <span className="label !text-bg/55 md:col-span-3">(II) Capacidades</span>

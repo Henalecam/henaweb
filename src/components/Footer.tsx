@@ -64,7 +64,7 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="sky gutter relative z-50 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon pt-20 pb-6">
+    <footer data-sheet className="sky gutter relative z-50 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon pt-20 pb-6">
       <div className="relative z-20 grid gap-12 lg:grid-cols-12">
         {/* who we are + the two ways to reach us */}
         <div className="lg:col-span-4">

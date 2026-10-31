@@ -6,7 +6,7 @@ import FaqAsk from './FaqAsk';
 /** Visible FAQ; the same Q&A feeds the FAQPage structured data on the home page. */
 export default function Faq() {
   return (
-    <section id="perguntas" aria-labelledby="perguntas-titulo" className="paper relative z-30 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon py-[clamp(5rem,9vw,8rem)] text-bg">
+    <section id="perguntas" aria-labelledby="perguntas-titulo" data-sheet className="paper relative z-30 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon py-[clamp(5rem,9vw,8rem)] text-bg">
       <div className="gutter grid gap-10 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <span className="label !text-bg/55">(VIII) Perguntas</span>

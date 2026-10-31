@@ -344,7 +344,7 @@ export default function Process() {
     <section
       ref={root}
       id="processo"
-      className="group/proc paper relative z-10 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon pt-[clamp(5rem,10vw,9rem)] text-bg"
+      data-sheet className="group/proc paper relative z-10 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon pt-[clamp(5rem,10vw,9rem)] text-bg"
     >
       <div className="gutter">
         <div className="grid gap-6 md:grid-cols-12">

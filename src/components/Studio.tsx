@@ -101,7 +101,7 @@ export default function Studio() {
     <section
       ref={root}
       id="studio"
-      className="sky gutter relative z-20 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon py-[clamp(5rem,10vw,9rem)]"
+      data-sheet className="sky gutter relative z-20 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon py-[clamp(5rem,10vw,9rem)]"
     >
       <div className="grid gap-14 lg:grid-cols-12">
         <div className="lg:col-span-4">

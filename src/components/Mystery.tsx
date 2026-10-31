@@ -523,7 +523,7 @@ export default function Mystery() {
   }, []);
 
   return (
-    <section ref={root} id="caso" className="sky relative z-20 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon text-ink">
+    <section ref={root} id="caso" data-sheet className="sky relative z-20 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon text-ink">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,rgb(255_255_255/0.5)_1px,transparent_1.5px)] bg-[length:90px_90px] opacity-30" />
       <div
         className="tape absolute top-14 -left-10 z-[16] w-[130%] -rotate-[3deg] py-1.5 font-mono text-xs font-bold tracking-[0.25em] whitespace-nowrap uppercase lg:top-8"

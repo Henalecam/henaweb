@@ -897,6 +897,28 @@ li:last-child > a > [data-tree]::before {
   to { translate: 0 -28px; }
 }
 
+/* home "sheets": each rounded section slides over the one before it (-mt-8, rounded top). As its top edge rises
+   from the bottom of the screen, a shadow grows above that edge onto the section underneath, so the cut between
+   sections reads as one card landing on the stack rather than a flat seam. Shadow only (no transform: Mystery and
+   the others pin with GSAP). Scroll-driven; reduced motion and browsers without view timelines keep the flat seam */
+@media screen and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-sheet] {
+      animation: sheet-land linear both;
+      animation-timeline: view(block);
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+@keyframes sheet-land {
+  from {
+    box-shadow: 0 0 0 0 rgb(13 8 32 / 0);
+  }
+  to {
+    box-shadow: 0 -22px 44px -10px rgb(13 8 32 / 0.55);
+  }
+}
+
 /* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
    reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
 [data-nav-pending] {

@@ -456,7 +456,7 @@ export default function Contact() {
       ref={root}
       id="contato"
       data-tint="#f7931e"
-      className="gutter relative z-40 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon bg-[linear-gradient(170deg,#f7931e_0%,#f9b25a_45%,#f4b942_100%)] py-[clamp(5rem,10vw,9rem)] text-acid-ink"
+      data-sheet className="gutter relative z-40 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon bg-[linear-gradient(170deg,#f7931e_0%,#f9b25a_45%,#f4b942_100%)] py-[clamp(5rem,10vw,9rem)] text-acid-ink"
     >
       <div className="grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-5">

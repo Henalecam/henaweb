@@ -9,7 +9,7 @@ export default function Clients() {
     <section
       id="clientes"
       aria-labelledby="clientes-titulo"
-      className="relative z-[5] -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon bg-white pt-10 pb-16 md:pt-12 md:pb-20"
+      data-sheet className="relative z-[5] -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon bg-white pt-10 pb-16 md:pt-12 md:pb-20"
     >
       <div className="gutter flex flex-wrap items-baseline gap-x-4 gap-y-1.5">
         <h2 id="clientes-titulo" className="label !text-acid-ink/60">
