@@ -338,7 +338,9 @@ export default function Work() {
         <div className="-mx-[clamp(1rem,4vw,3.5rem)] mt-12 lg:hidden">
           <ol ref={strip} onScroll={onStrip} className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-[clamp(1rem,4vw,3.5rem)] pb-10 [scrollbar-width:none]">
             {projects.map((item, i) => (
-              <li key={item.name} className="w-[86%] shrink-0 snap-center sm:w-[70%]">
+              // a keyboard reaching this card's link (Tab) centres the card, as a swipe would: the browser only
+              // nudged a half-visible link into view, leaving the card cut at the screen's edge
+              <li key={item.name} onFocus={() => goCard(i)} className="w-[86%] shrink-0 snap-center sm:w-[70%]">
                 {/* the screenshot opens the case page, like the link below it, instead of leaving for the client's site */}
                 {/* same target as "Ver caso completo" below: hidden from screen readers and the tab order so it isn't announced twice */}
                 <a href={`/casos/${item.slug}`} aria-hidden tabIndex={-1} className="block aspect-[16/10.5]">
