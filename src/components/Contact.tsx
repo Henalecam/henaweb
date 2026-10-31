@@ -106,10 +106,21 @@ const field =
  * once filled, so the visitor never loses track of which line is which. The label is a real <label>.
  * Inputs need `placeholder=" "` for the :placeholder-shown check.
  */
-function Floating({ label, children, className = '' }: { label: string; children: ReactNode; className?: string }) {
+function Floating({ label, children, className = '', check = false }: { label: string; children: ReactNode; className?: string; check?: boolean }) {
   return (
     <label className={`relative block ${className}`}>
       {children}
+      {/* `check`: a field that has an answer the browser accepts gets a small green tick at its right end, so a
+          filled form reads as done at a glance (the red underline already marks the wrong ones). Decorative */}
+      {check && (
+        <span
+          aria-hidden
+          data-field-ok
+          className="pointer-events-none absolute right-0 bottom-2.5 flex h-5 w-5 scale-50 items-center justify-center rounded-full bg-[#1f6f63] text-[0.7rem] font-bold text-paper opacity-0 transition-[opacity,scale] duration-200 ease-[cubic-bezier(0.3,0.7,0.4,1.5)] peer-[:not(:placeholder-shown):valid]:scale-100 peer-[:not(:placeholder-shown):valid]:opacity-100"
+        >
+          ✓
+        </span>
+      )}
       <span className="pointer-events-none absolute top-6 left-0 origin-left text-lg text-acid-ink/70 transition-all duration-200 peer-focus:top-0 peer-focus:font-mono peer-focus:text-[0.7rem] peer-focus:tracking-[0.12em] peer-focus:text-acid-ink/80 peer-focus:uppercase peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:font-mono peer-[:not(:placeholder-shown)]:text-[0.7rem] peer-[:not(:placeholder-shown)]:tracking-[0.12em] peer-[:not(:placeholder-shown)]:text-acid-ink/80 peer-[:not(:placeholder-shown)]:uppercase motion-reduce:transition-none">
         {label}
       </span>
@@ -622,13 +633,13 @@ export default function Contact() {
               <fieldset className="min-w-0">
                 <legend className="label mb-2 !text-acid-ink/60">3 · Quem está investigando</legend>
                 <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
-                  <Floating label="Seu nome">
+                  <Floating label="Seu nome" check>
                     {/* names and company names aren't dictionary words: no red squiggle under "Henrique" or "Neodent", and
                         phones start each word capitalised */}
-                    <input name="name" enterKeyHint="next" required maxLength={120} placeholder=" " autoComplete="name" autoCapitalize="words" spellCheck={false} className={field} onInvalid={explain} onInput={clear} />
+                    <input name="name" enterKeyHint="next" required maxLength={120} placeholder=" " autoComplete="name" autoCapitalize="words" spellCheck={false} className={`${field} pr-7`} onInvalid={explain} onInput={clear} />
                   </Floating>
                   <div className="min-w-0">
-                    <Floating label="E-mail">
+                    <Floating label="E-mail" check>
                     <input
                       ref={emailRef}
                       name="email" enterKeyHint="next"
@@ -640,7 +651,7 @@ export default function Contact() {
                       maxLength={254}
                       spellCheck={false}
                       autoCapitalize="none"
-                      className={field}
+                      className={`${field} pr-7`}
                       aria-describedby={emailHint ? 'email-hint' : undefined}
                       onInvalid={explain}
                       onInput={(e) => {
@@ -669,7 +680,7 @@ export default function Contact() {
                       </p>
                     )}
                   </div>
-                  <Floating label="WhatsApp (opcional)">
+                  <Floating label="WhatsApp (opcional)" check>
                   <input
                     name="whatsapp" enterKeyHint="next"
                     type="tel"
@@ -677,7 +688,7 @@ export default function Contact() {
                     placeholder=" "
                     autoComplete="tel"
                     maxLength={22}
-                    className={field}
+                    className={`${field} pr-7`}
                     onInput={(e) => {
                       // (41) 99999-9999 as it is typed; foreign numbers starting with + stay as typed
                       const el = e.currentTarget;
