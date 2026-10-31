@@ -933,6 +933,25 @@ li:last-child > a > [data-tree]::before {
   }
 }
 
+/* Clock (hero and footer): blinking colons and a rolling last digit, like a desk clock */
+@media (prefers-reduced-motion: no-preference) {
+  [data-clock-colon] {
+    animation: clock-blink 1s steps(1, end) infinite;
+  }
+  [data-clock-roll] {
+    animation: clock-roll 0.32s cubic-bezier(0.2, 0.8, 0.3, 1.2);
+  }
+}
+@keyframes clock-blink {
+  50% { opacity: 0.25; }
+}
+@keyframes clock-roll {
+  from {
+    translate: 0 -0.6em;
+    opacity: 0;
+  }
+}
+
 /* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
    reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
 [data-nav-pending] {

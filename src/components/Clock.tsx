@@ -60,7 +60,23 @@ export default function Clock({ stack = false }: { stack?: boolean }) {
       <span aria-hidden className="mr-1 inline-block w-[1em] text-center">
         {sky}
       </span>
-      {time || '--:--:--'}
+      {/* a desk clock: the colons blink and the last second digit rolls in from above on each tick (CSS; with
+          reduced motion both stand still). Keyed by its value so each new digit remounts and replays the roll */}
+      {time ? (
+        <>
+          {time.slice(0, -1).split(':').map((part, i, all) => (
+            <span key={i}>
+              {part}
+              {i < all.length - 1 && <span data-clock-colon>:</span>}
+            </span>
+          ))}
+          <span key={time.slice(-1)} data-clock-roll className="inline-block">
+            {time.slice(-1)}
+          </span>
+        </>
+      ) : (
+        '--:--:--'
+      )}
       {theirs && (
         <span className={`opacity-70 ${stack ? 'md:absolute md:top-full md:right-0 md:mt-1 md:whitespace-nowrap' : ''}`}>
           <span className={stack ? 'md:hidden' : ''}> · </span>aí: {theirs}
