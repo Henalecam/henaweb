@@ -18,6 +18,7 @@ import MockUI from '@/components/MockUI';
 import CaseKeys from '@/components/CaseKeys';
 import { stepTransitionScript } from '@/lib/stepTransition';
 import NewTab from '@/components/NewTab';
+import { blurProps } from '@/lib/shotBlur';
 
 export const dynamicParams = false;
 
@@ -227,6 +228,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                         {pr.shot ? (
                           <Image
                             src={pr.shot.desktop.replace(/\.jpg$/, '-top.jpg')}
+                            {...blurProps(pr.shot.desktop.replace(/\.jpg$/, '-top.jpg'))}
                             alt=""
                             width={1440}
                             height={846}

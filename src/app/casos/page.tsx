@@ -8,6 +8,7 @@ import MockUI from '@/components/MockUI';
 import ClosingCta from '@/components/ClosingCta';
 import CaseFilter from '@/components/CaseFilter';
 import { services } from '@/lib/services';
+import { blurProps } from '@/lib/shotBlur';
 
 const description =
   'Casos resolvidos pela HenaWeb: ERPs, plataformas com IA, agendamento, produtos financeiros e sites. Veja o problema de cada cliente e o que construímos.';
@@ -123,6 +124,7 @@ export default function CasesIndex() {
                       {p.shot ? (
                         <Image
                           src={p.shot.desktop}
+                          {...blurProps(p.shot.desktop)}
                           // decorative inside the link: the title names the case
                           alt=""
                           fill

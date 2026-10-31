@@ -13,6 +13,7 @@ import { ArchiveReturn, MarkRead, UnreadHint } from '@/components/ReadMarks';
 import FullShot, { MaximizeButton, ZoomArea } from '@/components/FullShot';
 import MockUI from '@/components/MockUI';
 import { stepTransitionScript } from '@/lib/stepTransition';
+import { blurProps } from '@/lib/shotBlur';
 
 export const dynamicParams = false;
 
@@ -171,6 +172,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
                     // the window only shows the top of the page: a pre-cropped copy (public/cases/*-top.jpg)
                     // instead of the full-length screenshot that /casos scrolls on hover
                     src={p.shot.desktop.replace(/\.jpg$/, '-top.jpg')}
+                    {...blurProps(p.shot.desktop.replace(/\.jpg$/, '-top.jpg'))}
                     alt={`Tela de ${p.name}`}
                     fill
                     preload
@@ -183,7 +185,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             </div>
             {p.shot && (
               <div className="toon absolute -right-2 -bottom-8 aspect-[390/844] w-[24%] max-w-[220px] overflow-hidden rounded-[1.4rem] bg-black md:-right-6">
-                <Image src={p.shot.mobile} alt={`${p.name} no celular`} fill sizes="(max-width: 1000px) 22vw, 220px" className="object-cover object-top" />
+                <Image src={p.shot.mobile} {...blurProps(p.shot.mobile)} alt={`${p.name} no celular`} fill sizes="(max-width: 1000px) 22vw, 220px" className="object-cover object-top" />
               </div>
             )}
           </div>
@@ -291,6 +293,7 @@ function CasePeek({ p }: { p: (typeof projects)[number] }) {
     <span className="mb-4 block aspect-[16/8] overflow-hidden rounded-lg border-2 border-[#7d7394] bg-acid-ink" aria-hidden>
       <Image
         src={p.shot.desktop.replace(/\.jpg$/, '-top.jpg')}
+        {...blurProps(p.shot.desktop.replace(/\.jpg$/, '-top.jpg'))}
         alt=""
         width={720}
         height={360}
