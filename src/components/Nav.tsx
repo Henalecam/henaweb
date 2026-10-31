@@ -11,10 +11,25 @@ import Social from './Social';
 // revealed Suspense boundary back ~300 ms, so the first ⌘K took ~345 ms to appear (now ~75 ms)
 type PaletteType = typeof import('./CommandPalette').default;
 let paletteModule: Promise<PaletteType> | null = null;
-const loadPalette = () => (paletteModule ??= import('./CommandPalette').then((m) => m.default));
+// a failed download (offline, a flaky connection) is forgotten instead of cached, so the next press tries again
+const loadPalette = () =>
+  (paletteModule ??= import('./CommandPalette').then(
+    (m) => m.default,
+    (e) => {
+      paletteModule = null;
+      throw e;
+    },
+  ));
 type HelpType = typeof import('./ShortcutsHelp').default;
 let helpModule: Promise<HelpType> | null = null;
-const loadHelp = () => (helpModule ??= import('./ShortcutsHelp').then((m) => m.default));
+const loadHelp = () =>
+  (helpModule ??= import('./ShortcutsHelp').then(
+    (m) => m.default,
+    (e) => {
+      helpModule = null;
+      throw e;
+    },
+  ));
 
 export default function Nav() {
   const inner = useRef<HTMLDivElement>(null);
@@ -36,7 +51,7 @@ export default function Nav() {
   // q: the search box opens already filled in (a ?pista= link, a capability tag); plain opens start empty
   const openSearch = (q = '') => {
     setInitialQuery(q);
-    loadPalette().then((C) => setCommandPalette(() => C));
+    loadPalette().then((C) => setCommandPalette(() => C), () => {});
     setOpen(false);
     setSearch(true);
   };
@@ -94,10 +109,13 @@ export default function Nav() {
       } else if (e.key === '?' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey && !document.querySelector('dialog[open]')) {
         e.preventDefault();
         setOpen(false);
-        loadHelp().then((C) => {
-          setShortcutsHelp(() => C);
-          setHelp(true);
-        });
+        loadHelp().then(
+          (C) => {
+            setShortcutsHelp(() => C);
+            setHelp(true);
+          },
+          () => {},
+        );
       }
     };
     window.addEventListener('keydown', onKey);

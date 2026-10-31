@@ -26,7 +26,9 @@ export default function Placard({ className = '' }: { className?: string }) {
         <span className="mt-0.5 block font-mono text-[0.62rem] text-acid-ink/70 uppercase">
           {dots === -1
             ? 'Mármore em repouso · economia de dados'
-            : dots === 0
+            : dots === -2
+              ? 'Mármore em repouso · sem conexão'
+              : dots === 0
               ? 'Mármore em repouso · sem 3D neste navegador'
               : `Mármore → ${dots ? dots.toLocaleString('pt-BR') : '...'} pontos de luz`}
         </span>

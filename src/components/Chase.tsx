@@ -54,7 +54,7 @@ export default function Chase() {
             // no WebGL: the night backdrop stays
             setNoVan(true);
           }
-        });
+        }, () => !cancelled && setNoVan(true)); // the 3D code didn't download (offline): the night backdrop stays
       },
       { rootMargin: '500px 0px' },
     );

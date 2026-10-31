@@ -213,7 +213,7 @@ export default function Process() {
             // no WebGL: the flat burger takes the plate
             setFlatBurger(true);
           }
-        });
+        }, () => !cancelled && setFlatBurger(true)); // the 3D code didn't download (offline): the flat burger too
       },
       { rootMargin: '600px 0px' },
     );

@@ -148,6 +148,14 @@ export default function Contact() {
   const [status, setStatus] = useState<Status>('idle');
   // a send that drags on says so (and gives up after SEND_TIMEOUT, so the WhatsApp/e-mail fallback appears)
   const [slow, setSlow] = useState(false);
+  // a send that failed because the device is offline says so, and says when the connection is back
+  const [net, setNet] = useState<'ok' | 'offline' | 'back'>('ok');
+  useEffect(() => {
+    if (net !== 'offline') return;
+    const back = () => setNet('back');
+    window.addEventListener('online', back);
+    return () => window.removeEventListener('online', back);
+  }, [net]);
   // what the visitor filled in, kept so a failed send can hand the whole case to WhatsApp or e-mail
   const [fallback, setFallback] = useState('');
   const [caseNo, setCaseNo] = useState('...');
@@ -382,6 +390,7 @@ export default function Contact() {
     );
     setStatus('sending');
     setSlow(false);
+    setNet('ok');
     const slowTimer = window.setTimeout(() => setSlow(true), SLOW_AFTER);
     // a stalled connection (a weak signal, a request stuck upstream) used to leave "Enviando…" up forever and the
     // fallback card never came; now the send gives up and the same case goes out by WhatsApp or e-mail instead
@@ -421,6 +430,7 @@ export default function Contact() {
     } catch {
       window.clearTimeout(slowTimer);
       window.clearTimeout(giveUp);
+      setNet(navigator.onLine ? 'ok' : 'offline');
       setStatus('error');
       // the fallback card renders below the button, often under the fold: bring it into view
       requestAnimationFrame(() => {
@@ -739,7 +749,15 @@ export default function Contact() {
                     role="alert"
                     className="flex basis-full flex-col gap-3 rounded-2xl border-[3px] border-acid-ink bg-paper p-5 shadow-[5px_5px_0_#120626] outline-none"
                   >
-                    <p className="font-medium">O formulário travou, mas a sua ficha não se perdeu. Envie o mesmo caso por aqui:</p>
+                    {net === 'ok' ? (
+                      <p className="font-medium">O formulário travou, mas a sua ficha não se perdeu. Envie o mesmo caso por aqui:</p>
+                    ) : (
+                      <p className="font-medium">
+                        {net === 'offline'
+                          ? 'Você está sem internet agora. A ficha ficou guardada nesta aba: quando a conexão voltar, é só tocar em “Abrir o caso” de novo. Ou deixe pronta por aqui:'
+                          : '✓ A conexão voltou. Pode tocar em “Abrir o caso” de novo, ou enviar por aqui:'}
+                      </p>
+                    )}
                     <div className="flex flex-wrap gap-3">
                       <a
                         href={whatsappLink(fallback)}

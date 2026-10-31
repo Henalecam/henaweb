@@ -36,7 +36,8 @@ export default function DavidStage({ children }: { children: ReactNode }) {
       else window.addEventListener('load', idle, { once: true });
     };
 
-    // the placard under the hero counts the render's dots; with no render it says why (0: no WebGL, -1: data saver)
+    // the placard under the hero counts the render's dots; with no render it says why (0: no WebGL, -1: data saver,
+    // -2: the 3D code couldn't download)
     if (saveData()) window.dispatchEvent(new CustomEvent('hena:dots', { detail: -1 }));
     else whenIdle(() => import('@/lib/davidScene').then(({ createDavidScene }) => {
       if (cancelled || !canvas.current) return;
@@ -56,7 +57,7 @@ export default function DavidStage({ children }: { children: ReactNode }) {
         onUpdate: (self) => scene?.setProgress(self.progress),
       });
       offReady = onReady(() => scene?.reveal());
-    }));
+    }, () => !cancelled && window.dispatchEvent(new CustomEvent('hena:dots', { detail: -2 })))); // didn't download (offline)
 
     return () => {
       cancelled = true;
