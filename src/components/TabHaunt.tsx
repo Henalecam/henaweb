@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
+import { projectLinks } from '@/lib/projectLinks';
+import { serviceLinks } from '@/lib/serviceLinks';
 
 const AWAY = '👻 Volte! O caso ainda não acabou';
 // a contact form left half-filled (Contact's same-tab draft, cleared on send) gets a more specific nudge
@@ -166,16 +168,45 @@ export default function TabHaunt() {
     window.addEventListener('hena:lanterna', onLantern);
 
     console.log(
-      '%cHenaWeb%c\nInvestigando o código? A gente gosta de gente curiosa.\nhenrique@henaweb.com\n\nPista: ↑ ↑ ↓ ↓ ← → ← → B A apaga as luzes.',
+      '%cHenaWeb%c\nInvestigando o código? A gente gosta de gente curiosa.\nhenrique@henaweb.com\n\nPista: ↑ ↑ ↓ ↓ ← → ← → B A apaga as luzes.\nOu digite %chena.ajuda()%c aqui no console.',
       'font: 700 28px Georgia, serif; color: #f7931e; text-shadow: 3px 3px 0 #140a26;',
       'font: 13px monospace; color: #3cc6b4;',
+      'font: 700 13px monospace; color: #f9e27d; background: #140a26; padding: 1px 4px; border-radius: 3px;',
+      'font: 13px monospace; color: #3cc6b4;',
     );
+    // a small detective kit for whoever opens the console: the case files as a table, the services, the
+    // flashlight and a way to reach us, all in the site's own voice
+    const tip = 'font: 13px monospace; color: #3cc6b4;';
+    const kit = {
+      ajuda() {
+        console.log(
+          '%chena.casos()%c     os casos resolvidos, em tabela\n%chena.servicos()%c  o que a gente faz\n%chena.lanterna()%c apaga (e acende) as luzes\n%chena.contato()%c  abre um caso com a gente',
+          ...Array(4).fill(['font: 700 13px monospace; color: #f9e27d;', tip]).flat(),
+        );
+      },
+      casos() {
+        console.table(projectLinks.map((c, i) => ({ nº: String(i + 1).padStart(2, '0'), caso: c.name, arquivo: `${location.origin}/casos/${c.slug}` })));
+      },
+      servicos() {
+        console.table(serviceLinks.map((s) => ({ serviço: s.name, página: `${location.origin}/servicos/${s.slug}` })));
+      },
+      lanterna() {
+        toggleFlashlight();
+        return document.getElementById('lanterna') ? '🔦 luzes apagadas' : '💡 luzes acesas';
+      },
+      contato() {
+        location.assign('/#contato');
+        return 'Abrindo o formulário de contato…';
+      },
+    };
+    (window as unknown as { hena?: typeof kit }).hena = kit;
 
     return () => {
       document.removeEventListener('visibilitychange', onVisibility);
       showAwayIcon(null);
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('hena:lanterna', onLantern);
+      delete (window as unknown as { hena?: unknown }).hena;
     };
   }, []);
 
