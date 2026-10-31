@@ -23,6 +23,8 @@ export default function Cursor() {
 
     gsap.set([dot.current, ring.current], { autoAlpha: 0 });
     let shown = false;
+    // the ring's resting size for what's under the pointer; a press squeezes it from there
+    let base = 1;
     const move = (e: PointerEvent) => {
       if (!shown) {
         shown = true;
@@ -38,8 +40,9 @@ export default function Cursor() {
       const el = (e.target as HTMLElement).closest<HTMLElement>('[data-cursor], a, button, input, textarea, label');
       const text = el?.dataset.cursor ?? '';
       setLabel(text);
+      base = el ? (text ? 2 : 1.6) : 1;
       gsap.to(ring.current, {
-        scale: el ? (text ? 2 : 1.6) : 1,
+        scale: base,
         backgroundColor: text ? 'rgba(247,147,30,1)' : 'rgba(247,147,30,0)',
         // the labelled bubble floats up and to the right of the pointer, so it never hides
         // the text of the button being hovered
@@ -51,11 +54,34 @@ export default function Cursor() {
       gsap.to(dot.current, { scale: el ? 0 : 1, duration: 0.3 });
     };
 
+    // a press squeezes the ring like a button going down, and lets it spring back on release
+    // (reduced motion: the squeeze still shows, as a plain step with no spring)
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const down = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      gsap.to(ring.current, { scale: base * 0.78, duration: still ? 0 : 0.12, ease: 'power2.out', overwrite: 'auto' });
+    };
+    const up = () =>
+      gsap.to(ring.current, { scale: base, duration: still ? 0 : 0.5, ease: still ? 'none' : 'elastic.out(1.1, 0.45)', overwrite: 'auto' });
+    // leaving the window used to strand the dot and ring at the edge it crossed; they fade out and come back
+    // where the pointer re-enters
+    const leave = (e: MouseEvent) => {
+      if (e.relatedTarget) return;
+      shown = false;
+      gsap.to([dot.current, ring.current], { autoAlpha: 0, duration: 0.2 });
+    };
+
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerover', over);
+    window.addEventListener('pointerdown', down);
+    window.addEventListener('pointerup', up);
+    document.documentElement.addEventListener('mouseleave', leave);
     return () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerover', over);
+      window.removeEventListener('pointerdown', down);
+      window.removeEventListener('pointerup', up);
+      document.documentElement.removeEventListener('mouseleave', leave);
     };
   }, [enabled]);
 
