@@ -1753,6 +1753,25 @@ h2[id]:target [data-mark] {
   animation: target-mark 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
 }
 
+/* the same "you landed here" cue for the home's chapters (menu links, /#capacidades from another page): once the
+   glide ends, the chapter's title gets a thick orange underline that follows its words line by line, holds,
+   then fades. Reduced motion skips it (the jump itself is instant there) */
+@media (prefers-reduced-motion: no-preference) {
+  section[id]:target h2:not(.label) {
+    text-decoration-line: underline;
+    text-decoration-thickness: 0.09em;
+    text-underline-offset: 0.12em;
+    text-decoration-skip-ink: none;
+    text-decoration-color: transparent;
+    animation: target-underline 2.6s ease 0.6s both;
+  }
+}
+@keyframes target-underline {
+  0% { text-decoration-color: rgb(247 147 30 / 0); }
+  18%, 70% { text-decoration-color: rgb(247 147 30 / 0.85); }
+  100% { text-decoration-color: rgb(247 147 30 / 0); }
+}
+
 @keyframes target-mark {
   0% { background-size: 0% 0.32em; }
   30% { background-size: 100% 0.32em; }
