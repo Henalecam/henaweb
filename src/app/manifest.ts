@@ -21,6 +21,16 @@ export default function manifest(): MetadataRoute.Manifest {
       { name: 'Passa tempo', short_name: 'Jogos', description: 'Jogos e experimentos das horas vagas', url: '/passatempo', icons: [{ src: '/icon-192.png', sizes: '192x192' }] },
       { name: 'Procurar pista', short_name: 'Buscar', description: 'Busca no site: casos, serviços e perguntas', url: '/?pista=', icons: [{ src: '/icon-192.png', sizes: '192x192' }] },
     ],
+    // the richer install sheet (Chrome/Edge show these in the "Instalar" dialog): real captures of the site,
+    // one phone and one desktop size each. Regenerate if these pages change a lot
+    screenshots: [
+      { src: '/screenshots/casos-narrow.webp', sizes: '390x844', type: 'image/webp', form_factor: 'narrow', label: 'Arquivo de casos resolvidos' },
+      { src: '/screenshots/servico-narrow.webp', sizes: '390x844', type: 'image/webp', form_factor: 'narrow', label: 'Página de serviço: Sistemas sob medida' },
+      { src: '/screenshots/passatempo-narrow.webp', sizes: '390x844', type: 'image/webp', form_factor: 'narrow', label: 'Passa tempo: os jogos da casa' },
+      { src: '/screenshots/casos-wide.webp', sizes: '1440x900', type: 'image/webp', form_factor: 'wide', label: 'Arquivo de casos resolvidos' },
+      { src: '/screenshots/servico-wide.webp', sizes: '1440x900', type: 'image/webp', form_factor: 'wide', label: 'Página de serviço: Sistemas sob medida' },
+      { src: '/screenshots/passatempo-wide.webp', sizes: '1440x900', type: 'image/webp', form_factor: 'wide', label: 'Passa tempo: os jogos da casa' },
+    ],
     icons: [
       { src: '/icon.png', sizes: '48x48', type: 'image/png' },
       { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
