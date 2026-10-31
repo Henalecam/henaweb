@@ -57,6 +57,9 @@ export default function FullShot({
   const [loaded, setLoaded] = useState(false);
   // how far down the long capture the reader is, shown in the title bar like an old viewer's status
   const [read, setRead] = useState(0);
+  // the full-length capture is a big file: until it arrives, a Win95 "copying" bar says it's on its way
+  // instead of a blank dark pane that looks broken
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const show = () => {
@@ -102,9 +105,18 @@ export default function FullShot({
           }}
           className="m-1.5 max-h-[82vh] overflow-y-auto overscroll-contain border-2 border-[#7d7394] bg-acid-ink p-3 md:p-5"
         >
+          {loaded && !ready && (
+            <p role="status" data-shot-loading className="mx-auto my-10 flex w-[min(100%,22rem)] flex-col gap-2 font-mono text-xs text-ink/80">
+              Revelando a página inteira de {name}…
+              <span aria-hidden className="block h-4 border-2 border-[#7d7394] bg-paper p-[2px] shadow-[inset_1px_1px_0_#12082a]">
+                <span data-shot-bar className="block h-full w-full" />
+              </span>
+            </p>
+          )}
           {loaded && (
-            <div className="grid items-start gap-5 md:grid-cols-[1fr_minmax(0,15rem)]">
+            <div className={`grid items-start gap-5 md:grid-cols-[1fr_minmax(0,15rem)] ${ready ? '' : 'h-0 overflow-hidden'}`}>
               <Image
+                onLoad={() => setReady(true)}
                 src={desktop}
                 alt={`Página inteira de ${name} no computador`}
                 width={1440}

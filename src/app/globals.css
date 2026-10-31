@@ -1135,6 +1135,21 @@ li:last-child > a > [data-tree]::before {
   animation-play-state: paused;
 }
 
+/* FullShot while the long capture downloads: Win95 progress blocks marching across the bar (static blocks
+   with reduced motion) */
+[data-shot-bar] {
+  background: repeating-linear-gradient(90deg, #12082a 0 10px, transparent 10px 13px);
+  background-size: 52px 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-shot-bar] {
+    animation: shot-bar 0.9s steps(4) infinite;
+  }
+}
+@keyframes shot-bar {
+  to { background-position: 52px 0; }
+}
+
 /* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
    reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
 [data-nav-pending] {
