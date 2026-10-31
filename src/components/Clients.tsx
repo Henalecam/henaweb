@@ -3,15 +3,31 @@ import Marquee from './Marquee';
 
 /** One line of client logos, looping. */
 export default function Clients() {
+  const publicCount = clients.filter((c) => c.group === 'public').length;
+  const privateCount = clients.length - publicCount;
   return (
     <section
       id="clientes"
       aria-labelledby="clientes-titulo"
       className="relative z-[5] -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon bg-white pt-10 pb-16 md:pt-12 md:pb-20"
     >
-      <h2 id="clientes-titulo" className="gutter label !text-acid-ink/60">
-        Alguns de nossos clientes
-      </h2>
+      <div className="gutter flex flex-wrap items-baseline gap-x-4 gap-y-1.5">
+        <h2 id="clientes-titulo" className="label !text-acid-ink/60">
+          Alguns de nossos clientes
+        </h2>
+        {/* who they are, counted from the same list as the logos: governments and companies both trust the studio */}
+        <p data-clients-split className="flex flex-wrap gap-2 font-mono text-[0.68rem] tracking-wider text-acid-ink/75 uppercase">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-acid-ink/25 px-2 py-0.5">
+            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-teal" />
+            {publicCount} no setor público
+          </span>
+          <span className="sr-only">, </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-acid-ink/25 px-2 py-0.5">
+            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-acid" />
+            {privateCount} empresas
+          </span>
+        </p>
+      </div>
       <ul className="sr-only">
         {clients.map((c) => (
           <li key={c.name}>{c.name}</li>
