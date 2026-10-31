@@ -9,6 +9,7 @@ const ROWS: { keys: string[][]; what: string }[] = [
   { keys: [['G', 'H'], ['G', 'C']], what: 'G, depois H ou C: ir para o início ou para os casos' },
   { keys: [['G', 'J'], ['G', 'O']], what: 'G, depois J ou O: ir para os jogos ou abrir um caso' },
   { keys: [['J'], ['K']], what: 'Próximo / anterior caso (no arquivo de casos)' },
+  { keys: [['P']], what: 'Pausar ou retomar as faixas que correm sozinhas (letreiros e logos)' },
   { keys: [['1'], ['2'], ['3']], what: 'Escolher uma máquina do fliperama (no Passa tempo)' },
   { keys: [['Ctrl', 'Enter'], ['⌘', 'Enter']], what: 'Enviar o formulário de contato (na caixa de mensagem)' },
   // the browser's own print, listed because case and service pages print as a clean dossier (or a PDF)

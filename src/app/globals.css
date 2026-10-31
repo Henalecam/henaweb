@@ -140,6 +140,10 @@
 @keyframes marquee {
   to { transform: translateX(-50%); }
 }
+/* "P" (Nav) holds every tape where it is; !important beats the play state Marquee writes inline */
+html[data-still] [data-marquee-track] {
+  animation-play-state: paused !important;
+}
 
 @keyframes blink {
   50% { opacity: 0; }

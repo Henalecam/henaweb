@@ -32,6 +32,7 @@ export default function Marquee({
   return (
     <div className={`group relative flex overflow-hidden ${className}`} onClick={() => setPaused((p) => !p)}>
       <div
+        data-marquee-track
         // the inline `animation` shorthand resets the play state, so hover needs !important and the tap state rides inline
         className="flex w-max group-hover:[animation-play-state:paused]!"
         style={{ animation: `marquee ${speed}s linear infinite ${reverse ? 'reverse' : 'normal'} ${paused ? 'paused' : 'running'}` }}

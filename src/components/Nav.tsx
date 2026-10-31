@@ -19,6 +19,7 @@ const loadHelp = () => (helpModule ??= import('./ShortcutsHelp').then((m) => m.d
 export default function Nav() {
   const inner = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const [stillNote, setStillNote] = useState('');
   const toggleBtn = useRef<HTMLButtonElement>(null);
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -65,6 +66,13 @@ export default function Nav() {
           return;
         }
         goAt = k === 'g' ? e.timeStamp : 0;
+        // p pauses (and resumes) the scrolling tapes and the client logos: a pointer stops them by hovering and a
+        // finger by tapping, but the keyboard had no way to (WCAG 2.2.2); globals.css holds them on html[data-still]
+        if (k === 'p') {
+          e.preventDefault();
+          const still = document.documentElement.toggleAttribute('data-still');
+          setStillNote(still ? 'Faixas animadas pausadas. P retoma.' : 'Faixas animadas retomadas.');
+        }
         // the case archive (/casos): j / k step through the case files on screen, Enter opens one
         if (k === 'j' || k === 'k') {
           const links = [...document.querySelectorAll<HTMLAnchorElement>('li[data-case-slug]:not([hidden]) > a')].filter((a) => a.offsetParent);
@@ -310,6 +318,9 @@ export default function Nav() {
           <Social />
         </div>
       </div>
+      <p className="sr-only" aria-live="polite">
+        {stillNote}
+      </p>
       {help && ShortcutsHelp && <ShortcutsHelp open={help} onClose={() => setHelp(false)} />}
       {CommandPalette && <CommandPalette
           open={search}
