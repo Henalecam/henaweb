@@ -336,7 +336,7 @@ export default function Work() {
 
         {/* mobile / tablet: swipeable cards */}
         <div className="-mx-[clamp(1rem,4vw,3.5rem)] mt-12 lg:hidden">
-          <ol ref={strip} onScroll={onStrip} className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-[clamp(1rem,4vw,3.5rem)] pb-10 [scrollbar-width:none]">
+          <ol ref={strip} onScroll={onStrip} data-work-strip className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-[clamp(1rem,4vw,3.5rem)] pb-10 [scrollbar-width:none]">
             {projects.map((item, i) => (
               // a keyboard reaching this card's link (Tab) centres the card, as a swipe would: the browser only
               // nudged a half-visible link into view, leaving the card cut at the screen's edge
@@ -364,7 +364,7 @@ export default function Work() {
             ))}
           </ol>
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-[clamp(1rem,4vw,3.5rem)]">
-            <p className="label">{card === projects.length - 1 ? '← Último caso. Deslize para voltar' : 'Deslize para ver os outros casos →'}</p>
+            <p className="label" data-print-hide>{card === projects.length - 1 ? '← Último caso. Deslize para voltar' : 'Deslize para ver os outros casos →'}</p>
             {/* where you are in the row; each dot jumps to its case (24px targets, the dot itself is small) */}
             <div className="flex items-center" data-print-hide>
               {projects.map((item, i) => (
@@ -383,6 +383,18 @@ export default function Work() {
           </div>
           <RevealRead />
         </div>
+        {/* on paper the swipe row above is cut at the page edge (2 of the 7 cases reached a PDF): the whole archive
+            follows as a plain index, one line per case with its address */}
+        <ol className="mt-6 hidden text-sm print:block">
+          {projects.map((item, i) => (
+            <li key={item.slug} className="flex gap-3 border-t border-line py-1.5">
+              <span className="font-mono">{pad(i + 1)}</span>
+              <span className="font-medium">{item.name}</span>
+              <span className="serif">{item.kind}</span>
+              <span className="ml-auto font-mono text-xs">henaweb.com/casos/{item.slug}</span>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   );
