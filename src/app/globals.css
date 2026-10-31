@@ -874,6 +874,31 @@ li:last-child > a > [data-tree]::before {
   to { translate: 0 -28px; }
 }
 
+/* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
+   reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
+[data-nav-pending] {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 61;
+  height: 3px;
+  pointer-events: none;
+  opacity: 0;
+  background: repeating-linear-gradient(90deg, #f7931e 0 18px, #f9e27d 18px 30px, #3cc6b4 30px 48px);
+  background-size: 48px 100%;
+  transition: opacity 0.2s;
+}
+html[data-navigating] [data-nav-pending] {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html[data-navigating] [data-nav-pending] {
+    animation: nav-pending 0.6s linear infinite;
+  }
+}
+@keyframes nav-pending {
+  to { background-position: 48px 0; }
+}
+
 /* sections out of view stop their endless CSS loops (OffscreenPause) */
 [data-offscreen],
 [data-offscreen] * {
