@@ -473,12 +473,12 @@ export default function Contact() {
 
           <div className="mt-8 flex flex-col gap-2 font-mono text-sm">
             {/* -my/py: a 24 px tall target (WCAG 2.5.8) without moving the lines */}
-            <a href={whatsappWithCase} target="_blank" rel="noopener noreferrer" className="-my-0.5 w-fit py-0.5 underline-offset-4 hover:underline">
+            <a href={whatsappWithCase} target="_blank" rel="noopener noreferrer" className="pen-link -my-0.5 w-fit py-0.5">
               WhatsApp · {site.whatsappDisplay} ↗
               <NewTab />
             </a>
             <span className="flex flex-wrap items-baseline gap-x-3">
-              <a href={`mailto:${site.email}`} className="-my-0.5 w-fit py-0.5 underline-offset-4 hover:underline">
+              <a href={`mailto:${site.email}`} className="pen-link -my-0.5 w-fit py-0.5">
                 {site.email}
               </a>
               <CopyEmail placement="contato" className="-my-1 py-1 text-xs text-acid-ink/75 underline underline-offset-4 hover:text-acid-ink" />

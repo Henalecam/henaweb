@@ -1593,3 +1593,52 @@ h2[id]:target [data-mark] {
   75% { background-size: 100% 0.32em; }
   100% { background-size: 100% 0; }
 }
+
+/* "Pen" text links: the plain "Ver caso →" links were told apart from the text only by color until hovered
+   (WCAG 1.4.1). At rest they now carry a faint dotted underline; on hover / keyboard focus a hand-drawn
+   squiggle is inked from left to right under the words, like an investigator underlining a clue.
+   The squiggle is a mask over currentColor, so it follows each link's color. For one-line links only (w-fit). */
+.pen-link {
+  position: relative;
+  text-decoration: underline dotted 1.5px color-mix(in oklab, currentColor 45%, transparent);
+  text-underline-offset: 5px;
+}
+.pen-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.3em;
+  height: 0.38em;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 6'%3E%3Cpath d='M0 3.2Q3 .4 6 3.2T12 3.2' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E") 0 50% / 0.62em 100% repeat-x;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 6'%3E%3Cpath d='M0 3.2Q3 .4 6 3.2T12 3.2' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E") 0 50% / 0.62em 100% repeat-x;
+  clip-path: inset(0 100% 0 0);
+  pointer-events: none;
+}
+.pen-link:focus-visible,
+.pen-link:hover {
+  text-decoration-color: transparent;
+}
+.pen-link:focus-visible::after,
+.pen-link:hover::after {
+  clip-path: inset(0 0 0 0);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pen-link {
+    transition: text-decoration-color 0.2s;
+  }
+  .pen-link::after {
+    transition: clip-path 0.38s cubic-bezier(0.3, 0.7, 0.2, 1);
+  }
+}
+@media (forced-colors: active) {
+  /* masks over a background are flattened away: fall back to a real solid underline on hover / focus */
+  .pen-link::after {
+    display: none;
+  }
+  .pen-link:hover,
+  .pen-link:focus-visible {
+    text-decoration: underline solid 2px currentColor;
+  }
+}
