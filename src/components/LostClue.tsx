@@ -19,19 +19,16 @@ const PLACES = [
   ...pastimes.map((p) => ({ label: `${p.action} ${p.name}`, href: `/${p.slug}`, key: p.slug })),
 ];
 
-/** Edit distance, for "did you mean /casos/diconta?" on mistyped links. */
+/** Edit distance, for "did you mean /casos/diconta?" on mistyped links; two swapped neighbours count as one slip
+ * ("/casos/dicnota" used to fall back to the archive instead of naming Diconta). */
 function distance(a: string, b: string) {
-  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
-  for (let i = 1; i <= a.length; i++) {
-    let prev = row[0];
-    row[0] = i;
+  const d = Array.from({ length: a.length + 1 }, (_, i) => Array.from({ length: b.length + 1 }, (_, j) => (i ? (j ? 0 : i) : j)));
+  for (let i = 1; i <= a.length; i++)
     for (let j = 1; j <= b.length; j++) {
-      const tmp = row[j];
-      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
-      prev = tmp;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
     }
-  }
-  return row[b.length];
+  return d[a.length][b.length];
 }
 
 /**
