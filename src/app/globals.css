@@ -1053,6 +1053,39 @@ li:last-child > a > [data-tree]::before {
   from { translate: 0 -14px; opacity: 0; }
 }
 
+/* modal windows (search, shortcuts, full screenshot): they used to pop in at once. Now they open like a Win95
+   window: a dotted "zoom rectangle" closes in on the frame while the window settles from slightly small, and
+   the dimmed backdrop fades in. Opening only (closing stays instant, so Esc feels immediate) */
+@media (prefers-reduced-motion: no-preference) {
+  dialog.win[open] {
+    animation: win-open 0.26s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+  }
+  dialog.win[open]::backdrop {
+    animation: win-backdrop 0.26s ease-out;
+  }
+}
+@keyframes win-open {
+  0% {
+    scale: 0.94;
+    opacity: 0;
+    outline: 2px dotted rgb(253 243 225 / 0.9);
+    outline-offset: 48px;
+  }
+  60% {
+    opacity: 1;
+    outline: 2px dotted rgb(253 243 225 / 0.6);
+    outline-offset: 6px;
+  }
+  100% {
+    scale: 1;
+    outline: 2px dotted rgb(253 243 225 / 0);
+    outline-offset: 0;
+  }
+}
+@keyframes win-backdrop {
+  from { opacity: 0; }
+}
+
 /* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
    reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
 [data-nav-pending] {
