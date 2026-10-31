@@ -1130,6 +1130,11 @@ li:last-child > a > [data-tree]::before {
   background-color: var(--cover);
 }
 
+/* the mobile menu's neon floor only scrolls while the menu is open */
+#menu-mobile[inert] .grid-floor::before {
+  animation-play-state: paused;
+}
+
 /* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
    reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
 [data-nav-pending] {

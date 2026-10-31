@@ -315,7 +315,18 @@ export default function Nav() {
           open ? '[clip-path:inset(0_0_0_0)]' : 'pointer-events-none [clip-path:inset(0_0_100%_0)]'
         }`}
       >
-        <nav className="mt-auto flex flex-col gap-2 [@media(max-height:640px)]:gap-0" aria-label="Menu mobile">
+        {/* the curtain is a little sunset of its own: a striped sun rises behind the links as it drops and the neon
+            floor glows at the bottom, faint enough to keep the links the thing you read. Decorative */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div
+            data-menu-sun
+            className={`sun absolute -top-[4%] -right-[18%] w-[min(70vw,340px)] opacity-25 transition-[translate,opacity] delay-150 duration-[1100ms] ease-[var(--ease-out-expo)] ${
+              open ? 'translate-y-0' : 'translate-y-[45%] !opacity-0'
+            }`}
+          />
+          <div className="grid-floor !h-[30%] opacity-30" />
+        </div>
+        <nav className="relative mt-auto flex flex-col gap-2 [@media(max-height:640px)]:gap-0" aria-label="Menu mobile">
           {[...nav, { label: 'Contato', href: '/#contato' }, { label: 'Passa tempo', href: '/passatempo' }].map((item, i) => (
             <a
               key={item.href}
@@ -345,7 +356,7 @@ export default function Nav() {
             </a>
           ))}
         </nav>
-        <div className="mt-8 flex items-center justify-between">
+        <div className="relative mt-8 flex items-center justify-between">
           <button type="button" onClick={() => openSearch()} onPointerDown={warmPalette} onFocus={warmPalette} className="label flex min-h-11 items-center gap-2 !text-ink">
             <span aria-hidden>🔎</span> Procurar pista
           </button>
