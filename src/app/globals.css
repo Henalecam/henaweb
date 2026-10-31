@@ -834,6 +834,14 @@ img[data-failed] {
   20%, 40%, 60%, 80% { rotate: 16deg; scale: 1.12; }
 }
 
+/* footer file tree: branch glyphs, the last entry of each folder closing the branch */
+[data-tree]::before {
+  content: '├─';
+}
+li:last-child > a > [data-tree]::before {
+  content: '└─';
+}
+
 /* sections out of view stop their endless CSS loops (OffscreenPause) */
 [data-offscreen],
 [data-offscreen] * {

@@ -287,11 +287,15 @@ function FooterLink({ href, children, accent = false }: { href: string; children
           here ? 'font-medium text-ink' : accent ? 'font-medium text-acid' : 'text-ink/75 hover:text-ink'
         }`}
       >
-        {(!accent || here) && (
-          <span aria-hidden className={`font-mono text-xs transition-colors ${here ? 'text-acid' : 'text-ink/30 group-hover:text-acid group-focus-visible:text-acid'}`}>
-            {here ? '●' : '›'}
-          </span>
-        )}
+        {/* the lists read as `tree` output under their folder ("casos/ · 7 itens"): ├─ for each entry, └─ for the
+            last (globals.css, data-tree); the open page keeps its ● */}
+        <span
+          aria-hidden
+          data-tree={here ? undefined : ''}
+          className={`w-[2ch] shrink-0 font-mono text-xs transition-colors ${here ? 'text-acid' : 'text-ink/35 group-hover:text-acid group-focus-visible:text-acid'}`}
+        >
+          {here ? '●' : ''}
+        </span>
         {/* one inline run: a name that wraps ("Sistemas / públicos") used to leave "(aberto)" stranded beside
             its first line; now the tag follows the last word */}
         <span>
