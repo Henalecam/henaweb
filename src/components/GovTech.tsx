@@ -24,6 +24,9 @@ export default function GovTech() {
   // logged in the audit trail (with Curitiba's time) and the window shakes (WinClose-style gag, 404)
   const panel = useRef<HTMLDivElement>(null);
   const [attempts, setAttempts] = useState<string[]>([]);
+  // the _ of the title bar works: the process window rolls up to its title bar (like a Win95 window shade)
+  // and the same button, now ▭, rolls it back down
+  const [rolled, setRolled] = useState(false);
   const tryClose = () => {
     const now = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }).format(new Date());
     setAttempts((a) => [...a, now].slice(-3));
@@ -159,13 +162,29 @@ export default function GovTech() {
             <div className="win-bar">
               <span className="truncate">PROCESSO_{YEAR}-0142.exe</span>
               <span className="ml-auto flex gap-1">
-                <span className="win-btn" aria-hidden>_</span>
+                <button
+                  type="button"
+                  onClick={() => setRolled((r) => !r)}
+                  className="win-btn cursor-pointer"
+                  aria-expanded={!rolled}
+                  aria-controls="processo-corpo"
+                  aria-label={rolled ? 'Restaurar a janela do processo' : 'Minimizar a janela do processo'}
+                >
+                  <span aria-hidden>{rolled ? '▭' : '_'}</span>
+                </button>
                 <span className="win-btn" aria-hidden>□</span>
                 <button type="button" onClick={tryClose} className="win-btn cursor-pointer" aria-label="Fechar o processo (não fecha: fica registrado)">
                   ×
                 </button>
               </span>
             </div>
+            <div
+              id="processo-corpo"
+              data-rolled={rolled ? '' : undefined}
+              inert={rolled}
+              className="grid grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-[var(--ease-out-expo)] data-[rolled]:grid-rows-[0fr] print:!grid-rows-[1fr]"
+            >
+            <div className="min-h-0 overflow-hidden">
             <div className="m-1.5 border-2 border-[#7d7394] bg-acid-ink">
             <div className="flex items-center justify-between border-b border-line px-5 py-3">
               <span className="label">Gestão de projetos e verbas</span>
@@ -225,6 +244,8 @@ export default function GovTech() {
                   {attempts.length > 0 && 'Processos públicos não se fecham: a tentativa ficou registrada na trilha de auditoria.'}
                 </p>
               </div>
+            </div>
+            </div>
             </div>
             </div>
           </div>
