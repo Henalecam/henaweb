@@ -8,6 +8,7 @@ import MockUI from './MockUI';
 import { RevealRead, ResumeReading } from './ReadMarks';
 import { serviceLinks } from '@/lib/serviceLinks';
 import { blurProps } from '@/lib/shotBlur';
+import PhoneStatus from './PhoneStatus';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -45,10 +46,14 @@ function Screen({ p, tall = true, images = true }: { p: Project; tall?: boolean;
         </div>
       </div>
       {p.shot && images && (
-        <div className="toon absolute -right-2 -bottom-5 aspect-[390/844] w-[22%] overflow-hidden rounded-[1.3rem] bg-black md:-right-4 md:w-[19%]">
+        <div className="@container toon absolute -right-2 -bottom-5 aspect-[390/844] w-[22%] overflow-hidden rounded-[1.3rem] bg-black md:-right-4 md:w-[19%]">
           {/* about a fifth of the screen card: ~160 px on a 1440 desktop (the index column takes the rest), ~75 px
               on a phone card. "18vw" asked for 259 px there and fetched the 384-px file */}
-          <Image src={p.shot.mobile} {...blurProps(p.shot.mobile)} alt={`${p.name} no celular`} fill sizes="(max-width: 1024px) 20vw, 12vw" className="object-cover object-top" />
+          {/* under the same status bar as the phone on the case pages (the visitor's own time) */}
+          <div className="absolute inset-x-0 top-[11cqw] bottom-0">
+            <Image src={p.shot.mobile} {...blurProps(p.shot.mobile)} alt={`${p.name} no celular`} fill sizes="(max-width: 1024px) 20vw, 12vw" className="object-cover object-top" />
+          </div>
+          <PhoneStatus />
         </div>
       )}
     </div>
