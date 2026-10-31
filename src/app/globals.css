@@ -1086,6 +1086,21 @@ li:last-child > a > [data-tree]::before {
   from { opacity: 0; }
 }
 
+/* MockUI "raffle" (the Dropcota case art): the drawn numbers pulse one after another, a ring flashing around
+   each like the live draw calling it. Eight numbers, 0.75 s apart, on a 6 s loop; paused off screen by
+   OffscreenPause like the other endless loops */
+@media (prefers-reduced-motion: no-preference) {
+  [data-raffle-hit] {
+    animation: raffle-call 6s ease-out infinite;
+    animation-delay: calc(var(--k) * 0.75s);
+  }
+}
+@keyframes raffle-call {
+  0% { scale: 1; box-shadow: 0 0 0 0 rgb(255 255 255 / 0); }
+  3% { scale: 1.22; box-shadow: 0 0 0 3px rgb(255 255 255 / 0.75), 0 0 18px var(--h); }
+  9%, 100% { scale: 1; box-shadow: 0 0 0 0 rgb(255 255 255 / 0); }
+}
+
 /* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
    reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
 [data-nav-pending] {
