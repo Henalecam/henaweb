@@ -76,8 +76,9 @@ const SYNONYMS: Record<string, string[]> = {
   valor: ['custa', 'custo', 'investimento', 'orcamento'],
   orcamento: ['custa', 'custo', 'investimento'],
   caro: ['custa', 'custo'],
-  prazo: ['tempo', 'semanas', 'cronograma'],
-  demora: ['tempo', 'semanas', 'prazo'],
+  // not 'tempo': it made "prazo" open with "Passa tempo", the games page
+  prazo: ['semanas', 'cronograma'],
+  demora: ['semanas', 'prazo'],
   manutencao: ['suporte', 'evolucao', 'monitoramento'],
   suporte: ['manutencao', 'monitoramento'],
   dono: ['fica com', 'propriedade'],
@@ -87,6 +88,18 @@ const SYNONYMS: Record<string, string[]> = {
   aplicativo: ['app', 'mobile'],
   chatbot: ['agente', 'atendimento', 'whatsapp'],
   robo: ['agente', 'automacao', 'automatica'],
+  // words people type that the pages say differently (each points only at what the pages already cover)
+  inteligencia: [' ia', 'agente'],
+  artificial: [' ia', 'agente'],
+  excel: ['planilha'],
+  planilhas: ['planilha'],
+  hospedagem: ['nuvem', 'servidor', 'deploy'],
+  servidor: ['nuvem', 'deploy'],
+  consulta: ['agendamento', 'horario'],
+  marcar: ['agendamento', 'horario'],
+  contrato: ['escopo'],
+  boleto: ['pagamento', 'financeiro'],
+  cobranca: ['pagamento', 'financeiro'],
 };
 
 const SEARCHABLE = ITEMS.map((it) => fold(`${it.label} ${it.hint ?? ''} ${it.group} ${it.keywords ?? ''}`));
