@@ -1,19 +1,21 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import WinClose from './WinClose';
 
-const ROWS: { keys: string[][]; what: string }[] = [
+// `here`: the page(s) where a shortcut does something; rows without it work everywhere
+const ROWS: { keys: string[][]; what: string; here?: (path: string) => boolean }[] = [
   { keys: [['⌘', 'K'], ['Ctrl', 'K'], ['/']], what: 'Procurar uma pista no site' },
-  { keys: [['←'], ['→']], what: 'Folhear os casos ou serviços (dentro de um deles)' },
+  { keys: [['←'], ['→']], what: 'Folhear os casos ou serviços (dentro de um deles)', here: (p) => /^\/(casos|servicos)\/[\w-]+/.test(p) },
   { keys: [['G', 'H'], ['G', 'C']], what: 'G, depois H ou C: ir para o início ou para os casos' },
   { keys: [['G', 'J'], ['G', 'O']], what: 'G, depois J ou O: ir para os jogos ou abrir um caso' },
-  { keys: [['J'], ['K']], what: 'Próximo / anterior caso (no arquivo de casos)' },
-  { keys: [['P']], what: 'Pausar ou retomar as faixas que correm sozinhas (letreiros e logos)' },
-  { keys: [['1'], ['2'], ['3']], what: 'Escolher uma máquina do fliperama (no Passa tempo)' },
-  { keys: [['Ctrl', 'Enter'], ['⌘', 'Enter']], what: 'Enviar o formulário de contato (na caixa de mensagem)' },
+  { keys: [['J'], ['K']], what: 'Próximo / anterior caso (no arquivo de casos)', here: (p) => p === '/casos' },
+  { keys: [['P']], what: 'Pausar ou retomar as faixas que correm sozinhas (letreiros e logos)', here: (p) => p === '/' },
+  { keys: [['1'], ['2'], ['3']], what: 'Escolher uma máquina do fliperama (no Passa tempo)', here: (p) => p === '/passatempo' },
+  { keys: [['Ctrl', 'Enter'], ['⌘', 'Enter']], what: 'Enviar o formulário de contato (na caixa de mensagem)', here: (p) => p === '/' },
   // the browser's own print, listed because case and service pages print as a clean dossier (or a PDF)
-  { keys: [['Ctrl', 'P'], ['⌘', 'P']], what: 'Salvar um caso ou serviço como dossiê em PDF' },
+  { keys: [['Ctrl', 'P'], ['⌘', 'P']], what: 'Salvar um caso ou serviço como dossiê em PDF', here: (p) => /^\/(casos|servicos)\/[\w-]+/.test(p) },
   { keys: [['Esc']], what: 'Fechar janelas e a busca' },
   { keys: [['?']], what: 'Abrir esta ajuda' },
 ];
@@ -21,6 +23,9 @@ const ROWS: { keys: string[][]; what: string }[] = [
 /** "?" opens a Win95-style help window listing the keyboard shortcuts scattered around the site. */
 export default function ShortcutsHelp({ open, onClose }: { open: boolean; onClose: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  // the shortcuts that only work somewhere say whether this page is that place: the ones that work here get a
+  // "● aqui", the others fade, so the list answers "what can I press now?" instead of listing everything flat
+  const path = usePathname();
 
   useEffect(() => {
     const d = dialog.current;
@@ -66,8 +71,10 @@ export default function ShortcutsHelp({ open, onClose }: { open: boolean; onClos
       <div className="m-1.5 border-2 border-[#7d7394] bg-paper p-5">
         <p className="font-mono text-xs tracking-[0.12em] text-acid-ink/75 uppercase">Atalhos do detetive</p>
         <dl className="mt-4 divide-y divide-acid-ink/15">
-          {ROWS.map((r) => (
-            <div key={r.what} className="flex items-center justify-between gap-4 py-2.5">
+          {ROWS.map((r) => {
+            const local = r.here ? r.here(path) : null;
+            return (
+            <div key={r.what} data-here={local === null ? undefined : String(local)} className={`flex items-center justify-between gap-4 py-2.5 ${local === false ? 'opacity-55' : ''}`}>
               <dt className="flex flex-wrap items-center gap-1.5">
                 {r.keys.map((combo, i) => (
                   <span key={i} className="flex items-center gap-1">
@@ -80,9 +87,14 @@ export default function ShortcutsHelp({ open, onClose }: { open: boolean; onClos
                   </span>
                 ))}
               </dt>
-              <dd className="text-right text-sm">{r.what}</dd>
+              <dd className="text-right text-sm">
+                {r.what}
+                {local === true && <span className="ml-1.5 font-mono text-[0.68rem] font-bold whitespace-nowrap text-[#c2410c]">● aqui</span>}
+                {local === false && <span className="sr-only"> (não nesta página)</span>}
+              </dd>
             </div>
-          ))}
+            );
+          })}
         </dl>
         <p className="serif mt-5 text-sm text-acid-ink/75 italic">Dizem que um código antigo de videogame (ou uma lua nova, lá no rodapé) acende uma lanterna por aqui…</p>
       </div>
