@@ -11,9 +11,13 @@ const markReady = () =>
     window.dispatchEvent(new Event('hena:ready'));
   }, 0);
 
+/** The intro's status line, one step per quarter of the bar (decorative: the whole intro is aria-hidden). */
+const STEPS = ['Procurando fantasmas no código…', 'Interrogando as planilhas…', 'Ligando os pontos…', 'Caso quase resolvido…'];
+
 export default function Preloader() {
   const root = useRef<HTMLDivElement>(null);
   const count = useRef<HTMLSpanElement>(null);
+  const step = useRef<HTMLParagraphElement>(null);
 
   useGSAP(
     () => {
@@ -47,6 +51,9 @@ export default function Preloader() {
             ease: 'power3.inOut',
             onUpdate: () => {
               if (count.current) count.current.textContent = String(Math.round(counter.v)).padStart(3, '0');
+              // the status line moves the investigation along with the bar, like an installer's step messages
+              const msg = STEPS[Math.min(STEPS.length - 1, Math.floor((counter.v / 100) * STEPS.length))];
+              if (step.current && step.current.textContent !== msg) step.current.textContent = msg;
             },
           },
           0,
@@ -87,7 +94,9 @@ export default function Preloader() {
               sistemas
             </span>
           </div>
-          <p className="mt-3 font-mono text-[0.68rem] uppercase">Procurando fantasmas no código…</p>
+          <p ref={step} data-pl-step className="mt-3 font-mono text-[0.68rem] uppercase">
+            {STEPS[0]}
+          </p>
           <div className="mt-4 flex items-center gap-3">
             <div className="h-6 flex-1 border-2 border-acid-ink bg-white p-0.5">
               <div
