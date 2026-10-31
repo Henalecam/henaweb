@@ -280,7 +280,13 @@ function Board() {
           style={{ rotate: `${e.rot}deg` }}
           // pulling on a piece of evidence tightens its own red thread to the suspect and lets the rest go slack
           onPointerEnter={(ev) => ev.pointerType === 'mouse' && pullThread(ev.currentTarget, e.id)}
-          onPointerLeave={(ev) => pullThread(ev.currentTarget, null)}
+          onPointerLeave={(ev) => ev.pointerType === 'mouse' && pullThread(ev.currentTarget, null)}
+          // a tablet has no hover: a tap pulls the card's thread, a second tap (or a tap on another card) lets go
+          onPointerUp={(ev) => {
+            if (ev.pointerType === 'mouse') return;
+            const pulled = ev.currentTarget.closest('[data-board]')?.querySelector(`[data-string="${e.id}"][data-pulled]`);
+            pullThread(ev.currentTarget, pulled ? null : e.id);
+          }}
         >
           {/* hanging from its pin: brushing the pointer past an evidence card sets it swinging */}
           <div className="evidence-swing">
