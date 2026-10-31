@@ -1,3 +1,5 @@
+import { buzz } from './haptic';
+
 /**
  * Copies text, falling back to a hidden textarea + execCommand where the async Clipboard API is
  * missing or refused (older Safari, embedded webviews, a denied permission). Resolves true when one
@@ -5,6 +7,8 @@
  */
 export async function copyText(text: string, { quiet = false }: { quiet?: boolean } = {}): Promise<boolean> {
   const ok = await tryCopy(text);
+  // copied: a short tick on phones that vibrate, the feel of something landing on the clipboard
+  if (ok) buzz(8);
   // when both routes fail, the site-wide CopyFallback window offers the text selected for a manual Ctrl+C,
   // so no "copy" button anywhere ends up doing nothing. Callers with their own failure UI pass quiet
   if (!ok && !quiet) window.dispatchEvent(new CustomEvent(COPY_FAILED, { detail: text }));

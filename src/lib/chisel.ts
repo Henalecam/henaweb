@@ -5,6 +5,8 @@
  * Mouse: moving across the word. Touch: a tap knocks a small burst off (chiselTap), so phones get the
  * sculpting too. Never with reduced motion; purely decorative (aria-hidden, no pointer events).
  */
+import { buzz } from './haptic';
+
 let last = 0;
 let live = 0;
 const MAX_LIVE = 24;
@@ -24,6 +26,8 @@ export function chiselTap(e: React.PointerEvent<HTMLElement>) {
   if (e.pointerType === 'mouse') return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   spawn(e.clientX, e.clientY, Math.min(7, MAX_LIVE - live));
+  // the blow is felt too: a two-tap knock, like the chisel hitting stone
+  buzz([6, 30, 4]);
 }
 
 function spawn(x: number, y: number, n: number) {
