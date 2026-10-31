@@ -16,7 +16,9 @@ const description =
 // content.ts can't hold this check: its own `process` export shadows Node's
 if (process.env.NODE_ENV !== 'production') {
   for (const p of projects) {
-    if (projectLinks.find((l) => l.slug === p.slug)?.name !== p.name) console.warn(`projectLinks.ts is out of sync with content.ts for "${p.slug}"`);
+    const link = projectLinks.find((l) => l.slug === p.slug);
+    if (link?.name !== p.name || link?.top !== p.shot?.desktop.replace(/\.jpg$/, '-top.jpg'))
+      console.warn(`projectLinks.ts is out of sync with content.ts for "${p.slug}"`);
   }
 }
 

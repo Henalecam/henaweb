@@ -87,14 +87,41 @@ export default function LostClue() {
     }
   }, []);
 
+  const lead = guess?.href.startsWith('/casos/') ? projectLinks.find((p) => `/casos/${p.slug}` === guess.href) : undefined;
+  const sketch = lead?.top;
+
   return (
     <div className="mt-8 flex flex-col gap-3">
       {guess && (
-        <p className="toon-sm self-start rounded-xl bg-lemon px-5 py-3 text-acid-ink">
-          <span className="label mr-2 !text-acid-ink/70">Pista mais provável</span>
-          <a href={guess.href} className="font-medium underline underline-offset-4">
-            {guess.label} →
-          </a>
+        <p className="toon-sm flex items-center gap-4 self-start rounded-xl bg-lemon px-5 py-3 text-acid-ink">
+          {/* a case as the likeliest lead comes with a "retrato falado" of it: its screenshot as a pencil sketch,
+              which colours in when pointed at (decorative: the link names the case) */}
+          {sketch && (
+            <span aria-hidden data-sketch className="group/sk relative hidden shrink-0 sm:block">
+              {/* plain img: a 120-px thumbnail of a file already cached by the case pages */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={sketch}
+                alt=""
+                width={120}
+                height={70}
+                loading="lazy"
+                // pencil on paper: dark interfaces are inverted to dark lines on light, light ones only greyed
+                className={`h-[70px] w-[120px] -rotate-2 border-2 border-acid-ink bg-paper object-cover object-top transition-[filter] duration-500 group-hover/sk:[filter:none] ${
+                  lead?.light ? '[filter:grayscale(1)_contrast(1.5)_sepia(0.35)]' : '[filter:grayscale(1)_invert(1)_contrast(1.4)_sepia(0.35)]'
+                }`}
+              />
+              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 -rotate-2 rounded-sm bg-acid-ink px-1.5 font-mono text-[0.55rem] tracking-wider whitespace-nowrap text-lemon uppercase">
+                retrato falado
+              </span>
+            </span>
+          )}
+          <span>
+            <span className="label mr-2 !text-acid-ink/70">Pista mais provável</span>
+            <a href={guess.href} className="font-medium underline underline-offset-4">
+              {guess.label} →
+            </a>
+          </span>
         </p>
       )}
       <button
