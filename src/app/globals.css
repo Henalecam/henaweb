@@ -857,6 +857,23 @@ li:last-child > a > [data-tree]::before {
   filter: grayscale(1) brightness(0.82);
 }
 
+/* case page: the phone held over the desktop window drifts a little faster than the page as it scrolls past —
+   two layers at different depths. Scroll-driven, so it only moves with the reader; static without view timelines,
+   with reduced motion and on paper */
+@media screen and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-case-phone] {
+      animation: phone-drift linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+@keyframes phone-drift {
+  from { translate: 0 28px; }
+  to { translate: 0 -28px; }
+}
+
 /* sections out of view stop their endless CSS loops (OffscreenPause) */
 [data-offscreen],
 [data-offscreen] * {

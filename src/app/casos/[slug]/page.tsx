@@ -185,7 +185,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
               </div>
             </div>
             {p.shot && (
-              <div className="@container toon absolute -right-2 -bottom-8 aspect-[390/844] w-[24%] max-w-[220px] overflow-hidden rounded-[1.4rem] bg-black md:-right-6">
+              <div data-case-phone className="@container toon absolute -right-2 -bottom-8 aspect-[390/844] w-[24%] max-w-[220px] overflow-hidden rounded-[1.4rem] bg-black md:-right-6">
                 {/* the screenshot sits under a phone status bar (the visitor's own time), like a phone in hand */}
                 <div className="absolute inset-x-0 top-[11cqw] bottom-0">
                   <Image src={p.shot.mobile} {...blurProps(p.shot.mobile)} alt={`${p.name} no celular`} fill sizes="(max-width: 1000px) 22vw, 220px" className="object-cover object-top" />
