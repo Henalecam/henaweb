@@ -145,7 +145,7 @@ export default function GovTech() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-5 leading-relaxed text-ink/65">
+              <p className="mt-5 max-w-xl leading-relaxed text-ink/65">
                 Ao lado, um exemplo de fluxo: gestão de projetos e repasse de verbas, da solicitação à prestação de
                 resultados, com cada passo auditável.
               </p>

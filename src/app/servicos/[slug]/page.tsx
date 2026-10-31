@@ -304,7 +304,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                       +
                     </span>
                   </summary>
-                  <p className="mt-3 leading-relaxed text-acid-ink/75">{f.a}</p>
+                  <p className="mt-3 max-w-2xl leading-relaxed text-acid-ink/75">{f.a}</p>
                   <div className="flex flex-wrap items-center gap-x-5">
                     <FaqCopyLink id={faqId(f.q)} />
                     <FaqAsk q={f.q} />
