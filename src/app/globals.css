@@ -1150,6 +1150,19 @@ li:last-child > a > [data-tree]::before {
   to { background-position: 52px 0; }
 }
 
+/* BackToTop: slides in from the bottom-left corner while heading up, gone otherwise */
+[data-back-top] {
+  transition: translate 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.1), opacity 0.25s;
+}
+[data-back-top='off'] {
+  translate: 0 calc(100% + 1.5rem);
+  opacity: 0;
+  pointer-events: none;
+}
+html[data-menu='open'] [data-back-top] {
+  display: none;
+}
+
 /* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
    reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
 [data-nav-pending] {
