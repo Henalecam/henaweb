@@ -1532,6 +1532,16 @@ html:active-view-transition-type(step-prev)::view-transition-new(*.case-window) 
     outline: 2px solid Highlight !important;
     outline-offset: 2px;
   }
+  /* marks added since, also drawn only with a fill: the page-loading stripe (NavPending), the service steps'
+     filled progress blocks (the empty ones keep just their border), and the phone status bar's signal bars and
+     battery level */
+  [data-nav-pending] {
+    background: Highlight !important;
+  }
+  [data-prog-fill],
+  [data-fc-fill] {
+    background: CanvasText !important;
+  }
 }
 
 /* "Increase contrast" (macOS/iOS, Windows contrast themes): the design leans on translucent text

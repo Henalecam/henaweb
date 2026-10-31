@@ -48,13 +48,13 @@ export default function PhoneStatus() {
         {/* signal: four rising bars */}
         <span className="flex items-end gap-[0.6cqw]">
           {[1.4, 2.2, 3, 3.8].map((h) => (
-            <span key={h} className="w-[0.9cqw] rounded-[0.3cqw] bg-white" style={{ height: `${h}cqw` }} />
+            <span key={h} data-fc-fill className="w-[0.9cqw] rounded-[0.3cqw] bg-white" style={{ height: `${h}cqw` }} />
           ))}
         </span>
         {/* battery: outline, a well-charged fill and the cap */}
         <span className="relative flex h-[3.4cqw] w-[6.4cqw] items-center rounded-[0.9cqw] border-[0.45cqw] border-white/55 p-[0.4cqw]">
-          <span className="h-full w-[80%] rounded-[0.4cqw] bg-white" />
-          <span className="absolute top-1/2 -right-[1.3cqw] h-[1.4cqw] w-[0.7cqw] -translate-y-1/2 rounded-r-[0.4cqw] bg-white/55" />
+          <span data-fc-fill className="h-full w-[80%] rounded-[0.4cqw] bg-white" />
+          <span data-fc-fill className="absolute top-1/2 -right-[1.3cqw] h-[1.4cqw] w-[0.7cqw] -translate-y-1/2 rounded-r-[0.4cqw] bg-white/55" />
         </span>
       </span>
     </div>
