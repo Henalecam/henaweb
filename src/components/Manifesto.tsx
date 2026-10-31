@@ -112,9 +112,12 @@ export default function Manifesto() {
       <div data-facts className="mt-[clamp(4rem,10vw,9rem)] grid gap-5 md:grid-cols-3">
         {facts.map((f) => (
           <div key={f.l} data-fact className="fact-card toon flex items-end justify-between gap-6 rounded-2xl bg-paper p-6 text-acid-ink md:p-8">
-            <span data-fact-n={f.n} className="font-groovy text-[clamp(3.5rem,7vw,6rem)] leading-none text-[#c2410c] tabular-nums">
+            {/* the rolling counter is for the eyes only: mid-roll a screen reader read "0 time só" or "71 caixa-preta";
+                the real number sits beside it for assistive tech */}
+            <span data-fact-n={f.n} aria-hidden className="font-groovy text-[clamp(3.5rem,7vw,6rem)] leading-none text-[#c2410c] tabular-nums">
               {f.n}
             </span>
+            <span className="sr-only">{f.n} </span>
             {/* the promise behind each number, readable at a glance (was 11px mono caps at 70%) */}
             <span className="max-w-[18ch] text-right text-base leading-snug font-medium text-acid-ink/80 md:text-lg">{f.l}</span>
           </div>
