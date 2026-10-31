@@ -234,6 +234,17 @@ function Suspect() {
   );
 }
 
+/** Marks the thread of one evidence card as pulled (`data-pulled`) and the board as busy (`data-pulling`). */
+function pullThread(card: HTMLElement, id: EvidenceId | null) {
+  const board = card.closest<HTMLElement>('[data-board]');
+  if (!board) return;
+  board.querySelectorAll('[data-pulled]').forEach((el) => el.removeAttribute('data-pulled'));
+  if (id) {
+    board.setAttribute('data-pulling', '');
+    board.querySelector(`[data-string="${id}"]`)?.setAttribute('data-pulled', '');
+  } else board.removeAttribute('data-pulling');
+}
+
 function Board() {
   return (
     <div
@@ -243,11 +254,11 @@ function Board() {
     >
       <div className="pointer-events-none absolute inset-0 z-[8] rounded-xl shadow-[inset_0_0_0_10px_#6b3f1f,inset_0_0_0_13px_#140a26,inset_0_0_40px_rgb(0_0_0/0.45)]" />
 
-      <svg className="pointer-events-none absolute inset-0 z-[1] h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
+      <svg data-threads className="pointer-events-none absolute inset-0 z-[1] h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
         {boardLayout.map((e) => (
           <path
             key={e.id}
-            data-string
+            data-string={e.id}
             d={`M${e.pin.x},${e.pin.y} Q${(e.pin.x + SUSPECT.x) / 2},${Math.max(e.pin.y, SUSPECT.y) + 8} ${SUSPECT.x},${SUSPECT.y}`}
             pathLength={1}
             fill="none"
@@ -262,7 +273,15 @@ function Board() {
       </svg>
 
       {boardLayout.map((e) => (
-        <div key={e.id} data-evidence className={`absolute z-[2] ${e.box}`} style={{ rotate: `${e.rot}deg` }}>
+        <div
+          key={e.id}
+          data-evidence
+          className={`absolute z-[2] ${e.box}`}
+          style={{ rotate: `${e.rot}deg` }}
+          // pulling on a piece of evidence tightens its own red thread to the suspect and lets the rest go slack
+          onPointerEnter={(ev) => ev.pointerType === 'mouse' && pullThread(ev.currentTarget, e.id)}
+          onPointerLeave={(ev) => pullThread(ev.currentTarget, null)}
+        >
           {/* hanging from its pin: brushing the pointer past an evidence card sets it swinging */}
           <div className="evidence-swing">
             <Pin />

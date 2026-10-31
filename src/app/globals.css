@@ -509,6 +509,25 @@ html {
     animation: evidence-swing 1.2s ease-out;
   }
 }
+/* Mystery board: the evidence under the mouse pulls its own thread taut and bright, the others go slack and fade.
+   Only colour and width change, so it also runs with reduced motion; the threads only show once the scene draws them */
+[data-board] [data-string] {
+  transition: stroke-opacity 0.25s ease-out, stroke-width 0.25s ease-out, stroke 0.25s ease-out;
+}
+/* the pulled thread is drawn over the cards (pin to suspect, end to end); the slack ones fade almost out */
+[data-board][data-pulling] [data-threads] {
+  z-index: 4;
+}
+[data-board][data-pulling] [data-string] {
+  stroke-opacity: 0.12;
+}
+[data-board][data-pulling] [data-string][data-pulled] {
+  stroke: #ff3b52;
+  stroke-opacity: 1;
+  stroke-width: 5px;
+  /* Chrome breaks a pathLength=1 dash into pieces once the stroke is non-scaling: the pulled thread is drawn whole */
+  stroke-dasharray: none;
+}
 /* the phone file has no hover: a tap sets one card swinging (Mystery adds data-swing) */
 @media (prefers-reduced-motion: no-preference) {
   .evidence-swing[data-swing] {
