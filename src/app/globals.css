@@ -842,6 +842,21 @@ li:last-child > a > [data-tree]::before {
   content: '└─';
 }
 
+/* /casos: the case window under the pointer (or keyboard focus) is the active one, the others drop to the grey
+   inactive title bar of Windows 95 — the same desktop rule as the Studio and service-page windows. :has() on the
+   case list only (seven cards, no GSAP), so pointing at the gap between cards changes nothing */
+[data-case-list] .win-bar {
+  transition: filter 0.25s ease-out;
+}
+@media (hover: hover) {
+  [data-case-list]:has(> li > a:hover) > li:not(:has(> a:hover)) .win-bar {
+    filter: grayscale(1) brightness(0.82);
+  }
+}
+[data-case-list]:has(> li > a:focus-visible) > li:not(:has(> a:focus-visible)) .win-bar {
+  filter: grayscale(1) brightness(0.82);
+}
+
 /* sections out of view stop their endless CSS loops (OffscreenPause) */
 [data-offscreen],
 [data-offscreen] * {
