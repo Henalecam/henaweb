@@ -30,6 +30,9 @@ import Social from './Social';
 import NewTab from './NewTab';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
+/** ms before the button admits the send is slow, and before it gives up and offers WhatsApp / e-mail */
+const SLOW_AFTER = 6000;
+const SEND_TIMEOUT = 20000;
 
 // symptom capability → service page slug, to point a freshly opened case at a similar solved one
 const CAPABILITY_SERVICE: Record<string, string> = {
@@ -143,6 +146,8 @@ export default function Contact() {
   const [picked, setPicked] = useState<string[]>([]);
   const [timeline, setTimeline] = useState(timelines[1]);
   const [status, setStatus] = useState<Status>('idle');
+  // a send that drags on says so (and gives up after SEND_TIMEOUT, so the WhatsApp/e-mail fallback appears)
+  const [slow, setSlow] = useState(false);
   // what the visitor filled in, kept so a failed send can hand the whole case to WhatsApp or e-mail
   const [fallback, setFallback] = useState('');
   const [caseNo, setCaseNo] = useState('...');
@@ -376,9 +381,16 @@ export default function Contact() {
         .join('\n'),
     );
     setStatus('sending');
+    setSlow(false);
+    const slowTimer = window.setTimeout(() => setSlow(true), SLOW_AFTER);
+    // a stalled connection (a weak signal, a request stuck upstream) used to leave "Enviando…" up forever and the
+    // fallback card never came; now the send gives up and the same case goes out by WhatsApp or e-mail instead
+    const ctrl = new AbortController();
+    const giveUp = window.setTimeout(() => ctrl.abort(), SEND_TIMEOUT);
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
+        signal: ctrl.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: data.get('name'),
@@ -393,6 +405,8 @@ export default function Contact() {
         }),
       });
       if (!res.ok) throw new Error();
+      window.clearTimeout(slowTimer);
+      window.clearTimeout(giveUp);
       setStatus('sent');
       setSimilar(similarCase(lead?.capability));
       try {
@@ -405,6 +419,8 @@ export default function Contact() {
       });
       track({ name: 'lead', capability: capabilities.join(' + ') || undefined, timeline });
     } catch {
+      window.clearTimeout(slowTimer);
+      window.clearTimeout(giveUp);
       setStatus('error');
       // the fallback card renders below the button, often under the fold: bring it into view
       requestAnimationFrame(() => {
@@ -710,7 +726,7 @@ export default function Contact() {
                   data-ready={ready || undefined}
                   className="group relative inline-flex items-center gap-3 rounded-full border-[3px] border-acid-ink bg-acid-ink px-8 py-4 font-medium text-acid shadow-[5px_5px_0_rgb(11_13_2/0.35)] transition-transform hover:-translate-y-0.5 disabled:opacity-60"
                 >
-                  {status === 'sending' ? 'Enviando…' : 'Abrir o caso'}
+                  {status === 'sending' ? (slow ? 'Enviando… (conexão lenta)' : 'Enviando…') : 'Abrir o caso'}
                   <span className="transition-transform duration-500 group-hover:translate-x-1 group-focus-visible:translate-x-1">→</span>
                 </button>
                 <p className="max-w-xs text-sm leading-snug text-acid-ink/75">
