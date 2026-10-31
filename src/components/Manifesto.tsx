@@ -46,12 +46,21 @@ export default function Manifesto() {
         if (!Number.isFinite(to)) return;
         const counter = { v: to === 0 ? 99 : 0 };
         el.textContent = String(counter.v);
+        // a mechanical counter: each new digit drops into place with a small tick, and the final value lands
+        // with a clunk (Web Animations on `translate`/`scale`, so the card's own tilt is untouched)
+        const show = () => {
+          const n = String(Math.round(counter.v));
+          if (n === el.textContent) return;
+          el.textContent = n;
+          el.animate([{ translate: '0 -0.14em', opacity: 0.5 }, { translate: '0 0', opacity: 1 }], { duration: 110, easing: 'ease-out' });
+          if (Number(n) === to) el.animate([{ scale: 1.14 }, { scale: 0.97 }, { scale: 1 }], { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' });
+        };
         const roll = gsap.to(counter, {
           v: to,
           duration: to === 0 ? 1.6 : 1.2,
           ease: 'power3.out',
           delay: 0.15,
-          onUpdate: () => (el.textContent = String(Math.round(counter.v))),
+          onUpdate: show,
           scrollTrigger: { trigger: '[data-facts]', start: 'top 85%' },
         });
         // pointing at a card rolls its number again, quicker (ignored while it is still rolling). The mouse
