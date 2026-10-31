@@ -91,6 +91,7 @@ function toggleFlashlight(force?: boolean) {
   if (existing) {
     existing.remove();
     document.getElementById('lanterna-pistas')?.remove();
+    document.getElementById('lanterna-placar')?.remove();
     return;
   }
   const clues = scatterClues();
@@ -106,9 +107,52 @@ function toggleFlashlight(force?: boolean) {
     background: 'radial-gradient(circle 170px at var(--lx, 50%) var(--ly, 40%), transparent 0 60%, rgb(6 3 16 / 0.94) 100%)',
   });
   document.body.appendChild(el);
+  // a tally above the dark: each note the beam passes over counts as found, until all four are — a little hunt
+  const tally = document.createElement('p');
+  tally.id = 'lanterna-placar';
+  tally.setAttribute('aria-hidden', 'true');
+  tally.dataset.printHide = '';
+  Object.assign(tally.style, {
+    position: 'fixed',
+    left: '50%',
+    bottom: '18px',
+    translate: '-50% 0',
+    zIndex: '96',
+    pointerEvents: 'none',
+    margin: '0',
+    font: '600 13px/1.3 ui-monospace, monospace',
+    color: '#f9e27d',
+    background: 'rgb(20 10 38 / 0.9)',
+    border: '1px solid rgb(249 226 125 / 0.4)',
+    padding: '6px 12px',
+    borderRadius: '999px',
+    whiteSpace: 'nowrap',
+  });
+  const notes = [...clues.children] as HTMLElement[];
+  const score = () => {
+    const n = notes.filter((c) => c.dataset.found).length;
+    tally.textContent =
+      n === notes.length
+        ? // touch screens have no Esc: the footer moon brings the lights back there
+          `🔦 Todas as ${n} pistas! ${matchMedia('(pointer: coarse)').matches ? 'A lua cheia acende as luzes' : 'Esc acende as luzes'}`
+        : `🔦 Pistas encontradas: ${n} de ${notes.length}`;
+  };
+  score();
+  document.body.appendChild(tally);
   const move = (e: PointerEvent) => {
     el.style.setProperty('--lx', `${e.clientX}px`);
     el.style.setProperty('--ly', `${e.clientY}px`);
+    // found = the beam's fully clear centre (about 100 px) reached the note's middle
+    let changed = false;
+    for (const c of notes) {
+      if (c.dataset.found) continue;
+      const r = c.getBoundingClientRect();
+      if (Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2)) < 100) {
+        c.dataset.found = '1';
+        changed = true;
+      }
+    }
+    if (changed) score();
   };
   const off = (e: KeyboardEvent) => {
     if (e.key !== 'Escape') return;
@@ -122,6 +166,7 @@ function toggleFlashlight(force?: boolean) {
   new MutationObserver((_, obs) => {
     if (el.isConnected) return;
     clues.remove();
+    tally.remove();
     window.removeEventListener('pointermove', move);
     window.removeEventListener('pointerdown', move);
     window.removeEventListener('keydown', off);
