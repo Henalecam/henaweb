@@ -46,7 +46,8 @@ function DinerBack() {
       <g data-neon filter="url(#neon)">
         <rect x="120" y="8" width="360" height="74" rx="37" fill="none" stroke="#3cc6b4" strokeWidth="5" />
         <text x="300" y="56" textAnchor="middle" fontFamily="var(--font-shrikhand), Georgia, serif" fontSize="30" fill="#f7931e">
-          Lanches &amp; Sistemas
+          {/* a tired tube: the ampersand sputters now and then, like any diner sign that has seen a few winters */}
+          Lanches <tspan data-neon-buzz>&amp;</tspan> Sistemas
         </text>
       </g>
       <text x="300" y="104" textAnchor="middle" fontFamily="monospace" fontWeight="700" fontSize="12" letterSpacing="4" fill="#8b5cc7">
@@ -159,6 +160,10 @@ export default function Process() {
       setReply(KITCHEN[replyN.current++ % KITCHEN.length]);
       clearTimeout(replyTimer.current);
       replyTimer.current = setTimeout(() => setReply(''), 2400);
+      // so much ringing the whole sign browns out for a second
+      const neon = el.querySelector('[data-neon]');
+      if (neon && !prefersReducedMotion())
+        gsap.fromTo(neon, { opacity: 1 }, { keyframes: { opacity: [1, 0.15, 0.9, 0.05, 0.6, 1] }, duration: 0.9, ease: 'none', overwrite: true });
     }
     const ding = el.querySelector('[data-burst="4"]');
     const bell = el.querySelector('[data-bell]');

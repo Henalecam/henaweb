@@ -760,6 +760,23 @@ img[data-failed] {
   100% { scale: 1 40; opacity: 0; }
 }
 
+/* diner sign (Process): the neon "&" buzzes off and on for a moment every 9 s — fill-opacity, since the glow filter
+   is built from the glyph and dims with it. A still sign with reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  [data-neon-buzz] {
+    animation: neon-buzz 9s steps(1, end) 2.5s infinite;
+  }
+}
+@keyframes neon-buzz {
+  0%, 100% { fill-opacity: 1; }
+  91% { fill-opacity: 0.15; }
+  92% { fill-opacity: 1; }
+  93% { fill-opacity: 0.25; }
+  94.5% { fill-opacity: 0.9; }
+  95.5% { fill-opacity: 0.1; }
+  97% { fill-opacity: 1; }
+}
+
 /* sections out of view stop their endless CSS loops (OffscreenPause) */
 [data-offscreen],
 [data-offscreen] * {
