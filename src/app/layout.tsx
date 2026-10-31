@@ -15,6 +15,7 @@ import ThemeTint from '@/components/ThemeTint';
 import ScrollProgress from '@/components/ScrollProgress';
 import NavPending from '@/components/NavPending';
 import CopyFallback from '@/components/CopyFallback';
+import NetStatus from '@/components/NetStatus';
 import OffscreenPause from '@/components/OffscreenPause';
 import ConsentBanner from '@/components/ConsentBanner';
 import { analyticsLoader } from '@/lib/consent';
@@ -205,6 +206,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ScrollProgress />
         <NavPending />
         <CopyFallback />
+        <NetStatus />
         <OffscreenPause />
         {children}
         <div className="grain" aria-hidden />
