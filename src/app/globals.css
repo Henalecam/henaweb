@@ -1159,6 +1159,10 @@ li:last-child > a > [data-tree]::before {
   opacity: 0;
   pointer-events: none;
 }
+/* the ring around the arrow fills with how deep in the page the visitor is */
+[data-back-ring] {
+  background: conic-gradient(#f7931e var(--depth, 0%), rgb(26 15 46 / 0.15) 0);
+}
 html[data-menu='open'] [data-back-top] {
   display: none;
 }
