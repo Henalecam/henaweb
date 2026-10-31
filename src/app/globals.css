@@ -202,15 +202,38 @@ html[data-still] [data-marquee-track] {
   border: 2.5px solid var(--color-toon);
   box-shadow: 4px 4px 0 var(--color-toon);
 }
+/* Toon buttons lift toward the pointer and squash flat when pressed, the shadow growing and shrinking as if the
+   button really left the page. The keyboard gets the same lift on focus (it had none); touch screens skip the
+   hover lift, which used to stay stuck after a tap; and the small variant moves in proportion to its smaller
+   shadow (it jumped 4 → 8 px, as big as the large one) */
 .toon-press {
   transition: transform 0.2s, box-shadow 0.2s;
 }
-.toon-press:hover {
+@media (hover: hover) {
+  .toon-press:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 var(--color-toon);
+  }
+  .toon-sm.toon-press:hover {
+    transform: translate(-1.5px, -1.5px);
+    box-shadow: 6px 6px 0 var(--color-toon);
+  }
+}
+.toon-press:focus-visible {
   transform: translate(-2px, -2px);
   box-shadow: 8px 8px 0 var(--color-toon);
 }
-.toon-press:active {
+.toon-sm.toon-press:focus-visible {
+  transform: translate(-1.5px, -1.5px);
+  box-shadow: 6px 6px 0 var(--color-toon);
+}
+.toon-press:active,
+.toon-press:focus-visible:active {
   transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 var(--color-toon);
+}
+.toon-sm.toon-press:active {
+  transform: translate(2.5px, 2.5px);
   box-shadow: 1px 1px 0 var(--color-toon);
 }
 
