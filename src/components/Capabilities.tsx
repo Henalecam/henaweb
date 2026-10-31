@@ -90,8 +90,24 @@ export default function Capabilities({ caseCounts = {}, caseSlugs = {} }: { case
                 <span className="relative col-span-8 text-[clamp(2rem,5.5vw,5.25rem)] leading-[0.95] font-medium tracking-[-0.045em] md:col-span-7">
                   {c.title}
                 </span>
+                {/* closed (desktop, lg+): a peek at what's inside — the first three tags, stacked like an index card's
+                    keywords; it steps aside when the row opens and the full set shows. Decorative: the button's name stays
+                    the capability's title */}
                 <span
-                  className={`toon-sm relative col-span-2 flex h-10 w-10 items-center justify-center self-center justify-self-end rounded-full bg-acid text-2xl leading-none text-acid-ink transition-transform duration-500 md:col-span-4 md:h-12 md:w-12 md:text-3xl ${
+                  aria-hidden
+                  data-cap-peek
+                  className={`relative hidden self-center justify-self-end text-right font-mono print:hidden text-[0.68rem] leading-[1.6] tracking-[0.14em] text-bg/70 uppercase transition-[opacity,translate] duration-500 lg:col-span-2 lg:block ${
+                    isOpen ? 'pointer-events-none translate-x-3 opacity-0' : 'opacity-100 group-hover:text-bg/85 group-focus-visible:text-bg/85'
+                  }`}
+                >
+                  {c.tags.slice(0, 3).map((t) => (
+                    <span key={t} className="block truncate">
+                      {t}
+                    </span>
+                  ))}
+                </span>
+                <span
+                  className={`toon-sm relative col-span-2 flex h-10 w-10 items-center justify-center self-center justify-self-end rounded-full bg-acid text-2xl leading-none text-acid-ink transition-transform duration-500 md:col-span-4 lg:col-span-2 md:h-12 md:w-12 md:text-3xl ${
                     isOpen ? 'rotate-45' : 'group-hover:scale-110 group-focus-visible:scale-110 group-hover:rotate-90 group-focus-visible:rotate-90'
                   }`}
                   aria-hidden
