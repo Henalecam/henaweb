@@ -922,6 +922,27 @@ html[data-navigating] [data-nav-pending] {
   to { background-position: 48px 0; }
 }
 
+/* closing call to action: "Caso nº 08 · em aberto · cliente: você" types itself, letter by letter, as its window
+   scrolls into view (scroll-driven: it only types while the reader scrolls). One line from md up; phones, reduced
+   motion and browsers without view timelines show it whole */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-typed] {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      vertical-align: bottom;
+      animation: typed steps(var(--n)) both;
+      animation-timeline: view();
+      animation-range: entry 40% cover 45%;
+    }
+  }
+}
+@keyframes typed {
+  from { width: 0; }
+  to { width: calc(var(--n) * (1ch + 0.2em)); }
+}
+
 /* sections out of view stop their endless CSS loops (OffscreenPause) */
 [data-offscreen],
 [data-offscreen] * {
