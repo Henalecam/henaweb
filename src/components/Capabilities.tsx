@@ -105,7 +105,8 @@ export default function Capabilities({ caseCounts = {}, caseSlugs = {} }: { case
                     isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                   }`}
                 >
-                  <span className="overflow-hidden">
+                  {/* -mx/px: room for the tags' 3px focus ring, which the collapse's overflow-hidden cut off at the edge */}
+                  <span className="-mx-1.5 overflow-hidden px-1.5">
                     <span className="grid gap-8 pt-4 pb-6 md:grid-cols-11 md:pt-2 md:pb-8">
                       <span className="flex flex-col gap-5 md:col-span-6">
                         <span className="text-lg leading-relaxed">{c.lead}</span>

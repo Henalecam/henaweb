@@ -529,7 +529,10 @@ export default function Mystery() {
               <div
                 key={k}
                 data-stage={i + 1}
-                className={`absolute inset-x-0 top-1/2 -translate-y-1/2 ${i ? 'invisible opacity-0' : ''}`}
+                // centred by layout, not by -translate-y-1/2: GSAP tweens these stages' y, and its 0 replaced the
+                // -50% on some sizes (1440×900, 1024×768), leaving the last stage hanging from the middle with its
+                // "Abra o seu caso" button under the next section
+                className={`absolute inset-0 flex flex-col items-start justify-center ${i ? 'invisible opacity-0' : ''}`}
               >
                 <span className="label !text-teal">{copy[k].kicker}</span>
                 {i === 0 ? (
