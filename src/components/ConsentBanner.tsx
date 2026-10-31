@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CONSENT_OPEN, readConsent, saveConsent, type Consent } from '@/lib/consent';
 
 /**
@@ -10,6 +10,29 @@ import { CONSENT_OPEN, readConsent, saveConsent, type Consent } from '@/lib/cons
 export default function ConsentBanner({ tools }: { tools: string[] }) {
   const [open, setOpen] = useState(false);
   const [shown, setShown] = useState(false);
+  const box = useRef<HTMLElement>(null);
+
+  // while the notice is up it covers the bottom of the screen (a fifth of a phone): Tab used to land on links
+  // hidden right under it (36 of 76 on the home page at 390 px). The page's scroll padding grows by the
+  // notice's height, so the browser scrolls each focused element above it (WCAG 2.4.11)
+  useEffect(() => {
+    const el = box.current;
+    if (!shown || !el) return;
+    const root = document.documentElement;
+    const fit = () => {
+      const r = el.getBoundingClientRect();
+      root.style.scrollPaddingBottom = `${Math.ceil(innerHeight - r.top + 12)}px`;
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    window.addEventListener('resize', fit);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', fit);
+      root.style.scrollPaddingBottom = '';
+    };
+  }, [shown]);
 
   useEffect(() => {
     // only once the visitor scrolls past the hero, so it never covers the first impression
@@ -47,6 +70,7 @@ export default function ConsentBanner({ tools }: { tools: string[] }) {
 
   return (
     <section
+      ref={box}
       data-print-hide
       aria-label="Cookies e medição"
       // while it slides in or out it is see-through: keep it out of the Tab order until it is really there
