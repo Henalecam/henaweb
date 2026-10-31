@@ -723,6 +723,43 @@ img[data-failed] {
   100% { opacity: 0; translate: 22vw 7vw; }
 }
 
+/* /passatempo: each cabinet's tube switches on when the page opens (without JavaScript the page's <noscript> hides it) — a bright line across the middle that opens up to the
+   picture, 0.25 s after its left-hand neighbour */
+.crt-power {
+  display: none;
+}
+@media screen and (prefers-reduced-motion: no-preference) {
+  /* the tubes stay dark until the opening curtain (Preloader) has lifted — html[data-ready] — so a first visit sees
+     them switch on instead of it happening behind the curtain */
+  .crt-power {
+    display: block;
+    background: #08040f;
+  }
+  html[data-ready] .crt-power {
+    animation: crt-open 0.55s cubic-bezier(0.7, 0, 0.3, 1) calc(0.2s + var(--i) * 0.25s) both;
+  }
+  .crt-power::after {
+    content: '';
+    position: absolute;
+    inset: calc(50% - 1px) 6%;
+    scale: 0 1;
+    background: #fff;
+    box-shadow: 0 0 10px 2px rgb(255 255 255 / 0.8);
+  }
+  html[data-ready] .crt-power::after {
+    animation: crt-line 0.55s ease-out calc(0.2s + var(--i) * 0.25s) both;
+  }
+}
+@keyframes crt-open {
+  0%, 45% { clip-path: inset(0); }
+  100% { clip-path: inset(50% 0 50% 0); }
+}
+@keyframes crt-line {
+  0% { scale: 0 1; opacity: 1; }
+  40% { scale: 1 1; opacity: 1; }
+  100% { scale: 1 40; opacity: 0; }
+}
+
 /* sections out of view stop their endless CSS loops (OffscreenPause) */
 [data-offscreen],
 [data-offscreen] * {

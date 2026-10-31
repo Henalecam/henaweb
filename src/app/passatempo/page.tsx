@@ -59,6 +59,10 @@ export default function Passatempo() {
             Jogos e experimentos que o Henrique faz nas horas vagas, fora dos projetos de clientes. Escolha uma máquina: cada uma abre em outra aba.
           </p>
 
+          {/* the tubes switch on once scripts mark the page ready; without them, show the picture right away */}
+          <noscript>
+            <style>{'.crt-power{display:none!important}'}</style>
+          </noscript>
           <PickPastime />
           <LastPlayed />
           <PastimeKeys />
@@ -110,6 +114,9 @@ export default function Passatempo() {
                         P{i + 1} · <span data-credits>1 crédito</span>
                       </span>
                       <span className="arcade-1up absolute top-2 right-2 font-mono text-[0.6rem] tracking-widest">1UP · último jogo</span>
+                      {/* power-on: the tube lights as a thin line across the middle, then opens to the full picture (one
+                          after the other, like switching on a row of machines); gone with reduced motion and on paper */}
+                      <span className="crt-power pointer-events-none absolute inset-0 print:hidden" style={{ '--i': i } as React.CSSProperties} />
                     </div>
                     {/* control deck: joystick, two buttons and a coin slot — pointing at the cabinet drops the coin in */}
                     <div aria-hidden className="arcade-deck mx-1.5 mb-1.5 flex h-10 print:hidden items-center gap-3 border-2 border-[#7d7394] bg-[#2a2140] px-3" style={{ '--a': p.accent } as React.CSSProperties}>
