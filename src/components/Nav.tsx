@@ -31,6 +31,10 @@ const loadHelp = () =>
     },
   ));
 
+// intent to search (pointing at or focusing the search button, holding ⌘/Ctrl before K) starts the ~30 KB
+// download early, so the first open doesn't wait on the network; a failure is simply forgotten (loadPalette)
+const warmPalette = () => void loadPalette().catch(() => {});
+
 export default function Nav() {
   const inner = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -100,6 +104,7 @@ export default function Nav() {
           }
         }
       }
+      if (e.key === 'Meta' || e.key === 'Control') warmPalette();
       if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         openSearch();
@@ -193,6 +198,7 @@ export default function Nav() {
     if (open) document.documentElement.dataset.menu = 'open';
     else delete document.documentElement.dataset.menu;
     if (!open) return;
+    warmPalette(); // the open menu offers "Procurar pista"
     // Esc closes the menu and hands focus back to the toggle
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
@@ -253,6 +259,8 @@ export default function Nav() {
             <button
               type="button"
               onClick={() => openSearch()}
+              onPointerEnter={warmPalette}
+              onFocus={warmPalette}
               aria-label="Buscar no site"
               aria-keyshortcuts="Meta+K Control+K /"
               className="hidden items-center gap-2 rounded-full border border-line px-3 py-2 font-mono text-xs whitespace-nowrap xl:flex text-ink/70 transition-colors hover:border-acid hover:text-acid"
@@ -330,7 +338,7 @@ export default function Nav() {
           ))}
         </nav>
         <div className="mt-8 flex items-center justify-between">
-          <button type="button" onClick={() => openSearch()} className="label flex min-h-11 items-center gap-2 !text-ink">
+          <button type="button" onClick={() => openSearch()} onPointerDown={warmPalette} onFocus={warmPalette} className="label flex min-h-11 items-center gap-2 !text-ink">
             <span aria-hidden>🔎</span> Procurar pista
           </button>
           <Social />
