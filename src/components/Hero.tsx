@@ -6,7 +6,7 @@ import { site, whatsappLink } from '@/lib/site';
 import Clock from './Clock';
 import Magnetic from './Magnetic';
 import Placard from './Placard';
-import { chisel } from '@/lib/chisel';
+import { chisel, chiselTap } from '@/lib/chisel';
 import NewTab from './NewTab';
 
 const ECHO = 'ｓｉｓｔｅｍａｓ　ｅｓｃｕｌｐｉｄｏｓ';
@@ -95,6 +95,7 @@ export default function Hero() {
         <h1
           data-hero-title
           onPointerMove={(e) => (e.target as HTMLElement).closest('[data-chisel]') && chisel(e)}
+          onPointerDown={(e) => (e.target as HTMLElement).closest('[data-chisel]') && chiselTap(e)}
           className="max-w-[12ch] text-[clamp(3rem,9vw,10rem)] leading-[0.88] font-medium tracking-[-0.055em] [text-shadow:0_0_48px_rgb(18_8_42/0.9)] max-md:[text-shadow:0_2px_4px_rgb(18_8_42/0.95),0_0_22px_rgb(18_8_42/0.95),0_0_48px_rgb(18_8_42/0.9)]"
         >
           Sistemas <span data-chisel className="font-groovy pr-[0.06em] text-[0.82em] tracking-normal text-acid [text-shadow:5px_5px_0_#120626,0_0_40px_rgb(255_113_206/0.6)]">esculpidos</span> para empresas e governos.

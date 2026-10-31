@@ -2,7 +2,8 @@
  * Marble chips for the hero's "esculpidos": moving the mouse across the word chips little flakes off it,
  * as if the pointer were the chisel. Each flake is a fixed-position span animated with the Web Animations
  * API and removed when it lands, so nothing is clipped by the title's line masks and nothing piles up.
- * Mouse only, never with reduced motion; purely decorative (aria-hidden, no pointer events).
+ * Mouse: moving across the word. Touch: a tap knocks a small burst off (chiselTap), so phones get the
+ * sculpting too. Never with reduced motion; purely decorative (aria-hidden, no pointer events).
  */
 let last = 0;
 let live = 0;
@@ -15,15 +16,25 @@ export function chisel(e: React.PointerEvent<HTMLElement>) {
   if (now - last < 70 || live >= MAX_LIVE) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   last = now;
+  spawn(e.clientX, e.clientY, 2);
+}
 
-  for (let i = 0; i < 2; i++) {
+/** A tap (finger or pen) on the word: one blow of the chisel, a burst of chips. */
+export function chiselTap(e: React.PointerEvent<HTMLElement>) {
+  if (e.pointerType === 'mouse') return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  spawn(e.clientX, e.clientY, Math.min(7, MAX_LIVE - live));
+}
+
+function spawn(x: number, y: number, n: number) {
+  for (let i = 0; i < n; i++) {
     const chip = document.createElement('span');
     const size = 4 + Math.random() * 5;
     chip.setAttribute('aria-hidden', 'true');
     Object.assign(chip.style, {
       position: 'fixed',
-      left: `${e.clientX - size / 2}px`,
-      top: `${e.clientY - size / 2}px`,
+      left: `${x - size / 2}px`,
+      top: `${y - size / 2}px`,
       width: `${size}px`,
       height: `${size * (0.6 + Math.random() * 0.5)}px`,
       background: COLORS[(Math.random() * COLORS.length) | 0],
