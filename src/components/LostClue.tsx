@@ -42,6 +42,9 @@ export default function LostClue() {
   const [guess, setGuess] = useState<{ label: string; href: string } | null>(null);
   // arrived through a link (ours or someone else's): that link is broken, and we'd like to know
   const [report, setReport] = useState<string | null>(null);
+  // the lost address's own words ("/casos/contabilidade" → "contabilidade") go into the search, which also reads
+  // what each case is about: an address that names a topic rather than a page still finds its case
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     // the same address in other letters ("/Casos/Diconta", "/PASSATEMPO", "/passatempo/") is no mystery:
@@ -61,6 +64,9 @@ export default function LostClue() {
       .replace(/[̀-ͯ]/g, '')
       .split(/[/_.\s]+/)
       .filter((w) => w.length > 2);
+    // the last segment of the path, minus the folder names that every page shares
+    const lost = words.filter((w) => !['casos', 'caso', 'servicos', 'servico', 'cases', 'projetos', 'projeto', 'www', 'html', 'php'].includes(w));
+    setQuery(lost.slice(-2).join(' ').replace(/-/g, ' ').slice(0, 40));
     let best: { label: string; href: string; d: number } | null = null;
     for (const w of words.reverse()) {
       // a piece of a real address also counts ("/casos/next" → next-card, "/servicos/sites" → sites-e-produtos,
@@ -97,10 +103,10 @@ export default function LostClue() {
       <button
         type="button"
         data-print-hide
-        onClick={() => window.dispatchEvent(new Event('hena:search'))}
+        onClick={() => window.dispatchEvent(new CustomEvent('hena:search', { detail: query }))}
         className="label flex min-h-11 items-center gap-2 self-start !text-ink underline underline-offset-4 hover:!text-acid"
       >
-        <span aria-hidden>🔎</span> Procurar no arquivo de casos
+        <span aria-hidden>🔎</span> {query ? `Procurar “${query}” no arquivo de casos` : 'Procurar no arquivo de casos'}
       </button>
       {report && (
         <a href={report} className="label flex min-h-11 items-center gap-2 self-start !text-ink/75 underline underline-offset-4 hover:!text-ink">
