@@ -24,6 +24,20 @@ function Trees() {
   );
 }
 
+/** A fixed scatter of stars (seeded, so server and browser draw the same sky), kept clear of the moon's corner. */
+const STARS = (() => {
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+  const out: { x: number; y: number; r: number; d: number; t: number }[] = [];
+  while (out.length < 26) {
+    const x = Math.round(rnd() * 960) / 10;
+    const y = Math.round(rnd() * 900) / 10;
+    if (x > 66 && y < 80) continue;
+    out.push({ x, y, r: rnd() < 0.2 ? 3 : 2, d: Math.round(rnd() * 40) / 10, t: 2.5 + Math.round(rnd() * 30) / 10 });
+  }
+  return out;
+})();
+
 export default function Chase() {
   const root = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -87,6 +101,18 @@ export default function Chase() {
     <div ref={root} className="relative h-[clamp(340px,42vw,520px)] overflow-hidden" aria-hidden>
       {/* night sky with a big moon */}
       <div className="absolute inset-0 bg-[linear-gradient(180deg,#140c2e_0%,#2b1a58_60%,#3a2a6e_100%)]" />
+      {/* stars come out as the moon wanes; one shoots across now and then */}
+      <div data-stars className="absolute inset-x-0 top-0 h-[58%] transition-opacity duration-700" style={{ opacity: [0.7, 0.8, 0.9, 1][phase] }}>
+        {STARS.map((s, i) => (
+          <span
+            key={i}
+            data-star
+            className="absolute rounded-full bg-[#fff6d6]"
+            style={{ left: `${s.x}%`, top: `${s.y}%`, width: s.r, height: s.r, animationDelay: `${s.d}s`, animationDuration: `${s.t}s` }}
+          />
+        ))}
+        <span data-shooting-star className="absolute top-[12%] left-[30%] h-px w-[clamp(60px,9vw,120px)]" />
+      </div>
       {/* above the 3D canvas so it can be clicked; pointer-only and decorative (the whole scene is aria-hidden) */}
       <div
         data-moon={phase}
