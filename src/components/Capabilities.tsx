@@ -73,6 +73,10 @@ export default function Capabilities({ caseCounts = {}, caseSlugs = {} }: { case
                       'scale-y-0 group-hover/cap:scale-y-[0.07] group-has-[:focus-visible]/cap:scale-y-[0.07]'
                 }`}
               />
+              {/* the accordion pattern (WAI-ARIA APG): each toggle sits in a heading, so a screen reader's heading list
+                  reaches the four capabilities directly (they were only buttons under the section's h2); the heading
+                  is a plain block that keeps the row's wrapping (no balance) and adds nothing to the layout */}
+              <h3 className="relative [text-wrap:inherit]">
               <button
                 type="button"
                 // opens on click/tap only: opening on hover made every row expand and collapse under a
@@ -95,6 +99,7 @@ export default function Capabilities({ caseCounts = {}, caseSlugs = {} }: { case
                   +
                 </span>
               </button>
+              </h3>
               {/* the answer sits next to the toggle, not inside it: inside a <button> it became part of the button's
                   name (335 characters read on every focus, closed rows included) and could not be browsed */}
               <div className="relative grid grid-cols-12 gap-4 px-3 md:px-6">
