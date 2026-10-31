@@ -53,6 +53,7 @@ export default function FullShot({
   height: number;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const pane = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState(false);
   // how far down the long capture the reader is, shown in the title bar like an old viewer's status
   const [read, setRead] = useState(0);
@@ -61,6 +62,9 @@ export default function FullShot({
     const show = () => {
       setLoaded(true);
       dialog.current?.showModal();
+      // the long capture is what one came to read: focus lands on it (not on ×), so ↓, Page Down, Space and End
+      // scroll it straight away; the close button is one Shift+Tab away and Esc still closes
+      pane.current?.focus({ preventScroll: true });
     };
     window.addEventListener(EVENT, show);
     return () => window.removeEventListener(EVENT, show);
@@ -86,8 +90,11 @@ export default function FullShot({
           <WinClose onClick={() => dialog.current?.close()} label="Fechar" />
         </div>
         <div
+          ref={pane}
           data-lenis-prevent
           tabIndex={0}
+          role="region"
+          aria-label={`Captura de ${name}: use as setas para rolar`}
           onScroll={(e) => {
             const el = e.currentTarget;
             const max = el.scrollHeight - el.clientHeight;
