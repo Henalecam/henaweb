@@ -173,6 +173,20 @@ export default function Studio() {
                   <span aria-hidden>regra_{pr.n.toLowerCase()}.txt</span>
                   <span className="win-btn ml-auto" aria-hidden>×</span>
                 </div>
+                {/* a Notepad menu bar, as on the real thing (Arquivo · Editar · Formatar · Exibir · Ajuda, with the
+                    keyboard-letter underlined); decorative, from sm up so the phone list stays compact */}
+                <div
+                  aria-hidden
+                  data-notepad-menu
+                  className="mx-1.5 mt-1 hidden gap-3 px-1.5 font-sans text-[0.72rem] text-[#12082a] sm:flex"
+                >
+                  {['Arquivo', 'Editar', 'Formatar', 'Exibir', 'Ajuda'].map((m) => (
+                    <span key={m}>
+                      <span className="underline underline-offset-2">{m[0]}</span>
+                      {m.slice(1)}
+                    </span>
+                  ))}
+                </div>
                 {/* phones: numeral beside the title instead of on a line of its own (rules list ~24% shorter) */}
                 <div className="m-1.5 flex-1 border-2 border-[#7d7394] bg-paper p-5 text-acid-ink sm:p-6">
                   <div className="flex items-baseline gap-4 sm:block">
