@@ -10,6 +10,7 @@ import { pastimes } from '@/lib/pastimes';
 export default function PickPastime() {
   const [label, setLabel] = useState('');
   const busy = useRef(false);
+  const last = useRef(-1);
 
   const spin = () => {
     if (busy.current) return;
@@ -17,7 +18,18 @@ export default function PickPastime() {
     if (!cards.length) return;
     busy.current = true;
     cards.forEach((c) => c.removeAttribute('data-picked'));
-    const pick = Math.floor(Math.random() * cards.length);
+    // a fair-feeling draw: never the machine it just landed on, and the ones this browser hasn't opened yet
+    // first (LastPlayed's coin counts, kept in localStorage); a pure coin flip often gave the same one twice
+    let counts: Record<string, number> = {};
+    try {
+      counts = JSON.parse(localStorage.getItem('hena:played') ?? 'null')?.counts ?? {};
+    } catch {}
+    const pool = cards.map((_, k) => k).filter((k) => k !== last.current || cards.length === 1);
+    const unplayed = pool.filter((k) => !counts[cards[k].dataset.pastimeSlug ?? '']);
+    const from = unplayed.length ? unplayed : pool;
+    const pick = from[Math.floor(Math.random() * from.length)];
+    last.current = pick;
+    const fresh = !counts[cards[pick].dataset.pastimeSlug ?? ''] && Object.keys(counts).length > 0;
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     // a few laps that end on the picked one, each hop a little slower than the last
     const hops = reduce ? 0 : cards.length * 2 + pick;
@@ -27,7 +39,9 @@ export default function PickPastime() {
       const card = cards[pick];
       card.setAttribute('data-picked', '');
       card.querySelector('a')?.focus({ preventScroll: false });
-      setLabel(`Saiu: ${card.dataset.pastime}! Aperte Enter para ${card.dataset.action === 'Jogar' ? 'jogar' : 'abrir'}.`);
+      setLabel(
+        `Saiu: ${card.dataset.pastime}!${fresh ? ' Essa você ainda não abriu.' : ''} Aperte Enter para ${card.dataset.action === 'Jogar' ? 'jogar' : 'abrir'}.`,
+      );
       busy.current = false;
     };
     const step = () => {
