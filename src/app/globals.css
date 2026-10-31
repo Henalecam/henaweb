@@ -88,6 +88,13 @@
   #contato :focus-visible {
     outline: 3px solid var(--color-acid-ink);
   }
+  /* the ring "focuses" like a magnifier finding its clue: it lands from wide and faint to tight in a snap, so the
+     eye can follow where Tab went. In the base layer, so components with an animation of their own keep it */
+  @media (prefers-reduced-motion: no-preference) {
+    :focus-visible {
+      animation: focus-snap 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.25);
+    }
+  }
 
   html.lenis,
   html.lenis body {
@@ -916,6 +923,13 @@ li:last-child > a > [data-tree]::before {
   }
   to {
     box-shadow: 0 -22px 44px -10px rgb(13 8 32 / 0.55);
+  }
+}
+
+@keyframes focus-snap {
+  from {
+    outline-offset: 10px;
+    outline-color: transparent;
   }
 }
 
