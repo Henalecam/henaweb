@@ -1110,6 +1110,33 @@ html:active-view-transition-type(step-prev)::view-transition-new(*.case-window) 
   main > article [data-win-item] h3 {
     font-size: 1.25rem !important;
   }
+  /* /casos on paper: three files to a row with shorter screenshots (3 A4 pages → 2, the last one no longer just
+     the contact line), and each file carries its address, since a printed "Diconta →" leads nowhere */
+  [data-case-list] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 5mm !important;
+    margin-top: 6mm !important;
+  }
+  [data-case-list] [data-case-window] > div:last-child {
+    aspect-ratio: 16 / 7 !important;
+  }
+  [data-case-list] h2 {
+    margin-top: 2.5mm !important;
+    font-size: 1.2rem !important;
+  }
+  [data-case-list] h2 [aria-hidden] {
+    display: none;
+  }
+  [data-case-list] p {
+    font-size: 0.85rem !important;
+  }
+  [data-case-list] li > a::after {
+    content: 'henaweb.com' attr(href);
+    display: block;
+    margin-top: 1.5mm;
+    font-family: var(--font-mono);
+    font-size: 7.5pt;
+  }
   /* the FAQ's open/close "+" is a control; on paper every answer is already open */
   summary > [aria-hidden]:last-child {
     display: none !important;
