@@ -18,6 +18,9 @@ const STARS = (() => {
   }));
 })();
 
+// the stage's sky color at the top edge, from dusk (the site's base) to the deep night behind the stars
+const dusk = gsap.utils.interpolate('#140c2e', '#07041a') as (t: number) => string;
+
 /**
  * The vaporwave sunset stage: striped sun, neon floor and the halftone David,
  * pinned behind its children (hero → manifesto).
@@ -49,7 +52,16 @@ export default function DavidStage({ children }: { children: ReactNode }) {
       : gsap.fromTo(
           night.current,
           { opacity: 0 },
-          { opacity: 1, ease: 'power1.in', scrollTrigger: { trigger: stage.current, start: 'top top', end: 'bottom bottom', scrub: true } },
+          {
+            opacity: 1,
+            ease: 'power1.in',
+            scrollTrigger: { trigger: stage.current, start: 'top top', end: 'bottom bottom', scrub: true },
+            // the phone's browser bar (theme-color, kept in step by ThemeTint) darkens with the sky
+            onUpdate() {
+              const o = Number(gsap.getProperty(night.current, 'opacity'));
+              if (stage.current) stage.current.dataset.tint = dusk(Math.round(o * 20) / 20);
+            },
+          },
         );
 
     // the 3D scene waits for the page to finish loading so it never competes with first paint
