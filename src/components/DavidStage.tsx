@@ -5,6 +5,19 @@ import { gsap, ScrollTrigger, onReady, prefersReducedMotion } from '@/lib/gsap';
 import type { DavidScene } from '@/lib/davidScene';
 import { saveData } from '@/lib/saveData';
 
+/** Seeded so the night sky is the same on the server and in every visit. Upper half of the stage only. */
+const STARS = (() => {
+  let seed = 11;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+  return Array.from({ length: 34 }, () => ({
+    x: Math.round(rnd() * 980) / 10,
+    y: Math.round(rnd() * 480) / 10,
+    r: rnd() < 0.18 ? 3 : 2,
+    d: Math.round(rnd() * 40) / 10,
+    t: 2.5 + Math.round(rnd() * 30) / 10,
+  }));
+})();
+
 /**
  * The vaporwave sunset stage: striped sun, neon floor and the halftone David,
  * pinned behind its children (hero → manifesto).
@@ -13,6 +26,7 @@ export default function DavidStage({ children }: { children: ReactNode }) {
   const stage = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const sun = useRef<HTMLDivElement>(null);
+  const night = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let scene: DavidScene | null = null;
@@ -27,6 +41,15 @@ export default function DavidStage({ children }: { children: ReactNode }) {
           sun.current,
           { yPercent: 0 },
           { yPercent: 55, ease: 'none', scrollTrigger: { trigger: stage.current, start: 'top top', end: 'bottom bottom', scrub: true } },
+        );
+
+    // ...and night falls behind it: the sky deepens and the stars come out (reduced motion keeps the dusk sky)
+    const nightTween = prefersReducedMotion()
+      ? null
+      : gsap.fromTo(
+          night.current,
+          { opacity: 0 },
+          { opacity: 1, ease: 'power1.in', scrollTrigger: { trigger: stage.current, start: 'top top', end: 'bottom bottom', scrub: true } },
         );
 
     // the 3D scene waits for the page to finish loading so it never competes with first paint
@@ -64,6 +87,8 @@ export default function DavidStage({ children }: { children: ReactNode }) {
       offReady();
       sunTween?.scrollTrigger?.kill();
       sunTween?.kill();
+      nightTween?.scrollTrigger?.kill();
+      nightTween?.kill();
       trigger?.kill();
       scene?.dispose();
     };
@@ -72,6 +97,18 @@ export default function DavidStage({ children }: { children: ReactNode }) {
   return (
     <div ref={stage} className="relative">
       <div className="sky sticky top-0 -mb-[100svh] h-[100svh] overflow-hidden" aria-hidden>
+        {/* nightfall: a deeper sky and a field of stars, both behind the sun, fading in as it sets */}
+        <div ref={night} data-nightfall className="absolute inset-0 opacity-0">
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,#07041a_0%,#140c2e_45%,transparent_80%)]" />
+          {STARS.map((st, i) => (
+            <span
+              key={i}
+              data-star
+              className="absolute rounded-full bg-[#fff6d6]"
+              style={{ left: `${st.x}%`, top: `${st.y}%`, width: st.r, height: st.r, animationDelay: `${st.d}s`, animationDuration: `${st.t}s` }}
+            />
+          ))}
+        </div>
         {/* sun sits behind the bust on desktop, centered on mobile */}
         <div
           ref={sun}
