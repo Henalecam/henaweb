@@ -35,9 +35,16 @@ export default function SmoothScroll() {
       lenis.scrollTo(el, { immediate: true, force: true });
     };
     window.addEventListener('hena:jump', jump);
+    // a glide to a page position (the hero's "role para investigar ↓" cue), at the scroller's own pace
+    const glide = (e: Event) => {
+      e.preventDefault();
+      lenis.scrollTo((e as CustomEvent<number>).detail, { duration: 1.2 });
+    };
+    window.addEventListener('hena:glide', glide);
 
     return () => {
       window.removeEventListener('hena:jump', jump);
+      window.removeEventListener('hena:glide', glide);
       watch.disconnect();
       gsap.ticker.remove(tick);
       lenis.destroy();

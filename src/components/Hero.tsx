@@ -106,12 +106,25 @@ export default function Hero() {
           </div>
         </div>
         {/* desktop: a quiet cue under the buttons that the story continues below (phones already show the next
-            section's edge); decorative, the bob is motion-safe only */}
+            section's edge); decorative, the bob is motion-safe only. A click does what it says: the page glides
+            down past the hero (keyboards and screen readers already have Tab and the skip link: kept out of both) */}
         <div data-hero-fade className="pointer-events-none absolute inset-x-0 bottom-2 hidden justify-center md:flex" aria-hidden>
-          <span data-hero-cue className="label flex items-center gap-2 !text-[0.65rem] !text-ink/70">
+          <button
+            type="button"
+            tabIndex={-1}
+            data-hero-cue
+            data-cursor="Descer"
+            onClick={() => {
+              const y = (root.current?.getBoundingClientRect().bottom ?? innerHeight) + scrollY;
+              // the smooth scroller glides when it's on (cancelling the event says so); otherwise a plain scroll
+              const handled = !window.dispatchEvent(new CustomEvent('hena:glide', { detail: y, cancelable: true }));
+              if (!handled) window.scrollTo({ top: y, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+            }}
+            className="label group pointer-events-auto -my-2 flex cursor-pointer items-center gap-2 py-2 !text-[0.65rem] !text-ink/70 transition-colors hover:!text-acid"
+          >
             role para investigar
-            <span className="inline-block motion-safe:animate-[cue-bob_1.8s_ease-in-out_infinite]">↓</span>
-          </span>
+            <span className="inline-block transition-transform group-hover:translate-y-0.5 motion-safe:animate-[cue-bob_1.8s_ease-in-out_infinite]">↓</span>
+          </button>
         </div>
       </div>
     </section>
