@@ -91,6 +91,61 @@ const SYNONYMS: Record<string, string[]> = {
 
 const SEARCHABLE = ITEMS.map((it) => fold(`${it.label} ${it.hint ?? ''} ${it.group} ${it.keywords ?? ''}`));
 
+/** The items a query finds (every word must hit), title matches first, groups kept together. */
+function matchItems(query: string): Item[] {
+  const words = fold(query).split(/\s+/).filter(Boolean);
+  // a dropped last letter forgives gender/number: "custo" finds "custa", "sistemas" finds "sistema"
+  const hitOne = (text: string, w: string) => text.includes(w) || (w.length >= 4 && text.includes(w.slice(0, -1)));
+  const hit = (text: string, w: string) => hitOne(text, w) || (SYNONYMS[w] ?? []).some((alt) => text.includes(alt));
+  const found = ITEMS.map((it, i) => ({ it, i })).filter(({ i }) => words.every((w) => hit(SEARCHABLE[i], w)));
+  // what the visitor typed in the title itself ranks above a match buried in keywords
+  const inLabel = ({ it }: { it: Item }) => words.every((w) => hit(fold(`${it.label} ${it.hint ?? ''}`), w));
+  const groupOrder = [...new Set(ITEMS.map((it) => it.group))];
+  return found
+    .sort((a, b) => groupOrder.indexOf(a.it.group) - groupOrder.indexOf(b.it.group) || Number(inLabel(b)) - Number(inLabel(a)) || a.i - b.i)
+    .map(({ it }) => it)
+    .slice(0, 40);
+}
+
+// every word the index knows, for "você quis dizer…?" when a typo finds nothing ("dicota", "sheduly", "lgdp")
+const VOCAB = [...new Set(SEARCHABLE.join(' ').split(/[^a-z0-9]+/).filter((w) => w.length >= 4))];
+
+/** Edit distance with swapped neighbours counting as one edit ("lgdp" → "lgpd", "ecobrian" → "ecobrain"). */
+function typoDistance(a: string, b: string) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => Array.from({ length: b.length + 1 }, (_, j) => (i ? (j ? 0 : i) : j)));
+  for (let i = 1; i <= a.length; i++)
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+    }
+  return d[a.length][b.length];
+}
+
+/** The query with each unknown word swapped for its closest known one, if that finds something. */
+function suggestFor(query: string): string | null {
+  const words = fold(query).split(/\s+/).filter(Boolean);
+  let changed = false;
+  const fixed = words.map((w) => {
+    if (w.length < 4 || SEARCHABLE.some((t) => t.includes(w))) return w;
+    let best = '';
+    let bestD = Infinity;
+    for (const v of VOCAB) {
+      if (Math.abs(v.length - w.length) > 2) continue;
+      const dd = typoDistance(w, v);
+      if (dd < bestD) [best, bestD] = [v, dd];
+    }
+    // roughly one slip every four letters, as the 404's guesses allow
+    if (best && bestD <= Math.max(1, Math.floor(w.length / 4))) {
+      changed = true;
+      return best;
+    }
+    return w;
+  });
+  const q = fixed.join(' ');
+  return changed && matchItems(q).length ? q : null;
+}
+
 /**
  * "Arquivo de pistas": a ⌘K / Ctrl+K search over sections, cases, services, FAQ answers and the
  * contact actions. Built on <dialog> (focus trap, Esc and inert page come from the browser) with
@@ -106,20 +161,10 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
   // cases this visitor already opened (ReadMarks, hena:read), newest first: "pick up where you left off"
   const [recent, setRecent] = useState<Item[]>([]);
   const results = useMemo(() => {
-    const words = fold(query).split(/\s+/).filter(Boolean);
-    if (!words.length) return [...recent, ...ITEMS.filter((it) => it.group !== 'Perguntas')];
-    // a dropped last letter forgives gender/number: "custo" finds "custa", "sistemas" finds "sistema"
-    const hitOne = (text: string, w: string) => text.includes(w) || (w.length >= 4 && text.includes(w.slice(0, -1)));
-    const hit = (text: string, w: string) => hitOne(text, w) || (SYNONYMS[w] ?? []).some((alt) => text.includes(alt));
-    const found = ITEMS.map((it, i) => ({ it, i })).filter(({ i }) => words.every((w) => hit(SEARCHABLE[i], w)));
-    // what the visitor typed in the title itself ranks above a match buried in keywords; groups stay together
-    const inLabel = ({ it }: { it: Item }) => words.every((w) => hit(fold(`${it.label} ${it.hint ?? ''}`), w));
-    const groupOrder = [...new Set(ITEMS.map((it) => it.group))];
-    return found
-      .sort((a, b) => groupOrder.indexOf(a.it.group) - groupOrder.indexOf(b.it.group) || Number(inLabel(b)) - Number(inLabel(a)) || a.i - b.i)
-      .map(({ it }) => it)
-      .slice(0, 40);
+    if (!fold(query).trim()) return [...recent, ...ITEMS.filter((it) => it.group !== 'Perguntas')];
+    return matchItems(query);
   }, [query, recent]);
+  const suggestion = useMemo(() => (results.length === 0 && query.trim() ? suggestFor(query) : null), [results, query]);
 
   useEffect(() => {
     const d = dialog.current;
@@ -187,7 +232,9 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
       setActive((a) => (a - 1 + results.length) % Math.max(results.length, 1));
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      go(results[active]);
+      // nothing found but a likely typo: Enter takes the suggestion
+      if (!results.length && suggestion) setQuery(suggestion);
+      else go(results[active]);
     }
   };
 
@@ -268,6 +315,22 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
         </ul>
           {results.length === 0 && (
             <p role="status" className="px-5 pb-6 pt-2 text-center font-mono text-sm text-acid-ink/75">
+              {suggestion && (
+                <span className="mb-2 block">
+                  Você quis dizer{' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuery(suggestion);
+                      input.current?.focus();
+                    }}
+                    className="font-medium text-acid-ink underline underline-offset-4 hover:decoration-2"
+                  >
+                    {suggestion}
+                  </button>
+                  ? <span className="text-acid-ink/60">(Enter)</span>
+                </span>
+              )}
               Nenhuma pista com esse nome. Tente outra palavra
               {query.trim() && (
                 <>
