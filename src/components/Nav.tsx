@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { nav } from '@/lib/site';
 import { gsap, onReady, prefersReducedMotion } from '@/lib/gsap';
 import Magnetic from './Magnetic';
@@ -222,8 +222,16 @@ export default function Nav() {
           }`}
         />
         <div ref={inner} className="flex h-20 items-center justify-between">
-          <a href="/#topo" className="font-groovy flex items-baseline gap-1 text-2xl text-acid [text-shadow:3px_3px_0_#120626]" aria-label="HenaWeb, início">
-            HenaWeb<span className="text-[0.6rem] align-super">®</span>
+          <a href="/#topo" data-logo className="font-groovy flex items-baseline gap-1 text-2xl text-acid [text-shadow:3px_3px_0_#120626]" aria-label="HenaWeb, início">
+            {/* pointing at the logo sends a little hop through its letters, left to right (globals.css, logo-hop) */}
+            <span className="whitespace-nowrap">
+              {'HenaWeb'.split('').map((ch, i) => (
+                <span key={i} data-logo-letter style={{ '--i': i } as CSSProperties}>
+                  {ch}
+                </span>
+              ))}
+            </span>
+            <span className="text-[0.6rem] align-super">®</span>
           </a>
           <nav className="hidden items-center gap-5 lg:flex xl:gap-8" aria-label="Principal">
             {nav.map((item) => (

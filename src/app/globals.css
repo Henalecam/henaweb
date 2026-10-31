@@ -777,6 +777,26 @@ img[data-failed] {
   97% { fill-opacity: 1; }
 }
 
+/* header logo: pointing at it (or tabbing to it) sends a hop through the letters, left to right, 45 ms apart.
+   `translate` on inline-blocks, so the text shadow travels with each letter */
+[data-logo-letter] {
+  display: inline-block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  @media (hover: hover) {
+    [data-logo]:hover [data-logo-letter] {
+      animation: logo-hop 0.42s cubic-bezier(0.3, 0.7, 0.4, 1.4) calc(var(--i) * 45ms) both;
+    }
+  }
+  [data-logo]:focus-visible [data-logo-letter] {
+    animation: logo-hop 0.42s cubic-bezier(0.3, 0.7, 0.4, 1.4) calc(var(--i) * 45ms) both;
+  }
+}
+@keyframes logo-hop {
+  0%, 100% { translate: 0 0; }
+  45% { translate: 0 -0.28em; rotate: -6deg; }
+}
+
 /* sections out of view stop their endless CSS loops (OffscreenPause) */
 [data-offscreen],
 [data-offscreen] * {
