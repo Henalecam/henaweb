@@ -9,6 +9,33 @@ import Placard from './Placard';
 import { chisel } from '@/lib/chisel';
 import NewTab from './NewTab';
 
+const ECHO = 'ｓｉｓｔｅｍａｓ　ｅｓｃｕｌｐｉｄｏｓ';
+// fullwidth noise: every glyph is one em wide, like the echo itself, so the line never changes width
+const NOISE = 'ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ０１２３４５６７８９＃％＆＊＋＝？＠';
+
+/**
+ * The vaporwave echo above the headline decodes itself when the mouse passes over it: the letters churn as
+ * fullwidth noise and settle left to right in ~0.7 s. Decorative (the echo is aria-hidden); still with reduced motion.
+ */
+function scramble(el: HTMLElement) {
+  if (el.dataset.scrambling || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  el.dataset.scrambling = '';
+  const chars = [...ECHO];
+  const t0 = performance.now();
+  const frame = (now: number) => {
+    const settled = Math.floor(((now - t0) / 700) * chars.length);
+    el.textContent = chars
+      .map((c, i) => (i < settled || c === '　' ? c : NOISE[Math.floor(Math.random() * NOISE.length)]))
+      .join('');
+    if (settled < chars.length) requestAnimationFrame(frame);
+    else {
+      el.textContent = ECHO;
+      delete el.dataset.scrambling;
+    }
+  };
+  requestAnimationFrame(frame);
+}
+
 export default function Hero() {
   const root = useRef<HTMLElement>(null);
 
@@ -57,9 +84,10 @@ export default function Hero() {
               letters cross the sun, so a dark halo under the cyan glow keeps them from melting into the yellow */}
           <span
             aria-hidden
+            onPointerEnter={(e) => e.pointerType === 'mouse' && scramble(e.currentTarget)}
             className="font-mono text-sm tracking-[0.3em] text-cyan [text-shadow:0_0_2px_rgb(18_8_42/0.95),0_0_6px_rgb(18_8_42/0.9),0_0_12px_rgb(1_205_254/0.6)]"
           >
-            ｓｉｓｔｅｍａｓ　ｅｓｃｕｌｐｉｄｏｓ
+            {ECHO}
           </span>
         </div>
 
