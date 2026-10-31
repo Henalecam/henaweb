@@ -154,7 +154,7 @@ export default function Capabilities({ caseCounts = {}, caseSlugs = {} }: { case
                 </span>
               </div>
               {/* the page link lives outside the toggle button (no nested interactive elements) */}
-              <span className={`relative mx-3 mb-6 flex-wrap items-center gap-x-5 gap-y-3 md:mx-6 md:mb-8 ${isOpen ? 'flex' : 'hidden'}`}>
+              <span data-cap-links className={`relative mx-3 mb-6 flex-wrap items-center gap-x-5 gap-y-3 md:mx-6 md:mb-8 ${isOpen ? 'flex' : 'hidden'}`}>
                 <a
                   href={`/servicos/${c.slug}`}
                   className="toon-sm toon-press inline-flex w-fit items-center gap-2 rounded-full bg-acid-ink px-4 py-2 text-sm font-medium text-paper"

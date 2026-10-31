@@ -1137,6 +1137,19 @@ html:active-view-transition-type(step-prev)::view-transition-new(*.case-window) 
     font-family: var(--font-mono);
     font-size: 7.5pt;
   }
+  /* home capabilities: only the open row's description printed (the other three panels are collapsed to 0 px on
+     screen), so three of the four services reached paper as a bare title; all of them print open, without the "+" */
+  [id^='cap-panel-'] {
+    grid-template-rows: 1fr !important;
+    opacity: 1 !important;
+    display: grid !important;
+  }
+  [data-cap-row] button > span[aria-hidden]:last-child {
+    display: none !important;
+  }
+  [data-cap-links] {
+    display: flex !important;
+  }
   /* the FAQ's open/close "+" is a control; on paper every answer is already open */
   summary > [aria-hidden]:last-child {
     display: none !important;
