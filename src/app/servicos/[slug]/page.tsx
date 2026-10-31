@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { services, serviceBySlug } from '@/lib/services';
-import { projects, site, whatsappLink } from '@/lib/content';
+import { capabilities, projects, site, whatsappLink } from '@/lib/content';
 import ClosingCta from '@/components/ClosingCta';
 import Footer from '@/components/Footer';
 import { FaqCopyLink, FaqHashOpener, FaqToggleAll } from '@/components/FaqLink';
@@ -55,6 +55,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
   if (!s) notFound();
   const url = `${site.url}/servicos/${s.slug}`;
   const caseCount = projects.filter((p) => p.service === s.slug).length;
+  const numeral = capabilities.find((c) => c.slug === s.slug)?.id;
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -98,7 +99,18 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
       {/* service → next/previous service (←/→, the folder cards): the swap slides the way the reader is walking */}
       <script dangerouslySetInnerHTML={{ __html: stepTransitionScript('servicos', services.map((o) => o.slug)) }} />
       <main id="conteudo" tabIndex={-1} className="sky min-h-screen text-ink">
-        <article className="gutter mx-auto max-w-6xl pt-36 pb-24">
+        <article className="gutter relative isolate mx-auto max-w-6xl pt-36 pb-24">
+          {/* the service's numeral from the home's Capacidades list (I–IV), carved huge and hollow behind the title:
+              the page reads as chapter N of the same book. Decorative; off on phones and on paper */}
+          {numeral && (
+            <span
+              aria-hidden
+              data-service-numeral
+              className="font-groovy pointer-events-none absolute top-24 right-[clamp(1rem,4vw,3.5rem)] -z-10 hidden text-[clamp(10rem,22vw,20rem)] leading-none text-transparent select-none [-webkit-text-stroke:2px_rgb(247_147_30/0.35)] md:block print:hidden"
+            >
+              {numeral}
+            </span>
+          )}
           <nav aria-label="Trilha" className="label">
             {/* links padded to a 27px-tall target (WCAG 2.5.8) without changing the line height */}
             <ol className="flex flex-wrap items-center gap-2">
