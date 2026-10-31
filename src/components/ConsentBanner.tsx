@@ -10,6 +10,8 @@ import { CONSENT_OPEN, readConsent, saveConsent, type Consent } from '@/lib/cons
 export default function ConsentBanner({ tools }: { tools: string[] }) {
   const [open, setOpen] = useState(false);
   const [shown, setShown] = useState(false);
+  // the title-bar cookie reacts to the answer as the window slides away: bitten for "Aceitar", left whole for "Recusar"
+  const [bitten, setBitten] = useState(false);
   const box = useRef<HTMLElement>(null);
 
   // while the notice is up it covers the bottom of the screen (a fifth of a phone): Tab used to land on links
@@ -63,9 +65,12 @@ export default function ConsentBanner({ tools }: { tools: string[] }) {
   if (!open) return null;
 
   const choose = (c: Consent) => {
+    setBitten(c === 'granted');
     saveConsent(c);
-    setShown(false);
-    setTimeout(() => setOpen(false), 300);
+    // the answer is saved at once; on "Aceitar" the window waits a beat so the bite is seen before it slides away
+    const linger = c === 'granted' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 280 : 0;
+    setTimeout(() => setShown(false), linger);
+    setTimeout(() => setOpen(false), linger + 300);
   };
 
   return (
@@ -81,6 +86,23 @@ export default function ConsentBanner({ tools }: { tools: string[] }) {
       } [html[data-menu=open]_&]:hidden`}
     >
       <div className="win-bar">
+        {/* a chocolate-chip cookie as the file's icon, drawn like the site's other toon bits; decorative */}
+        <svg data-cookie={bitten ? 'bitten' : ''} viewBox="0 0 16 16" className="h-4 w-4 shrink-0" aria-hidden>
+          <defs>
+            <mask id="cookie-bite">
+              <rect width="16" height="16" fill="#fff" />
+              <circle className="cookie-bite" cx="15" cy="2.5" r="4.2" fill="#000" />
+              <circle className="cookie-bite" cx="11.2" cy="0.4" r="2.6" fill="#000" />
+            </mask>
+          </defs>
+          <g mask="url(#cookie-bite)">
+            <circle cx="8" cy="8" r="6.6" fill="#d9a05b" stroke="#2a1608" strokeWidth="1.4" />
+            <circle cx="5.6" cy="6" r="1.05" fill="#3b2412" />
+            <circle cx="9.6" cy="5.2" r="0.9" fill="#3b2412" />
+            <circle cx="10.4" cy="9.8" r="1.1" fill="#3b2412" />
+            <circle cx="6.3" cy="10.4" r="0.85" fill="#3b2412" />
+          </g>
+        </svg>
         <span>COOKIES.TXT</span>
       </div>
       <div className="m-1.5 border-2 border-[#7d7394] bg-paper p-3.5">

@@ -797,6 +797,17 @@ img[data-failed] {
   45% { translate: 0 -0.28em; rotate: -6deg; }
 }
 
+/* COOKIES.TXT: the title-bar cookie loses a bite when the visitor accepts (the window is sliding away meanwhile) */
+[data-cookie] .cookie-bite {
+  scale: 0;
+  transform-origin: 15px 2px;
+  transform-box: view-box;
+}
+[data-cookie='bitten'] .cookie-bite {
+  scale: 1;
+  transition: scale 0.18s cubic-bezier(0.3, 0.7, 0.4, 1.5);
+}
+
 /* sections out of view stop their endless CSS loops (OffscreenPause) */
 [data-offscreen],
 [data-offscreen] * {
