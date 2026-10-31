@@ -131,10 +131,12 @@ export default function Passatempo() {
                     </div>
                   </div>
                   <div className="mt-5 flex items-baseline justify-between gap-4">
-                    <span>
-                      <span className="block text-3xl font-medium tracking-[-0.03em] group-hover:text-acid group-focus-visible:text-acid">{p.name}</span>
+                    {/* each machine's name is a heading: the page had only its h1, so a screen reader's heading list
+                        (H / the rotor) couldn't jump from one game to the next */}
+                    <div>
+                      <h2 className="text-3xl font-medium tracking-[-0.03em] group-hover:text-acid group-focus-visible:text-acid">{p.name}</h2>
                       <span className="mt-1 block font-mono text-sm text-ink/65">{p.url.replace('https://', '')}</span>
-                    </span>
+                    </div>
                     <span className="toon-sm toon-press shrink-0 rounded-full bg-acid px-5 py-2.5 print:hidden font-medium text-acid-ink">
                       {p.action} <span aria-hidden>↗</span>
                     </span>
