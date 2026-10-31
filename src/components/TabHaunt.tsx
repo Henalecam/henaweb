@@ -13,6 +13,26 @@ const hasDraft = () => {
     return false;
   }
 };
+// the tab's icon joins in while the visitor is away: a little ghost (or an envelope, when the form was left
+// half-filled), drawn inline as SVG and appended as the last icon link, which browsers prefer; removed on return
+const svgIcon = (body: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">${body}</svg>`)}`;
+const GHOST_ICON = svgIcon(
+  '<rect width="32" height="32" rx="8" fill="#140c2e"/><path d="M8 27V14a8 8 0 0 1 16 0v13l-2.7-2.2L18.7 27 16 24.8 13.3 27l-2.6-2.2Z" fill="#fdf3e1"/><circle cx="13" cy="14" r="1.8" fill="#140c2e"/><circle cx="19" cy="14" r="1.8" fill="#140c2e"/>',
+);
+const DRAFT_ICON = svgIcon(
+  '<rect width="32" height="32" rx="8" fill="#f7931e"/><rect x="6" y="9" width="20" height="14" rx="2" fill="#fdf3e1" stroke="#1a0f2e" stroke-width="2"/><path d="m7 10 9 7 9-7" fill="none" stroke="#1a0f2e" stroke-width="2"/>',
+);
+const showAwayIcon = (href: string | null) => {
+  document.getElementById('hena-away-icon')?.remove();
+  if (!href) return;
+  const link = document.createElement('link');
+  link.id = 'hena-away-icon';
+  link.rel = 'icon';
+  link.type = 'image/svg+xml';
+  link.href = href;
+  document.head.appendChild(link);
+};
 const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
 /**
@@ -114,9 +134,12 @@ export default function TabHaunt() {
     const onVisibility = () => {
       if (document.hidden) {
         original = document.title;
-        document.title = hasDraft() ? AWAY_DRAFT : AWAY;
-      } else if (document.title === AWAY || document.title === AWAY_DRAFT) {
-        document.title = original;
+        const draft = hasDraft();
+        document.title = draft ? AWAY_DRAFT : AWAY;
+        showAwayIcon(draft ? DRAFT_ICON : GHOST_ICON);
+      } else {
+        showAwayIcon(null);
+        if (document.title === AWAY || document.title === AWAY_DRAFT) document.title = original;
       }
     };
     document.addEventListener('visibilitychange', onVisibility);
@@ -150,6 +173,7 @@ export default function TabHaunt() {
 
     return () => {
       document.removeEventListener('visibilitychange', onVisibility);
+      showAwayIcon(null);
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('hena:lanterna', onLantern);
     };
