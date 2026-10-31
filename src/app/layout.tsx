@@ -148,6 +148,12 @@ const jsonLd = {
 
 const SEEN_SCRIPT = "try{sessionStorage.getItem('hena:seen')==='1'&&(document.documentElement.dataset.seen='')}catch(e){}";
 
+// an image that fails (offline, a dropped connection) showed the browser's broken-picture icon over the dark frame
+// of every screenshot window; it's marked so CSS swaps it for a quiet "imagem fora do ar" plate, and it is
+// requested again once the connection comes back. error and load don't bubble, so this listens in the capture
+// phase (on document for load: a load event never reaches window from an element)
+const IMG_FAIL_SCRIPT = `(()=>{const mark=(i)=>{if(i.dataset.failed!==undefined)return;i.dataset.failed='';const p=i.parentElement;if(p&&getComputedStyle(p).position!=='static')p.dataset.imgFailed=''};addEventListener('error',(e)=>{const t=e.target;if(t instanceof HTMLImageElement)mark(t)},true);document.addEventListener('load',(e)=>{const t=e.target;if(t instanceof HTMLImageElement&&t.dataset.failed!==undefined){delete t.dataset.failed;t.parentElement&&delete t.parentElement.dataset.imgFailed}},true);addEventListener('online',()=>{document.querySelectorAll('img[data-failed]').forEach((i)=>{const s=i.srcset;if(s){i.srcset='';i.srcset=s}else{const u=i.src;i.src='';i.src=u}})})})();`;
+
 const SPECULATION_RULES = JSON.stringify({
   prefetch: [
     {
@@ -183,6 +189,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* repeat views in the same tab skip the intro: hide the overlay before the first paint instead
             of holding the page under it until hydration fades it out */}
         <script dangerouslySetInnerHTML={{ __html: SEEN_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: IMG_FAIL_SCRIPT }} />
         {/* hovering an internal link for ~200 ms fetches that page, so the click lands on a warm cache */}
         <script type="speculationrules" dangerouslySetInnerHTML={{ __html: SPECULATION_RULES }} />
         <Preloader />
