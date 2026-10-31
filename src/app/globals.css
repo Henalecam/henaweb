@@ -65,6 +65,18 @@
     background: var(--color-acid);
     color: var(--color-acid-ink);
   }
+  /* on the light and orange surfaces an orange highlight vanished (the contact section: the very same colour,
+     1:1; the lemon "Caso resolvido" card 1.8:1). There, selected text turns into the site's ink with lemon
+     letters — dark on light, orange on dark. Dark islands inside light sections keep the orange */
+  :where(#contato, .paper, .bg-paper, .bg-lemon, .bg-acid, .bg-white, [data-cap-row]) ::selection {
+    background: var(--color-acid-ink);
+    color: var(--color-lemon);
+  }
+  .bg-acid-ink::selection,
+  .bg-acid-ink ::selection {
+    background: var(--color-acid);
+    color: var(--color-acid-ink);
+  }
 
   :focus-visible {
     outline: 2px solid var(--color-acid);
