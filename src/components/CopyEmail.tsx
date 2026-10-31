@@ -16,7 +16,7 @@ export default function CopyEmail({ className = '', placement }: { className?: s
   const [n, setN] = useState(0);
 
   const copy = async () => {
-    const ok = await copyText(site.email);
+    const ok = await copyText(site.email, { quiet: true });
     track({ name: 'email_click', placement: `${placement}-copy` });
     setState(ok ? 'ok' : 'fail');
     setN((x) => x + 1);
