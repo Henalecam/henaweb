@@ -1034,6 +1034,18 @@ a:focus-visible .arcade-credit::after { content: ' · 01'; }
   animation: stamp-in 0.5s 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+/* FAQ: once every answer has been opened, the "N de M lidas" count turns into a small stamp (a gentler thump than
+   the contact's: it sits beside a button and must not overflow a phone screen) */
+.faq-stamp {
+  rotate: -3deg;
+  animation: faq-stamp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes faq-stamp {
+  0% { scale: 1.5; opacity: 0; }
+  70% { scale: 0.95; opacity: 1; }
+  100% { scale: 1; opacity: 1; }
+}
+
 /* ───────────── Page-to-page transitions (cross-document View Transitions) ─────────────
    Links between pages are plain <a>, so each click is a full navigation. Browsers that support it
    animate the swap: the old page sinks back into the dark and the new one is wiped up from the

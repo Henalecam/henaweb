@@ -82,12 +82,29 @@ export function FaqToggleAll() {
 
   return (
     <span className="inline-flex items-center gap-3">
-      {seen.n > 0 && (
-        // visual only: screen readers already hear each answer's expanded state
-        <span aria-hidden className="font-mono text-xs tracking-wider opacity-70">
-          <span className="text-[#15803d]">✓</span> {seen.n === seen.of ? `todas as ${seen.of} lidas` : `${seen.n} de ${seen.of} lidas`}
-        </span>
-      )}
+      {seen.n > 0 &&
+        (seen.n === seen.of ? (
+          // every answer read: the count becomes a little rubber stamp closing the interrogation (in the section's own
+          // ink, so it reads on the dark service pages and on the light home section alike)
+          <span
+            aria-hidden
+            data-faq-done
+            className="faq-stamp inline-block rounded-sm border-2 border-current px-1.5 py-0.5 font-mono text-[0.68rem] font-bold tracking-wider uppercase"
+          >
+            ✓ interrogatório completo
+          </span>
+        ) : (
+          // visual only: screen readers already hear each answer's expanded state. One notch per question,
+          // filled as it is read, beside the count
+          <span aria-hidden className="inline-flex items-center gap-2 font-mono text-xs tracking-wider opacity-70">
+            <span className="flex gap-[3px]" data-faq-notches>
+              {Array.from({ length: seen.of }, (_, i) => (
+                <span key={i} className={`h-2.5 w-1.5 rounded-[1px] border border-current ${i < seen.n ? 'bg-current' : 'opacity-60'}`} />
+              ))}
+            </span>
+            {seen.n} de {seen.of} lidas
+          </span>
+        ))}
       <button
         ref={ref}
         type="button"
