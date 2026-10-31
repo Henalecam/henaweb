@@ -1117,6 +1117,19 @@ li:last-child > a > [data-tree]::before {
   50% { scale: 1; opacity: 1; }
 }
 
+/* scroll shadows for short scrolling panes (the search results): a soft shade appears at the top once the list
+   has scrolled and at the bottom while there's more below, so a cut-off list reads as "keeps going" instead of
+   "that's all". Pure CSS: the covers scroll with the content (local), the shades stay put (scroll) */
+.scroll-shadows {
+  --cover: var(--color-paper);
+  background:
+    linear-gradient(var(--cover) 40%, transparent) center top / 100% 2.2rem no-repeat local,
+    linear-gradient(transparent, var(--cover) 60%) center bottom / 100% 2.2rem no-repeat local,
+    radial-gradient(farthest-side at 50% 0, rgb(26 15 46 / 0.22), transparent) center top / 100% 0.8rem no-repeat scroll,
+    radial-gradient(farthest-side at 50% 100%, rgb(26 15 46 / 0.22), transparent) center bottom / 100% 0.8rem no-repeat scroll;
+  background-color: var(--cover);
+}
+
 /* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
    reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
 [data-nav-pending] {
