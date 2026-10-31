@@ -43,6 +43,20 @@ export default function FloatingContact() {
   const [compact, setCompact] = useState(false);
   const [tucked, setTucked] = useState(false);
   const [href, setHref] = useState(() => whatsappLink());
+  // the first time the button shows up in a visit, its phone icon rings once (a hello, not a nag: never again
+  // in the same tab session)
+  const [ring, setRing] = useState(false);
+  useEffect(() => {
+    // only where the button is actually drawn (phones) and allowed to move
+    if (!show || !matchMedia('(max-width: 767px) and (prefers-reduced-motion: no-preference)').matches) return;
+    try {
+      if (sessionStorage.getItem('hena:rang')) return;
+      sessionStorage.setItem('hena:rang', '1');
+    } catch {
+      return;
+    }
+    setRing(true);
+  }, [show]);
 
   useEffect(() => {
     // service pages already carry a tailored message in the closing CTA; case pages name the case
@@ -119,7 +133,14 @@ export default function FloatingContact() {
       } ${tucked ? 'translate-x-[calc(100%+6px)] focus-visible:translate-x-0' : 'translate-x-0'} [html[data-menu=open]_&]:pointer-events-none [html[data-menu=open]_&]:opacity-0`}
       style={{ bottom: 'max(1rem, env(safe-area-inset-bottom))' }}
     >
-      <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="currentColor" aria-hidden>
+      <svg
+        viewBox="0 0 24 24"
+        data-ring={ring ? '' : undefined}
+        onAnimationEnd={() => setRing(false)}
+        className="h-5 w-5 shrink-0"
+        fill="currentColor"
+        aria-hidden
+      >
         <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.2-.2-.4-.3Z" />
       </svg>
       <span
