@@ -1101,6 +1101,22 @@ li:last-child > a > [data-tree]::before {
   9%, 100% { scale: 1; box-shadow: 0 0 0 0 rgb(255 255 255 / 0); }
 }
 
+/* Work on phones/tablets: in the swipeable case strip, the card in the middle is the one in focus; its
+   neighbours peeking at the edges sit a little smaller and dimmer, growing as the swipe brings them to the
+   centre (scroll-driven on the strip's own horizontal scroll, so it follows the finger exactly) */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-work-strip] > li {
+      animation: strip-focus linear both;
+      animation-timeline: view(inline);
+    }
+  }
+}
+@keyframes strip-focus {
+  0%, 100% { scale: 0.9; opacity: 0.55; }
+  50% { scale: 1; opacity: 1; }
+}
+
 /* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
    reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
 [data-nav-pending] {
