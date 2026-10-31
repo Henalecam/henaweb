@@ -572,6 +572,7 @@ nav[aria-label='Casos do arquivo']:hover a:not(:hover) .dot-tip {
   transition: stroke-dashoffset 0.9s cubic-bezier(0.6, 0, 0.3, 1) 0.25s;
 }
 [data-portrait-card]:hover .sig-line path,
+[data-portrait-card]:focus-within .sig-line path,
 [data-portrait-card].is-developed .sig-line path {
   stroke-dashoffset: 0;
 }

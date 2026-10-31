@@ -5,6 +5,15 @@ import Image from 'next/image';
 import { gsap, ScrollTrigger, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { principles } from '@/lib/content';
 
+/** Develops the polaroid for good and wobbles it (restarted on every press); no wobble with reduced motion. */
+function develop(card: HTMLElement) {
+  card.classList.add('is-developed');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  card.classList.remove('is-shaking');
+  void card.offsetWidth;
+  card.classList.add('is-shaking');
+}
+
 export default function Studio() {
   const root = useRef<HTMLElement>(null);
   // the Notepad status bars count a selection like the real one: select part of a rule and its bar reads
@@ -101,17 +110,22 @@ export default function Studio() {
           <figure
             data-portrait-card
             data-cursor="Chacoalhar"
-            onClick={(e) => {
-              const card = e.currentTarget;
-              card.classList.add('is-developed');
-              if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-              card.classList.remove('is-shaking');
-              void card.offsetWidth; // restart the wobble on every click
-              card.classList.add('is-shaking');
-            }}
+            onClick={(e) => develop(e.currentTarget)}
             onAnimationEnd={(e) => e.animationName === 'polaroid-shake' && e.currentTarget.classList.remove('is-shaking')}
-            className="group toon relative mt-10 max-w-sm -rotate-2 cursor-pointer rounded-sm bg-paper p-3 pb-4 transition-transform duration-500 hover:rotate-0 [&.is-developed]:rotate-0"
+            className="group toon relative mt-10 max-w-sm -rotate-2 cursor-pointer rounded-sm bg-paper p-3 pb-4 transition-transform duration-500 hover:rotate-0 focus-within:rotate-0 [&.is-developed]:rotate-0"
           >
+            {/* keyboards could never develop the photo (a click or a hover did): a button that only shows
+                when focused does what a click does, and focus alone already develops it, like a hover */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                develop(e.currentTarget.closest('figure')!);
+              }}
+              className="sr-only z-20 font-mono text-xs focus-visible:not-sr-only focus-visible:absolute focus-visible:right-5 focus-visible:bottom-24 focus-visible:rounded-full focus-visible:bg-acid focus-visible:px-3 focus-visible:py-1.5 focus-visible:text-acid-ink"
+            >
+              Chacoalhar a foto ↻
+            </button>
             {/* a strip of tape holds the polaroid in place, like a photo taped into a case file */}
             <span
               aria-hidden
@@ -123,9 +137,9 @@ export default function Studio() {
                 alt="Henrique Alexandre de Camargo, fundador da HenaWeb"
                 fill
                 sizes="(max-width: 767px) 80vw, (max-width: 1024px) 48vw, 25vw"
-                className="object-cover grayscale contrast-125 transition-[filter] duration-700 group-hover:grayscale-0 group-hover:contrast-100 group-[.is-developed]:grayscale-0 group-[.is-developed]:contrast-100"
+                className="object-cover grayscale contrast-125 transition-[filter] duration-700 group-hover:grayscale-0 group-hover:contrast-100 group-focus-within:grayscale-0 group-focus-within:contrast-100 group-[.is-developed]:grayscale-0 group-[.is-developed]:contrast-100"
               />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,transparent_1.1px,rgb(18_8_42/0.85)_1.9px)] bg-[length:6px_6px] transition-opacity duration-700 group-hover:opacity-0 group-[.is-developed]:opacity-0" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,transparent_1.1px,rgb(18_8_42/0.85)_1.9px)] bg-[length:6px_6px] transition-opacity duration-700 group-hover:opacity-0 group-focus-within:opacity-0 group-[.is-developed]:opacity-0" />
             </div>
             <figcaption className="mt-3 text-center text-acid-ink">
               <span className="font-groovy block text-lg text-[#c2410c]">Fundador · Cientista da computação</span>
