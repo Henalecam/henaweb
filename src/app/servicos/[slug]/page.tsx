@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import type { CSSProperties } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { services, serviceBySlug } from '@/lib/services';
@@ -193,7 +194,12 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                     {/* where this step sits in the whole delivery, like a copy dialog's progress: one block per step */}
                     <span aria-hidden className="ml-auto flex items-center gap-[3px]">
                       {s.deliverables.map((_, j) => (
-                        <span key={j} className={`h-2.5 w-2 border border-white/85 shadow-[1px_1px_0_rgb(0_0_0/0.35)] ${j <= i ? 'bg-white' : 'bg-transparent'}`} />
+                        <span
+                          key={j}
+                          data-prog-fill={j <= i ? '' : undefined}
+                          style={j <= i ? ({ '--j': j } as CSSProperties) : undefined}
+                          className={`h-2.5 w-2 border border-white/85 shadow-[1px_1px_0_rgb(0_0_0/0.35)] ${j <= i ? 'bg-white' : 'bg-transparent'}`}
+                        />
                       ))}
                     </span>
                   </div>

@@ -292,6 +292,28 @@ button.win-btn::after {
   inset: -4px;
 }
 
+/* service-page steps: the title-bar progress blocks fill one by one as each window scrolls in, like a copy dialog
+   catching up — scrubbed by the scroll, so it only moves when the reader does. Browsers without view timelines,
+   reduced motion and print keep the static blocks */
+@media screen and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-win-item] {
+      view-timeline: --win-step block;
+    }
+    [data-win-item] [data-prog-fill] {
+      animation: prog-fill linear both;
+      animation-timeline: --win-step;
+      animation-range: entry calc(25% + var(--j) * 14%) entry calc(37% + var(--j) * 14%);
+    }
+  }
+}
+@keyframes prog-fill {
+  from {
+    background-color: transparent;
+    scale: 1 0.4;
+  }
+}
+
 /* Studio rules and service-page steps: like a real desktop, the window under the pointer is the focused one — it lifts
    toward you and keeps its colour bar, the others drop to the grey "inactive" bar of Windows 95.
    `translate` (not transform) so it stacks with GSAP's inline transform; !important because GSAP also
