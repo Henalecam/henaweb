@@ -20,6 +20,16 @@ export default function OfflineRunner() {
   const [score, setScore] = useState(0);
   const [best, setBest] = useState(0);
   const jumpRef = useRef<() => void>(() => {});
+  const again = useRef<HTMLButtonElement>(null);
+
+  // game over while playing by keyboard: focus sat on the canvas (now inert), so Space did nothing and the way back in
+  // was a Tab hunt. The restart button takes focus instead, a beat later so a jump still being mashed doesn't
+  // restart the run by accident; Space or Enter then plays again, as on the browser's own offline game.
+  useEffect(() => {
+    if (phase !== 'over' || document.activeElement !== canvas.current) return;
+    const t = setTimeout(() => again.current?.focus({ preventScroll: true }), 450);
+    return () => clearTimeout(t);
+  }, [phase]);
 
   useEffect(() => {
     try {
@@ -185,7 +195,7 @@ export default function OfflineRunner() {
         {phase !== 'run' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#fffaf0]/85 text-center">
             {phase === 'over' && <p className="font-mono text-sm text-acid-ink">caso arquivado · {score} pontos</p>}
-            <button type="button" onClick={start} className="toon-sm toon-press rounded-full bg-acid px-4 py-1.5 text-sm font-medium text-acid-ink">
+            <button ref={again} type="button" onClick={start} className="toon-sm toon-press rounded-full bg-acid px-4 py-1.5 text-sm font-medium text-acid-ink">
               {phase === 'over' ? 'Investigar de novo ▸' : 'Investigar enquanto espera ▸'}
             </button>
           </div>
