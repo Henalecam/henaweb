@@ -17,9 +17,9 @@ export const metadata: Metadata = {
  */
 export default function Offline() {
   return (
-    <main id="conteudo" tabIndex={-1} className="sky relative flex min-h-[100svh] items-center overflow-x-clip text-ink">
+    <main id="conteudo" tabIndex={-1} className="sky relative flex min-h-[100svh] items-center overflow-x-clip text-ink print:block print:min-h-0">
       <div className="grid-floor !h-[28%] opacity-50" aria-hidden />
-      <div className="relative mx-auto w-[min(100%-2rem,32rem)] py-28">
+      <div className="relative mx-auto w-[min(100%-2rem,32rem)] py-28 print:py-6">
         <div className="win">
           <div className="win-bar">
             <span>sem_sinal.exe</span>

@@ -1348,6 +1348,18 @@ html {
   font-size: 1.125rem;
   max-width: 62ch;
 }
+/* paper shows the steps as written, not as arranged on screen: a maximized window prints at its normal place and
+   size (minimized ones already print, see [data-min]) */
+@media print {
+  [data-win-item][data-max] {
+    grid-column: auto;
+  }
+  [data-win-item][data-max] h3,
+  [data-win-item][data-max] p {
+    font-size: revert-layer;
+    max-width: none;
+  }
+}
 
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */

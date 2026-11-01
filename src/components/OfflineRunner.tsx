@@ -13,7 +13,7 @@ type Clue = { x: number; w: number; h: number };
  * /offline: something to do while the signal is gone, the way a browser's own offline page has its dinosaur. Here the
  * runner is the studio's magnifying glass, hopping over the "?" of unsolved cases. Space / ↑ / a tap jumps; it only
  * starts when asked (nothing moves on its own), pauses when the tab is hidden, and keeps the best score in this
- * browser. The score is mirrored in text for screen readers.
+ * browser. The score is mirrored in text for screen readers. Left off the printout.
  */
 export default function OfflineRunner() {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -171,7 +171,8 @@ export default function OfflineRunner() {
   };
 
   return (
-    <div className="mt-6 border-t-2 border-dashed border-acid-ink/20 pt-5">
+    // a game has nothing to say on paper (the canvas printed as a squashed box under its own button)
+    <div className="mt-6 border-t-2 border-dashed border-acid-ink/20 pt-5 print:hidden">
       <div className="flex items-baseline justify-between gap-3">
         <p className="label !text-acid-ink/70">Enquanto o sinal não volta</p>
         {best > 0 && <p className="font-mono text-xs text-acid-ink/70">recorde: {best}</p>}

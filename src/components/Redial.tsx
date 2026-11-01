@@ -25,7 +25,7 @@ export default function Redial() {
       .catch(() => window.setTimeout(() => setState('searching'), 700));
   };
   return (
-    <div className="mt-6 flex flex-wrap items-center gap-4">
+    <div className="mt-6 flex flex-wrap items-center gap-4 print:hidden">
       <button type="button" onClick={redial} disabled={state !== 'searching'} className="toon-sm toon-press rounded-full bg-acid px-5 py-2.5 font-medium text-acid-ink disabled:opacity-70">
         {state === 'trying' ? 'Discando…' : state === 'back' ? 'Conectado!' : 'Tentar de novo ☎'}
       </button>
