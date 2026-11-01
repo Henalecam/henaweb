@@ -9,6 +9,7 @@ import { RevealRead, ResumeReading } from './ReadMarks';
 import { serviceLinks } from '@/lib/serviceLinks';
 import { blurProps } from '@/lib/shotBlur';
 import PhoneStatus from './PhoneStatus';
+import RollCount from './RollCount';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -199,7 +200,7 @@ export default function Work() {
           <div className="md:col-span-7">
             <span className="label">(V) Arquivo de casos resolvidos</span>
             <h2 className="mt-5 text-[clamp(2.6rem,5.6vw,6rem)] leading-[0.9] font-medium tracking-[-0.05em]">
-              {pad(projects.length)} casos{' '}
+              <RollCount n={projects.length} /> casos{' '}
               <span className="font-groovy text-[0.85em] tracking-normal text-acid [text-shadow:4px_4px_0_#140a26]">resolvidos.</span>
             </h2>
           </div>
