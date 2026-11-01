@@ -494,6 +494,19 @@ button.win-btn::after {
   to { transform: scaleX(1); }
 }
 
+/* failsafe: the intro is dismissed by script, so if the scripts never run (a chunk that fails to download on a
+   bad connection, a blocked CDN, an extension) it used to cover the whole page forever. After 8 s it fades away on
+   its own; normally the script has removed it long before (about 2.5 s on a first visit, at once on repeat ones) */
+[data-preloader] {
+  animation: preloader-failsafe 0.4s ease-out 8s forwards;
+}
+@keyframes preloader-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
 /* repeat views: the inline script in the layout marks <html data-seen> before the first paint */
 html[data-seen] [data-preloader] {
   display: none !important;
