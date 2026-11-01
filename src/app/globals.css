@@ -528,6 +528,26 @@ html {
     animation: check-pop 0.32s cubic-bezier(0.3, 1.6, 0.5, 1) both;
   }
 }
+/* the picked chip (symptoms, deadline) is inked in by a marker sweeping left to right instead of
+   flipping colour at once; its text turns light as the ink passes under it */
+@media (prefers-reduced-motion: no-preference) {
+  .chip-sweep {
+    background-image: linear-gradient(var(--color-acid-ink), var(--color-acid-ink));
+    background-repeat: no-repeat;
+    animation: chip-sweep 0.34s cubic-bezier(0.65, 0, 0.25, 1) both;
+  }
+}
+@keyframes chip-sweep {
+  0% { background-color: transparent; background-size: 0% 100%; color: var(--color-acid-ink); }
+  45% { color: var(--color-acid-ink); }
+  55% { color: var(--color-acid); }
+  99% { background-color: transparent; }
+  100% { background-color: var(--color-acid-ink); background-size: 100% 100%; }
+}
+@media (forced-colors: active) {
+  .chip-sweep { background-image: none; }
+}
+
 /* …and the tick inside is a pen stroke that inks itself in, just behind the stamp (Tick.tsx) */
 .tick-draw path {
   stroke-dasharray: 1;
