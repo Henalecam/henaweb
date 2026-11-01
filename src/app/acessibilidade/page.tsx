@@ -9,6 +9,33 @@ export const metadata: Metadata = {
   description,
   alternates: { canonical: '/acessibilidade' },
   openGraph: { type: 'website', url: '/acessibilidade', title: 'Acessibilidade · HenaWeb', description, locale: 'pt_BR', siteName: 'HenaWeb' },
+  // the large card like every other indexed page, so a shared link shows the page's own image (opengraph-image.tsx)
+  twitter: { card: 'summary_large_image', title: 'Acessibilidade · HenaWeb', description },
+};
+
+// the same page-level structured data the other indexed pages carry: what this page is, tied to the site and studio
+// the layout already describes, and the "henaweb.com › Acessibilidade" trail for search results
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': `${site.url}/acessibilidade#page`,
+      name: 'Acessibilidade',
+      url: `${site.url}/acessibilidade`,
+      description,
+      inLanguage: 'pt-BR',
+      isPartOf: { '@id': `${site.url}/#website` },
+      about: { '@id': `${site.url}/#organization` },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Início', item: site.url },
+        { '@type': 'ListItem', position: 2, name: 'Acessibilidade', item: `${site.url}/acessibilidade` },
+      ],
+    },
+  ],
 };
 
 // each line is something this site really does (see the components named in the comments), not a promise
@@ -31,6 +58,7 @@ const FEATURES: [string, string][] = [
 export default function Acessibilidade() {
   return (
     <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     <main id="conteudo" tabIndex={-1} className="sky relative min-h-[100svh] overflow-x-clip text-ink">
       <div className="grid-floor !h-[22%] opacity-40" aria-hidden />
       <article className="gutter relative mx-auto max-w-3xl pt-36 pb-28">
