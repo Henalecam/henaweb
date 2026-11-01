@@ -19,9 +19,18 @@ export default function Studio() {
   // the Notepad status bars count a selection like the real one: select part of a rule and its bar reads
   // "Sel: 23 de 97" (which rule, and how many characters of its body are selected)
   const [sel, setSel] = useState<{ n: string; len: number } | null>(null);
+  // and a click in a rule's text puts Notepad's caret there: the bar reads "Ln 1, Col 42", as the real one does
+  const [caret, setCaret] = useState<{ n: string; col: number } | null>(null);
   useEffect(() => {
     const onChange = () => {
       const s = window.getSelection();
+      const at = s?.anchorNode?.parentElement?.closest<HTMLElement>('[data-rule-body]');
+      if (s && s.isCollapsed && at && s.anchorNode) {
+        const r = document.createRange();
+        r.setStart(at, 0);
+        r.setEnd(s.anchorNode, s.anchorOffset);
+        setCaret({ n: at.dataset.ruleBody!, col: r.toString().length + 1 });
+      } else setCaret((v) => (v ? null : v));
       const body = s && !s.isCollapsed ? s.anchorNode?.parentElement?.closest<HTMLElement>('[data-rule-body]') : null;
       if (!s || !body || !body.contains(s.focusNode)) return setSel((v) => (v ? null : v));
       const len = s.toString().replace(/\s+/g, ' ').trim().length;
@@ -201,7 +210,9 @@ export default function Studio() {
                   className="mx-1.5 mb-1.5 flex justify-between gap-3 border border-[#7d7394] bg-[#c9c3d8] px-2 py-0.5 font-mono text-[0.62rem] text-[#12082a] shadow-[inset_1px_1px_0_#fff]"
                 >
                   {denied === pr.n ? <span className="font-bold text-[#b3122b]">⚠ arquivo somente leitura</span> : <span>🔒 somente leitura</span>}
-                  <span className="tabular-nums">{sel?.n === pr.n ? `Sel: ${sel.len} de ${pr.body.length}` : `${pr.body.length} caracteres`}</span>
+                  <span className="tabular-nums">
+                    {sel?.n === pr.n ? `Sel: ${sel.len} de ${pr.body.length}` : caret?.n === pr.n ? `Ln 1, Col ${caret.col}` : `${pr.body.length} caracteres`}
+                  </span>
                 </div>
               </li>
             ))}
