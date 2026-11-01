@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Footer from '@/components/Footer';
 import Footprints from '@/components/Footprints';
 import GhostWitness from '@/components/GhostWitness';
+import CaseLedger from '@/components/CaseLedger';
 import LostClue from '@/components/LostClue';
 import LostSuspect from '@/components/LostSuspect';
 import LostWindow from '@/components/LostWindow';
@@ -71,6 +72,7 @@ export default function NotFound() {
               <span aria-hidden>🕹</span> Passa tempo →
             </a>
           </p>
+          <CaseLedger />
           {/* on phones the witness sits under the clues (tap anywhere to startle it) */}
           <GhostWitness className="pointer-events-none mx-auto mt-24 block w-40 lg:hidden" />
         </div>
