@@ -4,6 +4,7 @@ import { site, whatsappLink } from '@/lib/site';
 import { services } from '@/lib/services';
 import NewTab from '@/components/NewTab';
 import ShareCase from '@/components/ShareCase';
+import InstallApp from '@/components/InstallApp';
 
 const description = 'Todos os caminhos da HenaWeb num lugar só: WhatsApp, e-mail, serviços, casos resolvidos e redes.';
 
@@ -92,6 +93,8 @@ export default function Links() {
                   Passa tempo (jogos) <span aria-hidden>🕹</span>
                 </a>
               </li>
+              {/* only where the browser offers installing (Chrome/Edge/Android): home-screen icon, offline pages, share sheet */}
+              <InstallApp className="toon-sm toon-press flex min-h-12 items-center justify-between rounded-xl px-4 text-sm font-medium" />
             </ul>
 
             {/* most studios are found by word of mouth: one tap passes this page on (the phone's share sheet, or a
