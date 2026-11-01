@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { gsap, ScrollTrigger, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
+import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/gsap';
+import { SplitText } from '@/lib/split';
 import { principles } from '@/lib/content';
 
 /** Develops the polaroid for good and wobbles it (restarted on every press); no wobble with reduced motion. */

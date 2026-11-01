@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { gsap, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
+import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
+import { SplitText } from '@/lib/split';
 import { govFlow, govPillars } from '@/lib/content';
 
 // the sample case file is numbered in the current year, so the demo never looks a year old

@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef } from 'react';
-import { gsap, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
+import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
+import { SplitText } from '@/lib/split';
 import { manifesto, facts } from '@/lib/content';
 import { chisel, chiselTap } from '@/lib/chisel';
 

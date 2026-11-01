@@ -2,11 +2,10 @@
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SplitText } from 'gsap/SplitText';
 import { useGSAP } from '@gsap/react';
 
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
+  gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
 export const prefersReducedMotion = () =>
@@ -22,4 +21,5 @@ export function onReady(cb: () => void) {
   return () => window.removeEventListener('hena:ready', cb);
 }
 
-export { gsap, ScrollTrigger, SplitText, useGSAP };
+// SplitText lives in ./split: only the home's sections split text, so the other pages don't ship it
+export { gsap, ScrollTrigger, useGSAP };

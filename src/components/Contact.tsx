@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { gsap, SplitText, useGSAP, prefersReducedMotion } from '@/lib/gsap';
+import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
+import { SplitText } from '@/lib/split';
 import { projects, symptoms, timelines, whatsappLink, site } from '@/lib/content';
 import { serviceLinks } from '@/lib/serviceLinks';
 

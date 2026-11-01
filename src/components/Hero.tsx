@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef } from 'react';
-import { gsap, SplitText, useGSAP, onReady } from '@/lib/gsap';
+import { gsap, useGSAP, onReady } from '@/lib/gsap';
+import { SplitText } from '@/lib/split';
 import { site, whatsappLink } from '@/lib/site';
 import Clock from './Clock';
 import Magnetic from './Magnetic';
