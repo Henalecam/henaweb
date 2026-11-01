@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { site } from '@/lib/site';
 import OfflineList from '@/components/OfflineList';
 import Redial from '@/components/Redial';
+import OfflineRunner from '@/components/OfflineRunner';
 
 export const metadata: Metadata = {
   title: 'Sem sinal',
@@ -33,6 +34,7 @@ export default function Offline() {
             </p>
             <OfflineList />
             <Redial />
+            <OfflineRunner />
             <p className="mt-6 font-mono text-xs text-acid-ink/70">
               Prefere falar direto? {site.whatsappDisplay} · {site.email}
             </p>
