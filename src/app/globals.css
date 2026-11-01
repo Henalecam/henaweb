@@ -1213,6 +1213,14 @@ html[data-menu='open'] [data-back-top] {
   to { opacity: 0.32; }
 }
 
+/* the idle screensaver fades in like a monitor dimming */
+[data-screensaver] {
+  animation: saver-in 0.8s ease-out;
+}
+@keyframes saver-in {
+  from { opacity: 0; }
+}
+
 /* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
    reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
 [data-nav-pending] {
