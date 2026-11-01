@@ -7,6 +7,44 @@ import { CONSENT_OPEN, readConsent, saveConsent, type Consent } from '@/lib/cons
  * Small, non-blocking cookie notice. Nothing is measured until the visitor accepts;
  * the footer can reopen it to change the choice.
  */
+/**
+ * "Aceitar" bites the title-bar cookie; a few crumbs fly off the bite and fall past the window with a little gravity.
+ * They live in their own fixed layer on <body>, so they keep falling after the notice has slid away. Decorative,
+ * pointer-transparent, gone after ~1 s; nothing with reduced motion.
+ */
+function crumbs(cookie: Element | null | undefined) {
+  if (!cookie || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const r = cookie.getBoundingClientRect();
+  // the bite is the cookie's top-right corner
+  const x0 = r.right - r.width * 0.15;
+  const y0 = r.top + r.height * 0.2;
+  const layer = document.createElement('div');
+  layer.setAttribute('aria-hidden', 'true');
+  layer.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:80;overflow:hidden';
+  document.body.append(layer);
+  const anims: Animation[] = [];
+  for (let i = 0; i < 7; i++) {
+    const c = document.createElement('span');
+    const size = 2 + Math.random() * 3;
+    c.style.cssText = `position:absolute;left:${x0}px;top:${y0}px;width:${size}px;height:${size}px;border-radius:${Math.random() > 0.5 ? '50%' : '1px'};background:${i % 3 ? '#d9a05b' : '#3b2412'}`;
+    layer.append(c);
+    const dx = (Math.random() - 0.25) * 70;
+    const up = 10 + Math.random() * 22;
+    const fall = 90 + Math.random() * 120;
+    anims.push(
+      c.animate(
+        [
+          { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+          { transform: `translate(${dx * 0.45}px,${-up}px) rotate(${90 * Math.random()}deg)`, opacity: 1, offset: 0.3 },
+          { transform: `translate(${dx}px,${fall}px) rotate(${200 + 160 * Math.random()}deg)`, opacity: 0 },
+        ],
+        { duration: 700 + Math.random() * 400, easing: 'cubic-bezier(.3,.1,.6,1)', delay: Math.random() * 60, fill: 'forwards' },
+      ),
+    );
+  }
+  Promise.all(anims.map((a) => a.finished)).finally(() => layer.remove());
+}
+
 export default function ConsentBanner({ tools }: { tools: string[] }) {
   const [open, setOpen] = useState(false);
   const [shown, setShown] = useState(false);
@@ -66,6 +104,7 @@ export default function ConsentBanner({ tools }: { tools: string[] }) {
 
   const choose = (c: Consent) => {
     setBitten(c === 'granted');
+    if (c === 'granted') crumbs(box.current?.querySelector('[data-cookie]'));
     saveConsent(c);
     // the answer is saved at once; on "Aceitar" the window waits a beat so the bite is seen before it slides away
     const linger = c === 'granted' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 280 : 0;
