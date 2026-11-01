@@ -829,6 +829,16 @@ html {
   to { rotate: 360deg; }
 }
 
+/* footer coordinates link: the pin drops onto the spot when pointed at */
+@media (prefers-reduced-motion: no-preference) {
+  .group\/map:is(:hover, :focus-visible) .map-pin {
+    animation: pin-drop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+}
+@keyframes pin-drop {
+  from { translate: 0 -0.6em; }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

@@ -120,7 +120,19 @@ export default function Footer() {
             </span>
           </div>
           <p className="mt-6 font-mono text-xs leading-relaxed text-ink/60">
-            {site.city} · {site.coords}
+            {site.city} ·{' '}
+            {/* the coordinates (the same ones in the JSON-LD) open on a map, like a pin dropped on the case board */}
+            <a
+              href="https://www.openstreetmap.org/?mlat=-25.4284&mlon=-49.2733#map=12/-25.4284/-49.2733"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-placement="footer-map"
+              className="group/map -my-1 inline-block py-1 underline decoration-ink/25 decoration-dotted underline-offset-4 transition-colors hover:text-ink hover:decoration-acid focus-visible:text-ink"
+            >
+              <span aria-hidden className="map-pin mr-1 inline-block">📍</span>
+              {site.coords}
+              <span className="sr-only"> (ver no mapa, abre em nova aba)</span>
+            </a>
             <br />
             Atendemos todo o Brasil e o exterior.
           </p>

@@ -30,7 +30,8 @@ export default function CopyEmail({ className = '', placement }: { className?: s
   return (
     <span className="relative inline-flex" data-print-hide>
       <button type="button" onClick={copy} className={className}>
-        <span aria-hidden>{state === 'ok' ? '✓ ' : state === 'fail' ? '✕ ' : '⧉ '}</span>
+        {/* a no-break space: a plain one is trimmed at the end of a flex item, gluing the icon to the word ("⧉copiar") */}
+        <span aria-hidden>{state === 'ok' ? '✓\u00a0' : state === 'fail' ? '✕\u00a0' : '⧉\u00a0'}</span>
         {state === 'ok' ? 'copiado' : state === 'fail' ? 'não deu' : 'copiar'}
         <span className="sr-only"> e-mail</span>
         <span className="sr-only" aria-live="polite">
