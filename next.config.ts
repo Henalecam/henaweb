@@ -70,6 +70,9 @@ const nextConfig: NextConfig = {
       { source: '/portfolio', destination: '/#projetos', permanent: true },
       { source: '/contato', destination: '/#contato', permanent: true },
       { source: '/blog', destination: '/', permanent: false },
+      // the usual names for a link-in-bio page, typed from memory or a printed card
+      { source: '/bio', destination: '/links', permanent: true },
+      { source: '/link', destination: '/links', permanent: true },
       // guessable variants of real addresses (typed by hand, read aloud, half-remembered): straight to
       // the page instead of the 404's "did you mean" (singular/plural, English, Portuguese synonyms)
       { source: '/caso/:slug', destination: '/casos/:slug', permanent: true },
