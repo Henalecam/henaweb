@@ -641,6 +641,25 @@ html {
   opacity: 0.94;
 }
 
+/* /offline signal meter (Redial.tsx): four bars that light one after another while it searches, all lit once the
+   line is back; with reduced motion they just sit dim, then lit */
+.signal > span {
+  width: 4px;
+  background: rgb(26 15 46 / 0.2);
+}
+.signal[data-signal='back'] > span {
+  background: #1f6f63;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .signal:not([data-signal='back']) > span {
+    animation: signal-scan 1.2s steps(1, end) infinite;
+  }
+}
+@keyframes signal-scan {
+  0%, 60% { background: rgb(26 15 46 / 0.2); }
+  20%, 40% { background: var(--color-acid); }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

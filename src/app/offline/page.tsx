@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { site } from '@/lib/site';
 import OfflineList from '@/components/OfflineList';
+import Redial from '@/components/Redial';
 
 export const metadata: Metadata = {
   title: 'Sem sinal',
@@ -31,8 +32,9 @@ export default function Offline() {
               Você está sem internet e esta página ainda não tinha sido aberta aqui. Mas o arquivo guarda o que você já leu:
             </p>
             <OfflineList />
+            <Redial />
             <p className="mt-6 font-mono text-xs text-acid-ink/70">
-              Quando o sinal voltar, é só recarregar. Ou fale direto: {site.whatsappDisplay} · {site.email}
+              Prefere falar direto? {site.whatsappDisplay} · {site.email}
             </p>
           </div>
         </div>
