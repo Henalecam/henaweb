@@ -1293,6 +1293,35 @@ html {
   }
 }
 
+/* /acessibilidade control panel (YourSettings): a small indicator lamp per preference, lit teal when the browser asks
+   for it, dark when not; it glows a moment as it changes */
+.settings-lamp {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 2px solid #12082a;
+  background: radial-gradient(circle at 35% 35%, #8a8399, #3d3550 70%);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.settings-lamp[data-on] {
+  background: radial-gradient(circle at 35% 35%, #c9fff6, var(--color-teal) 55%, #1f6f63);
+  box-shadow: 0 0 0 3px rgb(60 198 180 / 0.25), 0 0 10px rgb(60 198 180 / 0.7);
+}
+.settings-lamp[data-unknown] {
+  background: repeating-linear-gradient(45deg, #c9c3d8 0 2px, #7d7394 2px 4px);
+}
+@media (forced-colors: active) {
+  .settings-lamp {
+    forced-color-adjust: none;
+    background: Canvas;
+    border-color: CanvasText;
+  }
+  .settings-lamp[data-on] {
+    background: Highlight;
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

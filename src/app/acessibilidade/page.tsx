@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { site } from '@/lib/site';
 import Footer from '@/components/Footer';
+import YourSettings from '@/components/YourSettings';
 
 const description = 'O que o site da HenaWeb faz para ser usado por todo mundo, o que ainda pode falhar e como avisar a gente de uma barreira.';
 
@@ -85,7 +86,9 @@ export default function Acessibilidade() {
           ))}
         </ul>
 
-        <h2 className="mt-16 text-2xl font-medium tracking-tight">Como verificamos</h2>
+        <YourSettings />
+
+        <h2 className="mt-14 text-2xl font-medium tracking-tight">Como verificamos</h2>
         <p className="mt-3 leading-relaxed text-ink/75">
           Cada mudança é testada em celular (390 px) e computador (1440 px), com e sem &quot;reduzir movimento&quot;. Na última verificação automática com o
           axe-core, em 1º de novembro de 2026, as oito páginas principais e as janelas interativas não tiveram nenhuma violação encontrada.
