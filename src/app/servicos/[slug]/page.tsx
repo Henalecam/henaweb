@@ -346,7 +346,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
               Outras capacidades
             </h2>
             {/* each one pitched with its own page headline, plus how many solved cases back it up */}
-            <CaseKeys prev={`/servicos/${prevSvc.slug}`} next={`/servicos/${nextSvc.slug}`} />
+            <CaseKeys prev={`/servicos/${prevSvc.slug}`} next={`/servicos/${nextSvc.slug}`} prevName={prevSvc.name} nextName={nextSvc.name} noun="serviço" />
             <ul className="mt-4 grid gap-4 md:grid-cols-3">
               {others.map((o) => {
                 const n = projects.filter((p) => p.service === o.slug).length;

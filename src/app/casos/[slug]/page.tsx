@@ -246,7 +246,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
 
           <MarkRead slug={p.slug} />
           <ArchiveReturn />
-          <CaseKeys prev={`/casos/${prev.slug}`} next={`/casos/${next.slug}`} />
+          <CaseKeys prev={`/casos/${prev.slug}`} next={`/casos/${next.slug}`} prevName={prev.name} nextName={next.name} />
           <nav aria-label="Relacionados" data-print-hide className="mt-24 grid gap-4 border-t border-line pt-10 md:grid-cols-3">
             <a href={`/casos/${prev.slug}`} rel="prev" aria-keyshortcuts="ArrowLeft" className="toon-sm toon-press group rounded-2xl bg-bg-2/80 p-6">
               <CasePeek p={prev} />
