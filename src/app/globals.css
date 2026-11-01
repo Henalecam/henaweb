@@ -723,6 +723,51 @@ html {
   to { clip-path: inset(0); }
 }
 
+/* the caret on the blank case file doesn't just blink: it taps out H-E-N-A-W-E-B in Morse, over and over
+   (65 units of 0.11s; a dot is 1 unit lit, a dash 3). Nobody has to notice; hena.ajuda() hints at it */
+@keyframes morse {
+  0.0% { opacity: 1; }
+  1.54% { opacity: 0; }
+  3.08% { opacity: 1; }
+  4.62% { opacity: 0; }
+  6.15% { opacity: 1; }
+  7.69% { opacity: 0; }
+  9.23% { opacity: 1; }
+  10.77% { opacity: 0; }
+  15.38% { opacity: 1; }
+  16.92% { opacity: 0; }
+  21.54% { opacity: 1; }
+  26.15% { opacity: 0; }
+  27.69% { opacity: 1; }
+  29.23% { opacity: 0; }
+  33.85% { opacity: 1; }
+  35.38% { opacity: 0; }
+  36.92% { opacity: 1; }
+  41.54% { opacity: 0; }
+  46.15% { opacity: 1; }
+  47.69% { opacity: 0; }
+  49.23% { opacity: 1; }
+  53.85% { opacity: 0; }
+  55.38% { opacity: 1; }
+  60.0% { opacity: 0; }
+  64.62% { opacity: 1; }
+  66.15% { opacity: 0; }
+  70.77% { opacity: 1; }
+  75.38% { opacity: 0; }
+  76.92% { opacity: 1; }
+  78.46% { opacity: 0; }
+  80.0% { opacity: 1; }
+  81.54% { opacity: 0; }
+  83.08% { opacity: 1; }
+  84.62% { opacity: 0; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .morse-caret {
+    animation: morse 7.15s steps(1, end) infinite;
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

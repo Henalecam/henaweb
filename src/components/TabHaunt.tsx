@@ -225,7 +225,7 @@ export default function TabHaunt() {
     const kit = {
       ajuda() {
         console.log(
-          '%chena.casos()%c     os casos resolvidos, em tabela\n%chena.servicos()%c  o que a gente faz\n%chena.lanterna()%c apaga (e acende) as luzes\n%chena.contato()%c  abre um caso com a gente\n\nE fora do console: digite a palavra de todo detetive famoso, na própria página (no celular: cinco toques no relógio).',
+          '%chena.casos()%c     os casos resolvidos, em tabela\n%chena.servicos()%c  o que a gente faz\n%chena.lanterna()%c apaga (e acende) as luzes\n%chena.contato()%c  abre um caso com a gente\n\nE fora do console: digite a palavra de todo detetive famoso, na própria página (no celular: cinco toques no relógio).\nE o cursor da ficha em branco, no fim das páginas de serviço, não pisca à toa: anote os pontos e traços.',
           ...Array(4).fill(['font: 700 13px monospace; color: #f9e27d;', tip]).flat(),
         );
       },
