@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
-const KEY = 'hena:case-view';
+import { CASE_VIEW_KEY as KEY } from '@/lib/caseView';
+
 type View = 'icons' | 'details';
 
 /**
@@ -12,23 +13,32 @@ type View = 'icons' | 'details';
  * this browser.
  */
 export default function CaseView() {
-  const [view, setView] = useState<View>('icons');
+  // null until mounted: the inline script after the list (caseViewScript) has already applied a saved "Detalhes"
+  // before the first paint, so the list must not be touched until the choice is read back from it
+  const [view, setView] = useState<View | null>(null);
 
   useEffect(() => {
-    try {
-      if (localStorage.getItem(KEY) === 'details') setView('details');
-    } catch {}
+    setView(document.querySelector('[data-case-list]')?.getAttribute('data-view') === 'details' ? 'details' : 'icons');
   }, []);
 
-  useEffect(() => {
+  const apply = (v: View) => {
     const list = document.querySelector<HTMLElement>('[data-case-list]');
     if (!list) return;
-    if (view === 'details') list.setAttribute('data-view', 'details');
+    if (v === 'details') list.setAttribute('data-view', 'details');
     else list.removeAttribute('data-view');
-  }, [view]);
+  };
 
   const pick = (v: View) => {
+    if (v === view) return;
     setView(v);
+    // the cards fold into rows (and back) as one morph: each case keeps a view-transition-name for the swap
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } };
+    const cards = [...document.querySelectorAll<HTMLElement>('[data-case-list] > li:not([hidden])')];
+    if (!doc.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches || cards.length > 30) apply(v);
+    else {
+      cards.forEach((li) => (li.style.viewTransitionName = `vista-${li.dataset.caseSlug}`));
+      doc.startViewTransition(() => apply(v)).finished.finally(() => cards.forEach((li) => (li.style.viewTransitionName = '')));
+    }
     try {
       if (v === 'details') localStorage.setItem(KEY, v);
       else localStorage.removeItem(KEY);

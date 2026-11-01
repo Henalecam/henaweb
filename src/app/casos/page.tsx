@@ -8,6 +8,7 @@ import MockUI from '@/components/MockUI';
 import ClosingCta from '@/components/ClosingCta';
 import CaseFilter from '@/components/CaseFilter';
 import CaseView from '@/components/CaseView';
+import { caseViewScript } from '@/lib/caseView';
 import { services } from '@/lib/services';
 import { blurProps } from '@/lib/shotBlur';
 
@@ -176,6 +177,7 @@ export default function CasesIndex() {
               </li>
             ))}
           </ul>
+          <script dangerouslySetInnerHTML={{ __html: caseViewScript }} />
           <CasesEmpty />
 
           <ClosingCta
