@@ -6,6 +6,7 @@ import { projects, site } from '@/lib/content';
 import { serviceBySlug } from '@/lib/services';
 import Footer from '@/components/Footer';
 import Stamp from '@/components/Stamp';
+import Declassify from '@/components/Declassify';
 import ShareCase from '@/components/ShareCase';
 import PrintDossier from '@/components/PrintDossier';
 import PhoneQR from '@/components/PhoneQR';
@@ -209,7 +210,8 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             </section>
             <section className="toon relative rounded-2xl bg-lemon p-7 text-acid-ink" aria-labelledby="resolvido">
               <h2 id="resolvido" className="font-groovy text-2xl text-[#1f6f63]">Caso resolvido</h2>
-              <p className="mt-3 text-lg leading-relaxed text-acid-ink/85">{p.built}</p>
+              {/* the solution comes in redacted and is declassified as the card scrolls into view */}
+              <Declassify text={p.built} className="mt-3 text-lg leading-relaxed text-acid-ink/85" />
               <Stamp className="-top-4 right-5 border-[#1f6f63] bg-lemon text-[#1f6f63]">Encerrado ✓</Stamp>
               {/* the case file reads as a story: a badge on the seam leads from the mystery to its solution
                   (down where the cards stack, across where they sit side by side; centred on the 20px gap) */}

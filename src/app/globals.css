@@ -1042,6 +1042,28 @@ html {
   }
 }
 
+/* case page "Caso resolvido" (Declassify): each word sits under a black censor bar, slightly ragged like a marker
+   stroke; when the card is in view the bars wipe off left to right, one word after the other */
+@media screen {
+  [data-declassify] .redact {
+    background-image: linear-gradient(#140a26, #140a26);
+    background-repeat: no-repeat;
+    background-position: 100% 55%;
+    background-size: 100% 0.95em;
+    color: transparent;
+    border-radius: 1px;
+    transition: background-size 0.28s cubic-bezier(0.6, 0, 0.3, 1), color 0.2s ease-out;
+    transition-delay: calc(var(--i) * 32ms + 0.15s), calc(var(--i) * 32ms + 0.3s);
+  }
+  [data-declassify] .redact::selection {
+    color: #fff;
+  }
+  [data-declassify='open'] .redact {
+    background-size: 0% 0.95em;
+    color: inherit;
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
