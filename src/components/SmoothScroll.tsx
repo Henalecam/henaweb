@@ -2,17 +2,21 @@
 
 import { useEffect } from 'react';
 import Lenis from 'lenis';
-import { gsap, ScrollTrigger, prefersReducedMotion } from '@/lib/gsap';
+import { prefersReducedMotion } from '@/lib/motion';
+import { withScrollTrigger } from '@/lib/scrollBridge';
 
 export default function SmoothScroll() {
   useEffect(() => {
     if (prefersReducedMotion()) return;
 
-    const lenis = new Lenis({ lerp: 0.09, anchors: { offset: -40 } });
-    lenis.on('scroll', ScrollTrigger.update);
-    const tick = (time: number) => lenis.raf(time * 1000);
-    gsap.ticker.add(tick);
-    gsap.ticker.lagSmoothing(0);
+    // Lenis runs on its own rAF (it used to ride GSAP's ticker, which put GSAP on every page); where the page has
+    // ScrollTrigger (the home's scenes), each scroll step updates it, as before
+    const lenis = new Lenis({ lerp: 0.09, anchors: { offset: -40 }, autoRaf: true });
+    let unhook = () => {};
+    const unwait = withScrollTrigger((st) => {
+      lenis.on('scroll', st.update);
+      unhook = () => lenis.off('scroll', st.update);
+    });
 
     // a modal (search, shortcuts, full screenshot) freezes the page behind it: without this the
     // wheel over the backdrop kept gliding the page underneath
@@ -46,7 +50,8 @@ export default function SmoothScroll() {
       window.removeEventListener('hena:jump', jump);
       window.removeEventListener('hena:glide', glide);
       watch.disconnect();
-      gsap.ticker.remove(tick);
+      unwait();
+      unhook();
       lenis.destroy();
     };
   }, []);
@@ -64,12 +69,18 @@ export default function SmoothScroll() {
     const land = () => {
       if (Math.abs(target.getBoundingClientRect().top) > 120) target.scrollIntoView({ block: 'start' });
     };
+    // pinned scenes re-measure on ScrollTrigger's refresh (home only); elsewhere the settle below is enough
+    let unlisten = () => {};
+    const unwait = withScrollTrigger((st) => {
+      st.addEventListener('refresh', land);
+      unlisten = () => st.removeEventListener('refresh', land);
+    });
     const stop = () => {
-      ScrollTrigger.removeEventListener('refresh', land);
+      unwait();
+      unlisten();
       window.clearTimeout(timer);
       for (const e of ['wheel', 'touchstart', 'keydown'] as const) window.removeEventListener(e, stop);
     };
-    ScrollTrigger.addEventListener('refresh', land);
     const timer = window.setTimeout(stop, 4000);
     const settle = window.setTimeout(land, 900);
     for (const e of ['wheel', 'touchstart', 'keydown'] as const) window.addEventListener(e, stop, { passive: true });
