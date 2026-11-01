@@ -45,6 +45,7 @@ export default function NetStatus() {
             {[4, 7, 10, 13].map((h, i) => (
               <span
                 key={h}
+                data-net-bar={net === 'off' && i > 0 ? 'off' : 'on'}
                 className={`w-[3px] rounded-[1px] ${net === 'off' && i > 0 ? 'bg-acid-ink/20' : 'bg-acid-ink'}`}
                 style={{ height: h }}
               />
