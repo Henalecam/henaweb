@@ -1221,6 +1221,20 @@ html[data-menu='open'] [data-back-top] {
   from { opacity: 0; }
 }
 
+/* case window: the magnifying glass shows only while a mouse is over the capture */
+[data-lens] {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+[data-lens][data-on] {
+  opacity: 1;
+}
+@media (hover: none) {
+  [data-lens] {
+    display: none;
+  }
+}
+
 /* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
    reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
 [data-nav-pending] {

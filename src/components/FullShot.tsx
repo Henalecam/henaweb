@@ -20,17 +20,47 @@ export function MaximizeButton() {
   );
 }
 
-/** Mouse shortcut: the screenshot itself opens the full view (keyboard and screen readers use □ or the link). */
-export function ZoomArea() {
+const LENS = 168; // px
+const ZOOM = 2.2;
+
+/**
+ * Mouse shortcut: the screenshot itself opens the full view (keyboard and screen readers use □ or the link).
+ * With a mouse, a detective's magnifying glass follows the pointer over the capture, showing it 2.2× (from the
+ * same top crop the window displays), so the details can be read before deciding to open the whole page.
+ */
+export function ZoomArea({ src }: { src?: string }) {
+  const lens = useRef<HTMLSpanElement>(null);
+  const move = (e: React.PointerEvent<HTMLButtonElement>) => {
+    const l = lens.current;
+    if (!l || !src || e.pointerType !== 'mouse') return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    l.style.translate = `${x - LENS / 2}px ${y - LENS / 2}px`;
+    l.style.backgroundSize = `${r.width * ZOOM}px auto`;
+    l.style.backgroundPosition = `${-(x * ZOOM - LENS / 2)}px ${-(y * ZOOM - LENS / 2)}px`;
+    l.dataset.on = '1';
+  };
   return (
     <button
       type="button"
       onClick={open}
+      onPointerMove={move}
+      onPointerLeave={() => lens.current && delete lens.current.dataset.on}
       tabIndex={-1}
       aria-hidden
-      data-cursor="Ampliar"
-      className="absolute inset-0 z-10 cursor-zoom-in"
-    />
+      data-cursor={src ? undefined : 'Ampliar'}
+      className="absolute inset-0 z-10 cursor-zoom-in overflow-hidden"
+    >
+      {src && (
+        <span
+          ref={lens}
+          data-lens
+          className="pointer-events-none absolute top-0 left-0 rounded-full border-[3px] border-toon bg-no-repeat shadow-[4px_4px_0_#12082a,inset_0_0_0_2px_rgb(255_255_255/0.6)]"
+          style={{ width: LENS, height: LENS, backgroundImage: `url(${src})` }}
+        />
+      )}
+    </button>
   );
 }
 

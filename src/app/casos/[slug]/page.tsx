@@ -181,7 +181,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
                 ) : (
                   p.mock && <MockUI variant={p.mock.variant} hue={p.mock.hue} />
                 )}
-                {p.shot && <ZoomArea />}
+                {p.shot && <ZoomArea src={p.shot.desktop.replace(/\.jpg$/, '-top.jpg')} />}
               </div>
             </div>
             {p.shot && (
