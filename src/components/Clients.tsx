@@ -1,5 +1,6 @@
 import { clients } from '@/lib/content';
 import Marquee from './Marquee';
+import ClientsSplit from './ClientsSplit';
 
 /** One line of client logos, looping. */
 export default function Clients() {
@@ -15,18 +16,8 @@ export default function Clients() {
         <h2 id="clientes-titulo" className="label !text-acid-ink/60">
           Alguns de nossos clientes
         </h2>
-        {/* who they are, counted from the same list as the logos: governments and companies both trust the studio */}
-        <p data-clients-split className="flex flex-wrap gap-2 font-mono text-[0.68rem] tracking-wider text-acid-ink/75 uppercase">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-acid-ink/25 px-2 py-0.5">
-            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-teal" />
-            {publicCount} no setor público
-          </span>
-          <span className="sr-only">, </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-acid-ink/25 px-2 py-0.5">
-            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-acid" />
-            {privateCount} empresas
-          </span>
-        </p>
+        {/* who they are, counted from the same list as the logos; each count also highlights its own logos (ClientsSplit) */}
+        <ClientsSplit publicCount={publicCount} privateCount={privateCount} />
       </div>
       <ul className="sr-only">
         {clients.map((c) => (
@@ -38,7 +29,7 @@ export default function Clients() {
           speed={38}
           separator={<span className="w-[clamp(2.5rem,6vw,5rem)] shrink-0" />}
           items={clients.map((c) => (
-            <span key={c.name} className="flex h-[clamp(3rem,6vw,4.5rem)] items-center">
+            <span key={c.name} data-group={c.group} className="client-logo flex h-[clamp(3rem,6vw,4.5rem)] items-center">
               {c.logo ? (
                 // plain img: small SVG/WebP logos (about 2x their display size), sized by height
                 // eslint-disable-next-line @next/next/no-img-element

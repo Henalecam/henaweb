@@ -1207,6 +1207,35 @@ html {
   }
 }
 
+/* Clients strip (ClientsSplit): a pressed count keeps its own logos in colour and fades the rest as they pass;
+   pointing at a count previews it. Opacity + grayscale only, so the tape's motion and layout don't change */
+#clientes .client-logo {
+  transition: opacity 0.35s ease-out, filter 0.35s ease-out;
+}
+#clientes[data-show='public'] .client-logo[data-group='private'],
+#clientes[data-show='private'] .client-logo[data-group='public'] {
+  opacity: 0.18;
+  filter: grayscale(1);
+}
+@media (hover: hover) {
+  #clientes:not([data-show]):has([data-split='public']:hover) .client-logo[data-group='private'],
+  #clientes:not([data-show]):has([data-split='private']:hover) .client-logo[data-group='public'] {
+    opacity: 0.18;
+    filter: grayscale(1);
+  }
+}
+.clients-chip {
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.clients-chip:hover {
+  border-color: rgb(18 8 42 / 0.6);
+}
+.clients-chip[aria-pressed='true'] {
+  border-color: #12082a;
+  background: #12082a;
+  color: #fff;
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
