@@ -1186,6 +1186,27 @@ html {
   }
 }
 
+/* the phone menu's "push it back up" grabber (Nav, curtainSwipe): only where fingers are the pointer */
+@media (pointer: coarse) {
+  .curtain-grab {
+    display: flex;
+  }
+}
+@media (pointer: coarse) and (prefers-reduced-motion: no-preference) {
+  html[data-menu='open'] .curtain-grab > span {
+    animation: curtain-nudge 2.4s 1.2s ease-in-out 2;
+  }
+}
+@keyframes curtain-nudge {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  40% {
+    translate: 0 -5px;
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

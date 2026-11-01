@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { nav } from '@/lib/site';
 import { gsap, onReady, prefersReducedMotion } from '@/lib/gsap';
+import { curtainSwipe } from '@/lib/curtainSwipe';
 import Magnetic from './Magnetic';
 import Social from './Social';
 
@@ -42,6 +43,8 @@ export default function Nav() {
   // after a lone "g", a little window lists where the next key goes (it closes with that key, or after a second)
   const [goHint, setGoHint] = useState(0);
   const toggleBtn = useRef<HTMLButtonElement>(null);
+  // the phone curtain also closes with an upward swipe (stable across renders: it only calls setOpen)
+  const [swipe] = useState(() => curtainSwipe(() => { setOpen(false); toggleBtn.current?.focus({ preventScroll: true }); }));
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   // which nav section the reader is in (home only); on /casos pages the "Casos" entry stays lit
@@ -315,6 +318,7 @@ export default function Nav() {
         // above the screen, out of reach. Now the list still rests at the bottom (mt-auto) but starts below the
         // header and the curtain scrolls on its own (data-lenis-prevent: the smooth scroller leaves it alone)
         data-lenis-prevent
+        {...swipe}
         className={`gutter fixed inset-0 z-40 flex flex-col overflow-y-auto overscroll-contain bg-bg pt-24 pb-10 transition-[clip-path] duration-700 ease-[var(--ease-out-expo)] lg:hidden ${
           open ? '[clip-path:inset(0_0_0_0)]' : 'pointer-events-none [clip-path:inset(0_0_100%_0)]'
         }`}
@@ -366,6 +370,11 @@ export default function Nav() {
           </button>
           <Social />
         </div>
+        {/* phones: a grabber at the foot of the curtain says it can be pushed back up (curtainSwipe) */}
+        <span aria-hidden className="curtain-grab relative mx-auto mt-6 hidden flex-col items-center gap-1 font-mono text-[0.65rem] tracking-[0.2em] text-ink/55 uppercase">
+          <span className="h-1 w-10 rounded-full bg-ink/35" />
+          arraste para cima para fechar
+        </span>
       </div>
       <p className="sr-only" aria-live="polite">
         {stillNote}
