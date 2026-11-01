@@ -20,6 +20,7 @@ import BackToTop from '@/components/BackToTop';
 import Elementar from '@/components/Elementar';
 import Screensaver from '@/components/Screensaver';
 import QuoteLink from '@/components/QuoteLink';
+import AccordionKeys from '@/components/AccordionKeys';
 import SwRegister from '@/components/SwRegister';
 import DragFile from '@/components/DragFile';
 import WinDrag from '@/components/WinDrag';
@@ -220,6 +221,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Elementar />
         <Screensaver />
         <QuoteLink />
+        <AccordionKeys />
         <SwRegister />
         <DragFile />
         <WinDrag />

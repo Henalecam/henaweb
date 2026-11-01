@@ -290,7 +290,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             <div className="mt-6 flex justify-end text-ink">
               <FaqToggleAll />
             </div>
-            <div className="mt-3 flex flex-col gap-3">
+            <div data-acc className="mt-3 flex flex-col gap-3">
               {s.faq.map((f, i) => (
                 <details key={f.q} id={faqId(f.q)} className="toon-sm group scroll-mt-28 rounded-xl bg-paper p-5 text-acid-ink">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium">

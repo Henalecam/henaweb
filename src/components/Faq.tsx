@@ -14,7 +14,7 @@ export default function Faq() {
             Perguntas que <span className="font-groovy text-[0.85em] tracking-normal text-[#c2410c]">todo cliente faz.</span>
           </h2>
         </div>
-        <div className="flex flex-col gap-3 lg:col-span-8">
+        <div data-acc className="flex flex-col gap-3 lg:col-span-8">
           <div className="flex justify-end text-bg">
             <FaqToggleAll />
           </div>

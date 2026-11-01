@@ -58,7 +58,7 @@ export default function Capabilities({ caseCounts = {}, caseSlugs = {} }: { case
         </h2>
       </div>
 
-      <ul data-cap-list className="flex flex-col gap-4 md:gap-5">
+      <ul data-cap-list data-acc className="flex flex-col gap-4 md:gap-5">
         {capabilities.map((c, i) => {
           const isOpen = active === i;
           return (
