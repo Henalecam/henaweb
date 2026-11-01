@@ -29,6 +29,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly' as const,
       priority: s.slug === 'sistemas-sob-medida' || s.slug === 'sistemas-publicos' ? 0.9 : 0.8,
     })),
+    { url: `${site.url}/acessibilidade`, lastModified: lastCommit('src/app/acessibilidade', ...SHARED), changeFrequency: 'yearly', priority: 0.3 },
     { url: `${site.url}/passatempo`, lastModified: lastCommit('src/app/passatempo', 'src/lib/pastimes.ts', ...SHARED), changeFrequency: 'monthly', priority: 0.4 },
     { url: `${site.url}/casos`, lastModified: lastCommit('src/app/casos/page.tsx', 'src/lib/content.ts', 'public/cases', ...SHARED), changeFrequency: 'monthly', priority: 0.8 },
     ...projects.map((p) => ({

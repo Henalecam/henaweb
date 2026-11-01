@@ -23,7 +23,7 @@ function footerMessage(path: string): string | undefined {
   if (service) return `Olá! Quero conversar sobre ${service} com a HenaWeb.`;
 }
 
-const studioLinks = [...nav.filter((n) => n.label !== 'Casos'), { label: 'Perguntas', href: '/#perguntas' }, { label: 'Contato', href: '/#contato' }, { label: 'Passa tempo', href: '/passatempo' }];
+const studioLinks = [...nav.filter((n) => n.label !== 'Casos'), { label: 'Perguntas', href: '/#perguntas' }, { label: 'Contato', href: '/#contato' }, { label: 'Passa tempo', href: '/passatempo' }, { label: 'Acessibilidade', href: '/acessibilidade' }];
 
 // the last change to the site (next.config bakes the last commit's date in at build), in Curitiba's calendar
 const UPDATED = process.env.NEXT_PUBLIC_UPDATED
