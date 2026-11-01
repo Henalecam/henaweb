@@ -20,6 +20,7 @@ import BackToTop from '@/components/BackToTop';
 import Elementar from '@/components/Elementar';
 import Screensaver from '@/components/Screensaver';
 import QuoteLink from '@/components/QuoteLink';
+import SwRegister from '@/components/SwRegister';
 import OffscreenPause from '@/components/OffscreenPause';
 import ConsentBanner from '@/components/ConsentBanner';
 import { analyticsLoader } from '@/lib/consent';
@@ -215,6 +216,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Elementar />
         <Screensaver />
         <QuoteLink />
+        <SwRegister />
         <OffscreenPause />
         {children}
         <div className="grain" aria-hidden />

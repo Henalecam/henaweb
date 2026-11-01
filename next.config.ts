@@ -54,6 +54,14 @@ const nextConfig: NextConfig = {
           { key: CSP_ENFORCE ? 'Content-Security-Policy' : 'Content-Security-Policy-Report-Only', value: csp },
         ],
       },
+      // the service worker must never be held by a cache, or a fix to it would take a day to reach visitors
+      {
+        source: '/sw.js',
+        headers: [
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          { key: 'Content-Type', value: 'application/javascript; charset=utf-8' },
+        ],
+      },
       // static media in public/ is served with max-age=0, so every visit re-asks for the 440 KB model and the
       // screenshots; a day of freshness (and a week of stale-while-revalidate) skips those round trips while a
       // replaced file (same name) still shows up within a day
