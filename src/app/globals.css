@@ -660,6 +660,69 @@ html {
   20%, 40% { background: var(--color-acid); }
 }
 
+/* footer start menu (StartMenu.tsx): the bevelled "Iniciar" button, a four-colour flag, the menu with its
+   vertical brand strip and items that highlight navy like Win95's */
+.start-btn {
+  background: #c9c3d8;
+  box-shadow: inset -2px -2px 0 #7d7394, inset 2px 2px 0 #fff;
+}
+.start-btn[aria-expanded='true'],
+.start-btn:active {
+  box-shadow: inset 2px 2px 0 #7d7394, inset -2px -2px 0 #fff;
+}
+.start-btn:focus-visible {
+  outline: 2px dotted var(--color-acid-ink);
+  outline-offset: -5px;
+}
+.start-flag {
+  width: 14px;
+  height: 12px;
+  background: conic-gradient(from 90deg at 50% 50%, #3cc6b4 0 25%, #f9e27d 0 50%, #8b5cc7 0 75%, #f7931e 0);
+  transform: skewX(-8deg);
+}
+.start-menu {
+  position: fixed;
+  inset: auto;
+  /* it sits inside the footer's mono caps line: the menu reads in the body face */
+  font-family: var(--font-sans);
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--color-acid-ink);
+}
+.start-side {
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+  padding: 0.6rem 0.35rem;
+  background: linear-gradient(#8b5cc7, #140c2e);
+  color: var(--color-paper);
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+}
+.start-item {
+  display: flex;
+  min-height: 2.25rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.9rem;
+  text-align: left;
+}
+.start-item:hover,
+.start-item:focus-visible {
+  background: #1e1442;
+  color: var(--color-paper);
+  outline: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .start-menu:popover-open {
+    animation: start-up 0.14s steps(3, end);
+  }
+}
+@keyframes start-up {
+  from { clip-path: inset(100% 0 0 0); }
+  to { clip-path: inset(0); }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

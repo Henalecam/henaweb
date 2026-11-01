@@ -10,6 +10,7 @@ import Clock from './Clock';
 import Chase from './Chase';
 import Social from './Social';
 import CopyEmail from './CopyEmail';
+import StartMenu from './StartMenu';
 import { RevealRead } from './ReadMarks';
 import NewTab from './NewTab';
 
@@ -206,6 +207,8 @@ export default function Footer() {
 
       {/* the two controls get a 3rem-tall hit area (WCAG 2.5.8) without moving the line */}
       <div className="label relative z-10 mt-2 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-6">
+        {/* the line reads as a Win95 taskbar: a start menu with the site's places (StartMenu) */}
+        <StartMenu />
         <span>
           © {new Date().getFullYear()} {site.legalName}
           {site.cnpj && <> · CNPJ {site.cnpj}</>}
