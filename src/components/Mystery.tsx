@@ -350,7 +350,7 @@ function MobileFile() {
       <p className="mt-4 text-lg leading-relaxed text-ink/75">{copy.intro.body}</p>
 
       {/* the evidence, pinned down a strip of cork and stitched with red thread */}
-      <div className="toon relative mt-10 overflow-hidden rounded-2xl bg-[#b98a5a] px-4 py-10 [--u:clamp(8.5px,2.6vw,12px)]" style={corkStyle}>
+      <div data-cork className="toon relative mt-10 overflow-hidden rounded-2xl bg-[#b98a5a] px-4 py-10 [--u:clamp(8.5px,2.6vw,12px)]" style={corkStyle}>
         <div className="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_0_0_7px_#6b3f1f,inset_0_0_0_9px_#140a26,inset_0_0_30px_rgb(0_0_0/0.4)]" />
         <span className="absolute top-0 bottom-0 left-1/2 w-[3px] -translate-x-1/2 bg-[#d7263d]/25" aria-hidden />
         <span data-thread className="absolute top-0 bottom-0 left-1/2 w-[3px] origin-top -translate-x-1/2 scale-y-0 bg-[#d7263d]" aria-hidden />

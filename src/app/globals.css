@@ -2479,6 +2479,11 @@ html:active-view-transition-type(step-prev)::view-transition-new(*.case-window) 
   li {
     break-inside: avoid;
   }
+  /* the mystery's cork strip is a whole page tall: kept whole, it jumped past the section's title and left that
+     page almost empty. It may split between its pieces of evidence (each one still stays whole) */
+  [data-cork] {
+    break-inside: auto;
+  }
   h1,
   h2,
   h3 {
