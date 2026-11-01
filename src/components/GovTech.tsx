@@ -36,6 +36,18 @@ export default function GovTech() {
     void el.offsetWidth;
     el.setAttribute('data-shake', '');
   };
+  // transparency you can take away: the audit trail downloads as a spreadsheet-ready CSV (semicolon-separated, as
+  // Brazilian Excel expects, with a BOM so the accents survive), the visitor's own close attempts included
+  const exportTrail = () => {
+    const rows = [['hora', 'evento'], ...audit, ...attempts.map((time) => [time, 'tentativa de fechar o processo registrada'])];
+    const csv = '\ufeff' + rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(';')).join('\r\n') + '\r\n';
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const a = Object.assign(document.createElement('a'), { href: url, download: `trilha_PROCESSO_${YEAR}-0142.csv` });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
   const traceProps = (i: number) => ({
     'data-on': trace === i ? '' : undefined,
     onPointerEnter: (e: React.PointerEvent) => e.pointerType === 'mouse' && setTrace(i),
@@ -240,6 +252,14 @@ export default function GovTech() {
                     </li>
                   ))}
                 </ul>
+                <button
+                  type="button"
+                  onClick={exportTrail}
+                  data-export-trail
+                  className="mt-5 inline-flex min-h-8 items-center gap-1.5 font-mono text-[0.68rem] text-mint underline decoration-mint/40 decoration-dotted underline-offset-4 transition-colors hover:text-ink hover:decoration-solid"
+                >
+                  <span aria-hidden>⤓</span> exportar_trilha.csv
+                </button>
                 <p className="sr-only" aria-live="polite">
                   {attempts.length > 0 && 'Processos públicos não se fecham: a tentativa ficou registrada na trilha de auditoria.'}
                 </p>
