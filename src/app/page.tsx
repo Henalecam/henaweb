@@ -1,5 +1,6 @@
 import DavidStage from '@/components/DavidStage';
 import Hero from '@/components/Hero';
+import ResumeReading from '@/components/ResumeReading';
 import Marquee from '@/components/Marquee';
 import Manifesto from '@/components/Manifesto';
 import Capabilities from '@/components/Capabilities';
@@ -99,6 +100,8 @@ export default function Home() {
         <Faq />
         <Contact />
       </main>
+      {/* left halfway last time? offers to pick up at that section (home only) */}
+      <ResumeReading />
       <Footer />
     </>
   );

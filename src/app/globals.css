@@ -839,6 +839,16 @@ html {
   from { translate: 0 -0.6em; }
 }
 
+/* "continuar_leitura.exe" (ResumeReading.tsx) pops up from the bottom like a notification balloon */
+@media (prefers-reduced-motion: no-preference) {
+  .resume-pop {
+    animation: resume-pop 0.35s cubic-bezier(0.3, 1.4, 0.5, 1) both;
+  }
+}
+@keyframes resume-pop {
+  from { opacity: 0; transform: translateY(1.5rem); }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
