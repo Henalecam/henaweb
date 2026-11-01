@@ -586,6 +586,32 @@ html {
   from { opacity: 0; transform: translateY(6px) scale(0.85); }
 }
 
+/* a dragged link's picture (DragFile.tsx): a Win95 file icon over its shortcut name, rendered off-screen just
+   long enough for the browser to take the drag image */
+.drag-file {
+  position: fixed;
+  top: -200px;
+  left: 0;
+  display: flex;
+  width: 13rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  pointer-events: none;
+}
+.drag-file span {
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0.1rem 0.35rem;
+  background: var(--color-acid-ink);
+  color: var(--color-paper);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  outline: 1px dotted var(--color-lemon);
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
