@@ -6,7 +6,8 @@ import { useId } from 'react';
  * "Abrir no celular": on a computer, a case or service page is often read to be passed on to a phone (to show
  * someone, to keep reading on the bus). A small button opens a celular.exe window with a QR of this very page,
  * pre-generated as a static SVG (public/qr/<kind>-<slug>.svg; regenerate if a slug changes). Desktop pointers
- * only: on a phone you're already there. A native popover: Esc or a click outside closes it.
+ * only: on a phone you're already there. A native popover: Esc or a click outside closes it. The printed dossier
+ * carries the same QR at its end.
  */
 export default function PhoneQR({ kind, slug, name }: { kind: 'casos' | 'servicos'; slug: string; name: string }) {
   const id = useId().replace(/:/g, '');
@@ -35,6 +36,18 @@ export default function PhoneQR({ kind, slug, name }: { kind: 'casos' | 'servico
           <span className="text-acid-ink/60">Esc fecha</span>
         </p>
       </div>
+      {/* on paper (the "Salvar dossiê em PDF" printout) the same QR closes the dossier, so a printed copy handed
+          around a procurement table still leads back to the live page. Print only; loaded eagerly so it's
+          there when the print dialog snapshots the page */}
+      <figure aria-hidden className="mt-8 hidden items-center gap-4 border-2 border-acid-ink p-3 text-acid-ink print:flex [break-inside:avoid]">
+        {/* eslint-disable-next-line @next/next/no-img-element -- a 3 KB static SVG */}
+        <img src={`/qr/${kind}-${slug}.svg`} alt="" width={96} height={96} className="block h-24 w-24" />
+        <figcaption className="font-mono text-[9pt] leading-snug">
+          Leia a versão online, sempre atualizada:
+          <br />
+          <strong>henaweb.com/{kind}/{slug}</strong>
+        </figcaption>
+      </figure>
     </>
   );
 }
