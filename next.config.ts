@@ -50,7 +50,15 @@ const nextConfig: NextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()' },
+          // nothing on the site uses these powers; denying them also denies them to any third-party script
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), browsing-topics=(), payment=(), usb=(), serial=(), hid=(), bluetooth=(), midi=(), display-capture=()',
+          },
+          // a page opened from here (WhatsApp, the games) can't reach back into this one, links or no rel=noopener
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          // for whoever reads response headers: the console has a detective kit too
+          { key: 'X-Pista', value: 'abra o console e digite hena.ajuda()' },
           { key: CSP_ENFORCE ? 'Content-Security-Policy' : 'Content-Security-Policy-Report-Only', value: csp },
         ],
       },
