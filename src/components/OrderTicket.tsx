@@ -111,7 +111,9 @@ export default function OrderTicket() {
                     {s.title.toUpperCase()}
                   </a>
                   <span aria-hidden className="mb-1 min-w-4 flex-1 border-b-2 border-dotted border-acid-ink/30" />
-                  <span className="shrink-0 text-right">{s.time.toUpperCase()}</span>
+                  {/* the time may wrap under itself ("SPRINTS / QUINZENAIS"): kept on one line it pushed past the
+                      slip on a 320px phone and let the whole page pan sideways */}
+                  <span className="min-w-0 text-right">{s.time.toUpperCase()}</span>
                 </div>
                 <ul className="pl-7 text-[0.72rem] text-acid-ink/70">
                   {s.ingredients.map((ing) => (
