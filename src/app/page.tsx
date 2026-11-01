@@ -17,6 +17,7 @@ import { capabilities, homeFaq, projects, site } from '@/lib/content';
 
 const capabilitySlugs = capabilities.map((c) => c.slug);
 import Footer from '@/components/Footer';
+import { caseMorphScript } from '@/lib/caseMorph';
 
 const ticker = [
   'Sistemas sob medida',
@@ -54,6 +55,8 @@ export default function Home() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {/* the cases section's screens morph into the case page window they open (lib/caseMorph) */}
+      <script dangerouslySetInnerHTML={{ __html: caseMorphScript }} />
       <main id="conteudo" tabIndex={-1} className="bg-bg">
         <DavidStage>
           <Hero />

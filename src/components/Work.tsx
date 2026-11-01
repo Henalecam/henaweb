@@ -309,7 +309,7 @@ export default function Work() {
               data-cursor="Visitar"
               className="group/screen block aspect-[16/9.4]"
             >
-              <div data-exhibit className="h-full">
+              <div data-exhibit data-case-window={p.slug} className="h-full">
                 <Screen p={p} images={cards === false} />
               </div>
             </a>
@@ -351,7 +351,7 @@ export default function Work() {
               <li key={item.name} onFocus={() => goCard(i)} className="w-[86%] shrink-0 snap-center sm:w-[70%]">
                 {/* the screenshot opens the case page, like the link below it, instead of leaving for the client's site */}
                 {/* same target as "Ver caso completo" below: hidden from screen readers and the tab order so it isn't announced twice */}
-                <a href={`/casos/${item.slug}`} aria-hidden tabIndex={-1} className="block aspect-[16/10.5]">
+                <a href={`/casos/${item.slug}`} aria-hidden tabIndex={-1} data-case-window={item.slug} className="block aspect-[16/10.5]">
                   <Screen p={item} tall={false} images={cards === true} />
                 </a>
                 <div className="mt-8 flex flex-col gap-3">
