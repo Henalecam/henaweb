@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { capabilities, homeFaq, nav, projects, site, whatsappLink } from '@/lib/content';
 import { services } from '@/lib/services';
 import { faqId } from '@/lib/slug';
@@ -118,6 +118,44 @@ function matchItems(query: string): Item[] {
     .sort((a, b) => groupOrder.indexOf(a.it.group) - groupOrder.indexOf(b.it.group) || Number(inLabel(b)) - Number(inLabel(a)) || a.i - b.i)
     .map(({ it }) => it)
     .slice(0, 40);
+}
+
+/**
+ * The typed words marked inside a result's title, accent- and case-blind ("acao" marks "Ação"): the reader sees
+ * at a glance why each line is there. A word that only hit the hidden keywords (or a synonym) marks nothing.
+ */
+function Marked({ text, query }: { text: string; query: string }) {
+  const words = fold(query).split(/\s+/).filter((w) => w.length >= 2);
+  if (!words.length) return <>{text}</>;
+  // fold one character at a time so each folded index still points at its original letter
+  const folded = [...text].map((ch) => fold(ch)[0] ?? ch).join('');
+  const on = new Array<boolean>(folded.length).fill(false);
+  for (const w of words) {
+    for (const cand of w.length >= 4 ? [w, w.slice(0, -1)] : [w]) {
+      let at = folded.indexOf(cand);
+      if (at < 0) continue;
+      for (; at >= 0; at = folded.indexOf(cand, at + cand.length)) on.fill(true, at, at + cand.length);
+      break;
+    }
+  }
+  const chars = [...text];
+  const out: ReactNode[] = [];
+  for (let i = 0; i < chars.length; ) {
+    let j = i;
+    while (j < chars.length && on[j] === on[i]) j++;
+    const piece = chars.slice(i, j).join('');
+    out.push(
+      on[i] ? (
+        <mark key={i} data-hit className="rounded-[3px] bg-lemon px-px text-inherit">
+          {piece}
+        </mark>
+      ) : (
+        piece
+      ),
+    );
+    i = j;
+  }
+  return <>{out}</>;
 }
 
 // every word the index knows, for "você quis dizer…?" when a typo finds nothing ("dicota", "sheduly", "lgdp")
@@ -312,7 +350,7 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
                   className={`flex items-baseline justify-between gap-4 rounded-md px-3 py-2.5 ${i === active ? 'bg-acid' : ''}`}
                 >
                   <span className="font-medium">
-                    {it.label}
+                    <Marked text={it.label} query={query} />
                     {it.external && (
                       <>
                         <span aria-hidden> ↗</span>
