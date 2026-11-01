@@ -111,7 +111,19 @@ export default function Manifesto() {
             // the text scrolls over the hero sun; the dark halo keeps it legible over its stripes, as in the headline
             className="mt-8 text-[clamp(1.75rem,3.6vw,3.75rem)] leading-[1.06] font-medium tracking-[-0.035em] [text-shadow:0_0_2px_rgb(18_8_42/0.9),0_2px_10px_rgb(18_8_42/0.85),0_0_36px_rgb(18_8_42/0.9)]"
           >
-            {manifesto}
+            {/* the manifesto's turn ("um sistema claro") gets a pen stroke under it as it scrolls up the screen */}
+            {(() => {
+              const key = 'sistema claro';
+              const at = manifesto.indexOf(key);
+              if (at < 0) return manifesto;
+              return (
+                <>
+                  {manifesto.slice(0, at)}
+                  <span className="mf-key">{key}</span>
+                  {manifesto.slice(at + key.length)}
+                </>
+              );
+            })()}
           </p>
           {/* the quote about carving answers the chisel too: the mouse knocks marble chips off it, and so does a tap,
               as on the hero's "esculpidos" */}

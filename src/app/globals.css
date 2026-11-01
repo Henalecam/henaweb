@@ -1265,6 +1265,33 @@ html {
   }
 }
 
+/* Manifesto: "sistema claro" is underlined by a single orange marker stroke, slightly crooked like a hand pulled
+   it. On browsers with scroll-driven animations the stroke is drawn left to right while the line rises through the
+   screen; elsewhere, with reduced motion and on paper it is simply there */
+.mf-key {
+  background: linear-gradient(176deg, transparent 0 46%, var(--color-acid) 46% 68%, transparent 68%) 0 100% / 100% 0.42em no-repeat;
+  padding-bottom: 0.06em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+@media screen and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .mf-key {
+      animation: mf-stroke linear both;
+      animation-timeline: view();
+      animation-range: entry 60% cover 45%;
+    }
+  }
+}
+@keyframes mf-stroke {
+  from {
+    background-size: 0% 0.42em;
+  }
+  to {
+    background-size: 100% 0.42em;
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
