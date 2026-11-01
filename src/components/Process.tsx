@@ -5,6 +5,8 @@ import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { process, stack } from '@/lib/content';
 import type { BurgerScene } from '@/lib/burgerScene';
 import { saveData } from '@/lib/saveData';
+import { chime } from '@/lib/chime';
+import { buzz } from '@/lib/haptic';
 import Marquee from './Marquee';
 import OrderTicket from './OrderTicket';
 
@@ -155,6 +157,9 @@ export default function Process() {
     if (!el) return;
     const now = performance.now();
     rings.current = [...rings.current.filter((t) => now - t < 2500), now];
+    // a real ding, a touch higher on each ring of a frantic burst (the 4th sets the kitchen answering)
+    chime(1568 * 2 ** ((rings.current.length - 1) / 24));
+    buzz([4, 20, 4]);
     if (rings.current.length >= 4) {
       rings.current = [];
       setReply(KITCHEN[replyN.current++ % KITCHEN.length]);
