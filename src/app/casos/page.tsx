@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import MockUI from '@/components/MockUI';
 import ClosingCta from '@/components/ClosingCta';
 import CaseFilter from '@/components/CaseFilter';
+import CaseView from '@/components/CaseView';
 import { services } from '@/lib/services';
 import { blurProps } from '@/lib/shotBlur';
 
@@ -94,7 +95,8 @@ export default function CasesIndex() {
           />
           <ReadProgress slugs={projects.map((p) => p.slug)} />
           <RandomCase />
-          <ul data-case-list className="mt-10 grid gap-6 md:grid-cols-2">
+          <CaseView />
+          <ul data-case-list className="mt-4 grid gap-6 md:grid-cols-2">
             {projects.map((p, i) => (
               <li key={p.slug} data-case-service={p.service} data-case-slug={p.slug}>
                 {/* the link is named by the case and its kind and described by the problem: the whole card used to be

@@ -920,6 +920,128 @@ html {
   }
 }
 
+/* /casos "Exibir" switch (CaseView): Win95 toolbar buttons, the chosen one pushed in */
+.case-view-btn {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.7rem;
+  background: #c9c3d8;
+  color: #12082a;
+  font-size: 0.8rem;
+  box-shadow: inset -1.5px -1.5px 0 #7d7394, inset 1.5px 1.5px 0 #fff;
+}
+.case-view-btn[aria-pressed='true'] {
+  background: repeating-conic-gradient(#c9c3d8 0 25%, #e4dff0 0 50%) 0 0 / 2px 2px;
+  box-shadow: inset 1.5px 1.5px 0 #7d7394, inset -1.5px -1.5px 0 #fff;
+  font-weight: 600;
+}
+.case-view-btn:focus-visible {
+  outline: 2px dotted #12082a;
+  outline-offset: -5px;
+}
+.case-view-ico {
+  width: 0.9rem;
+  height: 0.8rem;
+}
+.case-view-ico--grid {
+  background: conic-gradient(#12082a 0 0) 0 0 / 40% 42% no-repeat, conic-gradient(#12082a 0 0) 100% 0 / 40% 42% no-repeat,
+    conic-gradient(#12082a 0 0) 0 100% / 40% 42% no-repeat, conic-gradient(#12082a 0 0) 100% 100% / 40% 42% no-repeat;
+}
+.case-view-ico--rows {
+  background: repeating-linear-gradient(#12082a 0 2px, transparent 2px 4px) 0 0 / 100% 100% no-repeat;
+  background-size: 100% 11px;
+}
+
+/* "Detalhes": the archive as a file listing — no screenshots, one row per case: number, name, kind and the
+   problem (two lines at most). On screen only: the printed archive keeps its windows */
+@media screen {
+  [data-case-list][data-view='details'] {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    counter-reset: case-row;
+    border-top: 2px solid rgb(from var(--color-ink) r g b / 0.2);
+  }
+  [data-case-list][data-view='details'] > li {
+    counter-increment: case-row;
+    position: relative;
+    border-bottom: 1px solid rgb(from var(--color-ink) r g b / 0.15);
+  }
+  [data-case-list][data-view='details'] [data-case-window],
+  [data-case-list][data-view='details'] > li > ul {
+    display: none;
+  }
+  [data-case-list][data-view='details'] > li > a {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: baseline;
+    padding: 0.9rem 0.5rem;
+    transition: background-color 0.15s;
+  }
+  [data-case-list][data-view='details'] > li > a::before {
+    content: counter(case-row, decimal-leading-zero);
+    grid-row: 1 / span 3;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: rgb(from var(--color-ink) r g b / 0.6);
+  }
+  [data-case-list][data-view='details'] > li[data-case-read] > a::before {
+    content: counter(case-row, decimal-leading-zero) ' ✓';
+    color: var(--color-teal);
+  }
+  [data-case-list][data-view='details'] > li > a:hover,
+  [data-case-list][data-view='details'] > li > a:focus-visible {
+    background: rgb(from var(--color-ink) r g b / 0.06);
+  }
+  [data-case-list][data-view='details'] h2 {
+    margin-top: 0;
+    font-size: 1.35rem;
+  }
+  [data-case-list][data-view='details'] h2,
+  [data-case-list][data-view='details'] > li > a > p {
+    grid-column: 2;
+  }
+  [data-case-list][data-view='details'] > li > a > p {
+    margin-top: 0.15rem;
+  }
+  [data-case-list][data-view='details'] > li > a > p:last-of-type {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.95rem;
+  }
+  @media (min-width: 900px) {
+    [data-case-list][data-view='details'] > li > a {
+      grid-template-columns: 3.25rem minmax(10rem, 15rem) minmax(9rem, 13rem) minmax(0, 1fr);
+    }
+    [data-case-list][data-view='details'] > li > a::before {
+      grid-row: auto;
+    }
+    [data-case-list][data-view='details'] h2,
+    [data-case-list][data-view='details'] > li > a > p {
+      grid-column: auto;
+      margin-top: 0;
+    }
+    [data-case-list][data-view='details'] > li > a > p:first-of-type {
+      font-size: 1rem;
+    }
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-case-list][data-view='details'] > li {
+    animation: case-row-in 0.3s ease-out both;
+  }
+}
+@keyframes case-row-in {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
