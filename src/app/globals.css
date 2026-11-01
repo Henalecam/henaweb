@@ -1236,6 +1236,22 @@ html {
   color: #fff;
 }
 
+/* Process menu lines: the dotted leader between a dish and its "price" (the time it takes) is drawn out by the pen as
+   that step comes up, and the other steps' leaders shrink back to a stub. Only once the scroll has lit a step
+   ([data-steps]:has(.is-active)), so without scripts or with reduced motion every leader stays whole */
+@media (prefers-reduced-motion: no-preference) {
+  .step-leader {
+    transform-origin: left center;
+    transition: scale 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s, border-color 0.5s;
+  }
+  [data-steps]:has(.is-active) [data-step]:not(.is-active) .step-leader {
+    scale: 0.12 1;
+  }
+  [data-step].is-active .step-leader {
+    border-color: rgb(194 65 12 / 0.55);
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
