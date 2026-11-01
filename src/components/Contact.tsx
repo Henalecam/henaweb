@@ -712,7 +712,7 @@ export default function Contact() {
                     placeholder=" "
                     aria-describedby="atalho-enviar"
                     // grows with the story instead of scrolling inside 3 rows (field-sizing; other browsers keep the 3 rows)
-                    className={`${field} min-h-[7.375rem] max-h-[22rem] resize-none [field-sizing:content]`}
+                    className={`${field} notepad min-h-[7.375rem] max-h-[22rem] resize-none [field-sizing:content]`}
                     onKeyDown={(e) => {
                       // Ctrl/⌘ + Enter sends from the message box, like in most mail and chat apps
                       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && status !== 'sending') {

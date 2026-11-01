@@ -27,6 +27,12 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@property --rule {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
 @layer base {
   html {
     background: var(--color-bg);
@@ -109,6 +115,28 @@
 }
 
 @layer components {
+  /* the message box is a detective's notepad: faint ruled lines under each line of text (they scroll with
+     the story via attachment:local) that ink in while the visitor writes; the caret is the orange pencil */
+  .notepad {
+    --rule: transparent;
+    background-image: linear-gradient(transparent calc(1.75rem - 1px), var(--rule) 0);
+    background-size: 100% 1.75rem;
+    background-origin: content-box;
+    background-clip: content-box;
+    background-position: 0 -0.2rem;
+    background-attachment: local;
+    caret-color: #c2410c;
+    transition: --rule 0.3s ease;
+  }
+  .notepad:focus,
+  .notepad:not(:placeholder-shown) {
+    --rule: rgb(26 15 46 / 0.14);
+  }
+  @media (forced-colors: active) {
+    .notepad {
+      background-image: none;
+    }
+  }
   .label {
     font-family: var(--font-mono);
     font-size: 0.72rem;
