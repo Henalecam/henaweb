@@ -152,6 +152,40 @@ function RansomNote({ text }: { text: string }) {
   );
 }
 
+// what the empty search box suggests, one at a time, typed out like a detective's note: each is a real query
+// that finds something (a case, a service, an answer), so copying the hint never ends in "nenhuma pista"
+const HINTS = ['LGPD', 'prazo', 'n8n', 'Diconta', 'gov.br', 'custo', 'agendamento', 'jogos'];
+
+/** The rotating placeholder: types a hint, holds it, erases it, moves on. Static with reduced motion. */
+function useTypedHint(active: boolean) {
+  const [text, setText] = useState('');
+  useEffect(() => {
+    if (!active || matchMedia('(prefers-reduced-motion: reduce)').matches) return setText('');
+    let h = 0;
+    let n = 0;
+    let dir = 1;
+    let t = 0;
+    const tick = () => {
+      const word = HINTS[h];
+      n += dir;
+      setText(word.slice(0, n));
+      let wait = dir > 0 ? 85 : 40;
+      if (dir > 0 && n === word.length) {
+        dir = -1;
+        wait = 1600;
+      } else if (dir < 0 && n === 0) {
+        dir = 1;
+        h = (h + 1) % HINTS.length;
+        wait = 350;
+      }
+      t = window.setTimeout(tick, wait);
+    };
+    t = window.setTimeout(tick, 600);
+    return () => window.clearTimeout(t);
+  }, [active]);
+  return text;
+}
+
 /**
  * The typed words marked inside a result's title, accent- and case-blind ("acao" marks "Ação"): the reader sees
  * at a glance why each line is there. A word that only hit the hidden keywords (or a synonym) marks nothing.
@@ -239,6 +273,7 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLUListElement>(null);
   const [query, setQuery] = useState('');
+  const hint = useTypedHint(open && query === '');
   const [active, setActive] = useState(0);
 
   // cases this visitor already opened (ReadMarks, hena:read), newest first: "pick up where you left off"
@@ -352,7 +387,7 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
             aria-activedescendant={results[active] ? `pista-${active}` : undefined}
             aria-autocomplete="list"
             aria-label="Procurar uma pista"
-            placeholder="Procurar pista: LGPD, ERP, custo, Diconta…"
+            placeholder={hint ? `Procurar pista: ${hint}▍` : 'Procurar pista: LGPD, ERP, custo, Diconta…'}
             className="h-14 flex-1 bg-transparent font-mono text-sm outline-none placeholder:text-acid-ink/60"
             autoComplete="off"
             spellCheck={false}
