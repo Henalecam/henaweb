@@ -612,6 +612,21 @@ html {
   outline: 1px dotted var(--color-lemon);
 }
 
+/* 404 crime scene: the visitor's shoe prints (Footprints.tsx), pressed in and fading like dust settling */
+.footprint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  fill: rgb(253 243 225 / 0.16);
+  animation: footprint 1.8s ease-out forwards;
+}
+@keyframes footprint {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  60% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

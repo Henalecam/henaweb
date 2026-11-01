@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Footer from '@/components/Footer';
+import Footprints from '@/components/Footprints';
 import GhostWitness from '@/components/GhostWitness';
 import LostClue from '@/components/LostClue';
 import LostSuspect from '@/components/LostSuspect';
@@ -25,6 +26,8 @@ export default function NotFound() {
     <>
       <main id="conteudo" tabIndex={-1} className="sky relative flex min-h-[100svh] items-center overflow-hidden text-ink">
         <div className="grid-floor !h-[32%] opacity-60" aria-hidden />
+        {/* the visitor's own tracks across the scene: shoe prints follow the mouse and fade (desktop) */}
+        <Footprints />
         {/* the missing page is a crime scene: the same tape that cordons off the home's mystery board */}
         <div
           aria-hidden
