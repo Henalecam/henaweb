@@ -5,6 +5,7 @@ import PickPastime from '@/components/PickPastime';
 import CopyShortLink from '@/components/CopyShortLink';
 import LastPlayed from '@/components/LastPlayed';
 import PastimeKeys from '@/components/PastimeKeys';
+import PlayerTag from '@/components/PlayerTag';
 import { site } from '@/lib/site';
 
 const description = 'Passa tempo: jogos e experimentos que o Henrique, da HenaWeb, faz nas horas vagas. Fortrex, Arena e Forno, cada um no seu endereço.';
@@ -111,7 +112,9 @@ export default function Passatempo() {
                       {/* CRT scanlines */}
                       <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,rgb(0_0_0/0.22)_0_1px,transparent_1px_3px)]" />
                       <span className="absolute top-2 left-2 font-mono text-[0.6rem] tracking-widest text-paper/80">
-                        P{i + 1} · <span data-credits>1 crédito</span>
+                        P{i + 1}
+                        {/* the visitor's initials, once entered below (PlayerTag) */}
+                        <span data-player /> · <span data-credits>1 crédito</span>
                       </span>
                       <span className="arcade-1up absolute top-2 right-2 font-mono text-[0.6rem] tracking-widest">1UP · último jogo</span>
                       {/* power-on: the tube lights as a thin line across the middle, then opens to the full picture (one
@@ -154,7 +157,9 @@ export default function Passatempo() {
             ))}
           </ul>
 
-          <p className="label mt-16 text-center">Feito por diversão · cada jogo vive no seu próprio endereço</p>
+          <PlayerTag />
+
+          <p className="label mt-12 text-center">Feito por diversão · cada jogo vive no seu próprio endereço</p>
         </div>
       </main>
       <Footer />

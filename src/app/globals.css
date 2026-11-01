@@ -898,6 +898,28 @@ html {
   }
 }
 
+/* /passatempo "enter your initials" (PlayerTag): the slot being edited glows and blinks its underline, like the cursor
+   on an arcade high-score table */
+.player-slot {
+  outline: none;
+  box-shadow: inset 0 -4px 0 transparent;
+}
+.player-slot:focus-visible,
+.player-slot:focus {
+  border-color: var(--color-acid);
+  box-shadow: inset 0 -4px 0 var(--color-acid), 0 0 0 3px rgb(18 8 42 / 0.9), 0 0 0 5px var(--color-acid);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .player-slot:focus {
+    animation: player-blink 0.9s steps(1, end) infinite;
+  }
+}
+@keyframes player-blink {
+  50% {
+    box-shadow: inset 0 -4px 0 transparent, 0 0 0 3px rgb(18 8 42 / 0.9), 0 0 0 5px var(--color-acid);
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
