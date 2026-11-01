@@ -65,7 +65,8 @@ export const metadata: Metadata = {
     'agentes de IA para empresas',
     'criação de sites Curitiba',
   ],
-  authors: [{ name: 'HenaWeb', url: site.url }],
+  // <link rel="author"> to the plain-text credits (src/app/humans.txt)
+  authors: [{ name: 'HenaWeb', url: `${site.url}/humans.txt` }],
   creator: 'HenaWeb',
   publisher: 'HenaWeb',
   category: 'technology',
