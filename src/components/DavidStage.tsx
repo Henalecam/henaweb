@@ -30,6 +30,32 @@ export default function DavidStage({ children }: { children: ReactNode }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const sun = useRef<HTMLDivElement>(null);
   const night = useRef<HTMLDivElement>(null);
+  const sky = useRef<HTMLDivElement>(null);
+
+  // the sky is sticky behind the hero and the manifesto, and the first opaque sheet (the clients strip, then every
+  // section after it) slides over it. The browser still counted it as on screen, so its sun, stars and the 3D bust
+  // kept repainting under the sheets (~25-50 ms frames on a phone, all of it invisible). A 1 px marker at the top of
+  // that sheet says when it covers the top of the screen; the sky is then marked data-offscreen, which pauses its CSS
+  // loops (globals.css) and the 3D loop (davidScene). 40 px of grace for the sheet's rounded corners
+  useEffect(() => {
+    const el = sky.current;
+    const sheet = document.querySelector<HTMLElement>('[data-sheet]');
+    if (!el || !sheet) return;
+    const marker = document.createElement('span');
+    marker.setAttribute('aria-hidden', 'true');
+    marker.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:1px;pointer-events:none';
+    sheet.append(marker);
+    const io = new IntersectionObserver(
+      ([e]) => el.toggleAttribute('data-offscreen', !e.isIntersecting && e.boundingClientRect.top < 0),
+      { rootMargin: '40px 0px 0px 0px' },
+    );
+    io.observe(marker);
+    return () => {
+      io.disconnect();
+      marker.remove();
+      el.removeAttribute('data-offscreen');
+    };
+  }, []);
 
   useEffect(() => {
     let scene: DavidScene | null = null;
@@ -108,7 +134,7 @@ export default function DavidStage({ children }: { children: ReactNode }) {
 
   return (
     <div ref={stage} className="relative">
-      <div className="sky sticky top-0 -mb-[100svh] h-[100svh] overflow-hidden" aria-hidden>
+      <div ref={sky} className="sky sticky top-0 -mb-[100svh] h-[100svh] overflow-hidden" aria-hidden>
         {/* nightfall: a deeper sky and a field of stars, both behind the sun, fading in as it sets */}
         <div ref={night} data-nightfall className="absolute inset-0 opacity-0">
           <div className="absolute inset-0 bg-[linear-gradient(180deg,#07041a_0%,#140c2e_45%,transparent_80%)]" />
