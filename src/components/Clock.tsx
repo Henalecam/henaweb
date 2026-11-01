@@ -55,7 +55,8 @@ export default function Clock({ stack = false }: { stack?: boolean }) {
     // stacked (hero, desktop): the visitor's time hangs below Curitiba's without taking layout space; as a
     // block it appeared ~1.5 s after load (the time zone is only known in the browser) and pushed the whole
     // hero headline up 21 px (layout shift 0.008)
-    <span className={`tabular-nums ${stack ? 'md:relative' : ''}`}>
+    // data-clock: five quick taps on it are the touch way into the "elementar" easter egg (Elementar.tsx)
+    <span data-clock className={`tabular-nums ${stack ? 'md:relative' : ''}`}>
       {/* fixed width from the first paint, so the glyph arriving after hydration moves nothing */}
       <span aria-hidden className="mr-1 inline-block w-[1em] text-center">
         {sky}

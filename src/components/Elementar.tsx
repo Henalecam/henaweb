@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react';
 const WORD = 'elementar';
 
 /**
- * A detective's easter egg: typing "elementar" anywhere on the page (outside a form field) gets the classic
+ * A detective's easter egg: typing "elementar" anywhere on the page (outside a form field), or on a phone
+ * tapping the studio's clock five times in a row (it's the one thing on the page that "ticks"), gets the classic
  * reply in a small Win95 note at the corner. No hint anywhere but the console kit's help; it just rewards the
  * curious. Closes itself after a few seconds; the text is announced to screen readers too.
  */
@@ -24,8 +25,23 @@ export default function Elementar() {
         setShown(true);
       }
     };
+    // five taps on the clock within two seconds
+    let taps: number[] = [];
+    const onTap = (e: PointerEvent) => {
+      if (!(e.target as HTMLElement | null)?.closest('[data-clock]')) return;
+      const now = performance.now();
+      taps = [...taps.filter((t) => now - t < 2000), now];
+      if (taps.length >= 5) {
+        taps = [];
+        setShown(true);
+      }
+    };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener('pointerup', onTap);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('pointerup', onTap);
+    };
   }, []);
 
   useEffect(() => {
