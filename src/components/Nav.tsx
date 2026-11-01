@@ -39,6 +39,8 @@ export default function Nav() {
   const inner = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [stillNote, setStillNote] = useState('');
+  // after a lone "g", a little window lists where the next key goes (it closes with that key, or after a second)
+  const [goHint, setGoHint] = useState(0);
   const toggleBtn = useRef<HTMLButtonElement>(null);
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -81,10 +83,12 @@ export default function Nav() {
         if (goAt && e.timeStamp - goAt < 1000 && GO[k]) {
           goAt = 0;
           e.preventDefault();
+          setGoHint(0);
           location.href = GO[k];
           return;
         }
         goAt = k === 'g' ? e.timeStamp : 0;
+        setGoHint(k === 'g' ? e.timeStamp : 0);
         // p pauses (and resumes) the scrolling tapes and the client logos: a pointer stops them by hovering and a
         // finger by tapping, but the keyboard had no way to (WCAG 2.2.2); globals.css holds them on html[data-still]
         if (k === 'p') {
@@ -366,6 +370,7 @@ export default function Nav() {
       <p className="sr-only" aria-live="polite">
         {stillNote}
       </p>
+      {goHint > 0 && <GoHint key={goHint} onDone={() => setGoHint(0)} />}
       {help && ShortcutsHelp && <ShortcutsHelp open={help} onClose={() => setHelp(false)} />}
       {CommandPalette && <CommandPalette
           open={search}
@@ -376,5 +381,41 @@ export default function Nav() {
           }}
         />}
     </>
+  );
+}
+
+
+const GO_KEYS: [string, string][] = [
+  ['H', 'início'],
+  ['C', 'casos'],
+  ['J', 'jogos'],
+  ['O', 'abrir um caso'],
+];
+
+/** "Ir para…": the keys that may follow a "g", shown for the one second they work, like a which-key popup. */
+function GoHint({ onDone }: { onDone: () => void }) {
+  // the latest callback, without restarting the second each time the nav re-renders
+  const done = useRef(onDone);
+  done.current = onDone;
+  useEffect(() => {
+    const t = window.setTimeout(() => done.current(), 1000);
+    return () => window.clearTimeout(t);
+  }, []);
+  return (
+    <div role="status" data-go-hint className="win pointer-events-none fixed bottom-6 left-1/2 z-[85] w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 text-acid-ink">
+      <div className="win-bar">
+        <span>ir_para.exe</span>
+      </div>
+      <p className="m-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 bg-paper px-3 py-2 font-mono text-xs">
+        <span className="sr-only">Ir para: </span>
+        {GO_KEYS.map(([k, label]) => (
+          <span key={k} className="flex items-center gap-1.5">
+            <kbd className="min-w-6 rounded border-2 border-b-4 border-acid-ink bg-white px-1 text-center">{k}</kbd>
+            {label}
+          </span>
+        ))}
+        <span aria-hidden data-go-fuse className="go-fuse basis-full" />
+      </p>
+    </div>
   );
 }

@@ -797,6 +797,21 @@ html {
   transition: background-color 9999s;
 }
 
+/* "g" pressed (Nav, GoHint): a fuse under the keys burns down over the one second the next key counts */
+.go-fuse {
+  height: 3px;
+  background: #c2410c;
+  transform-origin: left;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .go-fuse {
+    animation: go-fuse 1s linear both;
+  }
+}
+@keyframes go-fuse {
+  to { transform: scaleX(0); }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
