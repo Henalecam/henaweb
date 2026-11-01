@@ -1863,6 +1863,20 @@ html:active-view-transition-type(step-prev)::view-transition-new(*.case-window) 
   .grain {
     display: none;
   }
+  /* newer bits that leaned on faintness: the resting dotted underline of text links goes solid and full
+     strength, and the case strip's side cards stay readable instead of fading to 55% */
+  .pen-link:not(:hover, :focus-visible) {
+    text-decoration: underline solid 1.5px currentColor !important;
+  }
+}
+@media (prefers-reduced-motion: no-preference) and ((prefers-contrast: more) or (prefers-reduced-transparency: reduce)) {
+  [data-work-strip] > li {
+    animation-name: strip-focus-contrast !important;
+  }
+}
+@keyframes strip-focus-contrast {
+  0%, 100% { scale: 0.94; opacity: 0.9; }
+  50% { scale: 1; opacity: 1; }
 }
 
 /* "Reduce transparency": frosted glass becomes solid (sticky header, government panel, dialog backdrops) */
@@ -1876,6 +1890,11 @@ html:active-view-transition-type(step-prev)::view-transition-new(*.case-window) 
   ::backdrop {
     backdrop-filter: none !important;
     background-color: #0d0820 !important;
+  }
+  /* and the see-through layers on top of content: the film grain over everything and the dimmed side cards
+     of the case strip (which keep their size cue, not the fade) */
+  .grain {
+    display: none;
   }
 }
 
