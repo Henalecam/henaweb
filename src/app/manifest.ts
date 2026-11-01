@@ -1,5 +1,10 @@
 import type { MetadataRoute } from 'next';
 
+const icon = (name: string) => [
+  { src: `/shortcuts/${name}-96.png`, sizes: '96x96', type: 'image/png' },
+  { src: `/shortcuts/${name}-192.png`, sizes: '192x192', type: 'image/png' },
+];
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'HenaWeb · Studio de engenharia de software',
@@ -22,11 +27,13 @@ export default function manifest(): MetadataRoute.Manifest {
       params: { title: 'titulo', text: 'texto', url: 'link' },
     },
     // long-press on the installed icon (Android) / right-click (desktop)
+    // each shortcut has its own little picture (an envelope, a case folder, a joystick, the magnifier) on the app
+    // icon's plate, so the long-press menu reads at a glance instead of four identical "H"s (public/shortcuts)
     shortcuts: [
-      { name: 'Abrir um caso', short_name: 'Contato', description: 'Formulário de contato com diagnóstico', url: '/#contato', icons: [{ src: '/icon-192.png', sizes: '192x192' }] },
-      { name: 'Casos resolvidos', short_name: 'Casos', description: 'Projetos entregues pela HenaWeb', url: '/casos', icons: [{ src: '/icon-192.png', sizes: '192x192' }] },
-      { name: 'Passa tempo', short_name: 'Jogos', description: 'Jogos e experimentos das horas vagas', url: '/passatempo', icons: [{ src: '/icon-192.png', sizes: '192x192' }] },
-      { name: 'Procurar pista', short_name: 'Buscar', description: 'Busca no site: casos, serviços e perguntas', url: '/?pista=', icons: [{ src: '/icon-192.png', sizes: '192x192' }] },
+      { name: 'Abrir um caso', short_name: 'Contato', description: 'Formulário de contato com diagnóstico', url: '/#contato', icons: icon('contato') },
+      { name: 'Casos resolvidos', short_name: 'Casos', description: 'Projetos entregues pela HenaWeb', url: '/casos', icons: icon('casos') },
+      { name: 'Passa tempo', short_name: 'Jogos', description: 'Jogos e experimentos das horas vagas', url: '/passatempo', icons: icon('jogos') },
+      { name: 'Procurar pista', short_name: 'Buscar', description: 'Busca no site: casos, serviços e perguntas', url: '/?pista=', icons: icon('buscar') },
     ],
     // the richer install sheet (Chrome/Edge show these in the "Instalar" dialog): real captures of the site,
     // one phone and one desktop size each. Regenerate if these pages change a lot
