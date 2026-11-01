@@ -16,6 +16,8 @@ const ROWS: { keys: string[][]; what: string; here?: (path: string) => boolean }
   { keys: [['Ctrl', 'Enter'], ['⌘', 'Enter']], what: 'Enviar o formulário de contato (na caixa de mensagem)', here: (p) => p === '/' },
   // the browser's own print, listed because case and service pages print as a clean dossier (or a PDF)
   { keys: [['Ctrl', 'P'], ['⌘', 'P']], what: 'Salvar um caso ou serviço como dossiê em PDF', here: (p) => /^\/(casos|servicos)\/[\w-]+/.test(p) },
+  // AccordionKeys: the home's questions and capabilities, and each service page's questions
+  { keys: [['↑'], ['↓'], ['Home'], ['End']], what: 'Pular entre as perguntas (com o foco numa delas)', here: (p) => p === '/' || /^\/servicos\/[\w-]+/.test(p) },
   { keys: [['Esc']], what: 'Fechar janelas e a busca' },
   { keys: [['?']], what: 'Abrir esta ajuda' },
 ];
@@ -73,8 +75,10 @@ export default function ShortcutsHelp({ open, onClose }: { open: boolean; onClos
         <dl className="mt-4 divide-y divide-acid-ink/15">
           {ROWS.map((r) => {
             const local = r.here ? r.here(path) : null;
+            // rows for other pages are dimmed by colour, not by opacity on the whole row: at 55% the row's text fell under
+            // 4.5:1 on the paper (axe, at 390 px); the keycaps alone keep a lighter look
             return (
-            <div key={r.what} data-here={local === null ? undefined : String(local)} className={`flex items-center justify-between gap-4 py-2.5 ${local === false ? 'opacity-55' : ''}`}>
+            <div key={r.what} data-here={local === null ? undefined : String(local)} className={`flex items-center justify-between gap-4 py-2.5 ${local === false ? 'text-acid-ink/75 [&_kbd]:opacity-60' : ''}`}>
               <dt className="flex flex-wrap items-center gap-1.5">
                 {r.keys.map((combo, i) => (
                   <span key={i} className="flex items-center gap-1">
