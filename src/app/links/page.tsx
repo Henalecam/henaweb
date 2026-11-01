@@ -98,6 +98,17 @@ export default function Links() {
             </ul>
           </div>
         </div>
+        {/* on a computer, the page is usually opened to pass on to a phone: a QR of the same address, beside the
+            window (public/links-qr.svg encodes https://henaweb.com/links; regenerate it if the address changes) */}
+        <figure className="win absolute top-28 left-[calc(100%+2.5rem)] hidden w-44 lg:block" data-print-hide>
+          <div className="win-bar">
+            <span aria-hidden>celular.exe</span>
+          </div>
+          <div className="m-1.5 border-2 border-[#7d7394] bg-white p-2">
+            <img src="/links-qr.svg" alt="QR code para abrir henaweb.com/links no celular" width={160} height={160} className="block h-auto w-full" loading="lazy" />
+          </div>
+          <figcaption className="px-2 pb-2 text-center font-mono text-[0.65rem] leading-snug text-acid-ink">Aponte a câmera do celular</figcaption>
+        </figure>
         <p className="mt-6 text-center font-mono text-xs text-ink/60">
           <a href="/" className="pen-link inline-block py-1">
             henaweb.com
