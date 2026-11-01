@@ -9,9 +9,13 @@ const still = () => typeof window !== 'undefined' && window.matchMedia('(prefers
 
 /* "O que você recebe" on a service page: each step is a Win95 window, and its "_" really minimizes it — the window
    shrinks down into a taskbar under the list, where a button brings it back (the way it left, in reverse). Nothing
-   is lost: minimized steps still print, and the page's server HTML has every step open */
+   is lost: minimized steps still print, and the page's server HTML has every step open. Its "□" works too: the step
+   takes the whole row at a larger reading size, and "❐" puts it back */
 export default function Deliverables({ items }: { items: Item[] }) {
   const [min, setMin] = useState<number[]>([]);
+  // "□" maximizes a step: it takes the whole row (both columns) at a larger reading size; "❐" puts it back
+  const [max, setMax] = useState<number | null>(null);
+  const flip = useRef<Map<Element, DOMRect> | null>(null);
   const list = useRef<HTMLOListElement>(null);
   const bar = useRef<HTMLDivElement>(null);
   // after a change, where focus should land (a taskbar button, or the restored window's "_") and which window
@@ -24,6 +28,7 @@ export default function Deliverables({ items }: { items: Item[] }) {
     const el = win(i);
     const done = () => {
       next.current = { focus: `[data-task="${i}"]` };
+      setMax((m) => (m === i ? null : m));
       setMin((m) => [...m, i]);
     };
     if (!el || !bar.current || still()) return done();
@@ -40,6 +45,31 @@ export default function Deliverables({ items }: { items: Item[] }) {
       { duration: 280, easing: 'cubic-bezier(.55,0,.75,.2)' },
     ).onfinish = done;
   };
+
+  const maximize = (i: number) => {
+    // FLIP: remember where every window was, then glide them from there once the grid has reflowed
+    if (!still() && list.current) flip.current = new Map([...list.current.children].map((el) => [el, el.getBoundingClientRect()]));
+    setMax((m) => (m === i ? null : i));
+  };
+
+  useLayoutEffect(() => {
+    const before = flip.current;
+    flip.current = null;
+    if (!before) return;
+    before.forEach((a, el) => {
+      const b = el.getBoundingClientRect();
+      const dx = a.left - b.left;
+      const dy = a.top - b.top;
+      if (!dx && !dy && a.width === b.width) return;
+      el.animate(
+        [
+          { transform: `translate(${dx}px, ${dy}px)`, clipPath: `inset(0 ${Math.max(0, b.width - a.width)}px ${Math.max(0, b.height - a.height)}px 0)` },
+          { transform: 'none', clipPath: 'inset(0 0 0 0)' },
+        ],
+        { duration: 320, easing: 'cubic-bezier(.2,.8,.3,1)' },
+      );
+    });
+  }, [max]);
 
   const restore = (i: number, from?: DOMRect) => {
     next.current = { focus: `[data-win-item="${i}"] [data-min-btn]`, grow: from && !still() ? { i, from } : undefined };
@@ -73,7 +103,13 @@ export default function Deliverables({ items }: { items: Item[] }) {
     <>
       <ol ref={list} data-win-group className="mt-8 grid gap-5 md:grid-cols-2">
         {items.map((d, i) => (
-          <li key={d.title} data-win-item={i} data-min={min.includes(i) ? '' : undefined} className="win flex flex-col">
+          <li
+            key={d.title}
+            data-win-item={i}
+            data-min={min.includes(i) ? '' : undefined}
+            data-max={max === i ? '' : undefined}
+            className={`win flex flex-col ${max === i ? 'md:col-span-2' : ''}`}
+          >
             <div className="win-bar">
               <span aria-hidden>{fileName(i)}</span>
               {/* where this step sits in the whole delivery, like a copy dialog's progress: one block per step */}
@@ -91,7 +127,14 @@ export default function Deliverables({ items }: { items: Item[] }) {
                 <button type="button" data-min-btn className="win-btn" aria-label={`Minimizar etapa ${i + 1}: ${d.title}`} onClick={() => minimize(i)}>
                   _
                 </button>
-                <span aria-hidden className="win-btn">□</span>
+                <button
+                  type="button"
+                  className="win-btn"
+                  aria-label={max === i ? `Restaurar tamanho da etapa ${i + 1}` : `Maximizar etapa ${i + 1}: ${d.title}`}
+                  onClick={() => maximize(i)}
+                >
+                  {max === i ? '❐' : '□'}
+                </button>
                 <span aria-hidden className="win-btn">×</span>
               </span>
             </div>
