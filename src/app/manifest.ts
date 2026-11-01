@@ -24,6 +24,8 @@ export default function manifest(): MetadataRoute.Manifest {
     share_target: {
       action: '/compartilhado',
       method: 'GET',
+      // stated outright: Chrome's manifest check warned that it was only being assumed
+      enctype: 'application/x-www-form-urlencoded',
       params: { title: 'titulo', text: 'texto', url: 'link' },
     },
     // long-press on the installed icon (Android) / right-click (desktop)
