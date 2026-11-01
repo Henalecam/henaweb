@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { site, whatsappLink } from '@/lib/site';
 import { services } from '@/lib/services';
 import NewTab from '@/components/NewTab';
+import ShareCase from '@/components/ShareCase';
 
 const description = 'Todos os caminhos da HenaWeb num lugar só: WhatsApp, e-mail, serviços, casos resolvidos e redes.';
 
@@ -92,6 +93,17 @@ export default function Links() {
                 </a>
               </li>
             </ul>
+
+            {/* most studios are found by word of mouth: one tap passes this page on (the phone's share sheet, or a
+                copied link on a computer) */}
+            <div className="mt-8 flex justify-center">
+              <ShareCase
+                title="HenaWeb · Studio de engenharia de software"
+                text="Sistemas sob medida, setor público, automação com IA e sites."
+                label="Indicar para alguém ↗"
+                placement="links-share"
+              />
+            </div>
 
             <ul className="mt-8 flex flex-wrap justify-center gap-x-5 gap-y-2 font-mono text-xs" aria-label="Redes sociais">
               {site.social.map((s) => (
