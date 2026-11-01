@@ -146,6 +146,14 @@ export default function Footer() {
                 <span data-read-mark={x.slug} hidden className="ml-1.5 font-mono text-[0.7rem] text-acid" title="Caso já lido">
                   ✓<span className="sr-only"> lido</span>
                 </span>
+                {/* a peek at the case: its screenshot pops beside the link on hover or keyboard focus (desktop pointers
+                    only, globals.css data-case-thumb); lazy, so nothing loads until someone points at it */}
+                {x.top && (
+                  <span aria-hidden data-case-thumb>
+                    {/* eslint-disable-next-line @next/next/no-img-element -- a pre-cropped static JPG shown at 240px */}
+                    <img src={x.top} alt="" width={240} height={141} loading="lazy" decoding="async" />
+                  </span>
+                )}
               </FooterLink>
             ))}
             <FooterLink href="/casos" accent>
@@ -283,7 +291,7 @@ function FooterLink({ href, children, accent = false }: { href: string; children
       <a
         href={href}
         aria-current={here ? 'page' : undefined}
-        className={`group inline-flex items-baseline gap-2 transition-colors ${
+        className={`group relative inline-flex items-baseline gap-2 transition-colors ${
           here ? 'font-medium text-ink' : accent ? 'font-medium text-acid' : 'text-ink/75 hover:text-ink'
         }`}
       >
