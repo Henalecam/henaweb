@@ -125,7 +125,12 @@ export default function Manifesto() {
           <div key={f.l} data-fact className="fact-card toon flex items-end justify-between gap-6 rounded-2xl bg-paper p-6 text-acid-ink md:p-8">
             {/* the rolling counter is for the eyes only: mid-roll a screen reader read "0 time só" or "71 caixa-preta";
                 the real number sits beside it for assistive tech */}
-            <span data-fact-n={f.n} aria-hidden className="font-groovy text-[clamp(3.5rem,7vw,6rem)] leading-none text-[#c2410c] tabular-nums">
+            <span data-fact-n={f.n} aria-hidden className="font-groovy text-[clamp(3.5rem,7vw,6rem)] leading-none text-[#c2410c] tabular-nums print:hidden">
+              {f.n}
+            </span>
+            {/* on paper, the real number: the counter above sits at its starting digit (0 or 99) until the cards
+                scroll into view, so printing the page from the top put "0 · 0 · 99" on the sheet instead of the facts */}
+            <span aria-hidden className="font-groovy hidden text-[clamp(3.5rem,7vw,6rem)] leading-none text-[#c2410c] tabular-nums print:inline">
               {f.n}
             </span>
             <span className="sr-only">{f.n} </span>
