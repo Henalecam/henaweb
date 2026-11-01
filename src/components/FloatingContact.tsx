@@ -119,6 +119,10 @@ export default function FloatingContact() {
   }, []);
 
   return (
+    // a landmark of its own: the button lives outside <main> and the footer, and content outside any landmark is
+    // skipped by screen-reader users who move region by region (axe "region"). Hidden with it while the button is
+    // away, and on desktop where the button doesn't exist
+    <aside aria-label="Contato rápido" aria-hidden={!show} data-print-hide className="md:hidden">
     <a
       data-print-hide
       href={href}
@@ -151,5 +155,6 @@ export default function FloatingContact() {
         WhatsApp
       </span>
     </a>
+    </aside>
   );
 }
