@@ -22,6 +22,7 @@ import Screensaver from '@/components/Screensaver';
 import QuoteLink from '@/components/QuoteLink';
 import SwRegister from '@/components/SwRegister';
 import DragFile from '@/components/DragFile';
+import WinDrag from '@/components/WinDrag';
 import OffscreenPause from '@/components/OffscreenPause';
 import ConsentBanner from '@/components/ConsentBanner';
 import { analyticsLoader } from '@/lib/consent';
@@ -220,6 +221,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <QuoteLink />
         <SwRegister />
         <DragFile />
+        <WinDrag />
         <OffscreenPause />
         {children}
         <div className="grain" aria-hidden />

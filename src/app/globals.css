@@ -627,6 +627,20 @@ html {
   100% { opacity: 0; }
 }
 
+/* floating windows move by their title bar (WinDrag.tsx): the bar says so with the move cursor, and a window in
+   flight gets a lighter shadow, as if lifted off the desk */
+@media (pointer: fine) {
+  dialog.win[open] > .win-bar,
+  .win.fixed > .win-bar,
+  .fixed > .win > .win-bar {
+    cursor: move;
+    user-select: none;
+  }
+}
+[data-dragging] {
+  opacity: 0.94;
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
