@@ -225,12 +225,34 @@ export default function TabHaunt() {
     const kit = {
       ajuda() {
         console.log(
-          '%chena.casos()%c     os casos resolvidos, em tabela\n%chena.servicos()%c  o que a gente faz\n%chena.lanterna()%c apaga (e acende) as luzes\n%chena.contato()%c  abre um caso com a gente\n\nE fora do console: digite a palavra de todo detetive famoso, na própria página (no celular: cinco toques no relógio).\nE o cursor da ficha em branco, no fim das páginas de serviço, não pisca à toa: anote os pontos e traços.',
+          '%chena.casos()%c     os casos resolvidos, em tabela (com os que você já leu)\n%chena.servicos()%c  o que a gente faz\n%chena.lanterna()%c apaga (e acende) as luzes\n%chena.contato()%c  abre um caso com a gente\n\nE fora do console: digite a palavra de todo detetive famoso, na própria página (no celular: cinco toques no relógio).\nE o cursor da ficha em branco, no fim das páginas de serviço, não pisca à toa: anote os pontos e traços.\nNa página, a tecla ? lista os atalhos de teclado.',
           ...Array(4).fill(['font: 700 13px monospace; color: #f9e27d;', tip]).flat(),
         );
       },
       casos() {
-        console.table(projectLinks.map((c, i) => ({ nº: String(i + 1).padStart(2, '0'), caso: c.name, arquivo: `${location.origin}/casos/${c.slug}` })));
+        // the same "read" stamps the archive shows (hena:read, ReadMarks): which files this browser already opened,
+        // and the next one waiting, like the 404's investigation ledger
+        let read: string[] = [];
+        try {
+          const v = JSON.parse(localStorage.getItem('hena:read') ?? '[]');
+          if (Array.isArray(v)) read = v.filter((x) => typeof x === 'string');
+        } catch {}
+        console.table(
+          projectLinks.map((c, i) => ({
+            nº: String(i + 1).padStart(2, '0'),
+            caso: c.name,
+            lido: read.includes(c.slug) ? '✓' : '',
+            arquivo: `${location.origin}/casos/${c.slug}`,
+          })),
+        );
+        const done = projectLinks.filter((c) => read.includes(c.slug)).length;
+        const next = projectLinks.find((c) => !read.includes(c.slug));
+        console.log(
+          next
+            ? `%c${done} de ${projectLinks.length} investigados neste navegador. Próxima pista: ${next.name} → ${location.origin}/casos/${next.slug}`
+            : `%cTodos os ${projectLinks.length} casos investigados. Detetive de carteirinha.`,
+          tip,
+        );
       },
       servicos() {
         console.table(serviceLinks.map((s) => ({ serviço: s.name, página: `${location.origin}/servicos/${s.slug}` })));
