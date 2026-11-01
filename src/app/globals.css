@@ -1192,6 +1192,27 @@ html[data-menu='open'] [data-back-top] {
   from { translate: 0 -12px; rotate: -3deg; opacity: 0; }
 }
 
+/* case page: the latent print in the corner of "O mistério" is dusted darker when the card is pointed at;
+   a phone has no hover, so there the dust settles on it as the card scrolls up into the middle of the screen */
+@media (hover: none) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    /* the card clips its corner (overflow hidden makes it a scroll container), so view() on the print itself
+       never moves: the timeline is taken from the card's own place in the page instead */
+    :has(> [data-fingerprint]) {
+      view-timeline: --print block;
+    }
+    [data-fingerprint] {
+      animation: print-dust linear both;
+      animation-timeline: --print;
+      animation-range: entry 40% cover 55%;
+    }
+  }
+}
+@keyframes print-dust {
+  from { opacity: 0.13; }
+  to { opacity: 0.32; }
+}
+
 /* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
    reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
 [data-nav-pending] {

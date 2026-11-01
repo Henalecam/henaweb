@@ -14,7 +14,7 @@ const loops = Array.from({ length: 10 }, (_, i) => {
 
 export default function Fingerprint({ className = '' }: { className?: string }) {
   return (
-    <svg viewBox="-50 -62 100 124" aria-hidden className={`pointer-events-none ${className}`}>
+    <svg viewBox="-50 -62 100 124" aria-hidden data-fingerprint className={`pointer-events-none ${className}`}>
       <g fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" transform="translate(-3 4) rotate(-8)">
         {loops.map((l, i) => (
           <ellipse key={i} cx={i * 0.35} cy={-i * 0.6} rx={l.rx} ry={l.ry} strokeDasharray={l.dash} strokeDashoffset={l.offset} />
