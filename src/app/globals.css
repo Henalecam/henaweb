@@ -948,7 +948,8 @@ html {
 .case-view-btn[aria-pressed='true'] {
   background: repeating-conic-gradient(#c9c3d8 0 25%, #e4dff0 0 50%) 0 0 / 2px 2px;
   box-shadow: inset 1.5px 1.5px 0 #7d7394, inset -1.5px -1.5px 0 #fff;
-  font-weight: 600;
+  /* no bolder weight: the pressed state is set after hydration, and a wider bold label nudged the switch sideways
+     (a small layout shift on every visit to /casos); the sunken bevel and the dither already say "pressed" */
 }
 .case-view-btn:focus-visible {
   outline: 2px dotted #12082a;
