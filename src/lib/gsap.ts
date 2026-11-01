@@ -8,18 +8,8 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
-export const prefersReducedMotion = () =>
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/** Runs `cb` once the preloader has finished (or immediately if it already did). */
-export function onReady(cb: () => void) {
-  if (document.documentElement.dataset.ready === 'true') {
-    cb();
-    return () => {};
-  }
-  window.addEventListener('hena:ready', cb, { once: true });
-  return () => window.removeEventListener('hena:ready', cb);
-}
+// the library-free helpers live in ./motion (so non-GSAP components don't import this file); re-exported here
+export { prefersReducedMotion, onReady } from './motion';
 
 // SplitText lives in ./split: only the home's sections split text, so the other pages don't ship it
 export { gsap, ScrollTrigger, useGSAP };

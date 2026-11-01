@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { nav } from '@/lib/site';
-import { gsap, onReady, prefersReducedMotion } from '@/lib/gsap';
+import { onReady, prefersReducedMotion } from '@/lib/motion';
 import { curtainSwipe } from '@/lib/curtainSwipe';
 import Magnetic from './Magnetic';
 import Social from './Social';
@@ -192,7 +192,15 @@ export default function Nav() {
     // reduced motion: the bar is simply there instead of sliding down
     const off = prefersReducedMotion()
       ? () => {}
-      : onReady(() => gsap.from(inner.current, { yPercent: -120, duration: 1.1, ease: 'expo.out', delay: 0.5 }));
+      : onReady(() =>
+          // slides down from above the screen (WAAPI; was a GSAP tween, the same timing and expo.out curve)
+          inner.current?.animate([{ transform: 'translateY(-120%)' }, { transform: 'none' }], {
+            duration: 1100,
+            delay: 500,
+            easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            fill: 'backwards',
+          }),
+        );
     return () => {
       off();
       window.removeEventListener('scroll', onScroll);
