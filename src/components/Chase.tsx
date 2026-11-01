@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import type { ChaseScene } from '@/lib/chaseScene';
 import { saveData } from '@/lib/saveData';
 
@@ -63,7 +62,7 @@ export default function Chase() {
         import('@/lib/chaseScene').then(({ createChaseScene }) => {
           if (cancelled) return;
           try {
-            scene = createChaseScene(el, { reducedMotion: prefersReducedMotion() });
+            scene = createChaseScene(el, { reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches });
           } catch {
             // no WebGL: the night backdrop stays
             setNoVan(true);
@@ -80,22 +79,47 @@ export default function Chase() {
     };
   }, []);
 
-  useGSAP(
-    () => {
-      if (prefersReducedMotion()) return;
-      // the loops only run while the chase is on screen: the footer sits on every page, and these
-      // used to tick every frame (a style recalc per frame) from the first paint, footer far below
-      const loops = [
-        gsap.fromTo('[data-layer="trees"]', { xPercent: 0 }, { xPercent: -50, duration: 22, ease: 'none', repeat: -1, paused: true }),
-        gsap.to('[data-window]', { opacity: 0.25, duration: 0.08, repeat: -1, yoyo: true, repeatDelay: 2.4, ease: 'none', paused: true }),
-        gsap.fromTo('[data-vruum]', { scale: 0.9, rotate: 4 }, { scale: 1.06, rotate: 8, duration: 0.5, repeat: -1, yoyo: true, ease: 'sine.inOut', paused: true }),
-      ];
-      const io = new IntersectionObserver(([e]) => loops.forEach((t) => (e.isIntersecting ? t.play() : t.pause())));
-      if (root.current) io.observe(root.current);
-      return () => io.disconnect();
-    },
-    { scope: root },
-  );
+  // the loops only run while the chase is on screen: the footer sits on every page, and these used to tick every
+  // frame (a style recalc per frame) from the first paint, footer far below. Plain WAAPI (it was GSAP, which this
+  // footer, on every page, no longer needs for three loops): the same timings, played and paused by an observer
+  useEffect(() => {
+    const el = root.current;
+    if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const all = <T extends Element>(sel: string) => [...el.querySelectorAll<T>(sel)];
+    const loops: Animation[] = [
+      ...all<HTMLElement>('[data-layer="trees"]').map((t) =>
+        t.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-50%)' }], { duration: 22000, iterations: Infinity }),
+      ),
+      // a flicker: dims in 80 ms, holds 2.4 s, comes back in 80 ms, holds 2.4 s (GSAP's yoyo + repeatDelay)
+      ...all<SVGElement>('[data-window]').map((w) =>
+        w.animate(
+          [
+            { opacity: 1, offset: 0 },
+            { opacity: 0.25, offset: 0.08 / 4.96 },
+            { opacity: 0.25, offset: 2.48 / 4.96 },
+            { opacity: 1, offset: 2.56 / 4.96 },
+            { opacity: 1, offset: 1 },
+          ],
+          { duration: 4960, iterations: Infinity },
+        ),
+      ),
+      ...all<HTMLElement>('[data-vruum]').map((v) =>
+        v.animate([{ transform: 'scale(0.9) rotate(4deg)' }, { transform: 'scale(1.06) rotate(8deg)' }], {
+          duration: 500,
+          iterations: Infinity,
+          direction: 'alternate',
+          easing: 'cubic-bezier(0.37, 0, 0.63, 1)', // sine.inOut
+        }),
+      ),
+    ];
+    loops.forEach((t) => t.pause());
+    const io = new IntersectionObserver(([e]) => loops.forEach((t) => (e.isIntersecting ? t.play() : t.pause())));
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      loops.forEach((t) => t.cancel());
+    };
+  }, []);
 
   return (
     <div ref={root} className="relative h-[clamp(340px,42vw,520px)] overflow-hidden" aria-hidden>
