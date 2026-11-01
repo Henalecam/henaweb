@@ -18,7 +18,7 @@ export default function PhoneQR({ kind, slug, name }: { kind: 'casos' | 'servico
         popoverTarget={`qr-${id}`}
         data-print-hide
         data-phone-qr
-        className="label mt-5 ml-5 hidden min-h-8 items-center gap-1.5 rounded-full !text-ink/70 transition-colors hover:!text-ink focus-visible:!text-ink pointer-fine:inline-flex"
+        className="label mt-5 hidden min-h-8 items-center gap-1.5 rounded-full !text-ink/70 transition-colors hover:!text-ink focus-visible:!text-ink pointer-fine:inline-flex"
       >
         <span aria-hidden>📱</span> Abrir no celular
       </button>

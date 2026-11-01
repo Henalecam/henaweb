@@ -819,6 +819,16 @@ html {
   }
 }
 
+/* "Ouvir o caso" (ListenCase.tsx): the tape reel turns while the case is being read aloud */
+@media (prefers-reduced-motion: no-preference) {
+  .reel {
+    animation: reel 1.6s linear infinite;
+  }
+}
+@keyframes reel {
+  to { rotate: 360deg; }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

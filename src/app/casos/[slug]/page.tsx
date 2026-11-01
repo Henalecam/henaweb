@@ -9,6 +9,7 @@ import Stamp from '@/components/Stamp';
 import ShareCase from '@/components/ShareCase';
 import PrintDossier from '@/components/PrintDossier';
 import PhoneQR from '@/components/PhoneQR';
+import ListenCase from '@/components/ListenCase';
 import CaseKeys from '@/components/CaseKeys';
 import { ArchiveReturn, MarkRead, UnreadHint } from '@/components/ReadMarks';
 import FullShot, { MaximizeButton, ZoomArea } from '@/components/FullShot';
@@ -243,8 +244,19 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             </a>
             <ShareCase title={`${p.name} · caso resolvido pela HenaWeb`} text={p.summary} />
           </div>
-          <PrintDossier placement="case-pdf" />
+          {/* the page's own tools, on one wrapping line: PDF, listen, phone */}
+          <div className="mt-5 flex flex-wrap items-center gap-x-6 print:block [&>button]:mt-0">
+            <PrintDossier placement="case-pdf" />
+          <ListenCase
+            lines={[
+              `Caso número ${i + 1}: ${p.name}. ${p.kind}.`,
+              `O mistério. ${p.challenge}`,
+              `Caso resolvido. ${p.built}`,
+              `Principais recursos: ${p.highlights.join(', ')}.`,
+            ]}
+          />
           <PhoneQR kind="casos" slug={p.slug} name={p.name} />
+          </div>
 
           <MarkRead slug={p.slug} />
           <ArchiveReturn />

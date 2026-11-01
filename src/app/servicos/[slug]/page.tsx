@@ -157,8 +157,10 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             </a>
             <ShareCase title={`${s.name} · HenaWeb`} text={s.intro} label="Enviar para alguém ↗" placement="service-share" />
           </div>
-          <PrintDossier placement="service-pdf" />
-          <PhoneQR kind="servicos" slug={s.slug} name={s.name} />
+          <div className="mt-5 flex flex-wrap items-center gap-x-6 print:block [&>button]:mt-0">
+            <PrintDossier placement="service-pdf" />
+            <PhoneQR kind="servicos" slug={s.slug} name={s.name} />
+          </div>
 
           {/* long page on a phone: a table of contents with the section count, jumping to the same ids SectionLink copies */}
           <nav aria-label="Nesta página" className="mt-12 font-mono text-xs" data-print-hide>
