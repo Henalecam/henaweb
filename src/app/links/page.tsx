@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { Metadata } from 'next';
 import { site, whatsappLink } from '@/lib/site';
 import { services } from '@/lib/services';
@@ -22,8 +23,14 @@ const big = 'toon toon-press flex min-h-14 w-full items-center justify-between g
  * drifts. Clicks are tagged data-placement="links" for the conversion tracking.
  */
 export default function Links() {
+  // each button drops into place one after another once the opening curtain lifts, like windows cascading open
+  let k = 0;
+  const pop = () => ({ className: 'links-pop', style: { '--i': k++ } as CSSProperties });
   return (
     <main id="conteudo" tabIndex={-1} data-placement="links" className="sky relative min-h-[100svh] overflow-x-clip text-ink">
+      <noscript>
+        <style>{'.links-pop{opacity:1!important;animation:none!important}'}</style>
+      </noscript>
       <div className="grid-floor !h-[26%] opacity-50" aria-hidden />
       <div className="relative mx-auto w-[min(100%-2rem,28rem)] pt-28 pb-20">
         <div className="win">
@@ -38,18 +45,18 @@ export default function Links() {
             <p className="mt-2 text-sm text-acid-ink/75">Sistemas sob medida, setor público, automação com IA e sites.</p>
 
             <ul className="mt-6 flex flex-col gap-3">
-              <li>
+              <li {...pop()}>
                 <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className={`${big} bg-[#25d366]`}>
                   Conversar no WhatsApp <span aria-hidden>↗</span>
                   <NewTab />
                 </a>
               </li>
-              <li>
+              <li {...pop()}>
                 <a href="/#contato" className={`${big} bg-acid`}>
                   Abrir um caso <span aria-hidden>→</span>
                 </a>
               </li>
-              <li>
+              <li {...pop()}>
                 <a href={`mailto:${site.email}`} className={`${big} bg-white`}>
                   <span className="truncate">{site.email}</span> <span aria-hidden>✉</span>
                 </a>
@@ -59,7 +66,7 @@ export default function Links() {
             <p className="label mt-8 !text-acid-ink/70">Serviços</p>
             <ul className="mt-3 grid grid-cols-2 gap-2.5">
               {services.map((s) => (
-                <li key={s.slug}>
+                <li key={s.slug} {...pop()}>
                   <a href={`/servicos/${s.slug}`} className="toon-sm toon-press flex h-full min-h-12 items-center rounded-xl bg-white px-3 py-2 text-sm font-medium">
                     {s.name}
                   </a>
@@ -69,17 +76,17 @@ export default function Links() {
 
             <p className="label mt-8 !text-acid-ink/70">Mais</p>
             <ul className="mt-3 flex flex-col gap-2.5">
-              <li>
+              <li {...pop()}>
                 <a href="/casos" className="toon-sm toon-press flex min-h-12 items-center justify-between rounded-xl bg-white px-4 text-sm font-medium">
                   Casos resolvidos <span aria-hidden>→</span>
                 </a>
               </li>
-              <li>
+              <li {...pop()}>
                 <a href="/henaweb.vcf" className="toon-sm toon-press flex min-h-12 items-center justify-between rounded-xl bg-white px-4 text-sm font-medium">
                   Salvar contato no celular <span aria-hidden>⤓</span>
                 </a>
               </li>
-              <li>
+              <li {...pop()}>
                 <a href="/passatempo" className="toon-sm toon-press flex min-h-12 items-center justify-between rounded-xl bg-white px-4 text-sm font-medium">
                   Passa tempo (jogos) <span aria-hidden>🕹</span>
                 </a>
