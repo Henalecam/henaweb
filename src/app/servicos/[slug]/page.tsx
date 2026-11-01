@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import type { CSSProperties } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { services, serviceBySlug } from '@/lib/services';
@@ -20,6 +19,7 @@ import MockUI from '@/components/MockUI';
 import CaseKeys from '@/components/CaseKeys';
 import { stepTransitionScript } from '@/lib/stepTransition';
 import NewTab from '@/components/NewTab';
+import Deliverables from '@/components/Deliverables';
 import { blurProps } from '@/lib/shotBlur';
 
 export const dynamicParams = false;
@@ -202,30 +202,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
               <span data-mark>O que você recebe</span>
             </h2>
             <SectionLink id="entregas" title="O que você recebe" />
-            <ol data-win-group className="mt-8 grid gap-5 md:grid-cols-2">
-              {s.deliverables.map((d, i) => (
-                <li key={d.title} data-win-item className="win flex flex-col">
-                  <div className="win-bar">
-                    <span aria-hidden>etapa_{String(i + 1).padStart(2, '0')}.txt</span>
-                    {/* where this step sits in the whole delivery, like a copy dialog's progress: one block per step */}
-                    <span aria-hidden className="ml-auto flex items-center gap-[3px]">
-                      {s.deliverables.map((_, j) => (
-                        <span
-                          key={j}
-                          data-prog-fill={j <= i ? '' : undefined}
-                          style={j <= i ? ({ '--j': j } as CSSProperties) : undefined}
-                          className={`h-2.5 w-2 border border-white/85 shadow-[1px_1px_0_rgb(0_0_0/0.35)] ${j <= i ? 'bg-white' : 'bg-transparent'}`}
-                        />
-                      ))}
-                    </span>
-                  </div>
-                  <div className="m-1.5 flex-1 border-2 border-[#7d7394] bg-paper p-6 text-acid-ink">
-                    <h3 className="text-2xl font-medium tracking-tight">{d.title}</h3>
-                    <p className="mt-2 leading-relaxed text-acid-ink/75">{d.body}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <Deliverables items={s.deliverables} />
           </section>
 
           <section className="group relative mt-24" aria-labelledby="exemplos">
