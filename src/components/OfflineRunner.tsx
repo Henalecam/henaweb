@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { buzz } from '@/lib/haptic';
 
 const BEST = 'hena:runner-best';
 const H = 120;
@@ -130,6 +131,7 @@ export default function OfflineRunner() {
       draw();
       if (hit) {
         alive = false;
+        buzz([22, 30, 10]); // the bump into the clue, felt on phones that vibrate
         const s = Math.floor(dist / 10);
         setScore(s);
         setBest((b) => {

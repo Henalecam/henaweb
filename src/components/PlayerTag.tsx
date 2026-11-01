@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { buzz } from '@/lib/haptic';
 
 const KEY = 'hena:initials';
 const ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -67,6 +68,8 @@ export default function PlayerTag() {
       localStorage.setItem(KEY, tag);
     } catch {}
     paint(tag);
+    // a coin dropping into the cabinet, on phones that vibrate
+    buzz([6, 40, 6, 40, 14]);
     setSaved(tag);
     setFresh(true);
   };

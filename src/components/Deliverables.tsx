@@ -1,6 +1,7 @@
 'use client';
 
 import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import { buzz } from '@/lib/haptic';
 
 type Item = { title: string; body: string };
 
@@ -25,6 +26,7 @@ export default function Deliverables({ items }: { items: Item[] }) {
   const win = (i: number) => list.current?.querySelector<HTMLElement>(`[data-win-item="${i}"]`);
 
   const minimize = (i: number) => {
+    buzz(6); // the click of a 95 title-bar button, on phones that vibrate
     const el = win(i);
     const done = () => {
       next.current = { focus: `[data-task="${i}"]` };
@@ -47,6 +49,7 @@ export default function Deliverables({ items }: { items: Item[] }) {
   };
 
   const maximize = (i: number) => {
+    buzz(6);
     // FLIP: remember where every window was, then glide them from there once the grid has reflowed
     if (!still() && list.current) flip.current = new Map([...list.current.children].map((el) => [el, el.getBoundingClientRect()]));
     setMax((m) => (m === i ? null : i));
