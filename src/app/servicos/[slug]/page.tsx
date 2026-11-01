@@ -18,6 +18,7 @@ import StackChip from '@/components/StackChip';
 import MockUI from '@/components/MockUI';
 import CaseKeys from '@/components/CaseKeys';
 import { stepTransitionScript } from '@/lib/stepTransition';
+import { caseMorphScript } from '@/lib/caseMorph';
 import NewTab from '@/components/NewTab';
 import Deliverables from '@/components/Deliverables';
 import { blurProps } from '@/lib/shotBlur';
@@ -99,6 +100,8 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       {/* service → next/previous service (←/→, the folder cards): the swap slides the way the reader is walking */}
       <script dangerouslySetInnerHTML={{ __html: stepTransitionScript('servicos', services.map((o) => o.slug)) }} />
+      {/* opening an example's folder tab morphs it into the case page's window, and back (caseMorphScript) */}
+      <script dangerouslySetInnerHTML={{ __html: caseMorphScript }} />
       <main id="conteudo" tabIndex={-1} className="sky min-h-screen text-ink">
         <article className="gutter relative isolate mx-auto max-w-6xl pt-36 pb-24">
           {/* the service's numeral from the home's Capacidades list (I–IV), carved huge and hollow behind the title:
@@ -222,6 +225,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                         href={`/casos/${pr.slug}`}
                         aria-hidden
                         tabIndex={-1}
+                        data-case-window={pr.slug}
                         className="group -mx-5 -mt-5 mb-5 block aspect-[16/9.4] overflow-hidden border-b-2 border-toon bg-acid-ink"
                       >
                         {pr.shot ? (
