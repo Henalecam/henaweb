@@ -14,6 +14,13 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: 'pt-BR',
     dir: 'ltr',
     categories: ['business', 'productivity'],
+    // installed, the app shows up in the phone's share sheet: a link or a note shared to HenaWeb lands in the
+    // contact form's message ("Vi isto e quero algo parecido"), see app/compartilhado
+    share_target: {
+      action: '/compartilhado',
+      method: 'GET',
+      params: { title: 'titulo', text: 'texto', url: 'link' },
+    },
     // long-press on the installed icon (Android) / right-click (desktop)
     shortcuts: [
       { name: 'Abrir um caso', short_name: 'Contato', description: 'Formulário de contato com diagnóstico', url: '/#contato', icons: [{ src: '/icon-192.png', sizes: '192x192' }] },
