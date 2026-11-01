@@ -27,7 +27,7 @@ export default function CaseLedger() {
   const total = projectLinks.length;
 
   return (
-    <section aria-labelledby="ledger-title" className="mt-12 min-h-[11rem]">
+    <section aria-labelledby="ledger-title" className="mt-12 min-h-[11rem] print:mt-6 print:min-h-0">
       <h2 id="ledger-title" className="label !text-teal">
         Seu arquivo de investigação
       </h2>

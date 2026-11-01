@@ -91,7 +91,9 @@ export default function LostClue() {
   const sketch = lead?.top;
 
   return (
-    <div className="mt-8 flex flex-col gap-3">
+    // on paper only the lead (if any) is left here (the search button is screen-only), so the 2rem gap above it goes
+    // too: it cost the printed 404 its one-page fit
+    <div className="mt-8 flex flex-col gap-3 print:mt-0">
       {guess && (
         <p className="toon-sm flex items-center gap-4 self-start rounded-xl bg-lemon px-5 py-3 text-acid-ink">
           {/* a case as the likeliest lead comes with a "retrato falado" of it: its screenshot as a pencil sketch,
