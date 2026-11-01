@@ -779,6 +779,24 @@ html {
   from { opacity: 0; scale: 1.6; }
 }
 
+/* the page is dark (color-scheme: dark, layout.tsx), but the contact form and the paper cards are light: there the
+   browser's own bits (autofill wash, spellcheck squiggles, the date/select pickers, scrollbars) must be the light
+   ones too, or an autofilled name turned into a navy slab with white letters on the cream form */
+#contato,
+.paper,
+.bg-paper {
+  color-scheme: light;
+}
+/* and a field the browser filled in for the visitor says so the site's way: marked in lemon highlighter over the
+   orange form, ink letters on top (the inset box-shadow is the only way past Chrome's forced autofill background) */
+#contato input:is(:autofill, :-webkit-autofill),
+#contato textarea:is(:autofill, :-webkit-autofill) {
+  -webkit-text-fill-color: var(--color-acid-ink);
+  caret-color: #c2410c;
+  box-shadow: inset 0 0 0 100vmax #f9e27d;
+  transition: background-color 9999s;
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
