@@ -137,6 +137,42 @@ export default function Work() {
     document.getElementById(`work-tab-${shown[k]}`)?.focus();
   };
 
+  // back from a case page (Back, or "Início"/the logo from there): the section opens on the case just read, not
+  // on case 01, so the screen the case window morphs back into is that case's and the reader picks up where they
+  // were. The phone row scrolls sideways only (never the page); the tab gets a brief "you were here" ring when seen.
+  useEffect(() => {
+    let from = '';
+    try {
+      from = (window as unknown as { navigation?: { activation?: { from?: { url?: string } | null } } }).navigation?.activation?.from?.url ?? '';
+      if (!from && document.referrer) from = document.referrer;
+      const u = new URL(from);
+      if (u.origin !== location.origin) return;
+      const slug = u.pathname.match(/^\/casos\/([\w-]+)/)?.[1];
+      const i = slug ? projects.findIndex((x) => x.slug === slug) : -1;
+      if (i < 0) return;
+      setActive(i);
+      setStopped(true);
+      const ol = strip.current;
+      const li = ol?.children[i] as HTMLElement | undefined;
+      if (ol && li) ol.scrollLeft = li.offsetLeft - (ol.clientWidth - li.offsetWidth) / 2;
+      // the ring plays when the tab is actually seen (Back lands on the section; "Início" lands at the top)
+      const tab = document.getElementById(`work-tab-${i}`);
+      if (!tab) return;
+      let t = 0;
+      const io = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        tab.setAttribute('data-returned', '');
+        t = window.setTimeout(() => tab.removeAttribute('data-returned'), 2600);
+      }, { threshold: 1 });
+      io.observe(tab);
+      return () => {
+        io.disconnect();
+        clearTimeout(t);
+      };
+    } catch {}
+  }, []);
+
   useGSAP(
     () => {
       // reduced motion: no entrance and no swap wipe (CSS reduced-motion can't stop GSAP tweens)

@@ -1322,6 +1322,24 @@ html {
   }
 }
 
+/* home cases: the tab of the case the visitor just came back from glows once (Work.tsx) */
+[role='tab'][data-returned]::after {
+  content: '';
+  position: absolute;
+  inset: 0.25rem -0.75rem;
+  border-radius: 0.6rem;
+  box-shadow: 0 0 0 2px var(--color-acid);
+  pointer-events: none;
+  animation: returned-ring 2.4s ease-out forwards;
+}
+@keyframes returned-ring {
+  0%, 55% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [role='tab'][data-returned]::after { animation-duration: 0.01s; animation-delay: 2.4s; animation-fill-mode: both; }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
