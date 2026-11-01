@@ -66,7 +66,8 @@ export const metadata: Metadata = {
   creator: 'HenaWeb',
   publisher: 'HenaWeb',
   category: 'technology',
-  alternates: { canonical: '/' },
+  // the case archive's RSS feed, announced on every page so reader apps find it from anywhere
+  alternates: { canonical: '/', types: { 'application/rss+xml': [{ url: '/casos/feed.xml', title: 'HenaWeb · Casos resolvidos' }] } },
   formatDetection: { telephone: false, email: false, address: false },
   openGraph: { type: 'website', locale: 'pt_BR', url: '/', siteName: 'HenaWeb', title, description },
   twitter: { card: 'summary_large_image', title, description },

@@ -159,6 +159,10 @@ export default function Footer() {
             <FooterLink href="/casos" accent>
               Ver todos →
             </FooterLink>
+            {/* the archive as a feed, for reader apps: listed like the file it is */}
+            <FooterLink href="/casos/feed.xml">
+              <span className="font-mono text-sm">feed.xml</span> <span className="font-mono text-[0.7rem] text-ink/50">(RSS)</span>
+            </FooterLink>
           </FooterColumn>
           <FooterColumn title="studio/" count={studioLinks.length} className="col-span-2 sm:col-span-1" listClassName="grid grid-cols-2 gap-x-6 sm:flex">
             {studioLinks.map((n) => (

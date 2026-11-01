@@ -25,7 +25,7 @@ if (process.env.NODE_ENV !== 'production') {
 export const metadata: Metadata = {
   title: 'Casos e projetos de software sob medida',
   description,
-  alternates: { canonical: '/casos' },
+  alternates: { canonical: '/casos', types: { 'application/rss+xml': [{ url: '/casos/feed.xml', title: 'HenaWeb · Casos resolvidos' }] } },
   openGraph: {
     type: 'website',
     url: '/casos',
