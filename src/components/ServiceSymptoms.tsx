@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { track } from '@/lib/track';
+import Tick from './Tick';
 
 const DRAFT = 'hena:draft';
 
@@ -48,7 +49,7 @@ export default function ServiceSymptoms({ problems, service }: { problems: strin
                   aria-hidden
                   className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded border-2 border-acid-ink text-xs ${on ? 'check-pop bg-acid-ink text-acid' : ''}`}
                 >
-                  {on ? '✓' : ''}
+                  {on && <Tick />}
                 </span>
                 <span>{p}</span>
               </label>

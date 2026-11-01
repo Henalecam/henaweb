@@ -28,6 +28,7 @@ import { suggestEmail } from '@/lib/emailTypos';
 import { formatPhoneBR } from '@/lib/phone';
 import Social from './Social';
 import NewTab from './NewTab';
+import Tick from './Tick';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 /** ms before the button admits the send is slow, and before it gives up and offers WhatsApp / e-mail */
@@ -595,7 +596,7 @@ export default function Contact() {
                           }`}
                           aria-hidden
                         >
-                          {on ? '✓' : ''}
+                          {on && <Tick />}
                         </span>
                         {s.label}
                       </label>
