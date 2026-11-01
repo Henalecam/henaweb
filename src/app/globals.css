@@ -812,6 +812,13 @@ html {
   to { transform: scaleX(0); }
 }
 
+/* "Abrir no celular" QR window (PhoneQR.tsx): opens with the same zoom-from-nothing as the dialogs */
+@media (prefers-reduced-motion: no-preference) {
+  .phone-qr:popover-open {
+    animation: check-pop 0.25s cubic-bezier(0.3, 1.4, 0.5, 1);
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import Stamp from '@/components/Stamp';
 import ShareCase from '@/components/ShareCase';
 import PrintDossier from '@/components/PrintDossier';
+import PhoneQR from '@/components/PhoneQR';
 import CaseKeys from '@/components/CaseKeys';
 import { ArchiveReturn, MarkRead, UnreadHint } from '@/components/ReadMarks';
 import FullShot, { MaximizeButton, ZoomArea } from '@/components/FullShot';
@@ -243,6 +244,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             <ShareCase title={`${p.name} · caso resolvido pela HenaWeb`} text={p.summary} />
           </div>
           <PrintDossier placement="case-pdf" />
+          <PhoneQR kind="casos" slug={p.slug} name={p.name} />
 
           <MarkRead slug={p.slug} />
           <ArchiveReturn />

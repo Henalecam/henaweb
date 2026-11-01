@@ -13,6 +13,7 @@ import SectionLink from '@/components/SectionLink';
 import ServiceSymptoms from '@/components/ServiceSymptoms';
 import ShareCase from '@/components/ShareCase';
 import PrintDossier from '@/components/PrintDossier';
+import PhoneQR from '@/components/PhoneQR';
 import TocSeen from '@/components/TocSeen';
 import StackChip from '@/components/StackChip';
 import MockUI from '@/components/MockUI';
@@ -157,6 +158,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             <ShareCase title={`${s.name} · HenaWeb`} text={s.intro} label="Enviar para alguém ↗" placement="service-share" />
           </div>
           <PrintDossier placement="service-pdf" />
+          <PhoneQR kind="servicos" slug={s.slug} name={s.name} />
 
           {/* long page on a phone: a table of contents with the section count, jumping to the same ids SectionLink copies */}
           <nav aria-label="Nesta página" className="mt-12 font-mono text-xs" data-print-hide>
