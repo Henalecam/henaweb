@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { capabilities, homeFaq, nav, projects, site, whatsappLink } from '@/lib/content';
 import { services } from '@/lib/services';
 import { faqId } from '@/lib/slug';
@@ -118,6 +118,38 @@ function matchItems(query: string): Item[] {
     .sort((a, b) => groupOrder.indexOf(a.it.group) - groupOrder.indexOf(b.it.group) || Number(inLabel(b)) - Number(inLabel(a)) || a.i - b.i)
     .map(({ it }) => it)
     .slice(0, 40);
+}
+
+// clippings for the ransom note: each letter cut from a different "magazine" (face, paper, ink, tilt)
+const CLIPS = [
+  'font-groovy bg-lemon text-acid-ink -rotate-6',
+  'font-serif italic bg-white text-[#c2410c] rotate-3',
+  'font-mono font-bold bg-acid-ink text-paper -rotate-2',
+  'font-sans font-black bg-[#3cc6b4] text-acid-ink rotate-6',
+  'font-serif bg-[#f7931e] text-acid-ink -rotate-3',
+  'font-mono bg-paper text-[#8b5cc7] rotate-2 underline',
+];
+
+/**
+ * A search that finds nothing shows what was typed as an anonymous note made of cut-out letters (decorative:
+ * the status line under it says the same in words). Long queries are clipped to keep the note one line or two.
+ */
+function RansomNote({ text }: { text: string }) {
+  const chars = [...text.trim().slice(0, 24)];
+  if (!chars.length) return null;
+  return (
+    <span aria-hidden className="ransom mx-auto mb-4 flex max-w-full flex-wrap justify-center gap-x-0.5 gap-y-1.5">
+      {chars.map((c, i) =>
+        c === ' ' ? (
+          <span key={i} className="w-2.5" />
+        ) : (
+          <span key={i} style={{ '--i': i } as CSSProperties} className={`inline-block px-1 py-0.5 text-lg leading-none shadow-[1px_1px_0_rgb(26_15_46/0.35)] ${CLIPS[(c.charCodeAt(0) * 7 + i * 3) % CLIPS.length]}`}>
+            {c}
+          </span>
+        ),
+      )}
+    </span>
+  );
 }
 
 /**
@@ -366,6 +398,7 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
         </ul>
           {results.length === 0 && (
             <p role="status" className="px-5 pb-6 pt-2 text-center font-mono text-sm text-acid-ink/75">
+              <RansomNote text={query} />
               {suggestion && (
                 <span className="mb-2 block">
                   Você quis dizer{' '}

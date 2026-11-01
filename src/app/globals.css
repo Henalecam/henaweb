@@ -768,6 +768,17 @@ html {
   }
 }
 
+/* the search's "no clue" ransom note (CommandPalette, RansomNote): the clippings land one after another, as if
+   glued on in a hurry */
+@media (prefers-reduced-motion: no-preference) {
+  .ransom > span {
+    animation: ransom-glue 0.22s calc(var(--i, 0) * 30ms) cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  }
+}
+@keyframes ransom-glue {
+  from { opacity: 0; scale: 1.6; }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
