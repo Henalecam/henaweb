@@ -23,6 +23,7 @@ import QuoteLink from '@/components/QuoteLink';
 import SwRegister from '@/components/SwRegister';
 import DragFile from '@/components/DragFile';
 import WinDrag from '@/components/WinDrag';
+import TabProgress from '@/components/TabProgress';
 import OffscreenPause from '@/components/OffscreenPause';
 import ConsentBanner from '@/components/ConsentBanner';
 import { analyticsLoader } from '@/lib/consent';
@@ -222,6 +223,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SwRegister />
         <DragFile />
         <WinDrag />
+        <TabProgress />
         <OffscreenPause />
         {children}
         <div className="grain" aria-hidden />
