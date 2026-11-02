@@ -126,7 +126,9 @@ export default function Deliverables({ items }: { items: Item[] }) {
                   />
                 ))}
               </span>
-              <span className="ml-2 flex shrink-0 gap-1 print:hidden">
+              {/* 8px apart: the two working buttons (and their 4px-wider hit areas, globals .win-btn::after) no longer overlap,
+                  and their centres are 26px apart (WCAG 2.5.8 spacing for an 18px target) */}
+              <span className="ml-2 flex shrink-0 gap-2 print:hidden">
                 <button type="button" data-min-btn className="win-btn" aria-label={`Minimizar etapa ${i + 1}: ${d.title}`} onClick={() => minimize(i)}>
                   _
                 </button>
