@@ -120,16 +120,24 @@ export default function Nav() {
         openSearch();
       } else if (e.key === '?' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey && !document.querySelector('dialog[open]')) {
         e.preventDefault();
-        setOpen(false);
-        loadHelp().then(
-          (C) => {
-            setShortcutsHelp(() => C);
-            setHelp(true);
-          },
-          () => {},
-        );
+        openHelp();
       }
     };
+    function openHelp() {
+      setOpen(false);
+      loadHelp().then(
+        (C) => {
+          setShortcutsHelp(() => C);
+          setHelp(true);
+        },
+        () => {},
+      );
+    }
+    // the shortcuts list can also be opened from a button (/acessibilidade), for a mouse or a phone without "?"
+    const onHelpEvent = () => {
+      if (!document.querySelector('dialog[open]')) openHelp();
+    };
+    window.addEventListener('hena:help', onHelpEvent);
     window.addEventListener('keydown', onKey);
     // other components (the 404 page, the capability tags) can open the search with this event,
     // optionally carrying the words to search for in its detail
@@ -138,6 +146,7 @@ export default function Nav() {
     return () => {
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('hena:search', onSearchEvent);
+      window.removeEventListener('hena:help', onHelpEvent);
     };
   }, []);
 

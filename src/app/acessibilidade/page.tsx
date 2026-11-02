@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { site } from '@/lib/site';
 import Footer from '@/components/Footer';
+import ShowShortcuts from '@/components/ShowShortcuts';
 import YourSettings from '@/components/YourSettings';
 
 const description = 'O que o site da HenaWeb faz para ser usado por todo mundo, o que ainda pode falhar e como avisar a gente de uma barreira.';
@@ -42,7 +43,7 @@ const jsonLd = {
 // each line is something this site really does (see the components named in the comments), not a promise
 const FEATURES: [string, string][] = [
   ['Teclado do começo ao fim', 'Todo link, botão e campo é alcançável pelo Tab, com foco visível. "Pular para o conteúdo" é o primeiro item da página, e a tecla ? lista os atalhos.'],
-  ['Menos movimento', 'Com "reduzir movimento" ligado no sistema, as animações de entrada, as faixas que correm sozinhas e os sons ficam parados ou desligados.'],
+  ['Menos movimento', 'Com "reduzir movimento" ligado no sistema, as animações de entrada, as faixas que correm sozinhas, os sons e as vibrações ficam parados ou desligados.'],
   ['Pausar o que se mexe', 'A tecla P pausa e retoma as faixas animadas da página inicial; um toque faz o mesmo no celular.'],
   ['Alto contraste', 'No modo de alto contraste do Windows o site usa as cores do sistema. Com "mais contraste" ou "menos transparência" ligados, sublinhados ficam sólidos e texturas somem.'],
   ['Alvos de toque', 'Botões e links isolados têm pelo menos 24 × 24 px de área de toque (WCAG 2.5.8), inclusive os botõezinhos das janelas.'],
@@ -81,6 +82,8 @@ export default function Acessibilidade() {
               <div className="m-1.5 h-[calc(100%-2.6rem)] border-2 border-[#7d7394] bg-paper p-4 text-acid-ink">
                 <h3 className="font-medium">{title}</h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-acid-ink/80">{body}</p>
+                {/* the "?" list, one click away for whoever reads this with a mouse or on a phone */}
+                {title.startsWith('Teclado') && <ShowShortcuts />}
               </div>
             </li>
           ))}
