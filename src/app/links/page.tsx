@@ -5,6 +5,7 @@ import { services } from '@/lib/services';
 import NewTab from '@/components/NewTab';
 import ShareCase from '@/components/ShareCase';
 import InstallApp from '@/components/InstallApp';
+import InAppHint from '@/components/InAppHint';
 
 const description = 'Todos os caminhos da HenaWeb num lugar só: WhatsApp, e-mail, serviços, casos resolvidos e redes.';
 
@@ -45,6 +46,7 @@ export default function Links() {
               Studio de engenharia de <span className="font-groovy tracking-normal text-[#c2410c]">software.</span>
             </h1>
             <p className="mt-2 text-sm text-acid-ink/75">Sistemas sob medida, setor público, automação com IA e sites.</p>
+            <InAppHint />
 
             <ul className="mt-6 flex flex-col gap-3">
               <li {...pop()}>
