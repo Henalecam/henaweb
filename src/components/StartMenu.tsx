@@ -68,12 +68,14 @@ export default function StartMenu() {
         <span aria-hidden className="start-flag" />
         Iniciar
       </button>
-      <div ref={menu} id="menu-iniciar" popover="auto" aria-label="Menu Iniciar" className="start-menu win m-0 w-64 p-0 text-acid-ink">
+      <div ref={menu} id="menu-iniciar" popover="auto" className="start-menu win m-0 w-64 p-0 text-acid-ink">
         <div className="flex">
           <span aria-hidden className="start-side font-groovy">
             Hena<span className="text-acid">Web</span>
           </span>
-          <nav className="flex-1 bg-[#c9c3d8] p-1">
+          {/* the name goes on the nav: on the popover's plain div an aria-label named nothing (a div has no role to
+              carry it), and the page already has other navs, so this one needs its own name */}
+          <nav aria-label="Menu Iniciar" className="flex-1 bg-[#c9c3d8] p-1">
             <ul className="flex flex-col">
               {ITEMS.map((it) => (
                 <li key={it.href}>

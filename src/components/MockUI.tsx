@@ -17,12 +17,13 @@ export default function MockUI({ variant, hue }: { variant: MockVariant; hue: nu
         style={{ background: 'var(--hs)' }}
       />
       {variant !== 'bank' && variant !== 'site' && variant !== 'chat' && (
-        <aside className="hidden w-[18%] shrink-0 flex-col gap-2.5 border-r border-line p-[3%] sm:flex">
+        // a plain div: an <aside> here was a stray "complementary" landmark inside a drawing
+        <div className="hidden w-[18%] shrink-0 flex-col gap-2.5 border-r border-line p-[3%] sm:flex">
           <div className="mb-3 h-3 w-2/3 rounded-full" style={{ background: 'var(--h)' }} />
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className={`h-2 rounded-full ${i === 1 ? 'bg-ink/50' : 'bg-ink/12'}`} style={{ width: `${55 + ((i * 17) % 35)}%` }} />
           ))}
-        </aside>
+        </div>
       )}
       <div className="relative flex-1 p-[4%]">{body(variant)}</div>
     </div>
