@@ -60,7 +60,13 @@ export default function Links() {
               </li>
               <li {...pop()}>
                 <a href={`mailto:${site.email}`} className={`${big} bg-white`}>
-                  <span className="truncate">{site.email}</span> <span aria-hidden>✉</span>
+                  {/* at 320 px the address was cut to "henrique@henaweb.c…" (an e-mail that can't be read is no use):
+                      it now breaks after the @ when it has to, and stays whole on one line wherever it fits */}
+                  <span className="min-w-0">
+                    {site.email.split('@')[0]}@<wbr />
+                    {site.email.split('@')[1]}
+                  </span>{' '}
+                  <span aria-hidden>✉</span>
                 </a>
               </li>
             </ul>
