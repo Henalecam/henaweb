@@ -18,13 +18,23 @@ const PREFS: { q: string; label: string; on: string; off: string }[] = [
  */
 export default function YourSettings() {
   const [state, setState] = useState<boolean[] | null>(null);
+  // the data saver (Save-Data, Chrome/Android "economia de dados") isn't a media query but the site honours it too
+  // (lib/saveData: the 3D scenes stay off); only Chromium browsers report it, the others get "não informado"
+  const [lite, setLite] = useState<boolean | 'unknown' | null>(null);
 
   useEffect(() => {
     const mqs = PREFS.map((p) => window.matchMedia(p.q));
     const read = () => setState(mqs.map((m) => m.matches));
     read();
     mqs.forEach((m) => m.addEventListener('change', read));
-    return () => mqs.forEach((m) => m.removeEventListener('change', read));
+    const conn = (navigator as Navigator & { connection?: EventTarget & { saveData?: boolean } }).connection;
+    const readLite = () => setLite(conn && typeof conn.saveData === 'boolean' ? conn.saveData : 'unknown');
+    readLite();
+    conn?.addEventListener?.('change', readLite);
+    return () => {
+      mqs.forEach((m) => m.removeEventListener('change', read));
+      conn?.removeEventListener?.('change', readLite);
+    };
   }, []);
 
   return (
@@ -50,6 +60,13 @@ export default function YourSettings() {
               </li>
             );
           })}
+          <li className="flex items-center gap-3 py-2.5">
+            <span aria-hidden className="settings-lamp" data-on={lite === true ? '' : undefined} data-unknown={lite === null || lite === 'unknown' ? '' : undefined} />
+            <span className="font-medium">Economia de dados</span>
+            <span className="ml-auto text-right font-mono text-xs text-acid-ink/75">
+              {lite === null ? '…' : lite === 'unknown' ? 'não informado por este navegador' : lite ? 'ligada: cenas 3D desligadas, fica o fundo' : 'desligada'}
+            </span>
+          </li>
         </ul>
       </div>
     </section>
