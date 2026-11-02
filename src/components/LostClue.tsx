@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { nav, site } from '@/lib/site';
 import { projectLinks } from '@/lib/projectLinks';
 import { serviceLinks } from '@/lib/serviceLinks';
@@ -100,13 +101,15 @@ export default function LostClue() {
               which colours in when pointed at (decorative: the link names the case) */}
           {sketch && (
             <span aria-hidden data-sketch className="group/sk relative hidden shrink-0 sm:block">
-              {/* plain img: a 120-px thumbnail of a file already cached by the case pages */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              {/* through the image optimiser: the plain <img> fetched the 1440-px original (84 KB) for this
+                  120-px thumbnail, on the chance the case page had cached it, but case pages load it optimised
+                  too; at 120 px (240 on a 2x screen) it is ~4 KB */}
+              <Image
                 src={sketch}
                 alt=""
                 width={120}
                 height={70}
+                sizes="120px"
                 loading="lazy"
                 // pencil on paper: dark interfaces are inverted to dark lines on light, light ones only greyed
                 className={`h-[70px] w-[120px] -rotate-2 border-2 border-acid-ink bg-paper object-cover object-top transition-[filter] duration-500 group-hover/sk:[filter:none] ${
