@@ -91,7 +91,9 @@ export default function Acessibilidade() {
         <h2 className="mt-14 text-2xl font-medium tracking-tight">Como verificamos</h2>
         <p className="mt-3 leading-relaxed text-ink/75">
           Cada mudança é testada em celular (390 px) e computador (1440 px), com e sem &quot;reduzir movimento&quot;. Na última verificação automática com o
-          axe-core, em 1º de novembro de 2026, as oito páginas principais e as janelas interativas não tiveram nenhuma violação encontrada.
+          axe-core, em 1º de novembro de 2026, as dez páginas principais (inclusive a de erro e a de sem conexão) e as janelas interativas não tiveram
+          nenhuma violação encontrada. Na mesma rodada conferimos a versão impressa (PDF) das páginas, o modo de alto contraste do sistema e o tamanho
+          dos alvos de toque.
         </p>
 
         <h2 className="mt-12 text-2xl font-medium tracking-tight">O que ainda pode falhar</h2>
