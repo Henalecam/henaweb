@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { capabilities } from '@/lib/content';
 
@@ -11,6 +11,10 @@ import { capabilities } from '@/lib/content';
 export default function Capabilities({ caseCounts = {}, caseSlugs = {} }: { caseCounts?: Record<string, number>; caseSlugs?: Record<string, string> }) {
   const root = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
+  // closed rows are made inert only once this has hydrated: in the server HTML they stay readable, so without
+  // JavaScript (where nothing could open them) the <noscript> rule below simply shows every answer
+  const [live, setLive] = useState(false);
+  useEffect(() => setLive(true), []);
 
   /**
    * Toggle a row (clicking the open one closes it, as its ✕ promises). Opening a row below the open one
@@ -51,6 +55,10 @@ export default function Capabilities({ caseCounts = {}, caseSlugs = {} }: { case
       id="capacidades"
       data-sheet className="paper gutter relative z-10 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon pt-[clamp(5rem,10vw,9rem)] pb-[clamp(5rem,10vw,9rem)] text-bg"
     >
+      {/* without JavaScript the rows can't be toggled, so every answer is shown open */}
+      <noscript>
+        <style>{'[data-cap-panel]{grid-template-rows:1fr!important;opacity:1!important}'}</style>
+      </noscript>
       <div className="mb-[clamp(3rem,7vw,6rem)] grid gap-8 md:grid-cols-12">
         <span className="label !text-bg/55 md:col-span-3">(II) Capacidades</span>
         <h2 className="text-[clamp(2.5rem,6.5vw,6.5rem)] leading-[0.92] font-medium tracking-[-0.05em] md:col-span-9">
@@ -121,7 +129,8 @@ export default function Capabilities({ caseCounts = {}, caseSlugs = {} }: { case
               <div className="relative grid grid-cols-12 gap-4 px-3 md:px-6">
                 <span
                   id={`cap-panel-${c.id}`}
-                  inert={!isOpen}
+                  data-cap-panel
+                  inert={live && !isOpen}
                   className={`relative col-span-12 grid transition-[grid-template-rows,opacity] duration-700 ease-[var(--ease-out-expo)] md:col-span-11 md:col-start-2 ${
                     isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                   }`}
