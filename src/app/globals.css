@@ -1514,6 +1514,35 @@ html {
   .evidence-tag { rotate: none; }
   .evidence-tag::before { background: #fff; }
 }
+/* each feature also gets a numbered evidence marker, the yellow tent a forensics team drops beside a clue (A, B,
+   C…), clipped to the tag's corner. Decorative: the alt text "/ ''" keeps screen readers from reading the letter
+   (browsers without that syntax fall back to the first declaration) */
+ul:has(> .evidence-tag) {
+  counter-reset: evidence;
+}
+.evidence-tag {
+  counter-increment: evidence;
+}
+.evidence-tag::after {
+  content: counter(evidence, upper-alpha);
+  content: counter(evidence, upper-alpha) / '';
+  position: absolute;
+  top: -9px;
+  right: -5px;
+  display: grid;
+  width: 17px;
+  height: 15px;
+  padding-top: 3px;
+  place-items: center;
+  background: #f9d34a;
+  color: #140a26;
+  font: 700 8.5px/1 var(--font-mono);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  filter: drop-shadow(0 1px 0 #140a26);
+  rotate: 4deg;
+  pointer-events: none;
+}
+.evidence-tag:nth-child(even)::after { rotate: -5deg; }
 
 /* case page dots: while the pointer is on the strip, only the hovered dot shows its name (a dot that
    still has keyboard focus used to keep its label up next to it) */
