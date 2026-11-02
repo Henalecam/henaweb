@@ -16,7 +16,7 @@ export default function MockUI({ variant, hue }: { variant: MockVariant; hue: nu
         className="pointer-events-none absolute -top-1/3 -right-1/4 h-[90%] w-[70%] rounded-full blur-[90px]"
         style={{ background: 'var(--hs)' }}
       />
-      {variant !== 'bank' && variant !== 'site' && (
+      {variant !== 'bank' && variant !== 'site' && variant !== 'chat' && (
         <aside className="hidden w-[18%] shrink-0 flex-col gap-2.5 border-r border-line p-[3%] sm:flex">
           <div className="mb-3 h-3 w-2/3 rounded-full" style={{ background: 'var(--h)' }} />
           {Array.from({ length: 6 }).map((_, i) => (
@@ -145,6 +145,27 @@ function body(variant: MockVariant) {
             <div className="h-2 w-3/4 rounded-full bg-ink/10" />
             <div className="h-2 w-2/3 rounded-full bg-ink/10" />
           </div>
+        </div>
+      );
+    case 'chat':
+      // a messaging thread: the customer's bubbles on the left, the agent's answers (in the hue) on the right
+      return (
+        <div className="flex h-full flex-col gap-[5%] overflow-hidden rounded-lg border border-line p-[4%]">
+          <div className="flex items-center gap-[3%] border-b border-line pb-[3%]">
+            <span className="h-4 w-4 rounded-full" style={{ background: 'var(--h)' }} />
+            <span className="h-2 w-1/4 rounded-full bg-ink/30" />
+          </div>
+          {[58, 72, 40, 66].map((w, i) => (
+            <div key={i} className={`flex ${i % 2 ? 'justify-end' : ''}`}>
+              <div
+                className={`flex flex-col gap-1.5 rounded-2xl p-[3%] ${i % 2 ? 'rounded-br-sm' : 'rounded-bl-sm bg-ink/10'}`}
+                style={{ width: `${w}%`, ...(i % 2 ? { background: 'var(--hs)', border: '1px solid var(--h)' } : {}) }}
+              >
+                <span className="h-1.5 w-[85%] rounded-full bg-ink/30" />
+                {i !== 2 && <span className="h-1.5 w-[55%] rounded-full bg-ink/30" />}
+              </div>
+            </div>
+          ))}
         </div>
       );
     case 'site':

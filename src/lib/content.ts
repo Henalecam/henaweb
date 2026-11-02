@@ -49,7 +49,7 @@ export const govPillars = [
 
 export const govFlow = ['Solicitação', 'Análise', 'Parecer', 'Aprovação', 'Execução', 'Resultados'];
 
-export type MockVariant = 'ledger' | 'raffle' | 'insights' | 'calendar' | 'bank' | 'site';
+export type MockVariant = 'ledger' | 'raffle' | 'insights' | 'calendar' | 'bank' | 'site' | 'chat';
 
 export type Project = {
   /** URL segment for /casos/[slug] */

@@ -219,6 +219,19 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                   {/* examples that are cases on this site show the top of their screenshot, like a folder tab */}
                   {(() => {
                     const pr = projects.find((x) => x.name === e.name);
+                    // a kind of system with no case on the site yet: a "police sketch" of the screen, pencil on paper,
+                    // its words scribbled out (a type, not a client's real screen), labelled as such
+                    if (!pr && e.sketch)
+                      return (
+                        <div aria-hidden className="relative -mx-5 -mt-5 mb-5 aspect-[16/9.4] overflow-hidden border-b-2 border-toon bg-[#f3ead8]">
+                          <div data-sketch className="h-full w-full">
+                            <MockUI variant={e.sketch} hue={30} />
+                          </div>
+                          <span className="absolute bottom-3 left-3 -rotate-3 rounded-sm border-2 border-acid-ink bg-paper px-2 py-0.5 font-mono text-[0.62rem] font-bold tracking-[0.2em] text-acid-ink uppercase">
+                            Retrato falado
+                          </span>
+                        </div>
+                      );
                     if (!pr || (!pr.shot && !pr.mock)) return null;
                     return (
                       <a
