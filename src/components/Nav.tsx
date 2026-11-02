@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { usePathname } from 'next/navigation';
 import { nav } from '@/lib/site';
 import { onReady, prefersReducedMotion } from '@/lib/motion';
 import { curtainSwipe } from '@/lib/curtainSwipe';
@@ -49,6 +50,10 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   // which nav section the reader is in (home only); on /casos pages the "Casos" entry stays lit
   const [active, setActive] = useState<string | null>(null);
+  // on a case page, "Casos" (lit as the current section) leads to the case archive, like the breadcrumb's "Casos"
+  // beside it; it used to go to the home's case strip, so the same word took the visitor to two different places
+  const pathname = usePathname();
+  const hrefOf = (href: string) => (href === '/#projetos' && /^\/casos\/./.test(pathname ?? '') ? '/casos' : href);
   const [search, setSearch] = useState(false);
   const [CommandPalette, setCommandPalette] = useState<PaletteType | null>(null);
   const [help, setHelp] = useState(false);
@@ -263,7 +268,7 @@ export default function Nav() {
             {nav.map((item) => (
               <a
                 key={item.href}
-                href={item.href}
+                href={hrefOf(item.href)}
                 aria-current={active === item.href ? 'location' : undefined}
                 className={`group relative text-sm transition-colors duration-300 ${active === item.href ? 'text-acid' : 'text-ink'}`}
               >
@@ -357,7 +362,7 @@ export default function Nav() {
           {[...nav, { label: 'Contato', href: '/#contato' }, { label: 'Passa tempo', href: '/passatempo' }].map((item, i) => (
             <a
               key={item.href}
-              href={item.href}
+              href={hrefOf(item.href)}
               onClick={() => setOpen(false)}
               aria-current={active === item.href ? 'location' : undefined}
               // the links rise into place one after another behind the curtain wipe (closing: all at once)
