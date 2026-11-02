@@ -179,7 +179,7 @@ export default function Work() {
       if (prefersReducedMotion()) return;
       gsap.from('[data-work-in]', {
         y: 50,
-        autoAlpha: 0,
+        opacity: 0,
         duration: 1,
         ease: 'expo.out',
         stagger: 0.08,
@@ -200,8 +200,8 @@ export default function Work() {
     );
     gsap.fromTo(
       el.querySelectorAll('[data-exhibit-text] > *'),
-      { y: 16, autoAlpha: 0 },
-      { y: 0, autoAlpha: 1, duration: 0.45, stagger: 0.04, ease: 'expo.out' },
+      { y: 16, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.45, stagger: 0.04, ease: 'expo.out' },
     );
   }, [active]);
 

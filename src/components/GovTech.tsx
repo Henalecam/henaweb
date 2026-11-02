@@ -111,7 +111,7 @@ export default function GovTech() {
 
         gsap.from('[data-pillar]', {
           y: 30,
-          autoAlpha: 0,
+          opacity: 0,
           duration: 0.9,
           ease: 'expo.out',
           stagger: 0.06,

@@ -17,7 +17,7 @@ const ROWS: { keys: string[][]; what: string; here?: (path: string) => boolean }
   // the browser's own print, listed because case and service pages print as a clean dossier (or a PDF)
   { keys: [['Ctrl', 'P'], ['⌘', 'P']], what: 'Salvar um caso ou serviço como dossiê em PDF', here: (p) => /^\/(casos|servicos)\/[\w-]+/.test(p) },
   // AccordionKeys: the home's questions and capabilities, and each service page's questions
-  { keys: [['↑'], ['↓'], ['Home'], ['End']], what: 'Pular entre as perguntas (com o foco numa delas)', here: (p) => p === '/' || /^\/servicos\/[\w-]+/.test(p) },
+  { keys: [['↑'], ['↓'], ['Home'], ['End']], what: 'Pular entre as perguntas ou as capacidades (com o foco numa delas)', here: (p) => p === '/' || /^\/servicos\/[\w-]+/.test(p) },
   { keys: [['Esc']], what: 'Fechar janelas e a busca' },
   { keys: [['?']], what: 'Abrir esta ajuda' },
 ];

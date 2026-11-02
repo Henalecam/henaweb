@@ -433,7 +433,7 @@ export default function Mystery() {
             defaults: { ease: 'none' },
             scrollTrigger: reduce ? undefined : { trigger: '[data-desk]', start: 'top top', end: '+=260%', pin: true, scrub: 0.6 },
           });
-          tl.from(q('[data-evidence]'), { scale: 0.6, y: -30, autoAlpha: 0, ease: 'back.out(2)', stagger: 0.12, duration: 0.3 }, 0.05)
+          tl.from(q('[data-evidence]'), { scale: 0.6, y: -30, opacity: 0, ease: 'back.out(2)', stagger: 0.12, duration: 0.3 }, 0.05)
             .to(q('[data-stage="1"]'), { autoAlpha: 0, y: -30, duration: 0.3 }, 0.6)
             .fromTo(q('[data-stage="2"]'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.3 }, 0.75)
             .set(q('[data-string]'), { opacity: 1 }, 0.79)
@@ -470,7 +470,7 @@ export default function Mystery() {
             gsap.from(card, {
               x: fromLeft ? -60 : 60,
               y: -24,
-              autoAlpha: 0,
+              opacity: 0,
               rotate: fromLeft ? -10 : 10,
               duration: 0.7,
               ease: 'back.out(1.8)',
@@ -493,7 +493,7 @@ export default function Mystery() {
 
           gsap.from(m('[data-mob-closed] > *'), {
             y: 30,
-            autoAlpha: 0,
+            opacity: 0,
             stagger: 0.08,
             duration: 0.7,
             ease: 'expo.out',

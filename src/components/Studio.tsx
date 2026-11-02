@@ -97,7 +97,7 @@ export default function Studio() {
       );
       gsap.from('[data-principle]', {
         y: 40,
-        autoAlpha: 0,
+        opacity: 0,
         duration: 1,
         ease: 'expo.out',
         stagger: 0.1,

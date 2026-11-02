@@ -39,7 +39,7 @@ export default function Capabilities({ caseCounts = {}, caseSlugs = {} }: { case
       if (prefersReducedMotion()) return;
       gsap.from('[data-cap-row]', {
         y: 60,
-        autoAlpha: 0,
+        opacity: 0,
         duration: 1.1,
         ease: 'expo.out',
         stagger: 0.08,

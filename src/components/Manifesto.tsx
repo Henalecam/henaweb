@@ -30,7 +30,7 @@ export default function Manifesto() {
       );
       gsap.from('[data-fact]', {
         y: 40,
-        autoAlpha: 0,
+        opacity: 0,
         duration: 1,
         ease: 'expo.out',
         stagger: 0.1,
