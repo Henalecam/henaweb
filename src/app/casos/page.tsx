@@ -89,6 +89,14 @@ export default function CasesIndex() {
           <ReadProgress slugs={projects.map((p) => p.slug)} />
           <RandomCase />
           <CaseView />
+          {/* "Exibir: Detalhes" on a wide screen reads as a file manager's details view, so it gets the column headers
+              one has (decorative: each row's link already names the case, its kind and the problem) */}
+          <div aria-hidden data-case-cols className="hidden">
+            <span>Nº</span>
+            <span>Nome</span>
+            <span>Tipo</span>
+            <span>O mistério</span>
+          </div>
           <ul data-case-list className="mt-4 grid gap-6 md:grid-cols-2">
             {projects.map((p, i) => (
               <li key={p.slug} data-case-service={p.service} data-case-slug={p.slug}>

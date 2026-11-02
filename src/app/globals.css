@@ -1042,6 +1042,28 @@ html {
     [data-case-list][data-view='details'] > li > a > p:first-of-type {
       font-size: 1rem;
     }
+    /* the column headers above the rows (casos/page.tsx), on the same grid as each row's link */
+    [data-case-cols]:has(+ [data-case-list][data-view='details']) {
+      display: grid;
+      grid-template-columns: 3.25rem minmax(10rem, 15rem) minmax(9rem, 13rem) minmax(0, 1fr);
+      column-gap: 0.75rem;
+      margin-top: 1rem;
+      padding: 0 0.5rem 0.45rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(from var(--color-ink) r g b / 0.6);
+    }
+    [data-case-cols] > span + span {
+      /* a column divider, like the grips between a details view's headers */
+      border-left: 1px solid rgb(from var(--color-ink) r g b / 0.2);
+      margin-left: -0.4rem;
+      padding-left: 0.4rem;
+    }
+    [data-case-cols]:has(+ [data-case-list][data-view='details']) + [data-case-list] {
+      margin-top: 0;
+    }
   }
 }
 
