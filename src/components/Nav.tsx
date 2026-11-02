@@ -194,6 +194,28 @@ export default function Nav() {
     };
   }, []);
 
+  // WCAG 2.4.11: the browser only scrolls a newly focused control into view when it is off screen, so one sitting
+  // just under the visible bar (the /casos filter chips, a service page's top buttons after Shift+Tab) stayed
+  // covered by it. Nudge the page down by the overlap, at once, so the focus ring is never under the header.
+  useEffect(() => {
+    const onFocusIn = (e: FocusEvent) => {
+      const t = e.target;
+      if (!(t instanceof HTMLElement) || !t.matches(':focus-visible')) return;
+      const bar = document.querySelector('header');
+      if (!bar || bar.contains(t) || t.closest('dialog, nav[aria-label="Atalhos de pulo"]')) return;
+      requestAnimationFrame(() => {
+        const hb = bar.getBoundingClientRect().bottom;
+        const r = t.getBoundingClientRect();
+        if (hb <= 0 || r.bottom <= 0 || r.top >= hb) return;
+        const top = Math.max(0, window.scrollY - (hb + 16 - r.top));
+        const ev = new CustomEvent('hena:glide', { detail: { top, immediate: true }, cancelable: true });
+        if (window.dispatchEvent(ev)) window.scrollTo({ top });
+      });
+    };
+    document.addEventListener('focusin', onFocusIn);
+    return () => document.removeEventListener('focusin', onFocusIn);
+  }, []);
+
   useEffect(() => {
     let last = window.scrollY;
     const onScroll = () => {

@@ -3137,6 +3137,12 @@ html:active-view-transition-type(step-prev)::view-transition-new(*.case-window) 
   }
 }
 
+/* WCAG 2.4.11 (focus not obscured): tabbing backwards (Shift+Tab) scrolls the page up, which brings the fixed header
+   back, and the browser parked the newly focused link at the very top edge, under the bar (footer lists, a case
+   page's buttons, the breadcrumb). The keyboard's own scrolling now keeps the focus clear of it */
+:focus-visible {
+  scroll-margin-block: 5.5rem 1.5rem;
+}
 /* section links (#entregas, #perguntas…) land with the title below the fixed header, not under it */
 h2[id] {
   scroll-margin-top: 6rem;
