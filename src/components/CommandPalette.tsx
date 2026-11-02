@@ -102,6 +102,35 @@ const SYNONYMS: Record<string, string[]> = {
   cobranca: ['pagamento', 'financeiro'],
 };
 
+// the jargon on the capability tags (which open this search) explained in a line, for whoever is buying a system
+// without being in the trade: typing or clicking "ERP", "LGPD" or "multi-tenant" shows what the word means above
+// the results. Keys are folded queries; several spellings share an entry
+const GLOSSARY: { keys: string[]; term: string; text: string }[] = [
+  { keys: ['erp'], term: 'ERP', text: 'Sistema de gestão que reúne num lugar só áreas como financeiro, fiscal, estoque e vendas, em vez de uma planilha para cada uma.' },
+  { keys: ['saas'], term: 'SaaS', text: 'Software como serviço: o sistema roda na nuvem e é usado pelo navegador, por assinatura, sem instalar nada.' },
+  { keys: ['dashboards', 'dashboard'], term: 'Dashboard', text: 'Painel que mostra os números mais importantes da operação em gráficos e indicadores que se atualizam sozinhos.' },
+  { keys: ['apis', 'api'], term: 'API', text: 'Ponto de conexão por onde um sistema conversa com outro e troca dados, sem ninguém copiar e colar.' },
+  { keys: ['integracoes', 'integracao'], term: 'Integração', text: 'Ligação entre sistemas que já existem (banco, ERP, planilha, CRM) para os dados passarem de um para o outro sem retrabalho.' },
+  { keys: ['multi-tenant', 'multitenant', 'multi tenant'], term: 'Multi-tenant', text: 'Um mesmo sistema atendendo várias empresas ou unidades, cada uma vendo só os próprios dados.' },
+  { keys: ['govtech'], term: 'GovTech', text: 'Tecnologia feita para o setor público: sistemas de órgãos e secretarias e serviços digitais para o cidadão.' },
+  { keys: ['emag / wcag', 'emag', 'wcag'], term: 'eMAG e WCAG', text: 'Padrões de acessibilidade digital: o eMAG é o modelo do governo federal brasileiro; a WCAG é a referência internacional do W3C.' },
+  { keys: ['lgpd'], term: 'LGPD', text: 'Lei Geral de Proteção de Dados (Lei nº 13.709/2018): as regras para coletar, guardar e usar dados pessoais no Brasil.' },
+  { keys: ['auditoria'], term: 'Trilha de auditoria', text: 'Registro de quem fez o quê e quando no sistema, para conferir e prestar contas depois.' },
+  { keys: ['gov.br', 'govbr'], term: 'gov.br', text: 'A conta única do governo federal: o cidadão entra com o mesmo login em vários serviços públicos digitais.' },
+  { keys: ['dados abertos'], term: 'Dados abertos', text: 'Dados públicos publicados em formatos que qualquer pessoa ou programa consegue baixar e reutilizar, como CSV e JSON.' },
+  { keys: ['n8n'], term: 'n8n', text: 'Plataforma de automação de fluxos que conecta sistemas por API. Pode rodar na nuvem ou em servidor próprio.' },
+  { keys: ['agentes de ia', 'agente de ia', 'agentes'], term: 'Agente de IA', text: 'Programa com IA que executa tarefas por conta própria dentro de regras definidas, como responder clientes ou triar pedidos.' },
+  { keys: ['crm'], term: 'CRM', text: 'Sistema de relacionamento com clientes: guarda contatos, conversas e o andamento de cada negociação.' },
+  { keys: ['rastreabilidade'], term: 'Rastreabilidade', text: 'Poder seguir cada etapa de um pedido, dado ou decisão, do começo ao fim.' },
+  { keys: ['llms', 'llm'], term: 'LLM', text: 'Modelo de linguagem de grande porte: a tecnologia por trás dos assistentes de IA que leem e escrevem texto.' },
+  { keys: ['seo tecnico', 'seo'], term: 'SEO técnico', text: 'Ajustes no código e na estrutura do site para que buscadores como o Google o encontrem, entendam e mostrem bem.' },
+  { keys: ['landing pages', 'landing page', 'landing'], term: 'Landing page', text: 'Página com um objetivo só, como captar um contato ou apresentar um produto, sem distrações em volta.' },
+];
+const termFor = (query: string) => {
+  const q = fold(query).trim().replace(/\s+/g, ' ');
+  return q ? GLOSSARY.find((g) => g.keys.includes(q)) ?? null : null;
+};
+
 const SEARCHABLE = ITEMS.map((it) => fold(`${it.label} ${it.hint ?? ''} ${it.group} ${it.keywords ?? ''}`));
 
 /** The items a query finds (every word must hit), title matches first, groups kept together. */
@@ -283,6 +312,7 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
     return matchItems(query);
   }, [query, recent]);
   const suggestion = useMemo(() => (results.length === 0 && query.trim() ? suggestFor(query) : null), [results, query]);
+  const term = useMemo(() => termFor(query), [query]);
 
   useEffect(() => {
     const d = dialog.current;
@@ -393,10 +423,22 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
             spellCheck={false}
           />
         </div>
+        {/* a jargon word gets its meaning first, as a dictionary entry (read out when it appears) */}
+        <p aria-live="polite" className="empty:hidden border-b-2 border-dashed border-[#7d7394]/60 px-5 py-3 text-sm leading-relaxed">
+          {term && (
+            <>
+              <span className="mr-2 font-mono text-[0.65rem] tracking-[0.18em] text-acid-ink/70 uppercase">Verbete</span>
+              <b className="font-semibold">{term.term}</b>
+              <span aria-hidden className="text-acid-ink/60"> · </span>
+              <span className="sr-only">: </span>
+              {term.text}
+            </>
+          )}
+        </p>
         {/* the list also yields to the window's height (minus the top gap and the bar, field and hint row around it):
             on a phone held sideways (844×390) the palette ran 9 px past the screen and the whole window scrolled,
             carrying the search field out of sight with the results */}
-        <ul ref={list} id="pistas" role="listbox" aria-label="Resultados" data-lenis-prevent className="scroll-shadows max-h-[min(55vh,26rem,calc(100svh-12vh-9.5rem))] overflow-y-auto overscroll-contain p-2">
+        <ul ref={list} id="pistas" role="listbox" aria-label="Resultados" data-lenis-prevent className={`scroll-shadows overflow-y-auto overscroll-contain p-2 ${term ? 'max-h-[min(45vh,22rem,calc(100svh-12vh-14rem))]' : 'max-h-[min(55vh,26rem,calc(100svh-12vh-9.5rem))]'}`}>
           {results.map((it, i) => {
             const header = it.group !== lastGroup ? it.group : null;
             lastGroup = it.group;
