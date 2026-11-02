@@ -8,6 +8,7 @@ import MockUI from '@/components/MockUI';
 import ClosingCta from '@/components/ClosingCta';
 import CaseFilter from '@/components/CaseFilter';
 import CaseView from '@/components/CaseView';
+import CaseSort from '@/components/CaseSort';
 import { caseViewScript } from '@/lib/caseView';
 import { caseMorphScript } from '@/lib/caseMorph';
 import { services } from '@/lib/services';
@@ -90,22 +91,18 @@ export default function CasesIndex() {
           <RandomCase />
           <CaseView />
           {/* "Exibir: Detalhes" on a wide screen reads as a file manager's details view, so it gets the column headers
-              one has (decorative: each row's link already names the case, its kind and the problem) */}
-          <div aria-hidden data-case-cols className="hidden">
-            <span>Nº</span>
-            <span>Nome</span>
-            <span>Tipo</span>
-            <span>O mistério</span>
-          </div>
+              one has, and like those they sort the list (CaseSort) */}
+          <CaseSort />
           {/* an odd count leaves the last row's second cell bare on a two-column screen: data-odd lets globals.css put
               an empty folder there that points down to the "your case" window (CaseFilter keeps it in step with the filter) */}
           <ul data-case-list data-odd={projects.length % 2 === 1 ? '' : undefined} className="mt-4 grid gap-6 md:grid-cols-2">
             {projects.map((p, i) => (
-              <li key={p.slug} data-case-service={p.service} data-case-slug={p.slug}>
+              <li key={p.slug} data-case-service={p.service} data-case-slug={p.slug} data-case-n={i}>
                 {/* the link is named by the case and its kind and described by the problem: the whole card used to be
                     its name (screenshot alt + title + kind + problem, 107–151 characters on every Tab) */}
                 <a
                   href={`/casos/${p.slug}`}
+                  data-case-no={String(i + 1).padStart(2, '0')}
                   aria-labelledby={`caso-${p.slug} tipo-${p.slug}`}
                   aria-describedby={`problema-${p.slug}`}
                   className="group block"

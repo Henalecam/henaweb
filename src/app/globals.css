@@ -994,15 +994,17 @@ html {
     padding: 0.9rem 0.5rem;
     transition: background-color 0.15s;
   }
+  /* the case's own number (data-case-no, as on its caso_NN.exe window), not its row: sorted by name (CaseSort) or
+     filtered, Scheduly is still nº 02 */
   [data-case-list][data-view='details'] > li > a::before {
-    content: counter(case-row, decimal-leading-zero);
+    content: attr(data-case-no);
     grid-row: 1 / span 3;
     font-family: var(--font-mono);
     font-size: 0.75rem;
     color: rgb(from var(--color-ink) r g b / 0.6);
   }
   [data-case-list][data-view='details'] > li[data-case-read] > a::before {
-    content: counter(case-row, decimal-leading-zero) ' ✓';
+    content: attr(data-case-no) ' ✓';
     color: var(--color-teal);
   }
   [data-case-list][data-view='details'] > li > a:hover,
