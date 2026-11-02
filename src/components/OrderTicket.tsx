@@ -134,20 +134,20 @@ export default function OrderTicket() {
             <span>SISTEMA NO AR</span>
           </p>
 
-          {/* rubber stamp: "em preparo" while the burger is being built, re-stamped "pronto" once the order is up
-              (Process sets data-served on its section when the last step lands) */}
-          <div
-            aria-hidden
-            data-order-stamp
-            className="pointer-events-none absolute right-5 bottom-28 -rotate-12 rounded-md border-4 border-[#b3122b] px-3 py-1 font-bold tracking-widest text-[#b3122b] opacity-80 group-data-[served]/proc:border-[#1f6f63] group-data-[served]/proc:text-[#1f6f63]"
-          >
-            <span className="group-data-[served]/proc:hidden">EM PREPARO</span>
-            <span className="hidden group-data-[served]/proc:inline">PRONTO ✓</span>
-          </div>
-
           {/* the barcode is the order button: pointing at it passes the scanner's red line over the bars,
               and following it goes to the form, where the visitor's own order is placed */}
           <a href="#contato" className="scan group/scan relative mt-5 block rounded-sm outline-offset-4">
+          {/* rubber stamp: "em preparo" while the burger is being built, re-stamped "pronto" once the order is up
+                (Process sets data-served on its section when the last step lands). It sits on the barcode's bars: placed
+                from the ticket's bottom, it landed on the "escaneie para fazer o seu pedido" link text on a phone */}
+            <div
+              aria-hidden
+              data-order-stamp
+              className="pointer-events-none absolute -top-1 right-1 z-10 -rotate-12 rounded-md bg-paper/85 border-4 border-[#b3122b] px-3 py-1 font-bold tracking-widest text-[#b3122b] opacity-80 group-data-[served]/proc:border-[#1f6f63] group-data-[served]/proc:text-[#1f6f63]"
+            >
+              <span className="group-data-[served]/proc:hidden">EM PREPARO</span>
+              <span className="hidden group-data-[served]/proc:inline">PRONTO ✓</span>
+            </div>
             <span className="relative block overflow-hidden">
               <Barcode />
               <span aria-hidden className="scan-laser pointer-events-none absolute inset-y-0 w-[3px] bg-[#e11d48] opacity-0 shadow-[0_0_8px_2px_rgb(225_29_72/0.6)]" />
