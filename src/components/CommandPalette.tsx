@@ -219,6 +219,18 @@ function useTypedHint(active: boolean) {
  * The typed words marked inside a result's title, accent- and case-blind ("acao" marks "Ação"): the reader sees
  * at a glance why each line is there. A word that only hit the hidden keywords (or a synonym) marks nothing.
  */
+/** Hands the search words (and their synonyms) to SearchMarks: stored for a page that loads next, announced
+ * for a section of this same page ("/#processo" doesn't reload). */
+function leaveMarks(query: string) {
+  const words = fold(query).split(/\s+/).filter((w) => w.length >= 3);
+  const all = [...new Set(words.flatMap((w) => [w, ...(SYNONYMS[w] ?? [])]))];
+  if (!all.length) return;
+  try {
+    sessionStorage.setItem('hena:marks', JSON.stringify({ words: all, at: Date.now() }));
+  } catch {}
+  window.dispatchEvent(new CustomEvent('hena:marks', { detail: all }));
+}
+
 function Marked({ text, query }: { text: string; query: string }) {
   const words = fold(query).split(/\s+/).filter((w) => w.length >= 2);
   if (!words.length) return <>{text}</>;
@@ -455,7 +467,11 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
                   tabIndex={-1}
                   data-placement="palette"
                   {...(it.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                  onClick={onClose}
+                  onClick={() => {
+                    // the words go along to the page this result opens, which marks them in its text (SearchMarks)
+                    if (!it.external) leaveMarks(query);
+                    onClose();
+                  }}
                   className={`flex items-baseline justify-between gap-4 rounded-md px-3 py-2.5 ${i === active ? 'bg-acid' : ''}`}
                 >
                   <span className="font-medium">

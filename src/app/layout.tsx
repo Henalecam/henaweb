@@ -23,6 +23,7 @@ import QuoteLink from '@/components/QuoteLink';
 import AccordionKeys from '@/components/AccordionKeys';
 import SwRegister from '@/components/SwRegister';
 import PrintImages from '@/components/PrintImages';
+import SearchMarks from '@/components/SearchMarks';
 import DragFile from '@/components/DragFile';
 import WinDrag from '@/components/WinDrag';
 import TabProgress from '@/components/TabProgress';
@@ -236,6 +237,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AccordionKeys />
         <SwRegister />
         <PrintImages />
+        <SearchMarks />
         <DragFile />
         <WinDrag />
         <TabProgress />

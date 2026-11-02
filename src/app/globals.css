@@ -1630,6 +1630,24 @@ html {
   }
 }
 
+/* the search's highlighter pen (SearchMarks.tsx): the words searched stay marked on the page the result opened,
+   in marker yellow; the one "próxima" stepped to, in orange */
+::highlight(hena-busca) {
+  background-color: #ffe14d;
+  color: #140a26;
+}
+::highlight(hena-busca-atual) {
+  background-color: #f7931e;
+  color: #140a26;
+}
+@media (forced-colors: active) {
+  ::highlight(hena-busca),
+  ::highlight(hena-busca-atual) {
+    background-color: Mark;
+    color: MarkText;
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
