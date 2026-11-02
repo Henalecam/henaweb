@@ -2914,6 +2914,7 @@ html:active-view-transition-type(step-prev)::view-transition-new(*.case-window) 
   /* small blocks stay whole; whole sections may split, or a long one jumps to the next page and leaves a blank half */
   .win,
   .toon,
+  .toon-sm,
   li {
     break-inside: avoid;
   }
