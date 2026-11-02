@@ -127,8 +127,9 @@ export default function Manifesto() {
           </p>
           {/* the quote about carving answers the chisel too: the mouse knocks marble chips off it, and so does a tap,
               as on the hero's "esculpidos" */}
-          <p data-quote onPointerMove={chisel} onPointerDown={chiselTap} className="font-groovy mt-8 text-2xl text-acid [text-shadow:3px_3px_0_#120626]">“Vi o anjo no mármore e esculpi até libertá-lo.”</p>
-          <span className="label mt-2 block">Frase atribuída a Michelangelo</span>
+          <p data-quote onPointerMove={chisel} onPointerDown={chiselTap} className="font-groovy mt-8 text-2xl text-acid [text-shadow:3px_3px_0_#120626,0_0_14px_rgb(18_8_42/0.95),0_0_30px_rgb(18_8_42/0.9)]">“Vi o anjo no mármore e esculpi até libertá-lo.”</p>
+          {/* it crosses the sun too (grey mono caps on its orange stripes): the same dark chip as the section label */}
+          <span className="label mt-2 inline-block rounded-sm bg-[rgb(18_8_42/0.85)] px-1.5 py-0.5">Frase atribuída a Michelangelo</span>
         </div>
       </div>
 
