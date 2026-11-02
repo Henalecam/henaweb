@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type Key = 'n' | 'name' | 'kind';
 
@@ -12,9 +12,29 @@ type Key = 'n' | 'name' | 'kind';
  */
 export default function CaseSort() {
   const [sort, setSort] = useState<{ key: Key; desc: boolean }>({ key: 'n', desc: false });
+  const [said, setSaid] = useState('');
+
+  // a sorted archive can be shared or reloaded like a filtered one (?ordem=nome, ?ordem=tipo-desc)
+  useEffect(() => {
+    const m = /^(n|nome|tipo)(-desc)?$/.exec(new URLSearchParams(location.search).get('ordem') ?? '');
+    if (m) order(m[1] === 'nome' ? 'name' : m[1] === 'tipo' ? 'kind' : 'n', !!m[2], false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const by = (key: Key) => {
     const desc = sort.key === key ? !sort.desc : false;
+    order(key, desc, true);
+    const url = new URL(location.href);
+    if (key === 'n' && !desc) url.searchParams.delete('ordem');
+    else url.searchParams.set('ordem', `${key === 'name' ? 'nome' : key === 'kind' ? 'tipo' : 'n'}${desc ? '-desc' : ''}`);
+    history.replaceState(history.state, '', url);
+    // the rows move silently for a screen reader: say what the order is now
+    const what = key === 'n' ? 'número' : key === 'name' ? 'nome' : 'tipo';
+    const dir = key === 'n' ? (desc ? 'do último ao primeiro' : 'do primeiro ao último') : desc ? 'de Z a A' : 'de A a Z';
+    setSaid(`Casos ordenados por ${what}, ${dir}.`);
+  };
+
+  const order = (key: Key, desc: boolean, animate: boolean) => {
     setSort({ key, desc });
     const list = document.querySelector<HTMLElement>('[data-case-list]');
     if (!list) return;
@@ -30,6 +50,7 @@ export default function CaseSort() {
       return desc ? -c : c;
     });
     const move = () => rows.forEach((li) => list.append(li));
+    if (!animate) return move();
     const doc = document as Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } };
     if (!doc.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) return move();
     rows.forEach((li) => (li.style.viewTransitionName = `ordem-${li.dataset.caseSlug}`));
@@ -60,6 +81,9 @@ export default function CaseSort() {
       <span>{head('name', 'Nome', 'nome')}</span>
       <span>{head('kind', 'Tipo', 'tipo')}</span>
       <span>O mistério</span>
+      <span aria-live="polite" className="sr-only">
+        {said}
+      </span>
     </div>
   );
 }
