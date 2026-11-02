@@ -201,7 +201,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             <FullShot name={p.name} host={new URL(p.href).hostname} desktop={p.shot.desktop} mobile={p.shot.mobile} height={p.shot.height} />
           )}
 
-          <div className="mt-16 grid gap-5 md:grid-cols-2">
+          <div className="relative mt-16 grid gap-5 md:grid-cols-2">
             <section className="group toon relative overflow-hidden rounded-2xl bg-paper p-7 text-acid-ink" aria-labelledby="misterio">
               {/* the first clue on the file: a latent print in the corner, dusted darker when the card is pointed at */}
               <Fingerprint className="absolute -right-6 -bottom-8 w-32 rotate-12 text-[#c2410c] opacity-[0.13] transition-opacity duration-500 group-hover:opacity-30" />
@@ -223,6 +223,19 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
                 <span className="hidden md:inline">→</span>
               </span>
             </section>
+            {/* the board's red thread, pinned to the foot of both cards and sagging under them: the mystery and its
+                solution, linked the way the home's evidence board links its clues (desktop, where they sit side by
+                side; globals.css case-thread draws it in as the pair scrolls up) */}
+            <span aria-hidden className="case-pin pointer-events-none absolute bottom-3.5 left-[38%] hidden md:block" />
+            <span aria-hidden className="case-pin pointer-events-none absolute bottom-3.5 left-[64%] hidden md:block" />
+            <svg
+              aria-hidden
+              className="case-thread pointer-events-none absolute inset-x-0 top-[calc(100%-14px)] hidden h-10 w-full overflow-visible md:block"
+              viewBox="0 0 100 40"
+              preserveAspectRatio="none"
+            >
+              <path d="M38.4 0 Q51.2 58 64.4 0" fill="none" stroke="#c2410c" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+            </svg>
           </div>
 
           <section className="mt-16" aria-labelledby="recursos">

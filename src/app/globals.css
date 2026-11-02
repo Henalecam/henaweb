@@ -1361,6 +1361,34 @@ html {
   }
 }
 
+/* case page: the red thread between "O mistério" and "Caso resolvido", and the two push pins holding it */
+.case-pin {
+  z-index: 2;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff8a65 0 22%, #c2410c 48%, #7a1f05 100%);
+  box-shadow: 1px 2px 0 rgb(20 10 38 / 0.45);
+}
+.case-thread {
+  z-index: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    /* revealed left to right with a clip (a pathLength dash breaks into pieces on a non-scaling stroke in Chrome) */
+    .case-thread {
+      animation: case-thread-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 60% cover 45%;
+    }
+  }
+}
+@keyframes case-thread-draw {
+  from { clip-path: inset(-20px 62% -20px 37%); }
+  to { clip-path: inset(-20px 35% -20px 37%); }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
