@@ -10,12 +10,13 @@ const fold = (s: string) =>
     .toLowerCase();
 
 /** Ranges over every occurrence of the words in the page's main text (folded: "lgpd" finds "LGPD",
- * "integracao" finds "integração"). A word of five letters or more also matches without its last letter,
- * so a plural still finds its singular. */
+ * "integracao" finds "integração"). A longer word also matches without its ending (one letter from five
+ * letters, two from seven), so "integracao" still finds "integrações". */
 function find(words: string[]) {
   const main = document.getElementById('conteudo');
   if (!main) return [];
-  const stems = words.map((w) => (w.length >= 5 ? w.slice(0, -1) : w));
+  // Portuguese plurals change the ending ("integração" → "integrações"): long words lose two letters
+  const stems = words.map((w) => (w.length >= 7 ? w.slice(0, -2) : w.length >= 5 ? w.slice(0, -1) : w));
   const walk = document.createTreeWalker(main, NodeFilter.SHOW_TEXT, {
     acceptNode: (n) =>
       n.parentElement?.closest('script, style, textarea, input, [aria-hidden="true"], [hidden], .sr-only') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
@@ -112,8 +113,10 @@ export default function SearchMarks() {
       className="toon-sm fixed top-[5.25rem] left-1/2 z-[54] flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-1 rounded-full bg-lemon py-1 pr-1 pl-3.5 font-mono text-xs text-acid-ink"
     >
       <span aria-hidden>🖍</span>
-      <span role="status" className="truncate px-1">
-        “{marks.words[0]}” marcado {marks.n}×
+      {/* on a phone the word gives way, never the count */}
+      <span role="status" className="flex min-w-0 px-1">
+        <span className="truncate">“{marks.words[0]}”</span>
+        <span className="shrink-0 whitespace-pre"> marcado {marks.n}×</span>
       </span>
       <button type="button" onClick={next} className="min-h-8 shrink-0 rounded-full px-2.5 underline underline-offset-2 hover:bg-acid-ink/10">
         próxima ↓
