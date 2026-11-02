@@ -1568,16 +1568,16 @@ html {
 /* "retrato falado" on a service page's examples: the dark product mock (MockUI) turned into a pencil sketch on
    paper (grey, inverted, a touch of sepia), and every word in it scribbled over with a thick line, since it
    shows a kind of screen, not anyone's actual one */
-[data-sketch] {
+[data-sketch-mock] {
   filter: grayscale(1) invert(0.9) sepia(0.3) contrast(1.1);
 }
-[data-sketch] * {
+[data-sketch-mock] * {
   color: transparent !important;
   text-decoration: line-through 0.5em rgb(236 235 228 / 0.28) !important;
   text-decoration-skip-ink: none !important;
 }
 @media (forced-colors: active) {
-  [data-sketch] {
+  [data-sketch-mock] {
     filter: none;
   }
 }

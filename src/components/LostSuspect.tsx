@@ -40,12 +40,12 @@ export default function LostSuspect() {
 
   return (
     <>
-      {path && (
-        <p className="mt-2">
-          <span className="opacity-70">Endereço procurado:</span>{' '}
-          <code className="mt-1 block w-fit max-w-full rounded-sm bg-acid-ink/10 px-1 [overflow-wrap:anywhere]">{path}</code>
-        </p>
-      )}
+      {/* the line is in the server HTML from the start with an empty code box, and the address fills it in: added
+          after hydration, its 50 px pushed the whole 404 down (layout shift 0.08 on a desktop) */}
+      <p className="mt-2">
+        <span className="opacity-70">Endereço procurado:</span>{' '}
+        <code className="mt-1 block w-fit max-w-full min-w-[8ch] rounded-sm bg-acid-ink/10 px-1 [overflow-wrap:anywhere]">{path ?? '\u00a0'}</code>
+      </p>
       <p className="mt-2 text-acid-ink/75">{suspect}</p>
     </>
   );

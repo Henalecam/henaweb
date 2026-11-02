@@ -226,7 +226,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                         <div aria-hidden className="relative -mx-5 -mt-5 mb-5 aspect-[16/9.4] overflow-hidden border-b-2 border-toon bg-[#f3ead8]">
                           {/* inert: the mock's words are only scribbled over, still in the DOM, and the page's find
                               (Ctrl+F "delivery" on Sistemas públicos) landed on an invisible sentence about spending */}
-                          <div data-sketch inert className="h-full w-full">
+                          <div data-sketch-mock inert className="h-full w-full">
                             <MockUI variant={e.sketch} hue={30} />
                           </div>
                           <span className="absolute bottom-3 left-3 -rotate-3 rounded-sm border-2 border-acid-ink bg-paper px-2 py-0.5 font-mono text-[0.62rem] font-bold tracking-[0.2em] text-acid-ink uppercase">
