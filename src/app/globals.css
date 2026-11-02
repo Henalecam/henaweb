@@ -1410,6 +1410,25 @@ html {
   }
 }
 
+/* service page: every symptom ticked, a verdict stamped beside the "levar para o contato" button */
+.symptoms-stamp {
+  display: inline-block;
+  padding: 0.35rem 0.7rem;
+  border: 2.5px solid var(--color-acid);
+  border-radius: 4px;
+  color: var(--color-acid);
+  rotate: -4deg;
+  mask-image: radial-gradient(circle at 30% 40%, #000 60%, rgb(0 0 0 / 0.75) 100%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .symptoms-stamp {
+    animation: symptoms-stamp 0.32s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  }
+}
+@keyframes symptoms-stamp {
+  from { scale: 2.2; opacity: 0; rotate: -12deg; }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

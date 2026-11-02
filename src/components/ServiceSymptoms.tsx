@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { track } from '@/lib/track';
 import Tick from './Tick';
+import { buzz } from '@/lib/haptic';
 
 const DRAFT = 'hena:draft';
 
@@ -42,7 +43,10 @@ export default function ServiceSymptoms({ problems, service }: { problems: strin
                 <input
                   type="checkbox"
                   checked={on}
-                  onChange={() => setPicked((cur) => (on ? cur.filter((x) => x !== p) : [...cur, p]))}
+                  onChange={() => {
+                    if (!on) buzz(6); // a tick felt as well as seen, on phones that vibrate
+                    setPicked((cur) => (on ? cur.filter((x) => x !== p) : [...cur, p]));
+                  }}
                   className="sr-only"
                 />
                 <span
@@ -57,11 +61,15 @@ export default function ServiceSymptoms({ problems, service }: { problems: strin
           );
         })}
       </ul>
-      <div className="mt-6 min-h-14" aria-live="polite" data-print-hide>
+      <div className="mt-6 flex min-h-14 flex-wrap items-center gap-x-5 gap-y-3" aria-live="polite" data-print-hide>
         {picked.length > 0 && (
           <button type="button" onClick={carry} className="toon toon-press rounded-full bg-acid px-6 py-4 font-medium text-acid-ink">
-            Levar {picked.length === 1 ? 'este sintoma' : `estes ${picked.length} sintomas`} para o contato →
+            Levar {picked.length === 1 ? 'este sintoma' : `estes ${picked.length} sintomas`} para o contato{'\u00a0'}→
           </button>
+        )}
+        {/* every symptom on the list ticked: the file gets its verdict stamped beside the button */}
+        {problems.length > 1 && picked.length === problems.length && (
+          <span className="symptoms-stamp font-mono text-xs font-bold tracking-[0.18em] uppercase">Diagnóstico: caso clássico</span>
         )}
       </div>
     </>
