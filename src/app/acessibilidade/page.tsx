@@ -42,7 +42,7 @@ const jsonLd = {
 
 // each line is something this site really does (see the components named in the comments), not a promise
 const FEATURES: [string, string][] = [
-  ['Teclado do começo ao fim', 'Todo link, botão e campo é alcançável pelo Tab, com foco visível. "Pular para o conteúdo" é o primeiro item da página, e a tecla ? lista os atalhos.'],
+  ['Teclado do começo ao fim', 'Todo link, botão e campo é alcançável pelo Tab, com foco visível. "Pular para o conteúdo" e "Pular para o contato" são os primeiros itens da página, e a tecla ? lista os atalhos.'],
   ['Menos movimento', 'Com "reduzir movimento" ligado no sistema, as animações de entrada, as faixas que correm sozinhas, os sons e as vibrações ficam parados ou desligados.'],
   ['Pausar o que se mexe', 'A tecla P pausa e retoma as faixas animadas da página inicial; um toque faz o mesmo no celular.'],
   ['Alto contraste', 'No modo de alto contraste do Windows o site usa as cores do sistema. Com "mais contraste" ou "menos transparência" ligados, sublinhados ficam sólidos e texturas somem.'],
