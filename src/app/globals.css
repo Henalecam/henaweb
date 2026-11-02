@@ -1535,6 +1535,36 @@ html {
   }
 }
 
+/* /casos with an odd number of cards on two columns: the bare cell beside the last one becomes an empty case
+   folder, dashed like a slot waiting for a file, pointing down to the closing "your case" window. A grid item
+   made of the list's own ::after, so it adds nothing to the list a screen reader counts (and its text has an
+   empty alternative); not in the details view, where the cards are rows, nor on paper */
+@media screen and (min-width: 768px) {
+  [data-case-list][data-odd]:not([data-view='details'])::after {
+    content: 'pasta vazia\A o próximo caso pode ser o seu ↓' / '';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 12rem;
+    padding: 2rem;
+    white-space: pre-line;
+    text-align: center;
+    font: 0.75rem/2 var(--font-mono);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgb(253 243 225 / 0.62);
+    border: 3px dashed rgb(253 243 225 / 0.22);
+    border-radius: 0.75rem;
+    background: repeating-linear-gradient(-45deg, transparent 0 14px, rgb(253 243 225 / 0.035) 14px 15px);
+  }
+}
+@media (forced-colors: active) {
+  [data-case-list][data-odd]::after {
+    border-color: GrayText;
+    color: GrayText;
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

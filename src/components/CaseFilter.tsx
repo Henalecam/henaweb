@@ -32,6 +32,7 @@ export default function CaseFilter({
       cards.forEach((li) => {
         li.hidden = !!slug && li.dataset.caseService !== slug;
       });
+      document.querySelector('[data-case-list]')?.toggleAttribute('data-odd', cards.filter((li) => !li.hidden).length % 2 === 1);
       setActive(slug);
       // the tab (and bookmarks, history) name the filtered archive: "Casos de Automação & IA · HenaWeb"
       const o = options.find((x) => x.slug === slug);

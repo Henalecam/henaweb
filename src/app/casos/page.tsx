@@ -97,7 +97,9 @@ export default function CasesIndex() {
             <span>Tipo</span>
             <span>O mistério</span>
           </div>
-          <ul data-case-list className="mt-4 grid gap-6 md:grid-cols-2">
+          {/* an odd count leaves the last row's second cell bare on a two-column screen: data-odd lets globals.css put
+              an empty folder there that points down to the "your case" window (CaseFilter keeps it in step with the filter) */}
+          <ul data-case-list data-odd={projects.length % 2 === 1 ? '' : undefined} className="mt-4 grid gap-6 md:grid-cols-2">
             {projects.map((p, i) => (
               <li key={p.slug} data-case-service={p.service} data-case-slug={p.slug}>
                 {/* the link is named by the case and its kind and described by the problem: the whole card used to be
