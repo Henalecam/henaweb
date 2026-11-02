@@ -45,9 +45,11 @@ export default function OfflineList() {
     <ul data-lenis-prevent aria-label="Páginas guardadas neste navegador" className={`${box} flex flex-col gap-2`}>
       {kept.map((k) => (
         <li key={k.path}>
-          <a href={k.path} className="toon-sm toon-press flex min-h-11 items-center justify-between gap-3 rounded-xl bg-white px-4 py-2 font-medium">
+          {/* phones: the address goes under the title, which had room for 11 letters beside it ("Diconta: ER…",
+              "Acessibilid…"); the drawer then shows two and a half rows, the cut-off one hinting that it scrolls */}
+          <a href={k.path} className="toon-sm toon-press flex min-h-11 flex-col justify-center rounded-xl bg-white px-4 py-2 font-medium sm:flex-row sm:items-center sm:justify-between sm:gap-3">
             <span className="truncate">{k.title}</span>
-            <span aria-hidden className="shrink-0 font-mono text-xs text-acid-ink/60">
+            <span aria-hidden className="truncate font-mono text-xs text-acid-ink/60 sm:shrink-0">
               {k.path}
             </span>
           </a>
