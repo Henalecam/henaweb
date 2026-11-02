@@ -1592,6 +1592,17 @@ ul:has(> .evidence-tag) {
   pointer-events: none;
 }
 .evidence-tag:nth-child(even)::after { rotate: -5deg; }
+/* forced colors drop the tent's yellow fill, leaving a stray letter floating off each tag: the markers (and the case
+   thread's pins, drawn the same way) step aside, and the thread takes the system's text colour */
+@media (forced-colors: active) {
+  .evidence-tag::after,
+  .case-pin {
+    display: none;
+  }
+  .case-thread path {
+    stroke: CanvasText;
+  }
+}
 
 /* case page dots: while the pointer is on the strip, only the hovered dot shows its name (a dot that
    still has keyboard focus used to keep its label up next to it) */
