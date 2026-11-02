@@ -40,7 +40,9 @@ export default function CaseStatus() {
 
   if (!s) return null;
   return (
-    <p className="case-status mt-6 flex gap-[3px] border-2 border-[#7d7394] bg-[#c9c3d8] p-[3px] font-mono text-[0.68rem] text-[#12082a] shadow-[inset_1px_1px_0_#fff] print:mt-4 print:border-0 print:bg-transparent print:p-0 print:shadow-none">
+    // on paper only when it says something the printout can't: which filter or order this copy shows (the whole
+    // archive in its usual order prints as before, on 2 pages)
+    <p className={`case-status mt-6 flex ${s.filter || s.sort ? '' : 'print:hidden'} gap-[3px] border-2 border-[#7d7394] bg-[#c9c3d8] p-[3px] font-mono text-[0.68rem] text-[#12082a] shadow-[inset_1px_1px_0_#fff] print:mt-4 print:border-0 print:bg-transparent print:p-0 print:shadow-none`}>
       <span className="flex-1">
         {s.shown} {s.shown === 1 ? 'caso' : 'casos'}
         {s.shown < s.total && ` de ${s.total}`}
