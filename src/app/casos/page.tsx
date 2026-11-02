@@ -9,6 +9,7 @@ import ClosingCta from '@/components/ClosingCta';
 import CaseFilter from '@/components/CaseFilter';
 import CaseView from '@/components/CaseView';
 import CaseSort from '@/components/CaseSort';
+import CaseStatus from '@/components/CaseStatus';
 import { caseViewScript } from '@/lib/caseView';
 import { caseMorphScript } from '@/lib/caseMorph';
 import { services } from '@/lib/services';
@@ -177,6 +178,7 @@ export default function CasesIndex() {
             ))}
           </ul>
           <script dangerouslySetInnerHTML={{ __html: caseViewScript }} />
+          <CaseStatus />
           <CasesEmpty />
 
           <ClosingCta

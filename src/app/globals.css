@@ -1612,6 +1612,13 @@ html {
   }
 }
 
+/* /casos status bar (CaseStatus): sunken Win95 panes, one per fact */
+.case-status > span {
+  padding: 1px 8px;
+  border: 1px solid;
+  border-color: #7d7394 #fff #fff #7d7394;
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
