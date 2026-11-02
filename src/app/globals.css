@@ -2846,6 +2846,14 @@ html:active-view-transition-type(step-prev)::view-transition-new(*.case-window) 
 h2[id] {
   scroll-margin-top: 6rem;
 }
+/* the home's nav links (/#clientes…) land 40px below the top when the smooth scroller runs (Lenis anchors offset);
+   with reduced motion there is no Lenis and they landed at 0, so going back up (header shown) put the Clientes
+   title under the bar. The same 40px, given natively */
+@media (prefers-reduced-motion: reduce) {
+  section[id] {
+    scroll-margin-top: 2.5rem;
+  }
+}
 
 /* arriving at a section from "Nesta página" or a copied #link: a marker stroke sweeps under the title
    once the smooth scroll has landed, then fades, so the eye finds where the jump ended. It sits on an
