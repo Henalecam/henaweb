@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { nav, site, whatsappLink } from '@/lib/site';
 import { projectLinks } from '@/lib/projectLinks';
@@ -163,8 +164,9 @@ export default function Footer() {
                     only, globals.css data-case-thumb); lazy, so nothing loads until someone points at it */}
                 {x.top && (
                   <span aria-hidden data-case-thumb>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- a pre-cropped static JPG shown at 240px */}
-                    <img src={x.top} alt="" width={240} height={141} loading="lazy" decoding="async" />
+                    {/* through the image optimiser: the plain <img> fetched the 1440-px original (~85 KB) for a
+                        240-px polaroid, on every case pointed at; now ~10 KB in AVIF/WebP at the size shown */}
+                    <Image src={x.top} alt="" width={240} height={141} sizes="240px" loading="lazy" />
                   </span>
                 )}
               </FooterLink>
