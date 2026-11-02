@@ -1,5 +1,5 @@
 import { projects, whatsappLink } from '@/lib/content';
-import NewTab from './NewTab';
+import ClosingCarry from './ClosingCarry';
 import FileLine from './FileLine';
 
 // the file this conversation would open: the next number after the solved cases, so it follows the archive
@@ -12,6 +12,8 @@ type Props = {
   text: string;
   /** Pre-filled WhatsApp message, so the conversation starts with context. */
   whatsappMessage: string;
+  /** A service page: the symptoms ticked above it travel with these buttons (ClosingCarry). */
+  symptoms?: boolean;
 };
 
 /**
@@ -19,7 +21,7 @@ type Props = {
  * visitor gets one clear next step instead of running into the footer. Section id feeds
  * click placement in ConversionTracking.
  */
-export default function ClosingCta({ title, accent, text, whatsappMessage }: Props) {
+export default function ClosingCta({ title, accent, text, whatsappMessage, symptoms }: Props) {
   return (
     <section id="proximo-passo" aria-labelledby="proximo-passo-titulo" className="mt-24" data-print-hide>
       <div className="win">
@@ -46,20 +48,7 @@ export default function ClosingCta({ title, accent, text, whatsappMessage }: Pro
             </h2>
             <p className="mt-4 max-w-xl text-lg leading-relaxed text-acid-ink/75">{text}</p>
           </div>
-          <div className="flex flex-wrap gap-3 md:justify-end">
-            <a href="/#contato" className="toon toon-press rounded-full bg-acid px-6 py-4 font-medium text-acid-ink">
-              Abrir um caso →
-            </a>
-            <a
-              href={whatsappLink(whatsappMessage)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="toon toon-press rounded-full bg-[#25d366] px-6 py-4 font-medium text-acid-ink"
-            >
-              WhatsApp
-              <NewTab />
-            </a>
-          </div>
+          <ClosingCarry whatsappMessage={whatsappMessage} symptoms={symptoms} />
         </div>
       </div>
     </section>

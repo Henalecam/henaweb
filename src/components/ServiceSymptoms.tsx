@@ -1,11 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { track } from '@/lib/track';
 import Tick from './Tick';
 import { buzz } from '@/lib/haptic';
 
 const DRAFT = 'hena:draft';
+
+/** The ticked symptoms as the line they become in a message ("Sintomas que reconheci (Automação e IA): ..."). */
+export const symptomsBlock = (picked: string[], service: string) => `Sintomas que reconheci (${service}):\n${picked.map((p) => `- ${p}`).join('\n')}`;
+
+/** Puts the ticked symptoms in the same-tab contact draft (Contact reads it), once. */
+export function carrySymptoms(picked: string[], service: string) {
+  const block = symptomsBlock(picked, service);
+  try {
+    const d = JSON.parse(sessionStorage.getItem(DRAFT) ?? 'null') ?? { picked: [], timeline: '', fields: {} };
+    const msg: string = d.fields?.message ?? '';
+    d.fields = { ...d.fields, message: msg.includes(block) ? msg : [msg, block].filter(Boolean).join('\n\n') };
+    sessionStorage.setItem(DRAFT, JSON.stringify(d));
+  } catch {}
+}
 
 /**
  * "Sintomas que resolvemos" as a checklist: the visitor ticks what happens in their company and
@@ -14,14 +28,13 @@ const DRAFT = 'hena:draft';
 export default function ServiceSymptoms({ problems, service }: { problems: string[]; service: string }) {
   const [picked, setPicked] = useState<string[]>([]);
 
+  // the closing "Seu caso parece com esse?" window takes the same ticks along (ClosingCarry)
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('hena:symptoms', { detail: { picked, service } }));
+  }, [picked, service]);
+
   const carry = () => {
-    const block = `Sintomas que reconheci (${service}):\n${picked.map((p) => `- ${p}`).join('\n')}`;
-    try {
-      const d = JSON.parse(sessionStorage.getItem(DRAFT) ?? 'null') ?? { picked: [], timeline: '', fields: {} };
-      const msg: string = d.fields?.message ?? '';
-      d.fields = { ...d.fields, message: msg.includes(block) ? msg : [msg, block].filter(Boolean).join('\n\n') };
-      sessionStorage.setItem(DRAFT, JSON.stringify(d));
-    } catch {}
+    carrySymptoms(picked, service);
     track({ name: 'cta_click', placement: 'service-symptoms', label: `${picked.length} sintomas` });
     // land on the message box itself (Contact centres and focuses #mensagem), where the symptoms now are
     location.href = '/#mensagem';

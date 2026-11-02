@@ -402,6 +402,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             accent="esse?"
             text="Marque os sintomas no formulário e receba um diagnóstico preliminar na hora, ou chame direto no WhatsApp."
             whatsappMessage={`Olá! Quero conversar sobre ${s.name} com a HenaWeb.`}
+            symptoms
           />
         </article>
       </main>
