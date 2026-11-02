@@ -38,6 +38,9 @@ export default function CaseSort() {
     setSort({ key, desc });
     const list = document.querySelector<HTMLElement>('[data-case-list]');
     if (!list) return;
+    // the archive's status bar (CaseStatus) reads the order from here
+    if (key === 'n' && !desc) delete list.dataset.sort;
+    else list.dataset.sort = `${key === 'name' ? 'nome' : key === 'kind' ? 'tipo' : 'nº'} ${desc ? '↓' : '↑'}`;
     const value = (li: HTMLElement) =>
       key === 'n'
         ? Number(li.dataset.caseN)
