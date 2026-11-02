@@ -206,7 +206,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
               {/* the first clue on the file: a latent print in the corner, dusted darker when the card is pointed at */}
               <Fingerprint className="absolute -right-6 -bottom-8 w-32 rotate-12 text-[#c2410c] opacity-[0.13] transition-opacity duration-500 group-hover:opacity-30" />
               <h2 id="misterio" className="relative font-groovy text-2xl text-[#c2410c]">O mistério</h2>
-              <p className="relative mt-3 text-lg leading-relaxed text-acid-ink/80">{p.challenge}</p>
+              <p data-dropcap className="relative mt-3 text-lg leading-relaxed text-acid-ink/80">{p.challenge}</p>
             </section>
             <section className="toon relative rounded-2xl bg-lemon p-7 text-acid-ink" aria-labelledby="resolvido">
               <h2 id="resolvido" className="font-groovy text-2xl text-[#1f6f63]">Caso resolvido</h2>

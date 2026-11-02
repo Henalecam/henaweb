@@ -1505,6 +1505,36 @@ html {
   pointer-events: auto;
 }
 
+/* the case file opens like a story: the mystery's first letter is a drop cap in the groovy face and the
+   mystery's own red, two lines deep. The shortest mystery (73 characters) still wraps to two lines in the
+   card's narrowest measure (~55 characters), so the cap never hangs under a one-line paragraph. Browsers
+   without initial-letter keep the plain letter */
+@supports (initial-letter: 2) or (-webkit-initial-letter: 2) {
+  [data-dropcap]::first-letter {
+    -webkit-initial-letter: 2;
+    initial-letter: 2;
+    font-family: var(--font-groovy);
+    color: #c2410c;
+    margin-inline-end: 0.06em;
+  }
+}
+@media (forced-colors: active) {
+  [data-dropcap]::first-letter {
+    color: CanvasText;
+  }
+}
+/* on paper the letter goes back into its word: a PDF's text layer split it off ("A" + "gendar"), so searching
+   the saved dossier for the word missed it */
+@media print {
+  [data-dropcap]::first-letter {
+    -webkit-initial-letter: normal;
+    initial-letter: normal;
+    font-family: inherit;
+    color: inherit;
+    margin: 0;
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
