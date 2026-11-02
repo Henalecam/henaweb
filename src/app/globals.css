@@ -1619,11 +1619,6 @@ html {
   border-color: #7d7394 #fff #fff #7d7394;
 }
 
-/* /casos "ocultar investigados" (CaseStatus): the files this browser already opened step aside */
-[data-case-list][data-hide-read] > li[data-case-read] {
-  display: none;
-}
-
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
