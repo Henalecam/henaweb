@@ -1496,6 +1496,15 @@ html {
   }
 }
 
+/* the Mystery board's last stage now hides with opacity only (so Tab reaches its link): while hidden it must not
+   catch the pointer over the first stage, and its link answers the pointer once the stage has played in */
+[data-desk] [data-stage='3'] {
+  pointer-events: none;
+}
+[data-desk] [data-stage='3'][style*='opacity: 1'] a {
+  pointer-events: auto;
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

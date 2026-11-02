@@ -53,7 +53,11 @@ export default function SmoothScroll() {
     // a glide to a page position (the hero's "role para investigar ↓" cue), at the scroller's own pace
     const glide = (e: Event) => {
       e.preventDefault();
-      lenis.scrollTo((e as CustomEvent<number>).detail, { duration: 1.2 });
+      // a number glides there; { top, immediate: true } lands at once (a keyboard focus jump must not still be
+      // gliding when the next Tab moves on)
+      const d = (e as CustomEvent<number | { top: number; immediate?: boolean }>).detail;
+      if (typeof d === 'number') lenis.scrollTo(d, { duration: 1.2 });
+      else lenis.scrollTo(d.top, { immediate: !!d.immediate, force: true });
     };
     window.addEventListener('hena:glide', glide);
 

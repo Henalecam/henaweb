@@ -239,6 +239,8 @@ export default function Nav() {
         className={`gutter fixed inset-x-0 top-0 z-50 [view-transition-name:site-header] transition-transform duration-500 ease-[var(--ease-out-expo)] ${
           hidden && !open ? '-translate-y-full' : ''
         }`}
+        // the bar hides while reading downwards; a keyboard user who Tabs (or Shift+Tabs) into it must see it
+        onFocus={() => setHidden(false)}
       >
         <div
           className={`pointer-events-none absolute inset-0 -z-10 border-b transition-[background-color,border-color,backdrop-filter] duration-500 ${

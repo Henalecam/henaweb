@@ -321,10 +321,25 @@ const copy = {
   },
 };
 
-function CaseCta() {
+function CaseCta({ playThrough = false }: { playThrough?: boolean }) {
   return (
     <a
       href="#contato"
+      // desktop board: the link sits in the last stage of a pinned, scroll-driven sequence. Reached with Tab before the
+      // board has played, it would be focused while still invisible, so focusing it scrolls to the end of the pin
+      onFocus={
+        playThrough
+          ? (e) => {
+              const stage = e.currentTarget.closest<HTMLElement>('[data-stage]');
+              if (!stage || Number(getComputedStyle(stage).opacity) > 0.5) return;
+              const spacer = e.currentTarget.closest<HTMLElement>('.pin-spacer');
+              if (!spacer) return;
+              const y = spacer.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
+              const handled = !window.dispatchEvent(new CustomEvent('hena:glide', { detail: { top: y, immediate: true }, cancelable: true }));
+              if (!handled) window.scrollTo({ top: y });
+            }
+          : undefined
+      }
       data-cursor="Abrir"
       className="toon-sm toon-press mt-6 inline-flex items-center gap-3 rounded-full bg-groovy px-6 py-3 font-medium text-acid-ink"
     >
@@ -442,7 +457,7 @@ export default function Mystery() {
             .to(q('[data-polaroid]'), { rotationY: 180, duration: 0.45, ease: 'power2.inOut' }, 1.65)
             .to(q('[data-dark]'), { opacity: 0, duration: 0.4 }, 1.7)
             .to(q('[data-stage="2"]'), { autoAlpha: 0, y: -30, duration: 0.3 }, 1.7)
-            .fromTo(q('[data-stage="3"]'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.3 }, 2.0)
+            .fromTo(q('[data-stage="3"]'), { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3 }, 2.0)
             .fromTo(q('[data-stamp]'), { opacity: 0, scale: 2.4 }, { opacity: 0.92, scale: 1, duration: 0.15, ease: 'power4.in' }, 2.1)
             .fromTo(q('[data-board]'), { x: 0 }, { x: 6, duration: 0.03, repeat: 3, yoyo: true }, 2.25)
             .to({}, { duration: 0.4 });
@@ -557,7 +572,9 @@ export default function Mystery() {
                 // centred by layout, not by -translate-y-1/2: GSAP tweens these stages' y, and its 0 replaced the
                 // -50% on some sizes (1440×900, 1024×768), leaving the last stage hanging from the middle with its
                 // "Abra o seu caso" button under the next section
-                className={`absolute inset-0 flex flex-col items-start justify-center ${i ? 'invisible opacity-0' : ''}`}
+                // the last stage hides with opacity only (not visibility), so its "Abra o seu caso" stays in the Tab order;
+                // focusing it plays the board through to that stage (CaseCta's onFocus)
+                className={`absolute inset-0 flex flex-col items-start justify-center ${i === 1 ? 'invisible opacity-0' : i === 2 ? 'opacity-0' : ''}`}
               >
                 <span className="label !text-teal">{copy[k].kicker}</span>
                 {i === 0 ? (
@@ -574,7 +591,7 @@ export default function Mystery() {
                   </p>
                 )}
                 <p className={`mt-4 max-w-md ${i === 2 ? 'serif text-2xl text-ink/80' : 'text-lg leading-relaxed text-ink/75'}`}>{copy[k].body}</p>
-                {i === 2 && <CaseCta />}
+                {i === 2 && <CaseCta playThrough />}
               </div>
             ))}
           </div>
