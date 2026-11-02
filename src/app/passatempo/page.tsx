@@ -105,9 +105,9 @@ export default function Passatempo() {
                         {p.name}
                       </p>
                       <p className="absolute inset-x-0 bottom-4 text-center font-mono text-xs tracking-[0.3em] text-paper uppercase">
-                        <span className="arcade-start motion-safe:animate-[blink_1.2s_steps(1,end)_infinite]">▸ press start</span>
+                        <span lang="en" className="arcade-start motion-safe:animate-[blink_1.2s_steps(1,end)_infinite]">▸ press start</span>
                         {/* shown instead on the cabinet this visitor opened last (LastPlayed) */}
-                        <span className="arcade-continue motion-safe:animate-[blink_1.2s_steps(1,end)_infinite]">▸ continue?</span>
+                        <span lang="en" className="arcade-continue motion-safe:animate-[blink_1.2s_steps(1,end)_infinite]">▸ continue?</span>
                       </p>
                       {/* CRT scanlines */}
                       <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,rgb(0_0_0/0.22)_0_1px,transparent_1px_3px)]" />

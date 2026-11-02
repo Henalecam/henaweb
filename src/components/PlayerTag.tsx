@@ -85,7 +85,7 @@ export default function PlayerTag() {
       {!ready ? null : saved ? (
         <div className="flex flex-col items-center gap-3">
           <p className="font-mono text-xs tracking-[0.3em] text-teal uppercase">Jogador da casa</p>
-          <p className="font-groovy text-[clamp(2.4rem,7vw,3.4rem)] leading-none text-acid [text-shadow:4px_4px_0_#140a26]">
+          <p lang="en" className="font-groovy text-[clamp(2.4rem,7vw,3.4rem)] leading-none text-acid [text-shadow:4px_4px_0_#140a26]">
             {fresh ? 'NEW PLAYER!' : `HI, ${saved}!`}
           </p>
           <p className="font-mono text-sm text-ink/70" role="status">
@@ -106,7 +106,9 @@ export default function PlayerTag() {
         </div>
       ) : (
         <form onSubmit={submit} className="flex flex-col items-center gap-4" aria-labelledby="player-tag-title">
-          <p id="player-tag-title" className="font-mono text-xs tracking-[0.3em] text-teal uppercase">
+          {/* the arcade's own words stay in English, marked as such (WCAG 3.1.2): a Portuguese voice read "Enter your
+              initials", the form's name, as if it were Portuguese */}
+          <p id="player-tag-title" lang="en" className="font-mono text-xs tracking-[0.3em] text-teal uppercase">
             Enter your initials
           </p>
           <div className="flex gap-3" role="group" aria-describedby="player-tag-hint">
