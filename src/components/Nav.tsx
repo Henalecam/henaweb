@@ -1,33 +1,66 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { nav } from '@/lib/site';
-import { gsap, onReady } from '@/lib/gsap';
+import { onReady, prefersReducedMotion } from '@/lib/motion';
+import { curtainSwipe } from '@/lib/curtainSwipe';
 import Magnetic from './Magnetic';
 import Social from './Social';
 
-// the search only downloads (with its index of cases, services and FAQ) the first time it opens
-const CommandPalette = dynamic(() => import('./CommandPalette'), { ssr: false });
-const ShortcutsHelp = dynamic(() => import('./ShortcutsHelp'), { ssr: false });
+// the search (with its index of cases, services and FAQ) and the shortcuts help download the first time
+// they open, with a plain import() rather than next/dynamic: a lazy component suspends, and React holds a
+// revealed Suspense boundary back ~300 ms, so the first ⌘K took ~345 ms to appear (now ~75 ms)
+type PaletteType = typeof import('./CommandPalette').default;
+let paletteModule: Promise<PaletteType> | null = null;
+// a failed download (offline, a flaky connection) is forgotten instead of cached, so the next press tries again
+const loadPalette = () =>
+  (paletteModule ??= import('./CommandPalette').then(
+    (m) => m.default,
+    (e) => {
+      paletteModule = null;
+      throw e;
+    },
+  ));
+type HelpType = typeof import('./ShortcutsHelp').default;
+let helpModule: Promise<HelpType> | null = null;
+const loadHelp = () =>
+  (helpModule ??= import('./ShortcutsHelp').then(
+    (m) => m.default,
+    (e) => {
+      helpModule = null;
+      throw e;
+    },
+  ));
+
+// intent to search (pointing at or focusing the search button, holding ⌘/Ctrl before K) starts the ~30 KB
+// download early, so the first open doesn't wait on the network; a failure is simply forgotten (loadPalette)
+const warmPalette = () => void loadPalette().catch(() => {});
 
 export default function Nav() {
   const inner = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const [stillNote, setStillNote] = useState('');
+  // after a lone "g", a little window lists where the next key goes (it closes with that key, or after a second)
+  const [goHint, setGoHint] = useState(0);
   const toggleBtn = useRef<HTMLButtonElement>(null);
+  // the phone curtain also closes with an upward swipe (stable across renders: it only calls setOpen)
+  const [swipe] = useState(() => curtainSwipe(() => { setOpen(false); toggleBtn.current?.focus({ preventScroll: true }); }));
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   // which nav section the reader is in (home only); on /casos pages the "Casos" entry stays lit
   const [active, setActive] = useState<string | null>(null);
   const [search, setSearch] = useState(false);
-  const [searchLoaded, setSearchLoaded] = useState(false);
+  const [CommandPalette, setCommandPalette] = useState<PaletteType | null>(null);
   const [help, setHelp] = useState(false);
+  const [ShortcutsHelp, setShortcutsHelp] = useState<HelpType | null>(null);
   const [mac, setMac] = useState(true);
   // "?pista=…" (browser site search, app shortcut) opens the search already filled in
   const [initialQuery, setInitialQuery] = useState('');
 
-  const openSearch = () => {
-    setSearchLoaded(true);
+  // q: the search box opens already filled in (a ?pista= link, a capability tag); plain opens start empty
+  const openSearch = (q = '') => {
+    setInitialQuery(q);
+    loadPalette().then((C) => setCommandPalette(() => C), () => {});
     setOpen(false);
     setSearch(true);
   };
@@ -37,37 +70,84 @@ export default function Nav() {
     const url = new URL(location.href);
     const pista = url.searchParams.get('pista');
     if (pista !== null) {
-      setInitialQuery(pista.slice(0, 80));
-      openSearch();
+      openSearch(pista.slice(0, 80));
       url.searchParams.delete('pista');
       history.replaceState(history.state, '', url.pathname + url.search + url.hash);
     }
+    // "g" then a letter jumps somewhere, like a mail client's go-to keys: g h home, g c cases, g j games,
+    // g o contact (open a case). The second key must come within a second; anything else cancels.
+    const GO: Record<string, string> = { h: '/', c: '/casos', j: '/passatempo', o: '/#contato' };
+    let goAt = 0;
     // ⌘K / Ctrl+K anywhere, or "/" when not typing in a field
     const onKey = (e: KeyboardEvent) => {
       const typing = (e.target as HTMLElement | null)?.closest?.('input, textarea, select, [contenteditable="true"]');
+      if (!typing && !e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.repeat && !document.querySelector('dialog[open]')) {
+        const k = e.key.toLowerCase();
+        if (goAt && e.timeStamp - goAt < 1000 && GO[k]) {
+          goAt = 0;
+          e.preventDefault();
+          setGoHint(0);
+          location.href = GO[k];
+          return;
+        }
+        goAt = k === 'g' ? e.timeStamp : 0;
+        setGoHint(k === 'g' ? e.timeStamp : 0);
+        // p pauses (and resumes) the scrolling tapes and the client logos: a pointer stops them by hovering and a
+        // finger by tapping, but the keyboard had no way to (WCAG 2.2.2); globals.css holds them on html[data-still]
+        if (k === 'p') {
+          e.preventDefault();
+          const still = document.documentElement.toggleAttribute('data-still');
+          setStillNote(still ? 'Faixas animadas pausadas. P retoma.' : 'Faixas animadas retomadas.');
+        }
+        // the case archive (/casos): j / k step through the case files on screen, Enter opens one
+        if (k === 'j' || k === 'k') {
+          const links = [...document.querySelectorAll<HTMLAnchorElement>('li[data-case-slug]:not([hidden]) > a')].filter((a) => a.offsetParent);
+          if (links.length) {
+            e.preventDefault();
+            const at = links.indexOf(document.activeElement as HTMLAnchorElement);
+            const to = links[at < 0 ? (k === 'j' ? 0 : links.length - 1) : Math.min(links.length - 1, Math.max(0, at + (k === 'j' ? 1 : -1)))];
+            to.focus({ preventScroll: true });
+            to.scrollIntoView({ block: 'center', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+          }
+        }
+      }
+      if (e.key === 'Meta' || e.key === 'Control') warmPalette();
       if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         openSearch();
       } else if (e.key === '/' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) {
         e.preventDefault();
-        openSearch();      } else if (e.key === '?' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey && !document.querySelector('dialog[open]')) {
+        openSearch();
+      } else if (e.key === '?' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey && !document.querySelector('dialog[open]')) {
         e.preventDefault();
         setOpen(false);
-        setHelp(true);
+        loadHelp().then(
+          (C) => {
+            setShortcutsHelp(() => C);
+            setHelp(true);
+          },
+          () => {},
+        );
       }
     };
     window.addEventListener('keydown', onKey);
-    // other components (the 404 page) can open the search with this event
-    window.addEventListener('hena:search', openSearch);
+    // other components (the 404 page, the capability tags) can open the search with this event,
+    // optionally carrying the words to search for in its detail
+    const onSearchEvent = (e: Event) => openSearch(typeof (e as CustomEvent).detail === 'string' ? (e as CustomEvent<string>).detail.slice(0, 80) : '');
+    window.addEventListener('hena:search', onSearchEvent);
     return () => {
       window.removeEventListener('keydown', onKey);
-      window.removeEventListener('hena:search', openSearch);
+      window.removeEventListener('hena:search', onSearchEvent);
     };
   }, []);
 
   useEffect(() => {
     if (window.location.pathname.startsWith('/casos')) {
       setActive('/#projetos');
+      return;
+    }
+    if (window.location.pathname.startsWith('/passatempo')) {
+      setActive('/passatempo');
       return;
     }
     if (window.location.pathname !== '/') return;
@@ -109,9 +189,18 @@ export default function Nav() {
       last = y;
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    const off = onReady(() =>
-      gsap.from(inner.current, { yPercent: -120, duration: 1.1, ease: 'expo.out', delay: 0.5 }),
-    );
+    // reduced motion: the bar is simply there instead of sliding down
+    const off = prefersReducedMotion()
+      ? () => {}
+      : onReady(() =>
+          // slides down from above the screen (WAAPI; was a GSAP tween, the same timing and expo.out curve)
+          inner.current?.animate([{ transform: 'translateY(-120%)' }, { transform: 'none' }], {
+            duration: 1100,
+            delay: 500,
+            easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            fill: 'backwards',
+          }),
+        );
     return () => {
       off();
       window.removeEventListener('scroll', onScroll);
@@ -124,6 +213,7 @@ export default function Nav() {
     if (open) document.documentElement.dataset.menu = 'open';
     else delete document.documentElement.dataset.menu;
     if (!open) return;
+    warmPalette(); // the open menu offers "Procurar pista"
     // Esc closes the menu and hands focus back to the toggle
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
@@ -147,10 +237,18 @@ export default function Nav() {
           }`}
         />
         <div ref={inner} className="flex h-20 items-center justify-between">
-          <a href="/#topo" className="font-groovy flex items-baseline gap-1 text-2xl text-acid [text-shadow:3px_3px_0_#120626]" aria-label="HenaWeb, início">
-            HenaWeb<span className="text-[0.6rem] align-super">®</span>
+          <a href="/#topo" data-logo className="font-groovy flex items-baseline gap-1 text-2xl text-acid [text-shadow:3px_3px_0_#120626]" aria-label="HenaWeb, início">
+            {/* pointing at the logo sends a little hop through its letters, left to right (globals.css, logo-hop) */}
+            <span className="whitespace-nowrap">
+              {'HenaWeb'.split('').map((ch, i) => (
+                <span key={i} data-logo-letter style={{ '--i': i } as CSSProperties}>
+                  {ch}
+                </span>
+              ))}
+            </span>
+            <span className="text-[0.6rem] align-super">®</span>
           </a>
-          <nav className="hidden items-center gap-6 lg:flex xl:gap-8" aria-label="Principal">
+          <nav className="hidden items-center gap-5 lg:flex xl:gap-8" aria-label="Principal">
             {nav.map((item) => (
               <a
                 key={item.href}
@@ -161,22 +259,39 @@ export default function Nav() {
                 {item.label}
                 <span
                   className={`absolute -bottom-1 left-0 h-px w-full bg-current transition-transform duration-500 ease-[var(--ease-out-expo)] ${
-                    active === item.href ? 'origin-left scale-x-100' : 'origin-right scale-x-0 group-hover:origin-left group-hover:scale-x-100'
+                    active === item.href ? 'origin-left scale-x-100' : 'origin-right scale-x-0 group-hover:origin-left group-focus-visible:origin-left group-hover:scale-x-100 group-focus-visible:scale-x-100'
                   }`}
                 />
               </a>
             ))}
+            {/* the side projects get their own door, set apart from the studio's sections: a small arcade token */}
+            <a
+              href="/passatempo"
+              aria-current={active === '/passatempo' ? 'page' : undefined}
+              className={`inline-flex items-center gap-1.5 rounded-full border-2 px-2.5 py-1 text-sm whitespace-nowrap xl:px-3 transition-colors duration-300 ${
+                active === '/passatempo'
+                  ? 'border-acid bg-acid text-acid-ink'
+                  : 'border-acid/60 text-acid hover:border-acid hover:bg-acid hover:text-acid-ink focus-visible:bg-acid focus-visible:text-acid-ink'
+              }`}
+            >
+              <span aria-hidden>🕹</span>
+              Passa tempo
+            </a>
           </nav>
           <div className="ml-auto mr-4 hidden items-center gap-4 md:flex lg:mr-0 lg:ml-0">
             <button
               type="button"
-              onClick={openSearch}
+              onClick={() => openSearch()}
+              onPointerEnter={warmPalette}
+              onFocus={warmPalette}
               aria-label="Buscar no site"
               aria-keyshortcuts="Meta+K Control+K /"
               className="hidden items-center gap-2 rounded-full border border-line px-3 py-2 font-mono text-xs whitespace-nowrap xl:flex text-ink/70 transition-colors hover:border-acid hover:text-acid"
             >
               <span aria-hidden>🔎</span>
-              <kbd className="font-mono">{mac ? '⌘K' : 'Ctrl K'}</kbd>
+              {/* fixed 6ch: the server renders "⌘K" and Windows/Linux swap in the wider "Ctrl K" after hydration,
+                  which used to push the whole menu sideways (layout shift 0.039 on desktop) */}
+              <kbd className="inline-block w-[6ch] text-center font-mono">{mac ? '⌘K' : 'Ctrl K'}</kbd>
             </button>
             <Magnetic>
               <a
@@ -184,7 +299,7 @@ export default function Nav() {
                 className="toon-sm toon-press flex items-center gap-2 rounded-full bg-acid px-5 py-2.5 text-sm font-medium text-acid-ink"
               >
                 <span className="h-1.5 w-1.5 animate-[blink_1.4s_infinite] rounded-full bg-acid-ink" />
-                Iniciar projeto
+                Abrir um caso
               </a>
             </Magnetic>
           </div>
@@ -206,21 +321,49 @@ export default function Nav() {
       <div
         id="menu-mobile"
         inert={!open}
-        className={`gutter fixed inset-0 z-40 flex flex-col justify-end bg-bg pb-10 transition-[clip-path] duration-700 ease-[var(--ease-out-expo)] lg:hidden ${
+        // on a short screen (a 375×667 phone under the browser's bars, any phone held sideways) seven 2.25rem links
+        // and the footer row are taller than the window: pinned to the bottom with justify-end, the first ones sat
+        // above the screen, out of reach. Now the list still rests at the bottom (mt-auto) but starts below the
+        // header and the curtain scrolls on its own (data-lenis-prevent: the smooth scroller leaves it alone)
+        data-lenis-prevent
+        {...swipe}
+        className={`gutter fixed inset-0 z-40 flex flex-col overflow-y-auto overscroll-contain bg-bg pt-24 pb-10 transition-[clip-path] duration-700 ease-[var(--ease-out-expo)] lg:hidden ${
           open ? '[clip-path:inset(0_0_0_0)]' : 'pointer-events-none [clip-path:inset(0_0_100%_0)]'
         }`}
       >
-        <nav className="flex flex-col gap-2" aria-label="Menu mobile">
-          {[...nav, { label: 'Contato', href: '/#contato' }].map((item, i) => (
+        {/* the curtain is a little sunset of its own: a striped sun rises behind the links as it drops and the neon
+            floor glows at the bottom, faint enough to keep the links the thing you read. Decorative */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div
+            data-menu-sun
+            className={`sun absolute -top-[4%] -right-[18%] w-[min(70vw,340px)] opacity-25 transition-[translate,opacity] delay-150 duration-[1100ms] ease-[var(--ease-out-expo)] ${
+              open ? 'translate-y-0' : 'translate-y-[45%] !opacity-0'
+            }`}
+          />
+          <div className="grid-floor !h-[30%] opacity-30" />
+        </div>
+        <nav className="relative mt-auto flex flex-col gap-2 [@media(max-height:640px)]:gap-0" aria-label="Menu mobile">
+          {[...nav, { label: 'Contato', href: '/#contato' }, { label: 'Passa tempo', href: '/passatempo' }].map((item, i) => (
             <a
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
               aria-current={active === item.href ? 'location' : undefined}
-              className={`flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight ${active === item.href ? 'text-acid' : ''}`}
+              // the links rise into place one after another behind the curtain wipe (closing: all at once)
+              style={{ transitionDelay: open ? `${180 + i * 55}ms` : '0ms' }}
+              className={`flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight [@media(max-height:640px)]:py-2 [@media(max-height:640px)]:text-3xl transition-[translate,opacity] duration-500 ease-[var(--ease-out-expo)] ${
+                open ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+              } ${active === item.href ? 'text-acid' : ''}`}
             >
               <span className="label">0{i + 1}</span>
               {item.label}
+              {/* the side projects stand apart from the studio's sections with their own tag, not with the
+                  orange that marks the page you're on (two orange items read as two "you are here") */}
+              {item.href === '/passatempo' && active !== item.href && (
+                <span className="ml-auto shrink-0 self-center rounded-full border-2 border-acid/70 px-2 py-0.5 font-mono text-xs whitespace-nowrap text-acid" aria-hidden>
+                  🕹 jogos
+                </span>
+              )}
               {active === item.href && (
                 <span className="label ml-auto shrink-0 self-center whitespace-nowrap !text-acid" aria-hidden>
                   ● aqui
@@ -229,15 +372,24 @@ export default function Nav() {
             </a>
           ))}
         </nav>
-        <div className="mt-8 flex items-center justify-between">
-          <button type="button" onClick={openSearch} className="label flex min-h-11 items-center gap-2 !text-ink">
+        <div className="relative mt-8 flex items-center justify-between">
+          <button type="button" onClick={() => openSearch()} onPointerDown={warmPalette} onFocus={warmPalette} className="label flex min-h-11 items-center gap-2 !text-ink">
             <span aria-hidden>🔎</span> Procurar pista
           </button>
           <Social />
         </div>
+        {/* phones: a grabber at the foot of the curtain says it can be pushed back up (curtainSwipe) */}
+        <span aria-hidden className="curtain-grab relative mx-auto mt-6 hidden flex-col items-center gap-1 font-mono text-[0.65rem] tracking-[0.2em] text-ink/55 uppercase">
+          <span className="h-1 w-10 rounded-full bg-ink/35" />
+          arraste para cima para fechar
+        </span>
       </div>
-      {help && <ShortcutsHelp open={help} onClose={() => setHelp(false)} />}
-      {searchLoaded && <CommandPalette
+      <p className="sr-only" aria-live="polite">
+        {stillNote}
+      </p>
+      {goHint > 0 && <GoHint key={goHint} onDone={() => setGoHint(0)} />}
+      {help && ShortcutsHelp && <ShortcutsHelp open={help} onClose={() => setHelp(false)} />}
+      {CommandPalette && <CommandPalette
           open={search}
           initialQuery={initialQuery}
           onClose={() => {
@@ -246,5 +398,41 @@ export default function Nav() {
           }}
         />}
     </>
+  );
+}
+
+
+const GO_KEYS: [string, string][] = [
+  ['H', 'início'],
+  ['C', 'casos'],
+  ['J', 'jogos'],
+  ['O', 'abrir um caso'],
+];
+
+/** "Ir para…": the keys that may follow a "g", shown for the one second they work, like a which-key popup. */
+function GoHint({ onDone }: { onDone: () => void }) {
+  // the latest callback, without restarting the second each time the nav re-renders
+  const done = useRef(onDone);
+  done.current = onDone;
+  useEffect(() => {
+    const t = window.setTimeout(() => done.current(), 1000);
+    return () => window.clearTimeout(t);
+  }, []);
+  return (
+    <div role="status" data-go-hint className="win pointer-events-none fixed bottom-6 left-1/2 z-[85] w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 text-acid-ink">
+      <div className="win-bar">
+        <span>ir_para.exe</span>
+      </div>
+      <p className="m-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 bg-paper px-3 py-2 font-mono text-xs">
+        <span className="sr-only">Ir para: </span>
+        {GO_KEYS.map(([k, label]) => (
+          <span key={k} className="flex items-center gap-1.5">
+            <kbd className="min-w-6 rounded border-2 border-b-4 border-acid-ink bg-white px-1 text-center">{k}</kbd>
+            {label}
+          </span>
+        ))}
+        <span aria-hidden data-go-fuse className="go-fuse basis-full" />
+      </p>
+    </div>
   );
 }

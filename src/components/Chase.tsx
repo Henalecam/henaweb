@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
+import { useEffect, useRef, useState } from 'react';
 import type { ChaseScene } from '@/lib/chaseScene';
+import { saveData } from '@/lib/saveData';
 
 
 /** One tile of roadside scenery; two copies side by side loop seamlessly. */
@@ -23,14 +23,36 @@ function Trees() {
   );
 }
 
+/** A fixed scatter of stars (seeded, so server and browser draw the same sky), kept clear of the moon's corner. */
+const STARS = (() => {
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+  const out: { x: number; y: number; r: number; d: number; t: number }[] = [];
+  while (out.length < 26) {
+    const x = Math.round(rnd() * 960) / 10;
+    const y = Math.round(rnd() * 900) / 10;
+    if (x > 66 && y < 80) continue;
+    out.push({ x, y, r: rnd() < 0.2 ? 3 : 2, d: Math.round(rnd() * 40) / 10, t: 2.5 + Math.round(rnd() * 30) / 10 });
+  }
+  return out;
+})();
+
 export default function Chase() {
   const root = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
+  // easter egg: clicking the moon walks it through its phases (full → gibbous → crescent → new-ish → full)
+  const [phase, setPhase] = useState(0);
+  // no 3D van (data saver, no WebGL): its "VRUUUM!" would be shouting from an empty road
+  const [noVan, setNoVan] = useState(false);
 
   // the 3D chase loads only when the footer gets close
   useEffect(() => {
     const el = canvas.current;
     if (!el) return;
+    if (saveData()) {
+      setNoVan(true);
+      return;
+    }
     let scene: ChaseScene | null = null;
     let cancelled = false;
     const io = new IntersectionObserver(
@@ -40,11 +62,12 @@ export default function Chase() {
         import('@/lib/chaseScene').then(({ createChaseScene }) => {
           if (cancelled) return;
           try {
-            scene = createChaseScene(el, { reducedMotion: prefersReducedMotion() });
+            scene = createChaseScene(el, { reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches });
           } catch {
             // no WebGL: the night backdrop stays
+            setNoVan(true);
           }
-        });
+        }, () => !cancelled && setNoVan(true)); // the 3D code didn't download (offline): the night backdrop stays
       },
       { rootMargin: '500px 0px' },
     );
@@ -56,23 +79,86 @@ export default function Chase() {
     };
   }, []);
 
-  useGSAP(
-    () => {
-      if (prefersReducedMotion()) return;
-      gsap.fromTo('[data-layer="trees"]', { xPercent: 0 }, { xPercent: -50, duration: 22, ease: 'none', repeat: -1 });
-      gsap.to('[data-window]', { opacity: 0.25, duration: 0.08, repeat: -1, yoyo: true, repeatDelay: 2.4, ease: 'none' });
-      gsap.fromTo('[data-vruum]', { scale: 0.9, rotate: 4 }, { scale: 1.06, rotate: 8, duration: 0.5, repeat: -1, yoyo: true, ease: 'sine.inOut' });
-    },
-    { scope: root },
-  );
+  // the loops only run while the chase is on screen: the footer sits on every page, and these used to tick every
+  // frame (a style recalc per frame) from the first paint, footer far below. Plain WAAPI (it was GSAP, which this
+  // footer, on every page, no longer needs for three loops): the same timings, played and paused by an observer
+  useEffect(() => {
+    const el = root.current;
+    if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const all = <T extends Element>(sel: string) => [...el.querySelectorAll<T>(sel)];
+    const loops: Animation[] = [
+      ...all<HTMLElement>('[data-layer="trees"]').map((t) =>
+        t.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-50%)' }], { duration: 22000, iterations: Infinity }),
+      ),
+      // a flicker: dims in 80 ms, holds 2.4 s, comes back in 80 ms, holds 2.4 s (GSAP's yoyo + repeatDelay)
+      ...all<SVGElement>('[data-window]').map((w) =>
+        w.animate(
+          [
+            { opacity: 1, offset: 0 },
+            { opacity: 0.25, offset: 0.08 / 4.96 },
+            { opacity: 0.25, offset: 2.48 / 4.96 },
+            { opacity: 1, offset: 2.56 / 4.96 },
+            { opacity: 1, offset: 1 },
+          ],
+          { duration: 4960, iterations: Infinity },
+        ),
+      ),
+      ...all<HTMLElement>('[data-vruum]').map((v) =>
+        v.animate([{ transform: 'scale(0.9) rotate(4deg)' }, { transform: 'scale(1.06) rotate(8deg)' }], {
+          duration: 500,
+          iterations: Infinity,
+          direction: 'alternate',
+          easing: 'cubic-bezier(0.37, 0, 0.63, 1)', // sine.inOut
+        }),
+      ),
+    ];
+    loops.forEach((t) => t.pause());
+    const io = new IntersectionObserver(([e]) => loops.forEach((t) => (e.isIntersecting ? t.play() : t.pause())));
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      loops.forEach((t) => t.cancel());
+    };
+  }, []);
 
   return (
     <div ref={root} className="relative h-[clamp(340px,42vw,520px)] overflow-hidden" aria-hidden>
       {/* night sky with a big moon */}
       <div className="absolute inset-0 bg-[linear-gradient(180deg,#140c2e_0%,#2b1a58_60%,#3a2a6e_100%)]" />
-      <div className="absolute top-[7%] right-[10%] aspect-square w-[clamp(80px,12vw,170px)] rounded-full bg-[#f9e27d] shadow-[0_0_80px_rgb(249_226_125/0.5)]">
-        <span className="absolute top-[24%] left-[22%] h-[18%] w-[18%] rounded-full bg-[#e9c95a]" />
-        <span className="absolute top-[52%] left-[54%] h-[24%] w-[24%] rounded-full bg-[#e9c95a]" />
+      {/* stars come out as the moon wanes; one shoots across now and then */}
+      <div data-stars className="absolute inset-x-0 top-0 h-[58%] transition-opacity duration-700" style={{ opacity: [0.7, 0.8, 0.9, 1][phase] }}>
+        {STARS.map((s, i) => (
+          <span
+            key={i}
+            data-star
+            className="absolute rounded-full bg-[#fff6d6]"
+            style={{ left: `${s.x}%`, top: `${s.y}%`, width: s.r, height: s.r, animationDelay: `${s.d}s`, animationDuration: `${s.t}s` }}
+          />
+        ))}
+        <span data-shooting-star className="absolute top-[12%] left-[30%] h-px w-[clamp(60px,9vw,120px)]" />
+      </div>
+      {/* above the 3D canvas so it can be clicked; pointer-only and decorative (the whole scene is aria-hidden) */}
+      <div
+        data-moon={phase}
+        onClick={() => {
+          const next = (phase + 1) % 4;
+          setPhase(next);
+          // the new moon puts the lights out (flashlight mode, TabHaunt); the full moon brings them back
+          if (next === 3) window.dispatchEvent(new CustomEvent('hena:lanterna', { detail: true }));
+          if (next === 0) window.dispatchEvent(new CustomEvent('hena:lanterna', { detail: false }));
+        }}
+        className="absolute top-[7%] right-[10%] z-[5] aspect-square w-[clamp(80px,12vw,170px)] cursor-pointer rounded-full bg-[#f9e27d] transition-shadow duration-700"
+        style={{ boxShadow: `0 0 80px rgb(249 226 125 / ${[0.5, 0.36, 0.22, 0.08][phase]})` }}
+      >
+        <span className="absolute inset-0 overflow-hidden rounded-full">
+          <span className="absolute top-[24%] left-[22%] h-[18%] w-[18%] rounded-full bg-[#e9c95a]" />
+          <span className="absolute top-[52%] left-[54%] h-[24%] w-[24%] rounded-full bg-[#e9c95a]" />
+          {/* the earth's shadow slides across from the left */}
+          <span
+            className="absolute inset-0 rounded-full bg-[#160d33] transition-transform duration-700 ease-[var(--ease-out-expo)]"
+            style={{ transform: `translateX(${[-105, -62, -30, -8][phase]}%)` }}
+          />
+        </span>
       </div>
 
       {/* haunted mansion on the hill */}
@@ -100,12 +186,12 @@ export default function Chase() {
       {/* the 3D chase */}
       <canvas ref={canvas} className="absolute inset-0 h-full w-full" />
 
-      <span
+      {!noVan && <span
         data-vruum
-        className="toon-sm font-groovy absolute top-[16%] right-[18%] z-10 rounded-full bg-lemon px-4 py-1 text-base text-acid-ink md:top-[20%] md:right-[22%] md:text-2xl"
+        className="toon-sm font-groovy pointer-events-none absolute top-[16%] right-[18%] z-10 rounded-full bg-lemon px-4 py-1 text-base text-acid-ink md:top-[20%] md:right-[22%] md:text-2xl"
       >
         VRUUUM!
-      </span>
+      </span>}
     </div>
   );
 }

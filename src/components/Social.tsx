@@ -4,8 +4,8 @@ const icons: Record<string, React.ReactNode> = {
   Instagram: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       <rect x="3" y="3" width="18" height="18" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+      <circle data-lens cx="12" cy="12" r="4" />
+      <circle data-flash cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
     </svg>
   ),
   LinkedIn: (
@@ -20,7 +20,12 @@ const icons: Record<string, React.ReactNode> = {
   ),
 };
 
-/** Round cartoon buttons for the studio's social profiles (all @henaweb). */
+/**
+ * Round cartoon buttons for the studio's social profiles (all @henaweb). Each icon has its own little act on
+ * hover / keyboard focus: the camera's lens focuses and its flash fires, "in" hops, the cat-octopus waves;
+ * and for keyboard focus a tag above names the network and the handle (the mouse already gets the custom
+ * cursor's label). Motion-safe only, see globals.css.
+ */
 export default function Social({ className = '', tone = 'dark' }: { className?: string; tone?: 'dark' | 'light' }) {
   const color = tone === 'dark' ? 'bg-paper text-acid-ink hover:bg-acid' : 'bg-acid-ink text-paper hover:bg-paper hover:text-acid-ink';
   return (
@@ -31,11 +36,19 @@ export default function Social({ className = '', tone = 'dark' }: { className?: 
             href={s.href}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`${s.name} @henaweb`}
+            aria-label={`${s.name} @henaweb (abre em nova aba)`}
             data-cursor={s.name}
-            className={`toon-sm toon-press flex h-11 w-11 items-center justify-center rounded-full transition-colors ${color}`}
+            data-social={s.name.toLowerCase()}
+            className={`group/soc toon-sm toon-press relative flex h-11 w-11 items-center justify-center rounded-full transition-colors ${color}`}
           >
-            <span className="h-5 w-5">{icons[s.name]}</span>
+            <span data-social-icon className="h-5 w-5">{icons[s.name]}</span>
+            <span
+              aria-hidden
+              data-social-tag
+              className="pointer-events-none absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 rounded-md bg-acid-ink px-2 py-1 font-mono text-[0.65rem] whitespace-nowrap text-paper shadow-[2px_2px_0_#f7931e]"
+            >
+              {s.name} · @henaweb
+            </span>
           </a>
         </li>
       ))}

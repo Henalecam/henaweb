@@ -2,15 +2,26 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { services, serviceBySlug } from '@/lib/services';
-import { projects, site, whatsappLink } from '@/lib/content';
+import { capabilities, projects, site, whatsappLink } from '@/lib/content';
 import ClosingCta from '@/components/ClosingCta';
 import Footer from '@/components/Footer';
-import { FaqCopyLink, FaqHashOpener } from '@/components/FaqLink';
+import { FaqCopyLink, FaqHashOpener, FaqToggleAll } from '@/components/FaqLink';
+import FaqAsk from '@/components/FaqAsk';
 import { faqId } from '@/lib/slug';
 import SectionLink from '@/components/SectionLink';
 import ServiceSymptoms from '@/components/ServiceSymptoms';
 import ShareCase from '@/components/ShareCase';
+import PrintDossier from '@/components/PrintDossier';
+import PhoneQR from '@/components/PhoneQR';
+import TocSeen from '@/components/TocSeen';
+import StackChip from '@/components/StackChip';
 import MockUI from '@/components/MockUI';
+import CaseKeys from '@/components/CaseKeys';
+import { stepTransitionScript } from '@/lib/stepTransition';
+import { caseMorphScript } from '@/lib/caseMorph';
+import NewTab from '@/components/NewTab';
+import Deliverables from '@/components/Deliverables';
+import { blurProps } from '@/lib/shotBlur';
 
 export const dynamicParams = false;
 
@@ -45,6 +56,8 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
   const s = serviceBySlug(slug);
   if (!s) notFound();
   const url = `${site.url}/servicos/${s.slug}`;
+  const caseCount = projects.filter((p) => p.service === s.slug).length;
+  const numeral = capabilities.find((c) => c.slug === s.slug)?.id;
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -75,21 +88,42 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
     ],
   };
 
-  const others = services.filter((o) => o.slug !== s.slug);
+  // the other services, in catalogue order starting right after this one: the first card is the
+  // "next" folder and the last the "previous", which is where ← / → (and a swipe) take you
+  const at = services.findIndex((o) => o.slug === s.slug);
+  const others = services.map((_, k) => services[(at + 1 + k) % services.length]).filter((o) => o.slug !== s.slug);
+  const nextSvc = others[0];
+  const prevSvc = others[others.length - 1];
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {/* service → next/previous service (←/→, the folder cards): the swap slides the way the reader is walking */}
+      <script dangerouslySetInnerHTML={{ __html: stepTransitionScript('servicos', services.map((o) => o.slug)) }} />
+      {/* opening an example's folder tab morphs it into the case page's window, and back (caseMorphScript) */}
+      <script dangerouslySetInnerHTML={{ __html: caseMorphScript }} />
       <main id="conteudo" tabIndex={-1} className="sky min-h-screen text-ink">
-        <article className="gutter mx-auto max-w-6xl pt-36 pb-24">
+        <article className="gutter relative isolate mx-auto max-w-6xl pt-36 pb-24">
+          {/* the service's numeral from the home's Capacidades list (I–IV), carved huge and hollow behind the title:
+              the page reads as chapter N of the same book. Decorative; off on phones and on paper */}
+          {numeral && (
+            <span
+              aria-hidden
+              data-service-numeral
+              className="font-groovy pointer-events-none absolute top-24 right-[clamp(1rem,4vw,3.5rem)] -z-10 hidden text-[clamp(10rem,22vw,20rem)] leading-none text-transparent select-none [-webkit-text-stroke:2px_rgb(247_147_30/0.35)] md:block print:hidden"
+            >
+              {numeral}
+            </span>
+          )}
           <nav aria-label="Trilha" className="label">
-            <ol className="flex flex-wrap gap-2">
+            {/* links padded to a 27px-tall target (WCAG 2.5.8) without changing the line height */}
+            <ol className="flex flex-wrap items-center gap-2">
               <li>
-                <a href="/" className="hover:text-ink">Início</a>
+                <a href="/" className="-my-1.5 inline-block py-1.5 hover:text-ink">Início</a>
               </li>
               <li aria-hidden>·</li>
               <li>
-                <a href="/#capacidades" className="hover:text-ink">Serviços</a>
+                <a href="/#capacidades" className="-my-1.5 inline-block py-1.5 hover:text-ink">Serviços</a>
               </li>
               <li aria-hidden>·</li>
               <li aria-current="page" className="text-ink">{s.name}</li>
@@ -101,52 +135,82 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             <span className="font-groovy text-[0.85em] tracking-normal text-acid [text-shadow:4px_4px_0_#140a26]">{s.h1Accent}</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink/75 md:text-xl">{s.intro}</p>
-          <div className="mt-10 flex flex-wrap gap-3">
+          {/* proof above the fold: the solved cases behind this service were only linked at the end of "Exemplos" */}
+          {caseCount > 0 && (
+            <a
+              href={`/casos?servico=${s.slug}`}
+              className="mt-5 inline-flex min-h-8 items-baseline gap-2 py-1 font-mono text-sm text-ink/80 underline decoration-acid decoration-2 underline-offset-4 hover:text-ink hover:decoration-4"
+            >
+              <span aria-hidden className="text-acid">✓</span>
+              {caseCount === 1 ? '1 caso resolvido' : `${caseCount} casos resolvidos`} neste serviço, no arquivo{'\u00a0'}→
+            </a>
+          )}
+          <div className="mt-10 flex flex-wrap gap-3" data-print-hide>
             <a href="/#contato" className="toon toon-press rounded-full bg-acid px-6 py-4 font-medium text-acid-ink">
               Abrir um caso →
             </a>
             <a
-              href={whatsappLink(`Olá! Quero conversar sobre ${s.name.toLowerCase()} com a HenaWeb.`)}
+              href={whatsappLink(`Olá! Quero conversar sobre ${s.name} com a HenaWeb.`)}
               target="_blank"
               rel="noopener noreferrer"
               className="toon toon-press rounded-full bg-cyan px-6 py-4 font-medium text-acid-ink"
             >
               WhatsApp
+              <NewTab />
             </a>
             <ShareCase title={`${s.name} · HenaWeb`} text={s.intro} label="Enviar para alguém ↗" placement="service-share" />
           </div>
+          <div className="mt-5 flex flex-wrap items-center gap-x-6 print:block [&>button]:mt-0">
+            <PrintDossier placement="service-pdf" />
+            <PhoneQR kind="servicos" slug={s.slug} name={s.name} />
+          </div>
+
+          {/* long page on a phone: a table of contents with the section count, jumping to the same ids SectionLink copies */}
+          <nav aria-label="Nesta página" className="mt-12 font-mono text-xs" data-print-hide>
+            <span className="label mr-3">Nesta página</span>
+            <ol className="mt-3 flex flex-wrap gap-2">
+              {[
+                { id: 'sintomas', label: 'Sintomas', n: s.problems.length },
+                { id: 'entregas', label: 'O que você recebe', n: s.deliverables.length },
+                { id: 'exemplos', label: 'Exemplos', n: s.examples.length },
+                { id: 'perguntas', label: 'Perguntas', n: s.faq.length },
+              ].map((t, i) => (
+                <li key={t.id}>
+                  <a
+                    href={`#${t.id}`}
+                    className="group inline-flex min-h-9 items-center gap-2 rounded-full border-2 border-ink/25 px-3 text-ink/80 transition-colors hover:border-acid hover:text-ink data-seen:border-acid/60"
+                  >
+                    {/* the number turns into a ✓ once the section has been read (TocSeen); same width, nothing moves */}
+                    <span className="text-acid group-data-seen:hidden">{String(i + 1).padStart(2, '0')}</span>
+                    <span aria-hidden className="hidden w-[2ch] text-center text-acid group-data-seen:inline">✓</span>
+                    {t.label}
+                    <span className="text-ink/60">({t.n})</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+            <TocSeen nav="Nesta página" />
+          </nav>
 
           <section className="group relative mt-24" aria-labelledby="sintomas">
-            <h2 id="sintomas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-groovy [text-shadow:3px_3px_0_#140a26]">
-              Sintomas que resolvemos
+            <h2 id="sintomas" className="font-groovy pr-28 text-[clamp(1.8rem,3.5vw,3rem)] md:pr-0 text-groovy [text-shadow:3px_3px_0_#140a26]">
+              <span data-mark>Sintomas que resolvemos</span>
             </h2>
             <SectionLink id="sintomas" title="Sintomas que resolvemos" />
             <ServiceSymptoms problems={s.problems} service={s.name} />
           </section>
 
           <section className="group relative mt-24" aria-labelledby="entregas">
-            <h2 id="entregas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-teal [text-shadow:3px_3px_0_#140a26]">
-              O que você recebe
+            <h2 id="entregas" className="font-groovy pr-28 text-[clamp(1.8rem,3.5vw,3rem)] md:pr-0 text-teal [text-shadow:3px_3px_0_#140a26]">
+              <span data-mark>O que você recebe</span>
             </h2>
             <SectionLink id="entregas" title="O que você recebe" />
-            <ol className="mt-8 grid gap-5 md:grid-cols-2">
-              {s.deliverables.map((d, i) => (
-                <li key={d.title} className="win flex flex-col">
-                  <div className="win-bar">
-                    <span>etapa_{String(i + 1).padStart(2, '0')}.txt</span>
-                  </div>
-                  <div className="m-1.5 flex-1 border-2 border-[#7d7394] bg-paper p-6 text-acid-ink">
-                    <h3 className="text-2xl font-medium tracking-tight">{d.title}</h3>
-                    <p className="mt-2 leading-relaxed text-acid-ink/75">{d.body}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <Deliverables items={s.deliverables} />
           </section>
 
           <section className="group relative mt-24" aria-labelledby="exemplos">
-            <h2 id="exemplos" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-acid [text-shadow:3px_3px_0_#140a26]">
-              Exemplos
+            <h2 id="exemplos" className="font-groovy pr-28 text-[clamp(1.8rem,3.5vw,3rem)] md:pr-0 text-acid [text-shadow:3px_3px_0_#140a26]">
+              <span data-mark>Exemplos</span>
             </h2>
             <SectionLink id="exemplos" title="Exemplos" />
             <ul className="mt-8 grid gap-4 md:grid-cols-3">
@@ -161,16 +225,20 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                         href={`/casos/${pr.slug}`}
                         aria-hidden
                         tabIndex={-1}
+                        data-case-window={pr.slug}
                         className="group -mx-5 -mt-5 mb-5 block aspect-[16/9.4] overflow-hidden border-b-2 border-toon bg-acid-ink"
                       >
                         {pr.shot ? (
                           <Image
                             src={pr.shot.desktop.replace(/\.jpg$/, '-top.jpg')}
+                            {...blurProps(pr.shot.desktop.replace(/\.jpg$/, '-top.jpg'))}
                             alt=""
                             width={1440}
                             height={846}
-                            sizes="(max-width: 768px) 92vw, 380px"
-                            className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+                            /* px, not vw: next/image drops every candidate below 0.88 × 640 px when sizes mentions vw, so a 1x desktop
+                                                   showing this at ~300 px fetched the 640-px file; with px breakpoints it gets 384 (phones still 1080) */
+                            sizes="(max-width: 480px) 360px, (max-width: 767px) 710px, 380px"
+                            className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04] group-focus-visible:scale-[1.04]"
                           />
                         ) : (
                           pr.mock && <MockUI variant={pr.mock.variant} hue={pr.mock.hue} />
@@ -202,47 +270,115 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             </ul>
             <p className="mt-6 flex flex-wrap gap-2">
               {s.stack.map((t) => (
-                <span key={t} className="rounded-full border-2 border-ink/25 px-3 py-0.5 font-mono text-xs text-ink/75 uppercase">
-                  {t}
-                </span>
+                <StackChip key={t} tech={t} />
               ))}
             </p>
+            {/* the archive already filters by service (?servico=, CaseFilter): link straight to this service's cases */}
+            {caseCount > 0 && (
+              <a
+                href={`/casos?servico=${s.slug}`}
+                data-print-hide
+                className="mt-8 inline-flex items-center gap-2 font-medium text-acid underline-offset-4 hover:underline"
+              >
+                Ver {caseCount === 1 ? 'o caso' : `os ${caseCount} casos`} de {s.name} no arquivo{'\u00a0'}→
+              </a>
+            )}
           </section>
 
           <section className="group relative mt-24" aria-labelledby="perguntas">
-            <h2 id="perguntas" className="font-groovy text-[clamp(1.8rem,3.5vw,3rem)] text-groovy [text-shadow:3px_3px_0_#140a26]">
-              Perguntas frequentes
+            <h2 id="perguntas" className="font-groovy pr-28 text-[clamp(1.8rem,3.5vw,3rem)] md:pr-0 text-groovy [text-shadow:3px_3px_0_#140a26]">
+              <span data-mark>Perguntas frequentes</span>
             </h2>
             <SectionLink id="perguntas" title="Perguntas frequentes" />
-            <div className="mt-8 flex flex-col gap-3">
-              {s.faq.map((f) => (
+            {/* same "open them all" as the home FAQ, for readers who'd rather scan every answer at once */}
+            <div className="mt-6 flex justify-end text-ink">
+              <FaqToggleAll />
+            </div>
+            <div data-acc className="mt-3 flex flex-col gap-3">
+              {s.faq.map((f, i) => (
                 <details key={f.q} id={faqId(f.q)} className="toon-sm group scroll-mt-28 rounded-xl bg-paper p-5 text-acid-ink">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium">
-                    {f.q}
+                    <span className="flex items-baseline gap-3">
+                      <span aria-hidden className="shrink-0 font-mono text-xs text-acid-ink/70">
+                        {String(i + 1).padStart(2, '0')}
+                        <span className="invisible ml-0.5 text-[#15803d] group-data-seen:visible">✓</span>
+                      </span>
+                      <span>{f.q}</span>
+                    </span>
                     <span className="text-2xl transition-transform group-open:rotate-45" aria-hidden>
                       +
                     </span>
                   </summary>
-                  <p className="mt-3 leading-relaxed text-acid-ink/75">{f.a}</p>
-                  <FaqCopyLink id={faqId(f.q)} />
+                  <p className="mt-3 max-w-2xl leading-relaxed text-acid-ink/75">{f.a}</p>
+                  <div className="flex flex-wrap items-center gap-x-5">
+                    <FaqCopyLink id={faqId(f.q)} />
+                    <FaqAsk q={f.q} />
+                  </div>
                 </details>
               ))}
             </div>
+            <p className="mt-5 text-ink/75" data-print-hide>
+              Não achou a sua?{' '}
+              <a href="/#mensagem" className="font-medium text-ink underline decoration-acid decoration-2 underline-offset-4 hover:decoration-4">
+                Pergunte direto pra gente →
+              </a>
+            </p>
             <FaqHashOpener />
           </section>
 
-          <section className="mt-24" aria-labelledby="outros">
+          <section className="mt-24" aria-labelledby="outros" data-print-hide>
             <h2 id="outros" className="label">
               Outras capacidades
             </h2>
-            <ul className="mt-4 flex flex-wrap gap-3">
-              {others.map((o) => (
-                <li key={o.slug}>
-                  <a href={`/servicos/${o.slug}`} className="toon-sm toon-press inline-block rounded-full bg-lemon px-4 py-2 text-acid-ink">
-                    {o.name} →
-                  </a>
-                </li>
-              ))}
+            {/* each one pitched with its own page headline, plus how many solved cases back it up */}
+            <CaseKeys prev={`/servicos/${prevSvc.slug}`} next={`/servicos/${nextSvc.slug}`} prevName={prevSvc.name} nextName={nextSvc.name} noun="serviço" />
+            <ul className="mt-4 grid gap-4 md:grid-cols-3">
+              {others.map((o) => {
+                const n = projects.filter((p) => p.service === o.slug).length;
+                const key = o === nextSvc ? '→' : o === prevSvc ? '←' : null;
+                return (
+                  <li key={o.slug} className="pt-3.5">
+                    {/* named by the service, described by its headline and track record (the whole card was the name) */}
+                    <a
+                      href={`/servicos/${o.slug}`}
+                      aria-labelledby={`outro-${o.slug}`}
+                      aria-describedby={`outro-${o.slug}-pitch outro-${o.slug}-casos`}
+                      aria-keyshortcuts={key ? (key === '→' ? 'ArrowRight' : 'ArrowLeft') : undefined}
+                      rel={key ? (key === '→' ? 'next' : 'prev') : undefined}
+                      className="toon-sm toon-press group relative flex h-full flex-col rounded-2xl rounded-tl-none bg-lemon p-5 text-acid-ink"
+                    >
+                      {/* each service is a manila folder in the archive: a tab on top, lifted when pointed at */}
+                      <span
+                        aria-hidden
+                        className="absolute bottom-[calc(100%-2.5px)] -left-[2.5px] h-4 w-24 rounded-t-lg border-[2.5px] border-b-0 border-toon bg-lemon transition-[height] duration-200 group-hover:h-5 group-focus-visible:h-5"
+                      />
+                      <span id={`outro-${o.slug}`} className="font-mono text-xs tracking-wide text-acid-ink/70 uppercase">
+                        {o.name}
+                      </span>
+                      {/* keyboard hint on the folder tab: only where there is a keyboard-ish pointer */}
+                      {key && (
+                        <kbd
+                          aria-hidden
+                          title={key === '→' ? 'Próximo serviço (tecla →)' : 'Serviço anterior (tecla ←)'}
+                          className="absolute top-3 right-3 hidden min-w-6 rounded-md border-[1.5px] border-b-[3px] border-toon bg-paper px-1.5 text-center font-mono text-xs leading-5 text-acid-ink pointer-fine:inline-block"
+                        >
+                          {key}
+                        </kbd>
+                      )}
+                      <span id={`outro-${o.slug}-pitch`} className="mt-2 text-xl leading-tight font-medium tracking-tight">
+                        {`${o.h1} ${o.h1Accent}`}
+                      </span>
+                      <span className="mt-auto pt-4 text-sm text-acid-ink/75">
+                        <span id={`outro-${o.slug}-casos`}>{n > 0 ? `${n} ${n === 1 ? 'caso resolvido' : 'casos resolvidos'}` : ''}</span>
+                        {n > 0 && ' · '}
+                        <span className="font-medium text-acid-ink underline-offset-4 group-hover:underline group-focus-visible:underline">
+                          Ver serviço <span aria-hidden>→</span>
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </section>
 
@@ -250,7 +386,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
             title="Seu caso parece com"
             accent="esse?"
             text="Marque os sintomas no formulário e receba um diagnóstico preliminar na hora, ou chame direto no WhatsApp."
-            whatsappMessage={`Olá! Quero conversar sobre ${s.name.toLowerCase()} com a HenaWeb.`}
+            whatsappMessage={`Olá! Quero conversar sobre ${s.name} com a HenaWeb.`}
           />
         </article>
       </main>

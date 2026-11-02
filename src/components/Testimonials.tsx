@@ -25,7 +25,7 @@ export default function Testimonials() {
                     <span className="block font-medium text-acid-ink">{t.name}</span>
                     {t.role}, {t.org}
                     {caseLink && (
-                      <a href={`/casos/${caseLink.slug}`} className="mt-2 block w-fit font-medium text-[#c2410c] underline-offset-4 hover:underline">
+                      <a href={`/casos/${caseLink.slug}`} className="pen-link mt-2 block w-fit font-medium text-[#c2410c]">
                         Ver o caso {caseLink.name} →
                       </a>
                     )}

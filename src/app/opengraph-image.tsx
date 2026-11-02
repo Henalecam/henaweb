@@ -1,4 +1,5 @@
 import { ImageResponse } from 'next/og';
+import { OgFloor, OgSun } from '@/lib/og-scene';
 
 export const alt = 'HenaWeb · Sistemas esculpidos para empresas e governos';
 export const size = { width: 1200, height: 630 };
@@ -23,23 +24,14 @@ export default function Image() {
           position: 'relative',
         }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            right: -70,
-            top: 150,
-            width: 360,
-            height: 360,
-            borderRadius: 360,
-            background: 'linear-gradient(180deg, #f9e27d 0%, #f4b942 45%, #f7931e 75%, #8b5cc7 100%)',
-          }}
-        />
+        <OgSun />
+        <OgFloor />
         <div style={{ display: 'flex', fontSize: 30, letterSpacing: 6, color: '#3cc6b4' }}>HENAWEB · STUDIO DE ENGENHARIA DE SOFTWARE</div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ fontSize: 92, fontWeight: 700, lineHeight: 1, letterSpacing: -3 }}>Sistemas esculpidos</div>
           <div style={{ fontSize: 92, fontWeight: 700, lineHeight: 1, letterSpacing: -3, color: '#f7931e' }}>para empresas e governos.</div>
         </div>
-        <div style={{ display: 'flex', gap: 16 }}>
+        <div style={{ display: 'flex', gap: 16, marginBottom: 6 }}>
           {tags.map((t) => (
             <div
               key={t}

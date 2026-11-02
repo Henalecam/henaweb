@@ -1,11 +1,15 @@
 'use client';
 
-import { useRef } from 'react';
-import { gsap, SplitText, useGSAP } from '@/lib/gsap';
+import { useRef, useState } from 'react';
+import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
+import { SplitText } from '@/lib/split';
 import { govFlow, govPillars } from '@/lib/content';
 
+// the sample case file is numbered in the current year, so the demo never looks a year old
+const YEAR = new Date().getFullYear();
+
 const audit = [
-  ['09:12', 'solicitação #2026/0142 registrada'],
+  ['09:12', `solicitação #${YEAR}/0142 registrada`],
   ['09:13', 'documentos validados automaticamente'],
   ['11:40', 'parecer técnico anexado · v2'],
   ['14:02', 'aprovação em alçada 2 · assinatura digital'],
@@ -15,26 +19,80 @@ const audit = [
 
 export default function GovTech() {
   const root = useRef<HTMLElement>(null);
+  // every step leaves its line in the audit trail: pointing at one (or tapping it) lights up its pair
+  const [trace, setTrace] = useState<number | null>(null);
+  // the × on the case file doesn't close it: public processes don't vanish, so the attempt itself is
+  // logged in the audit trail (with Curitiba's time) and the window shakes (WinClose-style gag, 404)
+  const panel = useRef<HTMLDivElement>(null);
+  const [attempts, setAttempts] = useState<string[]>([]);
+  // the _ of the title bar works: the process window rolls up to its title bar (like a Win95 window shade)
+  // and the same button, now ▭, rolls it back down
+  const [rolled, setRolled] = useState(false);
+  const tryClose = () => {
+    const now = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }).format(new Date());
+    setAttempts((a) => [...a, now].slice(-3));
+    const el = panel.current;
+    if (!el) return;
+    el.removeAttribute('data-shake');
+    void el.offsetWidth;
+    el.setAttribute('data-shake', '');
+  };
+  // transparency you can take away: the audit trail downloads as a spreadsheet-ready CSV (semicolon-separated, as
+  // Brazilian Excel expects, with a BOM so the accents survive), the visitor's own close attempts included
+  const exportTrail = () => {
+    const rows = [['hora', 'evento'], ...audit, ...attempts.map((time) => [time, 'tentativa de fechar o processo registrada'])];
+    const csv = '\ufeff' + rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(';')).join('\r\n') + '\r\n';
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const a = Object.assign(document.createElement('a'), { href: url, download: `trilha_PROCESSO_${YEAR}-0142.csv` });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  const traceProps = (i: number) => ({
+    'data-on': trace === i ? '' : undefined,
+    onPointerEnter: (e: React.PointerEvent) => e.pointerType === 'mouse' && setTrace(i),
+    onPointerLeave: (e: React.PointerEvent) => e.pointerType === 'mouse' && setTrace(null),
+    // touch has no hover: a tap lights the pair (a second tap on it turns it off). A touch pointer "leaves"
+    // right after lifting, which is why leave only clears for the mouse; a scroll gesture ends in
+    // pointercancel, never pointerup, so scrolling across the list lights nothing
+    onPointerUp: (e: React.PointerEvent) => e.pointerType !== 'mouse' && setTrace((t) => (t === i ? null : i)),
+  });
 
   useGSAP(
     () => {
-      const split = SplitText.create('[data-gov-title]', { type: 'lines', mask: 'lines', linesClass: 'line-mask' });
-      gsap.from(split.lines, {
-        yPercent: 105,
-        duration: 1.2,
-        ease: 'expo.out',
-        stagger: 0.08,
-        scrollTrigger: { trigger: '[data-gov-title]', start: 'top 80%' },
-      });
+      const mm = gsap.matchMedia();
+      // reduced motion: the title is simply there (CSS reduced-motion can't stop GSAP tweens)
+      const split = prefersReducedMotion() ? null : SplitText.create('[data-gov-title]', { type: 'lines', mask: 'lines', linesClass: 'line-mask' });
+      if (split) {
+        gsap.from(split.lines, {
+          yPercent: 105,
+          duration: 1.2,
+          ease: 'expo.out',
+          stagger: 0.08,
+          scrollTrigger: { trigger: '[data-gov-title]', start: 'top 80%' },
+        });
+      }
 
       // the markup ships the finished flow, so it reads the same without JS or with reduced motion;
       // only when motion is welcome do we rewind it and let the scroll play it back
-      const mm = gsap.matchMedia();
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         const steps = gsap.utils.toArray<HTMLElement>('[data-step]');
         const logs = gsap.utils.toArray<HTMLElement>('[data-log]');
+        // the status badge follows the replay: "em andamento" while the flow fills, "concluído" once the
+        // last step lands (the server HTML, like the flow, ships finished)
+        const badge = root.current?.querySelector<HTMLElement>('[data-gov-status]');
+        const setDone = (done: boolean) => badge?.toggleAttribute('data-done', done);
+        setDone(false);
         const tl = gsap.timeline({
-          scrollTrigger: { trigger: '[data-panel]', start: 'top 70%', end: 'bottom 55%', scrub: 0.6 },
+          scrollTrigger: {
+            trigger: '[data-panel]',
+            start: 'top 70%',
+            end: 'bottom 55%',
+            scrub: 0.6,
+            onUpdate: (self) => setDone(self.progress > 0.97),
+            onRefresh: (self) => setDone(self.progress > 0.97),
+          },
         });
         steps.forEach((s, i) => {
           // each segment fills from this dot to the next one
@@ -59,11 +117,12 @@ export default function GovTech() {
           stagger: 0.06,
           scrollTrigger: { trigger: '[data-pillars]', start: 'top 85%' },
         });
+        return () => setDone(true);
       });
 
       return () => {
         mm.revert();
-        split.revert();
+        split?.revert();
       };
     },
     { scope: root },
@@ -73,7 +132,7 @@ export default function GovTech() {
     <section
       ref={root}
       id="govtech"
-      className="sky gutter relative z-20 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon py-[clamp(5rem,10vw,9rem)]"
+      data-sheet className="sky gutter relative z-20 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon py-[clamp(5rem,10vw,9rem)]"
     >
       <div className="grid-floor !h-[30%] opacity-60" aria-hidden />
 
@@ -102,7 +161,7 @@ export default function GovTech() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-5 leading-relaxed text-ink/65">
+              <p className="mt-5 max-w-xl leading-relaxed text-ink/65">
                 Ao lado, um exemplo de fluxo: gestão de projetos e repasse de verbas, da solicitação à prestação de
                 resultados, com cada passo auditável.
               </p>
@@ -112,27 +171,50 @@ export default function GovTech() {
 
         <div className="lg:col-span-7">
           {/* Illustrative case-file panel, dressed as a Windows 95 window */}
-          <div data-panel className="win">
+          <div data-panel ref={panel} className="win" onAnimationEnd={(e) => e.target === e.currentTarget && e.currentTarget.removeAttribute('data-shake')}>
             <div className="win-bar">
-              <span className="truncate">PROCESSO_2026-0142.exe</span>
-              <span className="ml-auto flex gap-1" aria-hidden>
-                <span className="win-btn">_</span>
-                <span className="win-btn">□</span>
-                <span className="win-btn">×</span>
+              <span className="truncate">PROCESSO_{YEAR}-0142.exe</span>
+              <span className="ml-auto flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => setRolled((r) => !r)}
+                  className="win-btn cursor-pointer"
+                  aria-expanded={!rolled}
+                  aria-controls="processo-corpo"
+                  aria-label={rolled ? 'Restaurar a janela do processo' : 'Minimizar a janela do processo'}
+                >
+                  <span aria-hidden>{rolled ? '▭' : '_'}</span>
+                </button>
+                <span className="win-btn" aria-hidden>□</span>
+                <button type="button" onClick={tryClose} className="win-btn cursor-pointer" aria-label="Fechar o processo (não fecha: fica registrado)">
+                  ×
+                </button>
               </span>
             </div>
+            <div
+              id="processo-corpo"
+              data-rolled={rolled ? '' : undefined}
+              inert={rolled}
+              className="grid grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-[var(--ease-out-expo)] data-[rolled]:grid-rows-[0fr] print:!grid-rows-[1fr]"
+            >
+            <div className="min-h-0 overflow-hidden">
             <div className="m-1.5 border-2 border-[#7d7394] bg-acid-ink">
             <div className="flex items-center justify-between border-b border-line px-5 py-3">
               <span className="label">Gestão de projetos e verbas</span>
-              <span className="rounded-full border border-mint/50 px-2.5 py-0.5 font-mono text-[0.65rem] text-mint uppercase">
-                em andamento
+              <span
+                data-gov-status
+                data-done=""
+                className="group rounded-full border border-mint/50 px-2.5 py-0.5 font-mono text-[0.65rem] text-mint uppercase transition-colors duration-300 data-[done]:border-mint data-[done]:bg-mint data-[done]:text-acid-ink"
+              >
+                <span className="group-data-[done]:hidden">em andamento</span>
+                <span className="hidden group-data-[done]:inline">✓ concluído</span>
               </span>
             </div>
 
             <div className="grid md:grid-cols-[1.1fr_1fr]">
               <ol className="p-6 md:p-8">
                 {govFlow.map((step, i) => (
-                  <li key={step} data-step className="relative flex items-center gap-5 py-3.5">
+                  <li key={step} data-step {...traceProps(i)} className="group/step relative flex items-center gap-5 py-3.5">
                     {/* rail segment anchored to this dot's center, reaching the next dot's center */}
                     {i < govFlow.length - 1 && (
                       <span aria-hidden className="absolute top-1/2 left-[6px] h-full w-[2px] bg-ink/15">
@@ -141,9 +223,9 @@ export default function GovTech() {
                     )}
                     <span
                       data-dot
-                      className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 border-mint bg-mint"
+                      className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 border-mint bg-mint transition-[scale] duration-200 group-data-[on]/step:scale-150"
                     />
-                    <span className="flex-1 text-lg tracking-tight">{step}</span>
+                    <span className="flex-1 text-lg tracking-tight transition-colors duration-200 group-data-[on]/step:text-mint">{step}</span>
                     <span data-status className="font-mono text-[0.65rem] text-mint uppercase">
                       ✓ {String(i + 1).padStart(2, '0')}
                     </span>
@@ -152,14 +234,39 @@ export default function GovTech() {
               </ol>
               <div className="border-t border-line p-6 md:border-t-0 md:border-l md:p-8">
                 <span className="label">Trilha de auditoria</span>
-                <ul className="mt-5 space-y-3 font-mono text-[0.72rem] leading-snug">
-                  {audit.map(([time, entry]) => (
-                    <li key={entry} data-log>
-                      <span className="text-muted">{time} ·</span> <span className="text-ink/85">{entry}</span>
+                <ul className="mt-5 space-y-2 font-mono text-[0.72rem] leading-snug">
+                  {audit.map(([time, entry], i) => (
+                    <li key={entry} data-log {...traceProps(i)} className="group/log -mx-2 rounded-sm px-2 py-0.5 transition-colors duration-200 data-[on]:bg-mint/20">
+                      <span className="text-muted transition-colors duration-200 group-data-[on]/log:text-mint">{time} ·</span> <span className="text-ink/85">{entry}</span>
+                      {/* the log is live: a terminal cursor waits after the last entry */}
+                      {i === audit.length - 1 && attempts.length === 0 && (
+                        <span aria-hidden className="log-cursor ml-1 inline-block h-[1.05em] w-[0.55em] translate-y-[0.15em] bg-mint" />
+                      )}
+                    </li>
+                  ))}
+                  {attempts.map((time, i) => (
+                    <li key={i} className="-mx-2 rounded-sm px-2 py-0.5 text-acid">
+                      <span className="text-acid/70">{time} ·</span> tentativa de fechar o processo registrada
+                      {i === attempts.length - 1 && (
+                        <span aria-hidden className="log-cursor ml-1 inline-block h-[1.05em] w-[0.55em] translate-y-[0.15em] bg-acid" />
+                      )}
                     </li>
                   ))}
                 </ul>
+                <button
+                  type="button"
+                  onClick={exportTrail}
+                  data-export-trail
+                  className="mt-5 inline-flex min-h-8 items-center gap-1.5 font-mono text-[0.68rem] text-mint underline decoration-mint/40 decoration-dotted underline-offset-4 transition-colors hover:text-ink hover:decoration-solid"
+                >
+                  <span aria-hidden>⤓</span> exportar_trilha.csv
+                </button>
+                <p className="sr-only" aria-live="polite">
+                  {attempts.length > 0 && 'Processos públicos não se fecham: a tentativa ficou registrada na trilha de auditoria.'}
+                </p>
               </div>
+            </div>
+            </div>
             </div>
             </div>
           </div>
@@ -169,13 +276,18 @@ export default function GovTech() {
             data-pillars
             className="mt-8 grid divide-y divide-acid-ink/15 rounded-xl border-[2.5px] border-toon bg-paper shadow-[4px_4px_0_var(--color-toon)] sm:grid-cols-2 sm:gap-4 sm:divide-y-0 sm:rounded-none sm:border-0 sm:bg-transparent sm:shadow-none"
           >
-            {govPillars.map((p) => (
+            {govPillars.map((p, i) => (
               <li
                 key={p.k}
                 data-pillar
                 className="px-5 py-3.5 text-acid-ink sm:rounded-xl sm:border-[2.5px] sm:border-toon sm:bg-paper sm:p-5 sm:shadow-[4px_4px_0_var(--color-toon)]"
               >
-                <span className="font-groovy text-base text-[#c2410c] sm:text-lg">{p.k}</span>
+                {/* numbered like the articles of a law: the section talks to people who read regulations for a living */}
+                <span aria-hidden className="mr-2 align-[0.12em] font-mono text-[0.7rem] tracking-wide text-acid-ink/70 uppercase">
+                  Art. {i + 1}º
+                </span>
+                {/* pointing at an article marks its title with a highlighter, the way a law gets read (globals.css .pillar-k) */}
+                <span className="pillar-k font-groovy text-base text-[#c2410c] sm:text-lg">{p.k}</span>
                 <p className="mt-0.5 text-[0.95rem] leading-snug text-acid-ink/80 sm:mt-1 sm:text-base sm:leading-normal">{p.v}</p>
               </li>
             ))}

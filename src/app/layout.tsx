@@ -13,17 +13,33 @@ import FloatingContact from '@/components/FloatingContact';
 import TabHaunt from '@/components/TabHaunt';
 import ThemeTint from '@/components/ThemeTint';
 import ScrollProgress from '@/components/ScrollProgress';
+import NavPending from '@/components/NavPending';
+import CopyFallback from '@/components/CopyFallback';
+import NetStatus from '@/components/NetStatus';
+import BackToTop from '@/components/BackToTop';
+import Elementar from '@/components/Elementar';
+import Screensaver from '@/components/Screensaver';
+import QuoteLink from '@/components/QuoteLink';
+import AccordionKeys from '@/components/AccordionKeys';
+import SwRegister from '@/components/SwRegister';
+import DragFile from '@/components/DragFile';
+import WinDrag from '@/components/WinDrag';
+import TabProgress from '@/components/TabProgress';
+import OffscreenPause from '@/components/OffscreenPause';
 import ConsentBanner from '@/components/ConsentBanner';
 import { analyticsLoader } from '@/lib/consent';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' });
+// only the italic is ever drawn (.serif), and never above the fold: no upright cut, and no preload, so
+// pages that don't use it (cases, services) never download it and the home fetches it when it shows up
 const instrument = Instrument_Serif({
   subsets: ['latin'],
   weight: '400',
-  style: ['italic', 'normal'],
+  style: 'italic',
   variable: '--font-instrument',
   display: 'swap',
+  preload: false,
 });
 
 const groovy = Shrikhand({ subsets: ['latin'], weight: '400', variable: '--font-shrikhand', display: 'swap' });
@@ -49,11 +65,13 @@ export const metadata: Metadata = {
     'agentes de IA para empresas',
     'criação de sites Curitiba',
   ],
-  authors: [{ name: 'HenaWeb', url: site.url }],
+  // <link rel="author"> to the plain-text credits (src/app/humans.txt)
+  authors: [{ name: 'HenaWeb', url: `${site.url}/humans.txt` }],
   creator: 'HenaWeb',
   publisher: 'HenaWeb',
   category: 'technology',
-  alternates: { canonical: '/' },
+  // the case archive's RSS feed, announced on every page so reader apps find it from anywhere
+  alternates: { canonical: '/', types: { 'application/rss+xml': [{ url: '/casos/feed.xml', title: 'HenaWeb · Casos resolvidos' }] } },
   formatDetection: { telephone: false, email: false, address: false },
   openGraph: { type: 'website', locale: 'pt_BR', url: '/', siteName: 'HenaWeb', title, description },
   twitter: { card: 'summary_large_image', title, description },
@@ -65,6 +83,8 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 },
   },
   icons: { icon: [{ url: '/favicon.ico', sizes: '32x32' }, { url: '/icon.png', type: 'image/png', sizes: '48x48' }, { url: '/icon-192.png', type: 'image/png', sizes: '192x192' }], apple: '/apple-icon.png' },
+  // iOS before 16.4 ignores the manifest and named the home-screen icon after the long <title> ("Desenvolvimento de sis…")
+  appleWebApp: { title: 'HenaWeb' },
 };
 
 export const viewport: Viewport = { themeColor: '#140c2e', colorScheme: 'dark' };
@@ -130,11 +150,23 @@ const jsonLd = {
       name: 'HenaWeb',
       inLanguage: 'pt-BR',
       publisher: { '@id': `${site.url}/#organization` },
+      // the site search (/?pista=) the OpenSearch description already advertises to browsers
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: `${site.url}/?pista={search_term_string}` },
+        'query-input': 'required name=search_term_string',
+      },
     },
   ],
 };
 
 const SEEN_SCRIPT = "try{sessionStorage.getItem('hena:seen')==='1'&&(document.documentElement.dataset.seen='')}catch(e){}";
+
+// an image that fails (offline, a dropped connection) showed the browser's broken-picture icon over the dark frame
+// of every screenshot window; it's marked so CSS swaps it for a quiet "imagem fora do ar" plate, and it is
+// requested again once the connection comes back. error and load don't bubble, so this listens in the capture
+// phase (on document for load: a load event never reaches window from an element)
+const IMG_FAIL_SCRIPT = `(()=>{const mark=(i)=>{if(i.dataset.failed!==undefined)return;i.dataset.failed='';const p=i.parentElement;if(p&&getComputedStyle(p).position!=='static')p.dataset.imgFailed=''};addEventListener('error',(e)=>{const t=e.target;if(t instanceof HTMLImageElement)mark(t)},true);document.addEventListener('load',(e)=>{const t=e.target;if(t instanceof HTMLImageElement&&t.dataset.failed!==undefined){delete t.dataset.failed;t.parentElement&&delete t.parentElement.dataset.imgFailed}},true);addEventListener('online',()=>{document.querySelectorAll('img[data-failed]').forEach((i)=>{const s=i.srcset;if(s){i.srcset='';i.srcset=s}else{const u=i.src;i.src='';i.src=u}})})})();`;
 
 const SPECULATION_RULES = JSON.stringify({
   prefetch: [
@@ -160,6 +192,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         {/* lets the browser add the site search (Chrome "tab to search", Firefox search bar); React hoists it to <head> */}
         <link rel="search" type="application/opensearchdescription+xml" title="HenaWeb" href="/opensearch.xml" />
+        {/* plain-Markdown map of the site for AI assistants (llmstxt.org) */}
+        <link rel="alternate" type="text/markdown" title="HenaWeb para assistentes de IA" href="/llms.txt" />
         <a
           href="#conteudo"
           className="toon-sm sr-only z-[200] rounded-full bg-acid px-5 py-3 font-medium text-acid-ink focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:px-5 focus:py-3"
@@ -169,6 +203,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* repeat views in the same tab skip the intro: hide the overlay before the first paint instead
             of holding the page under it until hydration fades it out */}
         <script dangerouslySetInnerHTML={{ __html: SEEN_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: IMG_FAIL_SCRIPT }} />
         {/* hovering an internal link for ~200 ms fetches that page, so the click lands on a warm cache */}
         <script type="speculationrules" dangerouslySetInnerHTML={{ __html: SPECULATION_RULES }} />
         <Preloader />
@@ -180,6 +215,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <TabHaunt />
         <ThemeTint />
         <ScrollProgress />
+        <NavPending />
+        <CopyFallback />
+        <NetStatus />
+        <BackToTop />
+        <Elementar />
+        <Screensaver />
+        <QuoteLink />
+        <AccordionKeys />
+        <SwRegister />
+        <DragFile />
+        <WinDrag />
+        <TabProgress />
+        <OffscreenPause />
         {children}
         <div className="grain" aria-hidden />
 

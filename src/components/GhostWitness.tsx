@@ -10,7 +10,9 @@ const FLEE = 90; // px: the furthest it drifts away
  * away and the "?" turns into a startled "!". Fine pointers only; with reduced motion the eyes
  * still look but the ghost stays put.
  */
-export default function GhostWitness() {
+const DESKTOP = 'pointer-events-none absolute top-1/2 right-[6vw] hidden w-[clamp(14rem,22vw,20rem)] -translate-y-1/2 transition-transform duration-500 ease-out lg:block';
+
+export default function GhostWitness({ className = DESKTOP }: { className?: string }) {
   const svg = useRef<SVGSVGElement>(null);
   const pupils = useRef<SVGGElement>(null);
   const [startled, setStartled] = useState(false);
@@ -18,7 +20,26 @@ export default function GhostWitness() {
   useEffect(() => {
     const el = svg.current;
     const eyes = pupils.current;
-    if (!el || !eyes || !matchMedia('(pointer: fine)').matches) return;
+    if (!el || !eyes || el.getClientRects().length === 0) return;
+    // touch screens: no pointer to follow, so a tap anywhere makes the ghost look there and jump
+    if (!matchMedia('(pointer: fine)').matches) {
+      let calm = 0;
+      const onTap = (e: PointerEvent) => {
+        const r = el.getBoundingClientRect();
+        const dx = e.clientX - (r.left + r.width / 2);
+        const dy = e.clientY - (r.top + r.height * 0.4);
+        const dist = Math.hypot(dx, dy) || 1;
+        eyes.setAttribute('transform', `translate(${(dx / dist) * 6} ${(dy / dist) * 6})`);
+        setStartled(true);
+        window.clearTimeout(calm);
+        calm = window.setTimeout(() => setStartled(false), 900);
+      };
+      window.addEventListener('pointerdown', onTap, { passive: true });
+      return () => {
+        window.removeEventListener('pointerdown', onTap);
+        window.clearTimeout(calm);
+      };
+    }
     const still = matchMedia('(prefers-reduced-motion: reduce)');
     let frame = 0;
     let px = 0;
@@ -66,7 +87,7 @@ export default function GhostWitness() {
       viewBox="0 0 260 300"
       aria-hidden
       data-ghost
-      className="ghost-bob pointer-events-none absolute top-1/2 right-[6vw] hidden w-[clamp(14rem,22vw,20rem)] -translate-y-1/2 transition-transform duration-500 ease-out lg:block"
+      className={`ghost-bob ${className}`}
     >
       <ellipse cx="120" cy="288" rx="70" ry="8" fill="#140a26" opacity="0.35" />
       <path

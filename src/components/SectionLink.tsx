@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { copyText } from '@/lib/clipboard';
 
 /**
  * A "#" next to a section title that copies a link straight to that section (/servicos/x#entregas),
@@ -12,12 +13,10 @@ export default function SectionLink({ id, title }: { id: string; title: string }
   const copy = async () => {
     const url = `${location.origin}${location.pathname}#${id}`;
     history.replaceState(history.state, '', `#${id}`);
-    try {
-      await navigator.clipboard.writeText(url);
+    // even with no clipboard at all the address bar already carries the section link
+    if (await copyText(url)) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // no clipboard: the address bar already carries the section link
     }
   };
 

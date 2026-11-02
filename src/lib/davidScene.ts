@@ -302,6 +302,9 @@ export function createDavidScene(canvas: HTMLCanvasElement, { reducedMotion, onD
   let visible = true;
   const io = new IntersectionObserver(([entry]) => (visible = entry.isIntersecting));
   io.observe(canvas);
+  // the sky is sticky, so the canvas counts as "in view" even once the opaque sheets below have slid over it;
+  // DavidStage marks the sky data-offscreen then, and the loop idles as it does for a hidden tab
+  const sky = canvas.closest<HTMLElement>('.sky');
 
   const draw = (now: number) => {
     const t = (now - start) / 1000;
@@ -383,7 +386,7 @@ export function createDavidScene(canvas: HTMLCanvasElement, { reducedMotion, onD
       return;
     }
     raf = requestAnimationFrame(frame);
-    if (!visible || document.hidden) {
+    if (!visible || sky?.hasAttribute('data-offscreen') || document.hidden) {
       last = now;
       perf.prev = 0;
       return;

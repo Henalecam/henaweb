@@ -1,11 +1,12 @@
 import { homeFaq } from '@/lib/content';
 import { faqId } from '@/lib/slug';
-import { FaqCopyLink, FaqHashOpener } from './FaqLink';
+import { FaqCopyLink, FaqHashOpener, FaqToggleAll } from './FaqLink';
+import FaqAsk from './FaqAsk';
 
 /** Visible FAQ; the same Q&A feeds the FAQPage structured data on the home page. */
 export default function Faq() {
   return (
-    <section id="perguntas" aria-labelledby="perguntas-titulo" className="paper relative z-30 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon py-[clamp(5rem,9vw,8rem)] text-bg">
+    <section id="perguntas" aria-labelledby="perguntas-titulo" data-sheet className="paper relative z-30 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon py-[clamp(5rem,9vw,8rem)] text-bg">
       <div className="gutter grid gap-10 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <span className="label !text-bg/55">(VIII) Perguntas</span>
@@ -13,19 +14,38 @@ export default function Faq() {
             Perguntas que <span className="font-groovy text-[0.85em] tracking-normal text-[#c2410c]">todo cliente faz.</span>
           </h2>
         </div>
-        <div className="flex flex-col gap-3 lg:col-span-8">
-          {homeFaq.map((f) => (
+        <div data-acc className="flex flex-col gap-3 lg:col-span-8">
+          <div className="flex justify-end text-bg">
+            <FaqToggleAll />
+          </div>
+          {homeFaq.map((f, i) => (
             <details key={f.q} id={faqId(f.q)} className="toon-sm group scroll-mt-28 rounded-xl bg-paper p-5 open:bg-lemon">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium md:text-xl">
-                {f.q}
+                {/* a file index, like the rest of the case archive: easier to say "a pergunta 04" */}
+                <span className="flex items-baseline gap-3">
+                  <span aria-hidden className="shrink-0 font-mono text-xs text-bg/70">
+                    {String(i + 1).padStart(2, '0')}
+                    <span className="invisible ml-0.5 text-[#15803d] group-data-seen:visible">✓</span>
+                  </span>
+                  <span>{f.q}</span>
+                </span>
                 <span className="toon-sm flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-acid text-xl transition-transform group-open:rotate-45" aria-hidden>
                   +
                 </span>
               </summary>
               <p className="mt-3 max-w-2xl leading-relaxed text-bg/75">{f.a}</p>
-              <FaqCopyLink id={faqId(f.q)} />
+              <div className="flex flex-wrap items-center gap-x-5">
+                <FaqCopyLink id={faqId(f.q)} />
+                <FaqAsk q={f.q} />
+              </div>
             </details>
           ))}
+          <p className="mt-3 text-bg/75" data-print-hide>
+            Não achou a sua?{' '}
+            <a href="#mensagem" className="font-medium text-bg underline decoration-[#c2410c] decoration-2 underline-offset-4 hover:decoration-4">
+              Pergunte direto pra gente →
+            </a>
+          </p>
         </div>
       </div>
       <FaqHashOpener />

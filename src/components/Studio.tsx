@@ -1,15 +1,82 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { gsap, ScrollTrigger, SplitText, useGSAP } from '@/lib/gsap';
+import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/gsap';
+import { SplitText } from '@/lib/split';
 import { principles } from '@/lib/content';
+
+/** Develops the polaroid for good and wobbles it (restarted on every press); no wobble with reduced motion. */
+function develop(card: HTMLElement) {
+  card.classList.add('is-developed');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  card.classList.remove('is-shaking');
+  void card.offsetWidth;
+  card.classList.add('is-shaking');
+}
 
 export default function Studio() {
   const root = useRef<HTMLElement>(null);
+  // the Notepad status bars count a selection like the real one: select part of a rule and its bar reads
+  // "Sel: 23 de 97" (which rule, and how many characters of its body are selected)
+  const [sel, setSel] = useState<{ n: string; len: number } | null>(null);
+  // and a click in a rule's text puts Notepad's caret there: the bar reads "Ln 1, Col 42", as the real one does
+  const [caret, setCaret] = useState<{ n: string; col: number } | null>(null);
+  useEffect(() => {
+    const onChange = () => {
+      const s = window.getSelection();
+      const at = s?.anchorNode?.parentElement?.closest<HTMLElement>('[data-rule-body]');
+      if (s && s.isCollapsed && at && s.anchorNode) {
+        const r = document.createRange();
+        r.setStart(at, 0);
+        r.setEnd(s.anchorNode, s.anchorOffset);
+        setCaret({ n: at.dataset.ruleBody!, col: r.toString().length + 1 });
+      } else setCaret((v) => (v ? null : v));
+      const body = s && !s.isCollapsed ? s.anchorNode?.parentElement?.closest<HTMLElement>('[data-rule-body]') : null;
+      if (!s || !body || !body.contains(s.focusNode)) return setSel((v) => (v ? null : v));
+      const len = s.toString().replace(/\s+/g, ' ').trim().length;
+      setSel(len ? { n: body.dataset.ruleBody!, len } : null);
+    };
+    document.addEventListener('selectionchange', onChange);
+    return () => document.removeEventListener('selectionchange', onChange);
+  }, []);
+  // and like the real one, typing over a selection in a read-only file is refused: the window shudders
+  // and the status bar says so for a moment (the text never changes; it isn't editable anyway)
+  const [denied, setDenied] = useState<string | null>(null);
+  useEffect(() => {
+    if (!sel) return;
+    let t = 0;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || (e.key.length !== 1 && e.key !== 'Backspace' && e.key !== 'Delete')) return;
+      // the selection may have just been cleared (a click elsewhere) before React caught up
+      const live = window.getSelection();
+      if (!live || live.isCollapsed || !live.anchorNode?.parentElement?.closest(`[data-rule-body="${sel.n}"]`)) return;
+      setDenied(sel.n);
+      const li = document.querySelector<HTMLElement>(`[data-principle][data-rule="${sel.n}"]`);
+      if (li && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        li.removeAttribute('data-shake');
+        void li.offsetWidth;
+        li.setAttribute('data-shake', '');
+      }
+      window.clearTimeout(t);
+      t = window.setTimeout(() => setDenied(null), 1600);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.clearTimeout(t);
+    };
+  }, [sel]);
 
   useGSAP(
     () => {
+      // touch screens never hover, so the halftone used to hide the founder's face for good:
+      // there the photo develops into colour (and straightens, like a polaroid picked up) once it sits in the middle of the screen
+      if (window.matchMedia('(hover: none)').matches) {
+        ScrollTrigger.create({ trigger: '[data-portrait]', start: 'top 60%', end: 'bottom 25%', toggleClass: { targets: '[data-portrait-card]', className: 'is-developed' } });
+      }
+      // reduced motion: entrances are skipped, the content just sits in place (CSS can't stop GSAP tweens)
+      if (prefersReducedMotion()) return;
       const split = SplitText.create('[data-studio-title]', { type: 'lines', mask: 'lines', linesClass: 'line-mask' });
       gsap.from(split.lines, {
         yPercent: 105,
@@ -28,11 +95,6 @@ export default function Studio() {
           scrollTrigger: { trigger: '[data-portrait]', start: 'top 80%' },
         },
       );
-      // touch screens never hover, so the halftone used to hide the founder's face for good:
-      // there the photo develops into colour once it sits in the middle of the screen
-      if (window.matchMedia('(hover: none)').matches) {
-        ScrollTrigger.create({ trigger: '[data-portrait]', start: 'top 60%', end: 'bottom 25%', toggleClass: { targets: '[data-portrait-card]', className: 'is-developed' } });
-      }
       gsap.from('[data-principle]', {
         y: 40,
         autoAlpha: 0,
@@ -49,25 +111,55 @@ export default function Studio() {
     <section
       ref={root}
       id="studio"
-      className="sky gutter relative z-20 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon py-[clamp(5rem,10vw,9rem)]"
+      data-sheet className="sky gutter relative z-20 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon py-[clamp(5rem,10vw,9rem)]"
     >
       <div className="grid gap-14 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <span className="label">(VII) Studio</span>
-          <figure data-portrait-card className="group toon mt-8 max-w-sm -rotate-2 rounded-sm bg-paper p-3 pb-4 transition-transform duration-500 hover:rotate-0">
+          {/* shake it like a Polaroid picture: a click (or tap) wobbles the photo and develops it at once */}
+          <figure
+            data-portrait-card
+            data-cursor="Chacoalhar"
+            onClick={(e) => develop(e.currentTarget)}
+            onAnimationEnd={(e) => e.animationName === 'polaroid-shake' && e.currentTarget.classList.remove('is-shaking')}
+            className="group toon relative mt-10 max-w-sm -rotate-2 cursor-pointer rounded-sm bg-paper p-3 pb-4 transition-transform duration-500 hover:rotate-0 focus-within:rotate-0 [&.is-developed]:rotate-0"
+          >
+            {/* keyboards could never develop the photo (a click or a hover did): a button that only shows
+                when focused does what a click does, and focus alone already develops it, like a hover */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                develop(e.currentTarget.closest('figure')!);
+              }}
+              className="sr-only z-20 font-mono text-xs focus-visible:not-sr-only focus-visible:absolute focus-visible:right-5 focus-visible:bottom-24 focus-visible:rounded-full focus-visible:bg-acid focus-visible:px-3 focus-visible:py-1.5 focus-visible:text-acid-ink"
+            >
+              Chacoalhar a foto ↻
+            </button>
+            {/* a strip of tape holds the polaroid in place, like a photo taped into a case file */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -top-3.5 left-1/2 z-10 h-7 w-28 -translate-x-1/2 rotate-[4deg] border-x border-dashed border-toon/25 bg-[repeating-linear-gradient(-45deg,rgb(249_226_125/0.88)_0_8px,rgb(255_228_92/0.88)_8px_16px)] shadow-[0_2px_0_rgb(18_8_42/0.18)]"
+            />
             <div data-portrait className="relative aspect-[4/5] overflow-hidden bg-bg-2">
               <Image
                 src="/team/henrique.png"
                 alt="Henrique Alexandre de Camargo, fundador da HenaWeb"
                 fill
-                sizes="(max-width: 1024px) 80vw, 25vw"
-                className="object-cover grayscale contrast-125 transition-[filter] duration-700 group-hover:grayscale-0 group-hover:contrast-100 group-[.is-developed]:grayscale-0 group-[.is-developed]:contrast-100"
+                sizes="(max-width: 767px) 80vw, (max-width: 1024px) 48vw, 25vw"
+                className="object-cover grayscale contrast-125 transition-[filter] duration-700 group-hover:grayscale-0 group-hover:contrast-100 group-focus-within:grayscale-0 group-focus-within:contrast-100 group-[.is-developed]:grayscale-0 group-[.is-developed]:contrast-100"
               />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,transparent_1.1px,rgb(18_8_42/0.85)_1.9px)] bg-[length:6px_6px] transition-opacity duration-700 group-hover:opacity-0 group-[.is-developed]:opacity-0" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,transparent_1.1px,rgb(18_8_42/0.85)_1.9px)] bg-[length:6px_6px] transition-opacity duration-700 group-hover:opacity-0 group-focus-within:opacity-0 group-[.is-developed]:opacity-0" />
             </div>
             <figcaption className="mt-3 text-center text-acid-ink">
               <span className="font-groovy block text-lg text-[#c2410c]">Fundador · Cientista da computação</span>
-              <span className="serif block text-xl">Henrique Alexandre de Camargo</span>
+              <span className="serif relative block text-xl">
+                Henrique Alexandre de Camargo
+                {/* a pen stroke signs under the name when the photo develops (hover, or mid-screen on touch) */}
+                <svg aria-hidden viewBox="0 0 200 12" preserveAspectRatio="none" className="sig-line pointer-events-none absolute -bottom-2 left-[12%] h-3 w-[76%] overflow-visible">
+                  <path d="M2,8 C30,2 52,11 80,6 S130,2 150,7 S186,9 198,4" pathLength="1" fill="none" stroke="#c2410c" strokeWidth="2.2" strokeLinecap="round" />
+                </svg>
+              </span>
             </figcaption>
           </figure>
         </div>
@@ -86,10 +178,24 @@ export default function Studio() {
 
           <ol data-principles className="mt-14 grid gap-5 sm:grid-cols-2">
             {principles.map((pr) => (
-              <li key={pr.n} data-principle className="win flex flex-col">
+              <li key={pr.n} data-principle data-rule={pr.n} className="win flex flex-col" onAnimationEnd={(e) => e.animationName === 'win-shake' && e.currentTarget.removeAttribute('data-shake')}>
                 <div className="win-bar">
-                  <span>regra_{pr.n.toLowerCase()}.txt</span>
+                  <span aria-hidden>regra_{pr.n.toLowerCase()}.txt</span>
                   <span className="win-btn ml-auto" aria-hidden>×</span>
+                </div>
+                {/* a Notepad menu bar, as on the real thing (Arquivo · Editar · Formatar · Exibir · Ajuda, with the
+                    keyboard-letter underlined); decorative, from sm up so the phone list stays compact */}
+                <div
+                  aria-hidden
+                  data-notepad-menu
+                  className="mx-1.5 mt-1 hidden gap-3 px-1.5 font-sans text-[0.72rem] text-[#12082a] sm:flex"
+                >
+                  {['Arquivo', 'Editar', 'Formatar', 'Exibir', 'Ajuda'].map((m) => (
+                    <span key={m}>
+                      <span className="underline underline-offset-2">{m[0]}</span>
+                      {m.slice(1)}
+                    </span>
+                  ))}
                 </div>
                 {/* phones: numeral beside the title instead of on a line of its own (rules list ~24% shorter) */}
                 <div className="m-1.5 flex-1 border-2 border-[#7d7394] bg-paper p-5 text-acid-ink sm:p-6">
@@ -97,7 +203,17 @@ export default function Studio() {
                     <span className="font-groovy w-14 shrink-0 text-4xl leading-none text-[#c2410c] sm:w-auto sm:text-5xl">{pr.n}</span>
                     <h3 className="text-xl font-medium tracking-tight sm:mt-6 sm:text-2xl">{pr.title}</h3>
                   </div>
-                  <p className="mt-3 leading-relaxed text-acid-ink/70">{pr.body}</p>
+                  <p data-rule-body={pr.n} className="mt-3 leading-relaxed text-acid-ink/70">{pr.body}</p>
+                </div>
+                {/* a Notepad status bar: house rules open read-only (they are not up for editing) */}
+                <div
+                  aria-hidden
+                  className="mx-1.5 mb-1.5 flex justify-between gap-3 border border-[#7d7394] bg-[#c9c3d8] px-2 py-0.5 font-mono text-[0.62rem] text-[#12082a] shadow-[inset_1px_1px_0_#fff]"
+                >
+                  {denied === pr.n ? <span className="font-bold text-[#b3122b]">⚠ arquivo somente leitura</span> : <span>🔒 somente leitura</span>}
+                  <span className="tabular-nums">
+                    {sel?.n === pr.n ? `Sel: ${sel.len} de ${pr.body.length}` : caret?.n === pr.n ? `Ln 1, Col ${caret.col}` : `${pr.body.length} caracteres`}
+                  </span>
                 </div>
               </li>
             ))}

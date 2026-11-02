@@ -1,9 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { process, stack } from '@/lib/content';
 import type { BurgerScene } from '@/lib/burgerScene';
+import { saveData } from '@/lib/saveData';
+import { chime } from '@/lib/chime';
+import { buzz } from '@/lib/haptic';
 import Marquee from './Marquee';
 import OrderTicket from './OrderTicket';
 
@@ -45,7 +48,8 @@ function DinerBack() {
       <g data-neon filter="url(#neon)">
         <rect x="120" y="8" width="360" height="74" rx="37" fill="none" stroke="#3cc6b4" strokeWidth="5" />
         <text x="300" y="56" textAnchor="middle" fontFamily="var(--font-shrikhand), Georgia, serif" fontSize="30" fill="#f7931e">
-          Lanches &amp; Sistemas
+          {/* a tired tube: the ampersand sputters now and then, like any diner sign that has seen a few winters */}
+          Lanches <tspan data-neon-buzz>&amp;</tspan> Sistemas
         </text>
       </g>
       <text x="300" y="104" textAnchor="middle" fontFamily="monospace" fontWeight="700" fontSize="12" letterSpacing="4" fill="#8b5cc7">
@@ -102,6 +106,34 @@ function DinerFront() {
   );
 }
 
+/** The 2D stand-in for the 3D burger, in the same toon outline as the diner drawing. */
+function FlatBurger() {
+  const ink = '#140a26';
+  return (
+    <svg viewBox="0 0 240 200" aria-hidden className="absolute left-1/2 top-[34%] h-[42%] -translate-x-1/2">
+      <g stroke={ink} strokeWidth="5" strokeLinejoin="round">
+        {/* top bun with sesame */}
+        <path d="M30 92 C30 40 210 40 210 92 Z" fill="#f4a23a" />
+        <g fill="#fdf3e1" stroke="none">
+          <ellipse cx="82" cy="68" rx="6" ry="3.5" transform="rotate(-20 82 68)" />
+          <ellipse cx="118" cy="60" rx="6" ry="3.5" />
+          <ellipse cx="154" cy="68" rx="6" ry="3.5" transform="rotate(20 154 68)" />
+          <ellipse cx="100" cy="76" rx="5" ry="3" transform="rotate(10 100 76)" />
+          <ellipse cx="140" cy="76" rx="5" ry="3" transform="rotate(-10 140 76)" />
+        </g>
+        {/* lettuce */}
+        <path d="M24 98 q12 14 24 0 q12 14 24 0 q12 14 24 0 q12 14 24 0 q12 14 24 0 q12 14 24 0 q12 14 24 0 q12 14 24 0 L216 94 L24 94 Z" fill="#a6d64b" />
+        {/* patty */}
+        <rect x="26" y="104" width="188" height="30" rx="14" fill="#6b3a1f" />
+        {/* cheese, dripping */}
+        <path d="M28 104 L212 104 L204 116 L184 108 L160 130 L140 110 L74 110 L58 124 L46 110 Z" fill="#f9e27d" />
+        {/* bottom bun */}
+        <path d="M32 140 L208 140 C208 170 196 176 120 176 C44 176 32 170 32 146 Z" fill="#f4a23a" />
+      </g>
+    </svg>
+  );
+}
+
 export default function Process() {
   const root = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -109,6 +141,50 @@ export default function Process() {
   // scroll triggers can fire before the lazy 3D scene exists; they live here so the scene can catch up
   const layerTriggers = useRef<ScrollTrigger[]>([]);
   const versionTrigger = useRef<ScrollTrigger | null>(null);
+
+  // ring it again and again and the kitchen answers back (a few rings inside a couple of seconds)
+  const KITCHEN = ['Já vai, já vai!', 'Calma, tá na chapa! 🍳', 'O que é bom leva tempo.', 'Sai em instantes, chef.'];
+  const rings = useRef<number[]>([]);
+  const replyN = useRef(0);
+  const replyTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [reply, setReply] = useState('');
+  // no 3D burger (data saver on, or no WebGL): a flat cartoon one is served instead
+  const [flatBurger, setFlatBurger] = useState(false);
+
+  /** The counter bell is a real bell: ring it any time for a ding (and a happy burger wobble). */
+  const ringBell = () => {
+    const el = root.current;
+    if (!el) return;
+    const now = performance.now();
+    rings.current = [...rings.current.filter((t) => now - t < 2500), now];
+    // a real ding, a touch higher on each ring of a frantic burst (the 4th sets the kitchen answering)
+    chime(1568 * 2 ** ((rings.current.length - 1) / 24));
+    buzz([4, 20, 4]);
+    if (rings.current.length >= 4) {
+      rings.current = [];
+      setReply(KITCHEN[replyN.current++ % KITCHEN.length]);
+      clearTimeout(replyTimer.current);
+      replyTimer.current = setTimeout(() => setReply(''), 2400);
+      // so much ringing the whole sign browns out for a second
+      const neon = el.querySelector('[data-neon]');
+      if (neon && !prefersReducedMotion())
+        gsap.fromTo(neon, { opacity: 1 }, { keyframes: { opacity: [1, 0.15, 0.9, 0.05, 0.6, 1] }, duration: 0.9, ease: 'none', overwrite: true });
+    }
+    const ding = el.querySelector('[data-burst="4"]');
+    const bell = el.querySelector('[data-bell]');
+    if (!ding || !bell) return;
+    if (prefersReducedMotion()) {
+      // no swing, no pop: the DING just shows for a moment
+      gsap.timeline().set(ding, { opacity: 1, scale: 1 }).set(ding, { opacity: 0 }, '+=0.9');
+      return;
+    }
+    scene.current?.celebrate();
+    gsap.timeline()
+      .to(bell, { rotation: 12, duration: 0.06, repeat: 5, yoyo: true, ease: 'none', overwrite: true })
+      .set(bell, { rotation: 0 })
+      .fromTo(ding, { opacity: 1, scale: 0.2 }, { scale: 1, duration: 0.4, ease: 'back.out(3)', overwrite: true }, 0)
+      .to(ding, { opacity: 0, duration: 0.25 }, '+=0.6');
+  };
 
   const versionAt = (p: number) => versions[Math.min(versions.length - 1, Math.floor(p * versions.length))];
 
@@ -128,6 +204,10 @@ export default function Process() {
   useEffect(() => {
     const el = canvas.current;
     if (!el) return;
+    if (saveData()) {
+      setFlatBurger(true);
+      return;
+    }
     let cancelled = false;
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -140,9 +220,10 @@ export default function Process() {
             ScrollTrigger.refresh();
             syncScene();
           } catch {
-            // no WebGL: the menu still tells the story
+            // no WebGL: the flat burger takes the plate
+            setFlatBurger(true);
           }
-        });
+        }, () => !cancelled && setFlatBurger(true)); // the 3D code didn't download (offline): the flat burger too
       },
       { rootMargin: '600px 0px' },
     );
@@ -167,7 +248,9 @@ export default function Process() {
         (ctx) => {
           if (ctx.conditions?.reduce) {
             gsap.set('[data-steam]', { opacity: 1 });
-            return;
+            // no scroll-played finale: the burger sits complete, so the slip says the order is up too
+            root.current?.setAttribute('data-served', '');
+            return () => root.current?.removeAttribute('data-served');
           }
           // below lg the diner sticks to the top ~half of the screen, so a step is only readable once it
           // clears it: the layer, the highlight and the finale happen lower in the viewport there
@@ -222,6 +305,13 @@ export default function Process() {
 
           const steps = root.current?.querySelectorAll('[data-step]');
           const last = steps?.[steps.length - 1];
+          // the steam only rises once the order is up, and only while the diner is on screen
+          // (it used to loop from page load, invisible at opacity 0)
+          const steam = gsap.to('[data-steam] path', { y: -10, opacity: 0.4, duration: 1.4, repeat: -1, yoyo: true, stagger: 0.3, ease: 'sine.inOut', paused: true });
+          let served = false;
+          let onScreen = false;
+          const syncSteam = () => (served && onScreen ? steam.play() : steam.pause());
+          ScrollTrigger.create({ trigger: root.current, start: 'top bottom', end: 'bottom top', onToggle: (self) => ((onScreen = self.isActive), syncSteam()) });
           versionTrigger.current = ScrollTrigger.create({
             trigger: last,
             start: stacked ? 'top 55%' : 'top 35%',
@@ -229,14 +319,19 @@ export default function Process() {
             onEnter: () => {
               gsap.to('[data-steam]', { opacity: 1, duration: 0.6 });
               finale.restart();
+              served = true;
+              root.current?.setAttribute('data-served', ''); // the order slip's stamp turns to "pronto" (OrderTicket)
+              syncSteam();
             },
             onLeaveBack: () => {
               gsap.to('[data-steam]', { opacity: 0, duration: 0.4 });
               finale.pause(0);
+              served = false;
+              root.current?.removeAttribute('data-served');
+              syncSteam();
             },
             onUpdate: (self) => scene.current?.setVersion(versionAt(self.progress)),
           });
-          gsap.to('[data-steam] path', { y: -10, opacity: 0.4, duration: 1.4, repeat: -1, yoyo: true, stagger: 0.3, ease: 'sine.inOut' });
 
           gsap.fromTo(
             '[data-ticket]',
@@ -254,7 +349,7 @@ export default function Process() {
     <section
       ref={root}
       id="processo"
-      className="paper relative z-10 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon pt-[clamp(5rem,10vw,9rem)] text-bg"
+      data-sheet className="group/proc paper relative z-10 -mt-8 rounded-t-[2rem] border-t-[3px] border-toon pt-[clamp(5rem,10vw,9rem)] text-bg"
     >
       <div className="gutter">
         <div className="grid gap-6 md:grid-cols-12">
@@ -271,20 +366,51 @@ export default function Process() {
           <div className="grid gap-6 lg:contents">
             {/* sticky diner */}
             <div className="sticky top-16 z-10 h-[40svh] lg:row-span-2 lg:top-[10vh] lg:col-span-6 lg:h-[80vh]">
-              <div className="toon relative mx-auto h-full max-w-[640px] overflow-hidden rounded-3xl bg-[#1e1442] p-[4%]">
+              <div className="diner toon relative mx-auto h-full max-w-[640px] overflow-hidden rounded-3xl bg-[#1e1442] p-[4%]">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_40%_at_50%_0%,rgb(60_198_180/0.25),transparent)]" />
                 <DinerBack />
                 <canvas ref={canvas} className="absolute inset-x-0 top-[12%] bottom-[8%] h-[80%] w-full" aria-hidden />
+                {flatBurger && <FlatBurger />}
                 <DinerFront />
+                {/* same viewBox as the drawing, so the hit area sits on the bell at any size */}
+                <svg viewBox="0 0 600 540" className="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
+                  <g
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Tocar a campainha do balcão"
+                    data-bell-btn
+                    className="pointer-events-auto cursor-pointer outline-none"
+                    onClick={ringBell}
+                    onPointerEnter={(e) => e.currentTarget.closest('.diner')?.setAttribute('data-bell-hover', '')}
+                    onPointerLeave={(e) => e.currentTarget.closest('.diner')?.removeAttribute('data-bell-hover')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        ringBell();
+                      }
+                    }}
+                  >
+                    <circle cx="62" cy="460" r="44" fill="transparent" />
+                    <circle data-bell-ring cx="62" cy="460" r="40" fill="none" stroke="#f9e27d" strokeWidth="4" strokeDasharray="8 6" opacity="0" />
+                  </g>
+                </svg>
+                {/* the kitchen talking back through the pass (role=status, so keyboard ringers hear it too) */}
+                <p
+                  role="status"
+                  className={`kitchen-reply toon-sm pointer-events-none absolute top-[30%] right-[5%] md:top-[7%] max-w-[60%] rounded-2xl rounded-br-sm bg-paper px-3 py-1.5 text-sm font-medium text-acid-ink ${reply ? 'is-on' : ''}`}
+                >
+                  {reply}
+                </p>
               </div>
             </div>
 
             {/* steps */}
             <div className="lg:col-span-6">
               <ol data-steps className="relative">
-                {process.map((s) => (
+                {process.map((s, i) => (
                   <li
                     key={s.n}
+                    id={`etapa-${i + 1}`}
                     data-step
                     className="group/step flex min-h-[56svh] flex-col justify-center border-t-2 border-bg/10 py-10 opacity-75 transition-opacity duration-500 motion-reduce:opacity-100 [&.is-active]:opacity-100 lg:min-h-[70vh]"
                   >
@@ -294,7 +420,7 @@ export default function Process() {
                         {s.n}
                       </span>
                       <h3 className="text-[clamp(1.9rem,3.2vw,2.9rem)] leading-none font-medium tracking-[-0.04em]">{s.title}</h3>
-                      <span className="mb-1.5 hidden min-w-6 flex-1 border-b-[3px] border-dotted border-bg/25 sm:block" aria-hidden />
+                      <span className="step-leader mb-1.5 hidden min-w-6 flex-1 border-b-[3px] border-dotted border-bg/25 sm:block" aria-hidden />
                       <span className="toon-sm shrink-0 rounded-full bg-cyan px-3 py-0.5 font-mono text-[0.68rem] text-acid-ink uppercase ">
                         {s.time}
                       </span>
@@ -303,8 +429,13 @@ export default function Process() {
                     <p className="mt-4 max-w-xl text-lg leading-relaxed text-bg/70">{s.body}</p>
                     <div className="mt-5 flex max-w-xl flex-wrap items-center gap-2">
                       <span className="label !text-bg/50">Ingredientes</span>
-                      {s.ingredients.map((ing) => (
-                        <span key={ing} className="rounded-full border-2 border-bg/70 bg-paper px-3 py-0.5 text-sm text-bg">
+                      {s.ingredients.map((ing, k) => (
+                        <span
+                          key={ing}
+                          data-ingredient
+                          style={{ '--i': k } as CSSProperties}
+                          className="rounded-full border-2 border-bg/70 bg-paper px-3 py-0.5 text-sm text-bg"
+                        >
                           {ing}
                         </span>
                       ))}

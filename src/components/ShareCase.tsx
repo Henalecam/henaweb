@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { copyText } from '@/lib/clipboard';
 import { track } from '@/lib/track';
 
 /**
@@ -21,7 +22,9 @@ export default function ShareCase({
   const [copied, setCopied] = useState(false);
 
   const share = async () => {
-    const url = location.href.split('#')[0];
+    // the page itself, without whatever brought this visitor here (?utm_…, ?fbclid=…, a filter): the person
+    // receiving it gets a clean address, and the campaign that reached the sender isn't credited twice
+    const url = location.origin + location.pathname;
     track({ name: 'cta_click', placement, label: title });
     if (navigator.share) {
       try {
@@ -32,11 +35,10 @@ export default function ShareCase({
         if ((e as DOMException)?.name === 'AbortError') return;
       }
     }
-    try {
-      await navigator.clipboard.writeText(url);
+    if (await copyText(url)) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2200);
-    } catch {}
+    }
   };
 
   return (
@@ -45,7 +47,7 @@ export default function ShareCase({
       onClick={share}
       className="toon toon-press rounded-full bg-paper px-6 py-4 font-medium text-acid-ink"
     >
-      <span aria-live="polite">{copied ? '✓ Link copiado' : label}</span>
+      <span aria-live="polite">{copied ? '✓ Link copiado' : label.replace(/ (\S+)$/, '\u00a0$1') /* the ↗ never wraps onto a line alone */}</span>
     </button>
   );
 }

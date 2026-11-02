@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { gsap, useGSAP } from '@/lib/gsap';
 
 const INK = '#140a26';
@@ -12,6 +12,28 @@ const INK = '#140a26';
 const u = (n: number) => `calc(var(--u)*${n})`;
 
 type EvidenceId = 'sheet' | 'mail' | 'note' | 'cal' | 'news';
+
+/**
+ * The "Sexta, 17h" calendar page notices when it is Friday where the visitor is (their office is the
+ * haunted one): before five it warns "é hoje", from five to six "é agora", later "foi hoje". Any other
+ * day it says nothing more. Client clock only, after mount (the server HTML is the plain "SEXTA").
+ */
+function FridayNote() {
+  const [note, setNote] = useState('');
+  useEffect(() => {
+    const tick = () => {
+      const d = new Date();
+      if (d.getDay() !== 5) return setNote('');
+      const h = d.getHours();
+      setNote(h < 17 ? 'é hoje' : h < 18 ? 'é agora' : 'foi hoje');
+    };
+    tick();
+    const id = window.setInterval(tick, 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+  if (!note) return null;
+  return <span data-friday={note} className="uppercase"> · {note}</span>;
+}
 
 const evidenceBodies: Record<EvidenceId, { label: string; body: ReactNode }> = {
   sheet: {
@@ -73,6 +95,7 @@ const evidenceBodies: Record<EvidenceId, { label: string; body: ReactNode }> = {
       >
         <div className="bg-[#d7263d] font-mono font-bold text-white" style={{ padding: `${u(0.5)} 0`, fontSize: u(1.5) }}>
           SEXTA
+          <FridayNote />
         </div>
         <div className="leading-none font-semibold" style={{ fontSize: u(5) }}>
           17h
@@ -211,6 +234,17 @@ function Suspect() {
   );
 }
 
+/** Marks the thread of one evidence card as pulled (`data-pulled`) and the board as busy (`data-pulling`). */
+function pullThread(card: HTMLElement, id: EvidenceId | null) {
+  const board = card.closest<HTMLElement>('[data-board]');
+  if (!board) return;
+  board.querySelectorAll('[data-pulled]').forEach((el) => el.removeAttribute('data-pulled'));
+  if (id) {
+    board.setAttribute('data-pulling', '');
+    board.querySelector(`[data-string="${id}"]`)?.setAttribute('data-pulled', '');
+  } else board.removeAttribute('data-pulling');
+}
+
 function Board() {
   return (
     <div
@@ -220,11 +254,11 @@ function Board() {
     >
       <div className="pointer-events-none absolute inset-0 z-[8] rounded-xl shadow-[inset_0_0_0_10px_#6b3f1f,inset_0_0_0_13px_#140a26,inset_0_0_40px_rgb(0_0_0/0.45)]" />
 
-      <svg className="pointer-events-none absolute inset-0 z-[1] h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
+      <svg data-threads className="pointer-events-none absolute inset-0 z-[1] h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
         {boardLayout.map((e) => (
           <path
             key={e.id}
-            data-string
+            data-string={e.id}
             d={`M${e.pin.x},${e.pin.y} Q${(e.pin.x + SUSPECT.x) / 2},${Math.max(e.pin.y, SUSPECT.y) + 8} ${SUSPECT.x},${SUSPECT.y}`}
             pathLength={1}
             fill="none"
@@ -239,9 +273,26 @@ function Board() {
       </svg>
 
       {boardLayout.map((e) => (
-        <div key={e.id} data-evidence className={`absolute z-[2] ${e.box}`} style={{ rotate: `${e.rot}deg` }}>
-          <Pin />
-          {evidenceBodies[e.id].body}
+        <div
+          key={e.id}
+          data-evidence
+          className={`absolute z-[2] ${e.box}`}
+          style={{ rotate: `${e.rot}deg` }}
+          // pulling on a piece of evidence tightens its own red thread to the suspect and lets the rest go slack
+          onPointerEnter={(ev) => ev.pointerType === 'mouse' && pullThread(ev.currentTarget, e.id)}
+          onPointerLeave={(ev) => ev.pointerType === 'mouse' && pullThread(ev.currentTarget, null)}
+          // a tablet has no hover: a tap pulls the card's thread, a second tap (or a tap on another card) lets go
+          onPointerUp={(ev) => {
+            if (ev.pointerType === 'mouse') return;
+            const pulled = ev.currentTarget.closest('[data-board]')?.querySelector(`[data-string="${e.id}"][data-pulled]`);
+            pullThread(ev.currentTarget, pulled ? null : e.id);
+          }}
+        >
+          {/* hanging from its pin: brushing the pointer past an evidence card sets it swinging */}
+          <div className="evidence-swing">
+            <Pin />
+            {evidenceBodies[e.id].body}
+          </div>
         </div>
       ))}
 
@@ -254,7 +305,7 @@ function Board() {
 
 const copy = {
   intro: {
-    kicker: '(III) Arquivo de casos',
+    kicker: '(III) Caso em aberto',
     title: 'O Caso do Sistema Assombrado',
     body: 'Toda empresa tem um fantasma. Ele some com aprovações, duplica cadastros e aparece toda sexta-feira às 17h.',
   },
@@ -299,7 +350,7 @@ function MobileFile() {
       <p className="mt-4 text-lg leading-relaxed text-ink/75">{copy.intro.body}</p>
 
       {/* the evidence, pinned down a strip of cork and stitched with red thread */}
-      <div className="toon relative mt-10 overflow-hidden rounded-2xl bg-[#b98a5a] px-4 py-10 [--u:clamp(8.5px,2.6vw,12px)]" style={corkStyle}>
+      <div data-cork className="toon relative mt-10 overflow-hidden rounded-2xl bg-[#b98a5a] px-4 py-10 [--u:clamp(8.5px,2.6vw,12px)]" style={corkStyle}>
         <div className="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_0_0_7px_#6b3f1f,inset_0_0_0_9px_#140a26,inset_0_0_30px_rgb(0_0_0/0.4)]" />
         <span className="absolute top-0 bottom-0 left-1/2 w-[3px] -translate-x-1/2 bg-[#d7263d]/25" aria-hidden />
         <span data-thread className="absolute top-0 bottom-0 left-1/2 w-[3px] origin-top -translate-x-1/2 scale-y-0 bg-[#d7263d]" aria-hidden />
@@ -319,7 +370,17 @@ function MobileFile() {
               >
                 Evidência {String(i + 1).padStart(2, '0')} · {evidenceBodies[e.id].label}
               </span>
-              <div className="relative clear-both">
+              {/* a tap sets the evidence swinging on its pin, like the pointer does on the desktop board */}
+              <div
+                className="evidence-swing relative clear-both"
+                onClick={(ev) => {
+                  const el = ev.currentTarget;
+                  el.removeAttribute('data-swing');
+                  void el.offsetWidth; // restart on every tap
+                  el.setAttribute('data-swing', '');
+                }}
+                onAnimationEnd={(ev) => ev.animationName === 'evidence-swing' && ev.currentTarget.removeAttribute('data-swing')}
+              >
                 <Pin />
                 {evidenceBodies[e.id].body}
               </div>
@@ -468,7 +529,7 @@ export default function Mystery() {
   }, []);
 
   return (
-    <section ref={root} id="caso" className="sky relative z-20 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon text-ink">
+    <section ref={root} id="caso" data-sheet className="sky relative z-20 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon text-ink">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,rgb(255_255_255/0.5)_1px,transparent_1.5px)] bg-[length:90px_90px] opacity-30" />
       <div
         className="tape absolute top-14 -left-10 z-[16] w-[130%] -rotate-[3deg] py-1.5 font-mono text-xs font-bold tracking-[0.25em] whitespace-nowrap uppercase lg:top-8"
@@ -493,7 +554,10 @@ export default function Mystery() {
               <div
                 key={k}
                 data-stage={i + 1}
-                className={`absolute inset-x-0 top-1/2 -translate-y-1/2 ${i ? 'invisible opacity-0' : ''}`}
+                // centred by layout, not by -translate-y-1/2: GSAP tweens these stages' y, and its 0 replaced the
+                // -50% on some sizes (1440×900, 1024×768), leaving the last stage hanging from the middle with its
+                // "Abra o seu caso" button under the next section
+                className={`absolute inset-0 flex flex-col items-start justify-center ${i ? 'invisible opacity-0' : ''}`}
               >
                 <span className="label !text-teal">{copy[k].kicker}</span>
                 {i === 0 ? (

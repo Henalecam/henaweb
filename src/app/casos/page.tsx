@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ReadProgress } from '@/components/ReadMarks';
+import { RandomCase, ReadProgress, CasesEmpty } from '@/components/ReadMarks';
 import { projectLinks } from '@/lib/projectLinks';
 import Image from 'next/image';
 import { projects, site } from '@/lib/content';
@@ -7,7 +7,11 @@ import Footer from '@/components/Footer';
 import MockUI from '@/components/MockUI';
 import ClosingCta from '@/components/ClosingCta';
 import CaseFilter from '@/components/CaseFilter';
+import CaseView from '@/components/CaseView';
+import { caseViewScript } from '@/lib/caseView';
+import { caseMorphScript } from '@/lib/caseMorph';
 import { services } from '@/lib/services';
+import { blurProps } from '@/lib/shotBlur';
 
 const description =
   'Casos resolvidos pela HenaWeb: ERPs, plataformas com IA, agendamento, produtos financeiros e sites. Veja o problema de cada cliente e o que construímos.';
@@ -15,14 +19,16 @@ const description =
 // content.ts can't hold this check: its own `process` export shadows Node's
 if (process.env.NODE_ENV !== 'production') {
   for (const p of projects) {
-    if (projectLinks.find((l) => l.slug === p.slug)?.name !== p.name) console.warn(`projectLinks.ts is out of sync with content.ts for "${p.slug}"`);
+    const link = projectLinks.find((l) => l.slug === p.slug);
+    if (link?.name !== p.name || link?.top !== p.shot?.desktop.replace(/\.jpg$/, '-top.jpg'))
+      console.warn(`projectLinks.ts is out of sync with content.ts for "${p.slug}"`);
   }
 }
 
 export const metadata: Metadata = {
   title: 'Casos e projetos de software sob medida',
   description,
-  alternates: { canonical: '/casos' },
+  alternates: { canonical: '/casos', types: { 'application/rss+xml': [{ url: '/casos/feed.xml', title: 'HenaWeb · Casos resolvidos' }] } },
   openGraph: {
     type: 'website',
     url: '/casos',
@@ -35,15 +41,6 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title: 'Casos e projetos de software sob medida · HenaWeb', description },
 };
 
-// Only the card of the case being opened (or the one being returned from) gets a
-// view-transition-name, so it morphs into the case page window while the other cards leave with
-// the page. pageswap/pagereveal only fire in browsers with cross-document view transitions.
-const CASE_MORPH = `(()=>{
-const card=(u)=>{try{const m=new URL(u).pathname.match(/^\\/casos\\/([\\w-]+)/);return m&&document.querySelector('[data-case-window="'+m[1]+'"]')}catch(e){return null}};
-const name=(el,on)=>{if(el)el.style.viewTransitionName=on?'caso-'+el.dataset.caseWindow:''};
-addEventListener('pageswap',(e)=>{if(!e.viewTransition)return;const el=card(e.activation&&e.activation.entry&&e.activation.entry.url);name(el,1);e.viewTransition.finished.finally(()=>name(el,0))});
-addEventListener('pagereveal',(e)=>{if(!e.viewTransition||!window.navigation)return;const f=navigation.activation&&navigation.activation.from;const el=card(f&&f.url);name(el,1);e.viewTransition.finished.finally(()=>name(el,0))});
-})();`;
 
 export default function CasesIndex() {
   const jsonLd = {
@@ -72,9 +69,9 @@ export default function CasesIndex() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <script dangerouslySetInnerHTML={{ __html: CASE_MORPH }} />
+      <script dangerouslySetInnerHTML={{ __html: caseMorphScript }} />
       <main id="conteudo" tabIndex={-1} className="sky min-h-screen text-ink">
-        <div className="gutter mx-auto max-w-6xl pt-36 pb-24">
+        <div data-case-zone className="gutter mx-auto max-w-6xl pt-36 pb-24">
           <p className="label !text-teal">Arquivo de casos</p>
           <h1 className="mt-4 text-[clamp(2.8rem,7vw,6.5rem)] leading-[0.9] font-medium tracking-[-0.05em]">
             Casos{' '}
@@ -87,52 +84,101 @@ export default function CasesIndex() {
             options={services
               .map((s) => ({ slug: s.slug, name: s.name, count: projects.filter((p) => p.service === s.slug).length }))
               .filter((o) => o.count > 0)}
+            empty={services.filter((s) => !projects.some((p) => p.service === s.slug)).map((s) => ({ slug: s.slug, name: s.name }))}
           />
           <ReadProgress slugs={projects.map((p) => p.slug)} />
-          <ul className="mt-10 grid gap-6 md:grid-cols-2">
+          <RandomCase />
+          <CaseView />
+          {/* "Exibir: Detalhes" on a wide screen reads as a file manager's details view, so it gets the column headers
+              one has (decorative: each row's link already names the case, its kind and the problem) */}
+          <div aria-hidden data-case-cols className="hidden">
+            <span>Nº</span>
+            <span>Nome</span>
+            <span>Tipo</span>
+            <span>O mistério</span>
+          </div>
+          <ul data-case-list className="mt-4 grid gap-6 md:grid-cols-2">
             {projects.map((p, i) => (
               <li key={p.slug} data-case-service={p.service} data-case-slug={p.slug}>
-                <a href={`/casos/${p.slug}`} className="group block">
-                  {/* the clicked card borrows the case page window's view-transition-name (CASE_MORPH) */}
+                {/* the link is named by the case and its kind and described by the problem: the whole card used to be
+                    its name (screenshot alt + title + kind + problem, 107–151 characters on every Tab) */}
+                <a
+                  href={`/casos/${p.slug}`}
+                  aria-labelledby={`caso-${p.slug} tipo-${p.slug}`}
+                  aria-describedby={`problema-${p.slug}`}
+                  className="group block"
+                >
+                  {/* the clicked card borrows the case page window's view-transition-name (caseMorphScript) */}
                   <div
                     data-case-window={p.slug}
-                    className="win transition-transform duration-500 ease-[var(--ease-out-expo)] [view-transition-class:case-window] group-hover:-translate-y-1.5 group-hover:-rotate-[0.6deg] group-focus-visible:-translate-y-1.5"
+                    className="win transition-transform duration-500 ease-[var(--ease-out-expo)] [view-transition-class:case-window] group-hover:-translate-y-1.5 group-hover:-rotate-[0.6deg] group-focus-visible:-rotate-[0.6deg] group-focus-visible:-translate-y-1.5"
                   >
                     <div className="win-bar">
-                      <span className="truncate">caso_{String(i + 1).padStart(2, '0')}.exe</span>
-                      <span data-read-mark={p.slug} hidden className="ml-auto shrink-0 rounded-sm bg-acid-ink/85 px-1.5 text-[0.65rem] text-acid">
+                      <span aria-hidden className="mr-auto truncate">caso_{String(i + 1).padStart(2, '0')}.exe</span>
+                      <span id={`lido-${p.slug}`} data-read-mark={p.slug} hidden className="shrink-0 rounded-sm bg-acid-ink/85 px-1.5 text-[0.65rem] text-acid">
                         ✓ investigado
+                      </span>
+                      {/* the same Win95 window controls as the case page's window this card turns into (decorative) */}
+                      <span aria-hidden className="flex shrink-0 gap-1">
+                        <span className="win-btn">_</span>
+                        <span className="win-btn">□</span>
+                        <span className="win-btn">×</span>
                       </span>
                     </div>
                     <div className="relative m-1.5 aspect-[16/10] overflow-hidden border-2 border-[#7d7394] bg-acid-ink">
                       {p.shot ? (
                         <Image
                           src={p.shot.desktop}
-                          alt={`Tela de ${p.name}`}
+                          {...blurProps(p.shot.desktop)}
+                          // decorative inside the link: the title names the case
+                          alt=""
                           fill
                           // the first card is the page's LCP: fetched right away instead of lazily
                           preload={i === 0}
                           fetchPriority={i === 0 ? 'high' : undefined}
-                          sizes="(max-width: 768px) 92vw, 540px"
+                          sizes="(max-width: 767px) 92vw, 540px"
                           className={`object-cover object-top ${
                             // long pages scroll by slowly on hover, like browsing the real site
                             p.shot.height > 1200
-                              ? 'transition-[object-position] duration-[6000ms] ease-linear group-hover:object-bottom'
-                              : 'transition-transform duration-700 group-hover:scale-[1.03]'
+                              ? 'transition-[object-position] duration-[6000ms] ease-linear motion-safe:group-hover:object-bottom motion-safe:group-focus-visible:object-bottom'
+                              : 'transition-transform duration-700 group-hover:scale-[1.03] group-focus-visible:scale-[1.03]'
                           }`}
                         />
                       ) : (
                         p.mock && <MockUI variant={p.mock.variant} hue={p.mock.hue} />
                       )}
+                      {/* pointing at a case (or tabbing to it) thumps the archive's verdict onto its screen */}
+                      <span
+                        aria-hidden
+                        className="case-stamp pointer-events-none absolute right-4 bottom-4 z-10 rounded-md border-4 border-[#1f6f63] bg-lemon/90 px-3 py-1 font-mono text-xs font-bold tracking-[0.2em] text-[#1f6f63] uppercase select-none"
+                      >
+                        Resolvido ✓
+                      </span>
                     </div>
                   </div>
-                  <h2 className="mt-5 text-3xl font-medium tracking-[-0.03em] group-hover:text-acid">{p.name} →</h2>
-                  <p className="serif mt-1 text-lg text-ink/60">{p.kind}</p>
-                  <p className="mt-2 leading-relaxed text-ink/70">{p.challenge}</p>
+                  <h2 id={`caso-${p.slug}`} className="mt-5 text-3xl font-medium tracking-[-0.03em] group-hover:text-acid group-focus-visible:text-acid">
+                    {p.name} <span aria-hidden>→</span>
+                  </h2>
+                  <p id={`tipo-${p.slug}`} className="serif mt-1 text-lg text-ink/60">
+                    {p.kind}
+                  </p>
+                  <p id={`problema-${p.slug}`} className="mt-2 leading-relaxed text-ink/70">
+                    {p.challenge}
+                  </p>
                 </a>
+                {/* what got built, at a glance: outside the link so its accessible name stays the case name */}
+                <ul aria-label={`Recursos de ${p.name}`} className="mt-4 flex flex-wrap gap-1.5">
+                  {p.highlights.map((h) => (
+                    <li key={h} className="rounded-full border border-ink/25 px-2.5 py-0.5 font-mono text-[0.7rem] tracking-wide text-ink/75">
+                      {h}
+                    </li>
+                  ))}
+                </ul>
               </li>
             ))}
           </ul>
+          <script dangerouslySetInnerHTML={{ __html: caseViewScript }} />
+          <CasesEmpty />
 
           <ClosingCta
             title="Reconheceu o seu problema em algum"

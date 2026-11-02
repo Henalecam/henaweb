@@ -2,10 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { gsap, useGSAP } from '@/lib/gsap';
+import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
 import { projects, type Project } from '@/lib/content';
 import MockUI from './MockUI';
-import { RevealRead } from './ReadMarks';
+import { RevealRead, ResumeReading } from './ReadMarks';
+import { serviceLinks } from '@/lib/serviceLinks';
+import { blurProps } from '@/lib/shotBlur';
+import PhoneStatus from './PhoneStatus';
+import RollCount from './RollCount';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -28,11 +32,12 @@ function Screen({ p, tall = true, images = true }: { p: Project; tall?: boolean;
             images && (
               <Image
                 src={p.shot.desktop}
+                {...blurProps(p.shot.desktop)}
                 alt={`Captura de tela de ${p.name}`}
                 fill
-                sizes="(max-width: 1024px) 92vw, 58vw"
+                sizes="(max-width: 767px) 92vw, (max-width: 1024px) 62vw, 58vw"
                 className={`object-cover object-top ${
-                  tall && p.shot.height > 1200 ? 'transition-[object-position] duration-[6000ms] ease-linear group-hover/screen:object-bottom' : ''
+                  tall && p.shot.height > 1200 ? 'transition-[object-position] duration-[6000ms] ease-linear motion-safe:group-hover/screen:object-bottom motion-safe:group-focus-visible/screen:object-bottom' : ''
                 }`}
               />
             )
@@ -42,8 +47,14 @@ function Screen({ p, tall = true, images = true }: { p: Project; tall?: boolean;
         </div>
       </div>
       {p.shot && images && (
-        <div className="toon absolute -right-2 -bottom-5 aspect-[390/844] w-[22%] overflow-hidden rounded-[1.3rem] bg-black md:-right-4 md:w-[19%]">
-          <Image src={p.shot.mobile} alt={`${p.name} no celular`} fill sizes="18vw" className="object-cover object-top" />
+        <div className="@container toon absolute -right-2 -bottom-5 aspect-[390/844] w-[22%] overflow-hidden rounded-[1.3rem] bg-black md:-right-4 md:w-[19%]">
+          {/* about a fifth of the screen card: ~160 px on a 1440 desktop (the index column takes the rest), ~75 px
+              on a phone card. "18vw" asked for 259 px there and fetched the 384-px file */}
+          {/* under the same status bar as the phone on the case pages (the visitor's own time) */}
+          <div className="absolute inset-x-0 top-[11cqw] bottom-0">
+            <Image src={p.shot.mobile} {...blurProps(p.shot.mobile)} alt={`${p.name} no celular`} fill sizes="(max-width: 1024px) 20vw, 12vw" className="object-cover object-top" />
+          </div>
+          <PhoneStatus />
         </div>
       )}
     </div>
@@ -79,20 +90,93 @@ export default function Work() {
     return () => mq.removeEventListener('change', sync);
   }, []);
   const [paused, setPaused] = useState(false);
+  // phones/tablets: which card of the swipe row is centred, for the dots under it
+  const strip = useRef<HTMLOListElement>(null);
+  const [card, setCard] = useState(0);
+  const onStrip = () => {
+    const ol = strip.current;
+    if (!ol) return;
+    const items = [...ol.children] as HTMLElement[];
+    const mid = ol.scrollLeft + ol.clientWidth / 2;
+    let best = 0;
+    items.forEach((li, i) => {
+      if (Math.abs(li.offsetLeft + li.offsetWidth / 2 - mid) < Math.abs(items[best].offsetLeft + items[best].offsetWidth / 2 - mid)) best = i;
+    });
+    setCard(best);
+  };
+  const goCard = (i: number) => {
+    const li = strip.current?.children[i] as HTMLElement | undefined;
+    li?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', inline: 'center', block: 'nearest' });
+  };
+  // an explicit stop (WCAG 2.2.2: content that changes by itself needs a way to stop it) and
+  // whether the section is on screen at all: rotating off screen only burned GSAP tweens
+  const [stopped, setStopped] = useState(false);
+  const [inView, setInView] = useState(false);
   const p = projects[active];
+  // desktop index: narrow the list to one service (the archive page has the same chips); rotation and
+  // arrow keys stay inside the filtered list
+  const [svc, setSvc] = useState<string | null>(null);
+  const shown = projects.map((_, i) => i).filter((i) => !svc || projects[i].service === svc);
+  const pickService = (slug: string | null) => {
+    setSvc(slug);
+    const first = projects.findIndex((x) => !slug || x.service === slug);
+    if (first >= 0 && (slug ? projects[active].service !== slug : false)) setActive(first);
+  };
+  const services = serviceLinks
+    .map((x) => ({ ...x, n: projects.filter((pr) => pr.service === x.slug).length }))
+    .filter((x) => x.n > 0);
 
   // WAI-ARIA tabs: arrows, Home and End move between projects (focusing a tab selects it)
   const onTabKey = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    const last = projects.length - 1;
-    const next = { ArrowDown: active + 1, ArrowRight: active + 1, ArrowUp: active - 1, ArrowLeft: active - 1, Home: 0, End: last }[e.key];
+    const pos = Math.max(0, shown.indexOf(active));
+    const last = shown.length - 1;
+    const next = { ArrowDown: pos + 1, ArrowRight: pos + 1, ArrowUp: pos - 1, ArrowLeft: pos - 1, Home: 0, End: last }[e.key];
     if (next === undefined) return;
     e.preventDefault();
-    const i = next < 0 ? last : next > last ? 0 : next;
-    document.getElementById(`work-tab-${i}`)?.focus();
+    const k = next < 0 ? last : next > last ? 0 : next;
+    document.getElementById(`work-tab-${shown[k]}`)?.focus();
   };
+
+  // back from a case page (Back, or "Início"/the logo from there): the section opens on the case just read, not
+  // on case 01, so the screen the case window morphs back into is that case's and the reader picks up where they
+  // were. The phone row scrolls sideways only (never the page); the tab gets a brief "you were here" ring when seen.
+  useEffect(() => {
+    let from = '';
+    try {
+      from = (window as unknown as { navigation?: { activation?: { from?: { url?: string } | null } } }).navigation?.activation?.from?.url ?? '';
+      if (!from && document.referrer) from = document.referrer;
+      const u = new URL(from);
+      if (u.origin !== location.origin) return;
+      const slug = u.pathname.match(/^\/casos\/([\w-]+)/)?.[1];
+      const i = slug ? projects.findIndex((x) => x.slug === slug) : -1;
+      if (i < 0) return;
+      setActive(i);
+      setStopped(true);
+      const ol = strip.current;
+      const li = ol?.children[i] as HTMLElement | undefined;
+      if (ol && li) ol.scrollLeft = li.offsetLeft - (ol.clientWidth - li.offsetWidth) / 2;
+      // the ring plays when the tab is actually seen (Back lands on the section; "Início" lands at the top)
+      const tab = document.getElementById(`work-tab-${i}`);
+      if (!tab) return;
+      let t = 0;
+      const io = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        tab.setAttribute('data-returned', '');
+        t = window.setTimeout(() => tab.removeAttribute('data-returned'), 2600);
+      }, { threshold: 1 });
+      io.observe(tab);
+      return () => {
+        io.disconnect();
+        clearTimeout(t);
+      };
+    } catch {}
+  }, []);
 
   useGSAP(
     () => {
+      // reduced motion: no entrance and no swap wipe (CSS reduced-motion can't stop GSAP tweens)
+      if (prefersReducedMotion()) return;
       gsap.from('[data-work-in]', {
         y: 50,
         autoAlpha: 0,
@@ -108,7 +192,7 @@ export default function Work() {
   // a quick swap animation every time the exhibit changes
   useEffect(() => {
     const el = root.current;
-    if (!el) return;
+    if (!el || prefersReducedMotion()) return;
     gsap.fromTo(
       el.querySelector('[data-exhibit]'),
       { clipPath: 'inset(0% 0% 100% 0%)' },
@@ -123,10 +207,25 @@ export default function Work() {
 
   // slow autoplay on desktop while nobody is browsing
   useEffect(() => {
-    if (paused || window.matchMedia('(max-width: 1023px), (prefers-reduced-motion: reduce)').matches) return;
-    const id = setInterval(() => setActive((a) => (a + 1) % projects.length), 6500);
+    const el = root.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.25 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const rotating = !paused && !stopped && inView;
+  useEffect(() => {
+    if (!rotating || window.matchMedia('(max-width: 1023px), (prefers-reduced-motion: reduce)').matches) return;
+    const id = setInterval(
+      () =>
+        setActive((a) => {
+          const list = projects.map((_, i) => i).filter((i) => !svc || projects[i].service === svc);
+          return list[(list.indexOf(a) + 1) % list.length] ?? a;
+        }),
+      6500,
+    );
     return () => clearInterval(id);
-  }, [paused]);
+  }, [rotating, svc]);
 
   return (
     <section ref={root} id="projetos" className="sky relative overflow-hidden border-t-[3px] border-toon py-[clamp(5rem,9vw,8rem)]">
@@ -137,7 +236,7 @@ export default function Work() {
           <div className="md:col-span-7">
             <span className="label">(V) Arquivo de casos resolvidos</span>
             <h2 className="mt-5 text-[clamp(2.6rem,5.6vw,6rem)] leading-[0.9] font-medium tracking-[-0.05em]">
-              {pad(projects.length)} casos{' '}
+              <RollCount n={projects.length} /> casos{' '}
               <span className="font-groovy text-[0.85em] tracking-normal text-acid [text-shadow:4px_4px_0_#140a26]">resolvidos.</span>
             </h2>
           </div>
@@ -146,9 +245,10 @@ export default function Work() {
               Cada projeto começou com um mistério na operação de alguém. Escolha um caso e veja o que encontramos e o
               que construímos.
             </p>
-            <a href="/casos" className="mt-4 inline-block font-medium text-acid underline-offset-4 hover:underline">
+            <a href="/casos" className="pen-link mt-4 inline-block font-medium text-acid">
               Ver o arquivo completo →
             </a>
+            <ResumeReading cases={projects.map((x) => ({ slug: x.slug, name: x.name }))} />
           </div>
         </div>
 
@@ -159,56 +259,83 @@ export default function Work() {
           onPointerLeave={() => setPaused(false)}
           onFocusCapture={() => setPaused(true)}
         >
-          <ol data-work-in className="flex flex-col lg:col-span-4" role="tablist" aria-label="Projetos">
-            {projects.map((item, i) => {
-              const on = i === active;
-              return (
-                <li key={item.name} role="presentation">
-                  <button
-                    type="button"
-                    role="tab"
-                    id={`work-tab-${i}`}
-                    aria-selected={on}
-                    aria-controls="work-panel"
-                    // roving focus: Tab enters the list once, arrows move between projects
-                    tabIndex={on ? 0 : -1}
-                    onKeyDown={onTabKey}
-                    onMouseEnter={() => setActive(i)}
-                    onFocus={() => setActive(i)}
-                    onClick={() => setActive(i)}
-                    className={`relative flex w-full items-baseline gap-4 border-b border-line py-3.5 text-left transition-colors ${
-                      on ? 'text-ink' : 'text-ink/45 hover:text-ink/80'
-                    }`}
-                  >
-                    <span className={`flex w-6 shrink-0 flex-col font-mono text-xs ${on ? 'text-acid' : ''}`}>
-                      {pad(i + 1)}
-                      {/* revealed by RevealRead for cases this visitor already opened */}
-                      <span data-read-mark={item.slug} hidden className="text-acid" title="Caso já lido">
-                        ✓<span className="sr-only"> lido</span>
-                      </span>
-                    </span>
-                    <span className="flex-1">
-                      <span className="block text-[clamp(1.5rem,2.3vw,2.25rem)] leading-none font-medium tracking-[-0.04em]">
-                        {item.name}
-                      </span>
-                      <span className={`serif mt-1 block text-base transition-opacity ${on ? 'opacity-70' : 'opacity-0'}`}>{item.kind}</span>
-                    </span>
-                    <span
-                      className={`toon-sm flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-acid text-acid-ink transition-all ${
-                        on ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+          <div className="lg:col-span-4">
+            <div role="group" aria-label="Filtrar casos por serviço" className="mb-4 flex flex-wrap gap-1.5" data-print-hide>
+              {[{ slug: null as string | null, name: 'Todos', n: projects.length }, ...services].map((x) => (
+                <button
+                  key={x.slug ?? 'todos'}
+                  type="button"
+                  aria-pressed={svc === x.slug}
+                  onClick={() => pickService(x.slug)}
+                  className={`min-h-8 rounded-full border px-3 font-mono text-[0.68rem] transition-colors ${
+                    svc === x.slug ? 'border-acid bg-acid text-acid-ink' : 'border-ink/30 text-ink/75 hover:border-ink hover:text-ink'
+                  }`}
+                >
+                  {x.name} <span className="opacity-80">({x.n})</span>
+                </button>
+              ))}
+            </div>
+            <ol data-work-in className="flex flex-col" role="tablist" aria-label="Projetos">
+              {projects.map((item, i) => {
+                const on = i === active;
+                if (!shown.includes(i)) return null;
+                return (
+                  <li key={item.name} role="presentation">
+                    <button
+                      type="button"
+                      role="tab"
+                      id={`work-tab-${i}`}
+                      aria-selected={on}
+                      aria-controls="work-panel"
+                      // roving focus: Tab enters the list once, arrows move between projects
+                      tabIndex={on ? 0 : -1}
+                      onKeyDown={onTabKey}
+                      onMouseEnter={() => setActive(i)}
+                      onFocus={() => setActive(i)}
+                      onClick={() => setActive(i)}
+                      className={`relative flex w-full items-baseline gap-4 border-b border-line py-3.5 text-left transition-colors ${
+                        on ? 'text-ink' : 'text-ink/60 hover:text-ink/85'
                       }`}
-                      aria-hidden
                     >
-                      →
-                    </span>
-                    {on && !paused && (
-                      <span key={active} className="absolute bottom-[-1px] left-0 h-[2px] w-full origin-left animate-[progress_6.5s_linear] bg-acid" />
-                    )}
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
+                      <span className={`flex w-6 shrink-0 flex-col font-mono text-xs ${on ? 'text-acid' : ''}`}>
+                        {pad(i + 1)}
+                        {/* revealed by RevealRead for cases this visitor already opened */}
+                        <span data-read-mark={item.slug} hidden className="text-acid" title="Caso já lido">
+                          ✓<span className="sr-only"> lido</span>
+                        </span>
+                      </span>
+                      <span className="flex-1">
+                        <span className="block text-[clamp(1.5rem,2.3vw,2.25rem)] leading-none font-medium tracking-[-0.04em]">
+                          {item.name}
+                        </span>
+                        <span className={`serif mt-1 block text-base transition-opacity ${on ? 'opacity-70' : 'opacity-0'}`}>{item.kind}</span>
+                      </span>
+                      <span
+                        className={`toon-sm flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-acid text-acid-ink transition-all ${
+                          on ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+                        }`}
+                        aria-hidden
+                      >
+                        →
+                      </span>
+                      {on && rotating && (
+                        <span key={active} className="absolute bottom-[-1px] left-0 h-[2px] w-full origin-left animate-[progress_6.5s_linear] bg-acid" />
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+            <button
+              type="button"
+              data-print-hide
+              onClick={() => setStopped((v) => !v)}
+              className="label mt-4 inline-flex min-h-8 items-center gap-2 rounded-full !text-ink/70 transition-colors hover:!text-ink motion-reduce:hidden"
+            >
+              <span aria-hidden>{stopped ? '▶' : '❚❚'}</span>
+              {stopped ? 'Retomar a troca automática' : 'Pausar a troca automática'}
+            </button>
+          </div>
 
           <div className="lg:col-span-8" role="tabpanel" id="work-panel" aria-labelledby={`work-tab-${active}`}>
             <a
@@ -218,7 +345,7 @@ export default function Work() {
               data-cursor="Visitar"
               className="group/screen block aspect-[16/9.4]"
             >
-              <div data-exhibit className="h-full">
+              <div data-exhibit data-case-window={p.slug} className="h-full">
                 <Screen p={p} images={cards === false} />
               </div>
             </a>
@@ -253,12 +380,14 @@ export default function Work() {
 
         {/* mobile / tablet: swipeable cards */}
         <div className="-mx-[clamp(1rem,4vw,3.5rem)] mt-12 lg:hidden">
-          <ol className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-[clamp(1rem,4vw,3.5rem)] pb-10 [scrollbar-width:none]">
+          <ol ref={strip} onScroll={onStrip} data-work-strip className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-[clamp(1rem,4vw,3.5rem)] pb-10 [scrollbar-width:none]">
             {projects.map((item, i) => (
-              <li key={item.name} className="w-[86%] shrink-0 snap-center sm:w-[70%]">
+              // a keyboard reaching this card's link (Tab) centres the card, as a swipe would: the browser only
+              // nudged a half-visible link into view, leaving the card cut at the screen's edge
+              <li key={item.name} onFocus={() => goCard(i)} className="w-[86%] shrink-0 snap-center sm:w-[70%]">
                 {/* the screenshot opens the case page, like the link below it, instead of leaving for the client's site */}
                 {/* same target as "Ver caso completo" below: hidden from screen readers and the tab order so it isn't announced twice */}
-                <a href={`/casos/${item.slug}`} aria-hidden tabIndex={-1} className="block aspect-[16/10.5]">
+                <a href={`/casos/${item.slug}`} aria-hidden tabIndex={-1} data-case-window={item.slug} className="block aspect-[16/10.5]">
                   <Screen p={item} tall={false} images={cards === true} />
                 </a>
                 <div className="mt-8 flex flex-col gap-3">
@@ -271,16 +400,45 @@ export default function Work() {
                   <h3 className="text-3xl leading-none font-medium tracking-[-0.04em]">{item.name}</h3>
                   <span className="serif -mt-1 text-lg text-ink/60">{item.kind}</span>
                   <Story p={item} />
-                  <a href={`/casos/${item.slug}`} className="mt-2 w-fit font-medium text-acid underline-offset-4 hover:underline">
+                  <a href={`/casos/${item.slug}`} className="pen-link mt-2 w-fit font-medium text-acid">
                     Ver caso completo →
                   </a>
                 </div>
               </li>
             ))}
           </ol>
-          <p className="label px-[clamp(1rem,4vw,3.5rem)]">Deslize para ver os outros casos →</p>
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-[clamp(1rem,4vw,3.5rem)]">
+            <p className="label" data-print-hide>{card === projects.length - 1 ? '← Último caso. Deslize para voltar' : 'Deslize para ver os outros casos →'}</p>
+            {/* where you are in the row; each dot jumps to its case (24px targets, the dot itself is small) */}
+            <div className="flex items-center" data-print-hide>
+              {projects.map((item, i) => (
+                <button
+                  key={item.slug}
+                  type="button"
+                  onClick={() => goCard(i)}
+                  aria-label={`Mostrar o caso ${item.name}`}
+                  aria-current={i === card ? 'true' : undefined}
+                  className="grid h-6 w-6 place-items-center"
+                >
+                  <span data-dot={i === card ? 'on' : ''} className={`block h-1.5 rounded-full transition-all duration-300 ${i === card ? 'w-4 bg-acid' : 'w-1.5 bg-ink/55'}`} />
+                </button>
+              ))}
+            </div>
+          </div>
           <RevealRead />
         </div>
+        {/* on paper the swipe row above is cut at the page edge (2 of the 7 cases reached a PDF): the whole archive
+            follows as a plain index, one line per case with its address */}
+        <ol className="mt-6 hidden text-sm print:block">
+          {projects.map((item, i) => (
+            <li key={item.slug} className="flex gap-3 border-t border-line py-1.5">
+              <span className="font-mono">{pad(i + 1)}</span>
+              <span className="font-medium">{item.name}</span>
+              <span className="serif">{item.kind}</span>
+              <span className="ml-auto font-mono text-xs">henaweb.com/casos/{item.slug}</span>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   );

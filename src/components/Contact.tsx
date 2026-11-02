@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { gsap, SplitText, useGSAP } from '@/lib/gsap';
+import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
+import { SplitText } from '@/lib/split';
 import { projects, symptoms, timelines, whatsappLink, site } from '@/lib/content';
 import { serviceLinks } from '@/lib/serviceLinks';
 
@@ -27,8 +28,37 @@ import CopyEmail from './CopyEmail';
 import { suggestEmail } from '@/lib/emailTypos';
 import { formatPhoneBR } from '@/lib/phone';
 import Social from './Social';
+import NewTab from './NewTab';
+import Tick from './Tick';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
+/** ms before the button admits the send is slow, and before it gives up and offers WhatsApp / e-mail */
+const SLOW_AFTER = 6000;
+const SEND_TIMEOUT = 20000;
+
+// symptom capability → service page slug, to point a freshly opened case at a similar solved one
+const CAPABILITY_SERVICE: Record<string, string> = {
+  'Sistema sob medida': 'sistemas-sob-medida',
+  'Automação & IA': 'automacao-e-ia',
+  'Sistema público': 'sistemas-publicos',
+  'Site / produto': 'sites-e-produtos',
+};
+
+/** A solved case close to what the visitor described, preferring one they haven't read yet; else the service page. */
+function similarCase(capability: string | undefined): { label: string; href: string } | null {
+  const service = capability && CAPABILITY_SERVICE[capability];
+  if (!service) return null;
+  let read: string[] = [];
+  try {
+    const v = JSON.parse(localStorage.getItem('hena:read') ?? '[]');
+    if (Array.isArray(v)) read = v;
+  } catch {}
+  const same = projects.filter((p) => p.service === service);
+  const pick = same.find((p) => !read.includes(p.slug)) ?? same[0];
+  if (pick) return { label: `o caso ${pick.name}`, href: `/casos/${pick.slug}` };
+  const name = serviceLinks.find((x) => x.slug === service)?.name;
+  return name ? { label: `como trabalhamos com ${name}`, href: `/servicos/${service}` } : null;
+}
 
 /**
  * Where the visitor came from, for the briefing e-mail: the page of this site they were reading
@@ -55,6 +85,9 @@ function leadOrigin(): string {
 // the half-written case survives a detour to read a case study and come back (same tab only)
 const DRAFT = 'hena:draft';
 const DRAFT_FIELDS = ['name', 'email', 'whatsapp', 'org', 'message'] as const;
+const MSG_MAX = 4000;
+// one sign per deadline chip (shown on the chosen one): from the siren of 'para ontem' to the coffee of 'sem pressa'
+const TIMELINE_ICON: Record<string, string> = { 'Para ontem': '🚨', '1 a 3 meses': '⏱', '3 a 6 meses': '📅', 'Sem pressa': '☕' };
 type Draft = { picked: string[]; timeline: string; fields: Partial<Record<(typeof DRAFT_FIELDS)[number], string>> };
 
 function readDraft(): Draft | null {
@@ -66,18 +99,30 @@ function readDraft(): Draft | null {
   }
 }
 
+// focus: the underline goes from a faint 2px to a solid 4px (border + a 2px shadow below, so nothing shifts)
 const field =
-  'peer w-full border-b-2 border-acid-ink/35 bg-transparent pt-6 pb-2 text-lg text-acid-ink placeholder:text-transparent focus:border-acid-ink focus:outline-none user-invalid:border-[#b3122b]';
+  'peer w-full border-b-2 border-acid-ink/35 bg-transparent pt-6 pb-2 text-lg text-acid-ink placeholder:text-transparent focus:border-acid-ink focus:shadow-[0_2px_0_var(--color-acid-ink)] focus:outline-none user-invalid:border-[#b3122b] user-invalid:focus:shadow-[0_2px_0_#b3122b]';
 
 /**
  * Floating label: sits inside the empty field like a placeholder, then shrinks above it on focus or
  * once filled, so the visitor never loses track of which line is which. The label is a real <label>.
  * Inputs need `placeholder=" "` for the :placeholder-shown check.
  */
-function Floating({ label, children, className = '' }: { label: string; children: ReactNode; className?: string }) {
+function Floating({ label, children, className = '', check = false }: { label: string; children: ReactNode; className?: string; check?: boolean }) {
   return (
     <label className={`relative block ${className}`}>
       {children}
+      {/* `check`: a field that has an answer the browser accepts gets a small green tick at its right end, so a
+          filled form reads as done at a glance (the red underline already marks the wrong ones). Decorative */}
+      {check && (
+        <span
+          aria-hidden
+          data-field-ok
+          className="pointer-events-none absolute right-0 bottom-2.5 flex h-5 w-5 scale-50 items-center justify-center rounded-full bg-[#1f6f63] text-[0.7rem] font-bold text-paper opacity-0 transition-[opacity,scale] duration-200 ease-[cubic-bezier(0.3,0.7,0.4,1.5)] peer-[:not(:placeholder-shown):valid]:scale-100 peer-[:not(:placeholder-shown):valid]:opacity-100"
+        >
+          ✓
+        </span>
+      )}
       <span className="pointer-events-none absolute top-6 left-0 origin-left text-lg text-acid-ink/70 transition-all duration-200 peer-focus:top-0 peer-focus:font-mono peer-focus:text-[0.7rem] peer-focus:tracking-[0.12em] peer-focus:text-acid-ink/80 peer-focus:uppercase peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:font-mono peer-[:not(:placeholder-shown)]:text-[0.7rem] peer-[:not(:placeholder-shown)]:tracking-[0.12em] peer-[:not(:placeholder-shown)]:text-acid-ink/80 peer-[:not(:placeholder-shown)]:uppercase motion-reduce:transition-none">
         {label}
       </span>
@@ -93,6 +138,17 @@ const explain = (e: FormEvent<HTMLInputElement>) => {
 };
 const clear = (e: FormEvent<HTMLInputElement>) => e.currentTarget.setCustomValidity('');
 
+/** WhatsApp is optional, but a half-typed number ("(41) 999") can't be called back: needs DDD + number. */
+const checkPhone = (el: HTMLInputElement) => {
+  const v = el.value.trimStart();
+  const digits = v.replace(/\D/g, '');
+  const foreign = v.startsWith('+') && !v.startsWith('+55');
+  const local = v.startsWith('+55') ? digits.slice(2) : digits;
+  el.setCustomValidity(
+    !digits || (foreign ? digits.length >= 8 : local.length >= 10) ? '' : 'Faltam dígitos: DDD + número, como (41) 99999-9999. Ou deixe em branco.',
+  );
+};
+
 export default function Contact() {
   const root = useRef<HTMLElement>(null);
   const done = useRef<HTMLDivElement>(null);
@@ -103,12 +159,41 @@ export default function Contact() {
   const [picked, setPicked] = useState<string[]>([]);
   const [timeline, setTimeline] = useState(timelines[1]);
   const [status, setStatus] = useState<Status>('idle');
+  // a send that drags on says so (and gives up after SEND_TIMEOUT, so the WhatsApp/e-mail fallback appears)
+  const [slow, setSlow] = useState(false);
+  // a send that failed because the device is offline says so, and says when the connection is back
+  const [net, setNet] = useState<'ok' | 'offline' | 'back'>('ok');
+  useEffect(() => {
+    if (net !== 'offline') return;
+    const back = () => setNet('back');
+    window.addEventListener('online', back);
+    return () => window.removeEventListener('online', back);
+  }, [net]);
   // what the visitor filled in, kept so a failed send can hand the whole case to WhatsApp or e-mail
   const [fallback, setFallback] = useState('');
   const [caseNo, setCaseNo] = useState('...');
   // "came from the Diconta case": shown on the form and attached to the message, removable
   const [reference, setReference] = useState<string | null>(null);
   useEffect(() => setReference(readReference()), []);
+  // "#mensagem" (the FAQ's "ask us directly") lands with the cursor already in the message box
+  useEffect(() => {
+    const focusMessage = () => {
+      if (location.hash !== '#mensagem') return;
+      const box = document.getElementById('mensagem') as HTMLTextAreaElement | null;
+      if (!box) return;
+      box.scrollIntoView({ block: 'center' });
+      box.focus({ preventScroll: true });
+    };
+    focusMessage();
+    // on a fresh load the pinned sections above are still being measured and the page grows by a few
+    // screens: centre the box again once they settle (other hashes are handled by SmoothScroll)
+    const settle = window.setTimeout(focusMessage, 900);
+    window.addEventListener('hashchange', focusMessage);
+    return () => {
+      window.clearTimeout(settle);
+      window.removeEventListener('hashchange', focusMessage);
+    };
+  }, []);
   const form = useRef<HTMLFormElement>(null);
   const [draftReady, setDraftReady] = useState(false);
   const [restored, setRestored] = useState(false);
@@ -121,6 +206,9 @@ export default function Contact() {
         const el = form.current.elements.namedItem(k) as HTMLInputElement | null;
         if (el && d.fields[k]) el.value = d.fields[k];
       }
+      // a restored half-typed number is checked too (setting .value fires no input event)
+      const phone = form.current.elements.namedItem('whatsapp') as HTMLInputElement | null;
+      if (phone) checkPhone(phone);
       setRestored(true);
     }
     setDraftReady(true);
@@ -136,8 +224,26 @@ export default function Contact() {
     } catch {}
   };
   useEffect(saveDraft, [picked, timeline, draftReady]);
+  // the submit button rings once the required clues (name and a valid e-mail) are in: "the file is complete"
+  const [ready, setReady] = useState(false);
+  // the message box has a 4000-character cap that used to cut long pastes silently: past 80% it says how much is left
+  const [msgLen, setMsgLen] = useState(0);
+  // who signs the case file: the name (and company) typed below show up on the ficha as they are written
+  const [client, setClient] = useState('');
+  // read the fields directly: checkValidity() would fire `invalid` and stamp our custom messages on fields
+  // the visitor hasn't reached yet
+  const checkReady = () => {
+    const required = [...(form.current?.elements ?? [])].filter((el): el is HTMLInputElement => el instanceof HTMLInputElement && el.required);
+    setReady(required.length > 0 && required.every((el) => el.value.trim() !== '' && !el.validity.typeMismatch));
+    setMsgLen((form.current?.elements.namedItem('message') as HTMLTextAreaElement | null)?.value.length ?? 0);
+    const field = (n: string) => ((form.current?.elements.namedItem(n) as HTMLInputElement | null)?.value ?? '').trim().slice(0, 60);
+    setClient([field('name'), field('org')].filter(Boolean).join(' · '));
+  };
+  useEffect(checkReady, [draftReady, picked]);
   const discardDraft = () => {
     form.current?.reset();
+    setMsgLen(0);
+    setClient('');
     setPicked([]);
     setTimeline(timelines[1]);
     setRestored(false);
@@ -151,6 +257,7 @@ export default function Contact() {
   const lead = chosen[0];
   const capabilities = [...new Set(chosen.map((c) => c.capability))];
   const [saving, setSaving] = useState(false);
+  const [similar, setSimilar] = useState<{ label: string; href: string } | null>(null);
 
   async function saveCard() {
     if (!lead) return;
@@ -163,6 +270,7 @@ export default function Contact() {
         capability: capabilities.join(' + '),
         firstStep: lead.firstStep,
         timeline,
+        client,
       });
       await shareOrDownload(blob, `ficha-do-caso-${caseNo.replace('/', '-')}.png`);
       track({ name: 'case_card_download' });
@@ -184,6 +292,8 @@ export default function Contact() {
 
   useGSAP(
     () => {
+      // reduced motion: the title is simply there (CSS reduced-motion can't stop GSAP tweens)
+      if (prefersReducedMotion()) return;
       const split = SplitText.create('[data-contact-title]', { type: 'lines', mask: 'lines', linesClass: 'line-mask' });
       gsap.from(split.lines, {
         yPercent: 105,
@@ -200,7 +310,7 @@ export default function Contact() {
   // visitors who prefer WhatsApp over the form keep the diagnosis they just built
   const whatsappWithCase = lead
     ? whatsappLink(
-        `Olá! Montei a ficha nº ${caseNo} no site da HenaWeb.\nSintomas: ${chosen.map((c) => c.label).join('; ')}\nEspecialidade indicada: ${capabilities.join(' + ')}\nPrazo: ${timeline}`,
+        `Olá! Montei a ficha nº ${caseNo} no site da HenaWeb.\nSintomas: ${chosen.map((c) => c.label).join('; ')}\nEspecialidade indicada: ${capabilities.join(' + ')}\nPrazo: ${timeline}${client ? `\nCliente: ${client}` : ''}`,
       )
     : whatsappLink();
 
@@ -231,6 +341,20 @@ export default function Contact() {
                   <dt className="label !text-acid-ink/75">Especialidade indicada</dt>
                   <dd className="text-lg font-medium">{capabilities.join(' + ')}</dd>
                 </div>
+                {/* the deadline chosen below goes on the file too, so the whole case reads in one place */}
+                <div>
+                  <dt className="label !text-acid-ink/75">Prazo</dt>
+                  <dd className="text-lg font-medium">
+                    <span aria-hidden>{TIMELINE_ICON[timeline] ?? ''} </span>
+                    {timeline}
+                  </dd>
+                </div>
+                {client && (
+                  <div>
+                    <dt className="label !text-acid-ink/75">Cliente</dt>
+                    <dd className="text-lg font-medium break-words">{client}</dd>
+                  </div>
+                )}
                 <div>
                   <dt className="label !text-acid-ink/75">Primeira diligência</dt>
                   <dd className="serif text-xl leading-snug">{lead.firstStep}</dd>
@@ -249,6 +373,7 @@ export default function Contact() {
                   className="toon-sm toon-press mt-5 inline-flex items-center gap-2 rounded-full bg-[#25d366] px-4 py-2 text-sm font-medium text-acid-ink"
                 >
                   Mandar a ficha pelo WhatsApp
+                  <NewTab />
                 </a>
               </div>
             )}
@@ -277,9 +402,17 @@ export default function Contact() {
         .join('\n'),
     );
     setStatus('sending');
+    setSlow(false);
+    setNet('ok');
+    const slowTimer = window.setTimeout(() => setSlow(true), SLOW_AFTER);
+    // a stalled connection (a weak signal, a request stuck upstream) used to leave "Enviando…" up forever and the
+    // fallback card never came; now the send gives up and the same case goes out by WhatsApp or e-mail instead
+    const ctrl = new AbortController();
+    const giveUp = window.setTimeout(() => ctrl.abort(), SEND_TIMEOUT);
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
+        signal: ctrl.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: data.get('name'),
@@ -294,7 +427,10 @@ export default function Contact() {
         }),
       });
       if (!res.ok) throw new Error();
+      window.clearTimeout(slowTimer);
+      window.clearTimeout(giveUp);
       setStatus('sent');
+      setSimilar(similarCase(lead?.capability));
       try {
         sessionStorage.removeItem(DRAFT);
       } catch {}
@@ -305,6 +441,9 @@ export default function Contact() {
       });
       track({ name: 'lead', capability: capabilities.join(' + ') || undefined, timeline });
     } catch {
+      window.clearTimeout(slowTimer);
+      window.clearTimeout(giveUp);
+      setNet(navigator.onLine ? 'ok' : 'offline');
       setStatus('error');
       // the fallback card renders below the button, often under the fold: bring it into view
       requestAnimationFrame(() => {
@@ -319,7 +458,7 @@ export default function Contact() {
       ref={root}
       id="contato"
       data-tint="#f7931e"
-      className="gutter relative z-40 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon bg-[linear-gradient(170deg,#f7931e_0%,#f9b25a_45%,#f4b942_100%)] py-[clamp(5rem,10vw,9rem)] text-acid-ink"
+      data-sheet className="gutter relative z-40 -mt-8 overflow-hidden rounded-t-[2rem] border-t-[3px] border-toon bg-[linear-gradient(170deg,#f7931e_0%,#f9b25a_45%,#f4b942_100%)] py-[clamp(5rem,10vw,9rem)] text-acid-ink"
     >
       <div className="grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-5">
@@ -335,21 +474,23 @@ export default function Contact() {
           <div className="hidden lg:block">{diagnosis}</div>
 
           <div className="mt-8 flex flex-col gap-2 font-mono text-sm">
-            <a href={whatsappWithCase} target="_blank" rel="noopener noreferrer" className="w-fit underline-offset-4 hover:underline">
+            {/* -my/py: a 24 px tall target (WCAG 2.5.8) without moving the lines */}
+            <a href={whatsappWithCase} target="_blank" rel="noopener noreferrer" className="pen-link -my-0.5 w-fit py-0.5">
               WhatsApp · {site.whatsappDisplay} ↗
+              <NewTab />
             </a>
             <span className="flex flex-wrap items-baseline gap-x-3">
-              <a href={`mailto:${site.email}`} className="w-fit underline-offset-4 hover:underline">
+              <a href={`mailto:${site.email}`} className="pen-link -my-0.5 w-fit py-0.5">
                 {site.email}
               </a>
-              <CopyEmail placement="contato" className="text-xs text-acid-ink/75 underline underline-offset-4 hover:text-acid-ink" />
+              <CopyEmail placement="contato" className="-my-1 py-1 text-xs text-acid-ink/75 underline underline-offset-4 hover:text-acid-ink" />
             </span>
             <span className="text-acid-ink/60">{site.city} · Atendemos todo o Brasil e exterior</span>
           </div>
           <Social tone="light" className="mt-6" />
         </div>
 
-        <div className="lg:col-span-7">
+        <div className="min-w-0 lg:col-span-7">
           {status === 'sent' ? (
             <div
               ref={done}
@@ -360,7 +501,7 @@ export default function Contact() {
               {/* rubber stamp, like the diner order slip */}
               <div
                 aria-hidden
-                className="stamp-in pointer-events-none absolute top-9 right-7 rounded-md border-4 border-[#d7263d] px-3 py-1 font-mono text-sm font-bold tracking-widest text-[#d7263d] opacity-85 md:text-base"
+                className="stamp-in pointer-events-none absolute top-9 right-7 rounded-md border-4 border-[#b3122b] px-3 py-1 font-mono text-sm font-bold tracking-widest text-[#b3122b] opacity-85 md:text-base"
               >
                 CASO ABERTO · {caseNo}
               </div>
@@ -375,13 +516,45 @@ export default function Contact() {
                   className="toon-sm toon-press rounded-full bg-[#25d366] px-5 py-2.5 text-sm font-medium"
                 >
                   Falar pelo WhatsApp
+                  <NewTab />
+                </a>
+                {/* the reply comes from this number and address: saved, it isn't mistaken for spam */}
+                <a href="/henaweb.vcf" download className="toon-sm toon-press rounded-full bg-white px-5 py-2.5 text-sm font-medium">
+                  <span aria-hidden>＋ </span>Salvar nosso contato
                 </a>
               </div>
+              {similar && (
+                <p className="mt-6 text-acid-ink/80">
+                  Enquanto isso, veja{' '}
+                  <a href={similar.href} className="font-medium underline underline-offset-4 hover:text-[#c2410c]">
+                    {similar.label} →
+                  </a>
+                </p>
+              )}
               <p className="mt-8 text-acid-ink/70">Quer levar o diagnóstico para o seu time? Guarde a ficha:</p>
               <div>{saveButton}</div>
             </div>
           ) : (
-            <form ref={form} onSubmit={submit} onInput={saveDraft} className="flex flex-col gap-9">
+            <form
+              ref={form}
+              // on paper a form can't be filled in: the printout's own footer carries the contact line instead
+              data-print-hide
+              onSubmit={submit} onInput={() => {
+              saveDraft();
+              checkReady();
+            }}
+              // Enter in a one-line field used to submit the half-filled form (and pop "preencha este campo" on
+              // the next one); like the phone keyboard's "next" key, it now moves to the next field instead
+              onKeyDown={(e) => {
+                const t = e.target as HTMLInputElement;
+                if (e.key !== 'Enter' || e.nativeEvent.isComposing || t.tagName !== 'INPUT' || !/^(text|email|tel)$/.test(t.type)) return;
+                const fields = [...e.currentTarget.querySelectorAll<HTMLElement>('input[name]:not([tabindex="-1"]):is([type=text],[type=email],[type=tel],:not([type])), textarea[name]')];
+                const next = fields[fields.indexOf(t) + 1];
+                if (!next) return;
+                e.preventDefault();
+                next.focus();
+              }}
+              className="flex flex-col gap-9">
               {restored && (
                 <p role="status" className="-mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 self-start font-mono text-xs text-acid-ink/80">
                   <span>↺ Recuperamos o rascunho que você deixou nesta aba.</span>
@@ -414,17 +587,17 @@ export default function Contact() {
                       <label
                         key={s.id}
                         className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3 text-[0.95rem] transition-all has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-acid-ink ${
-                          on ? 'border-acid-ink bg-acid-ink text-acid shadow-[4px_4px_0_rgb(11_13_2/0.35)]' : 'border-acid-ink/25 hover:border-acid-ink'
+                          on ? 'chip-sweep border-acid-ink bg-acid-ink text-acid shadow-[4px_4px_0_rgb(11_13_2/0.35)]' : 'border-acid-ink/25 hover:border-acid-ink'
                         }`}
                       >
                         <input type="checkbox" checked={on} onChange={() => toggle(s.id)} className="sr-only" />
                         <span
                           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 text-xs ${
-                            on ? 'border-acid bg-acid text-acid-ink' : 'border-acid-ink/40'
+                            on ? 'check-pop border-acid bg-acid text-acid-ink' : 'border-acid-ink/40'
                           }`}
                           aria-hidden
                         >
-                          {on ? '✓' : ''}
+                          {on && <Tick />}
                         </span>
                         {s.label}
                       </label>
@@ -441,32 +614,46 @@ export default function Contact() {
                     <label
                       key={o}
                       className={`cursor-pointer rounded-full border-2 px-4 py-2 text-sm transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-acid-ink ${
-                        timeline === o ? 'border-acid-ink bg-acid-ink text-acid' : 'border-acid-ink/25 hover:border-acid-ink'
+                        timeline === o ? 'chip-sweep border-acid-ink bg-acid-ink text-acid' : 'border-acid-ink/25 hover:border-acid-ink'
                       }`}
                     >
                       <input type="radio" name="timeline" value={o} checked={timeline === o} onChange={() => setTimeline(o)} className="sr-only" />
+                      {/* the chosen deadline gets its little sign, stamped in like the symptom ticks (check-pop) */}
+                      {timeline === o && (
+                        <span aria-hidden className="check-pop mr-1.5 inline-block">
+                          {TIMELINE_ICON[o] ?? '✓'}
+                        </span>
+                      )}
                       {o}
                     </label>
                   ))}
                 </div>
               </fieldset>
 
-              <fieldset>
+              {/* min-w-0 here and on the form column: a fieldset and a grid item are min-content wide by default,
+                  so a long unbroken paste (a URL) in the self-sizing message box stretched the column off screen */}
+              <fieldset className="min-w-0">
                 <legend className="label mb-2 !text-acid-ink/60">3 · Quem está investigando</legend>
                 <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
-                  <Floating label="Seu nome">
-                    <input name="name" required maxLength={120} placeholder=" " autoComplete="name" className={field} onInvalid={explain} onInput={clear} />
+                  <Floating label="Seu nome" check>
+                    {/* names and company names aren't dictionary words: no red squiggle under "Henrique" or "Neodent", and
+                        phones start each word capitalised */}
+                    <input name="name" enterKeyHint="next" required maxLength={120} placeholder=" " autoComplete="name" autoCapitalize="words" spellCheck={false} className={`${field} pr-7`} onInvalid={explain} onInput={clear} />
                   </Floating>
-                  <div>
-                    <Floating label="E-mail">
+                  <div className="min-w-0">
+                    <Floating label="E-mail" check>
                     <input
                       ref={emailRef}
-                      name="email"
+                      name="email" enterKeyHint="next"
                       type="email"
                       required
                       placeholder=" "
                       autoComplete="email"
-                      className={field}
+                      // the API keeps 254 characters (the longest valid address); spell-check flagged every address
+                      maxLength={254}
+                      spellCheck={false}
+                      autoCapitalize="none"
+                      className={`${field} pr-7`}
                       aria-describedby={emailHint ? 'email-hint' : undefined}
                       onInvalid={explain}
                       onInput={(e) => {
@@ -481,7 +668,8 @@ export default function Contact() {
                         Você quis dizer{' '}
                         <button
                           type="button"
-                          className="font-medium underline decoration-2 underline-offset-2"
+                          // a long address has no break opportunities: let it wrap anywhere instead of running off the card
+                          className="text-left font-medium underline decoration-2 underline-offset-2 [overflow-wrap:anywhere]"
                           onClick={() => {
                             if (emailRef.current) emailRef.current.value = emailHint;
                             setEmailHint(null);
@@ -494,31 +682,63 @@ export default function Contact() {
                       </p>
                     )}
                   </div>
-                  <Floating label="WhatsApp (opcional)">
+                  <Floating label="WhatsApp (opcional)" check>
                   <input
-                    name="whatsapp"
+                    name="whatsapp" enterKeyHint="next"
                     type="tel"
                     inputMode="tel"
                     placeholder=" "
                     autoComplete="tel"
                     maxLength={22}
-                    className={field}
+                    className={`${field} pr-7`}
                     onInput={(e) => {
                       // (41) 99999-9999 as it is typed; foreign numbers starting with + stay as typed
                       const el = e.currentTarget;
                       const atEnd = el.selectionStart === el.value.length;
                       if (atEnd) el.value = formatPhoneBR(el.value);
+                      checkPhone(el);
                     }}
                   />
                   </Floating>
                   <Floating label="Empresa ou órgão (opcional)">
-                    <input name="org" placeholder=" " autoComplete="organization" className={field} />
+                    <input name="org" enterKeyHint="next" maxLength={160} placeholder=" " autoComplete="organization" autoCapitalize="words" spellCheck={false} className={field} />
                   </Floating>
                 </div>
                 <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
                 <Floating label="Mais alguma pista? (opcional)" className="mt-2">
-                  <textarea name="message" rows={3} maxLength={4000} placeholder=" " className={`${field} resize-none`} />
+                  <textarea
+                    id="mensagem"
+                    name="message"
+                    rows={3}
+                    maxLength={MSG_MAX}
+                    placeholder=" "
+                    aria-describedby="atalho-enviar"
+                    // grows with the story instead of scrolling inside 3 rows (field-sizing; other browsers keep the 3 rows)
+                    className={`${field} notepad min-h-[7.375rem] max-h-[22rem] resize-none [field-sizing:content]`}
+                    onKeyDown={(e) => {
+                      // Ctrl/⌘ + Enter sends from the message box, like in most mail and chat apps
+                      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && status !== 'sending') {
+                        e.preventDefault();
+                        e.currentTarget.form?.requestSubmit();
+                      }
+                    }}
+                  />
                 </Floating>
+                {/* a live region that is always there (an inserted one may go unannounced); only the limit itself is spoken */}
+                <p
+                  role="status"
+                  className={`mt-1 text-right font-mono text-xs empty:mt-0 ${msgLen >= MSG_MAX ? 'font-medium text-[#c2410c]' : 'text-acid-ink/70'}`}
+                  data-print-hide
+                >
+                  {msgLen >= MSG_MAX ? (
+                    <>Limite de {MSG_MAX.toLocaleString('pt-BR')} caracteres. O resto da história cabe numa conversa pelo WhatsApp.</>
+                  ) : msgLen >= MSG_MAX * 0.8 ? (
+                    <span aria-hidden>{(MSG_MAX - msgLen).toLocaleString('pt-BR')} caracteres restantes</span>
+                  ) : null}
+                </p>
+                <p id="atalho-enviar" className="hidden text-xs text-acid-ink/70 pointer-fine:block" data-print-hide>
+                  <kbd className="font-mono">Ctrl</kbd> + <kbd className="font-mono">Enter</kbd> envia direto da mensagem.
+                </p>
               </fieldset>
 
               <div className="flex flex-wrap items-center gap-6">
@@ -526,10 +746,11 @@ export default function Contact() {
                   type="submit"
                   disabled={status === 'sending'}
                   data-cursor="Enviar"
-                  className="group inline-flex items-center gap-3 rounded-full border-[3px] border-acid-ink bg-acid-ink px-8 py-4 font-medium text-acid shadow-[5px_5px_0_rgb(11_13_2/0.35)] transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                  data-ready={ready || undefined}
+                  className="group relative inline-flex items-center gap-3 rounded-full border-[3px] border-acid-ink bg-acid-ink px-8 py-4 font-medium text-acid shadow-[5px_5px_0_rgb(11_13_2/0.35)] transition-transform hover:-translate-y-0.5 disabled:opacity-60"
                 >
-                  {status === 'sending' ? 'Enviando…' : 'Abrir o caso'}
-                  <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
+                  {status === 'sending' ? (slow ? 'Enviando… (conexão lenta)' : 'Enviando…') : 'Abrir o caso'}
+                  <span className="transition-transform duration-500 group-hover:translate-x-1 group-focus-visible:translate-x-1">→</span>
                 </button>
                 <p className="max-w-xs text-sm leading-snug text-acid-ink/75">
                   Usamos seus dados só para responder este caso.
@@ -541,7 +762,15 @@ export default function Contact() {
                     role="alert"
                     className="flex basis-full flex-col gap-3 rounded-2xl border-[3px] border-acid-ink bg-paper p-5 shadow-[5px_5px_0_#120626] outline-none"
                   >
-                    <p className="font-medium">O formulário travou, mas a sua ficha não se perdeu. Envie o mesmo caso por aqui:</p>
+                    {net === 'ok' ? (
+                      <p className="font-medium">O formulário travou, mas a sua ficha não se perdeu. Envie o mesmo caso por aqui:</p>
+                    ) : (
+                      <p className="font-medium">
+                        {net === 'offline'
+                          ? 'Você está sem internet agora. A ficha ficou guardada nesta aba: quando a conexão voltar, é só tocar em “Abrir o caso” de novo. Ou deixe pronta por aqui:'
+                          : '✓ A conexão voltou. Pode tocar em “Abrir o caso” de novo, ou enviar por aqui:'}
+                      </p>
+                    )}
                     <div className="flex flex-wrap gap-3">
                       <a
                         href={whatsappLink(fallback)}
@@ -550,6 +779,7 @@ export default function Contact() {
                         className="toon-sm rounded-full bg-[#25d366] px-5 py-2.5 text-sm font-medium"
                       >
                         Enviar pelo WhatsApp
+                        <NewTab />
                       </a>
                       <a
                         href={`mailto:${site.email}?subject=${encodeURIComponent(`Caso nº ${caseNo}`)}&body=${encodeURIComponent(fallback)}`}

@@ -1,5 +1,6 @@
 import DavidStage from '@/components/DavidStage';
 import Hero from '@/components/Hero';
+import ResumeReading from '@/components/ResumeReading';
 import Marquee from '@/components/Marquee';
 import Manifesto from '@/components/Manifesto';
 import Capabilities from '@/components/Capabilities';
@@ -12,8 +13,11 @@ import Studio from '@/components/Studio';
 import Contact from '@/components/Contact';
 import Faq from '@/components/Faq';
 import Testimonials from '@/components/Testimonials';
-import { homeFaq, projects, site } from '@/lib/content';
+import { capabilities, homeFaq, projects, site } from '@/lib/content';
+
+const capabilitySlugs = capabilities.map((c) => c.slug);
 import Footer from '@/components/Footer';
+import { caseMorphScript } from '@/lib/caseMorph';
 
 const ticker = [
   'Sistemas sob medida',
@@ -51,6 +55,8 @@ export default function Home() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {/* the cases section's screens morph into the case page window they open (lib/caseMorph) */}
+      <script dangerouslySetInnerHTML={{ __html: caseMorphScript }} />
       <main id="conteudo" tabIndex={-1} className="bg-bg">
         <DavidStage>
           <Hero />
@@ -84,7 +90,10 @@ export default function Home() {
           <Manifesto />
         </DavidStage>
         <Clients />
-        <Capabilities />
+        <Capabilities
+          caseCounts={Object.fromEntries(capabilitySlugs.map((slug) => [slug, projects.filter((p) => p.service === slug).length]))}
+          caseSlugs={Object.fromEntries(projects.map((p) => [p.name, p.slug]))}
+        />
         <Mystery />
         <GovTech />
         <Work />
@@ -94,6 +103,8 @@ export default function Home() {
         <Faq />
         <Contact />
       </main>
+      {/* left halfway last time? offers to pick up at that section (home only) */}
+      <ResumeReading />
       <Footer />
     </>
   );

@@ -27,6 +27,12 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@property --rule {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
 @layer base {
   html {
     background: var(--color-bg);
@@ -41,7 +47,39 @@
     overflow-x: clip;
   }
 
+  /* typography: headings split their lines evenly, and running text avoids a lone word on the last
+     line (browsers without support just wrap as before) */
+  h1, h2, h3, h4, blockquote {
+    text-wrap: balance;
+  }
+  p, li, dd, figcaption, summary {
+    text-wrap: pretty;
+  }
+
+  /* an open modal freezes the page behind it (Lenis is stopped and html[data-modal] set in SmoothScroll;
+     it was `html:has(dialog[open])`, but a :has() anchored on html made every inline-style write on the
+     page restyle the whole document — ~2,200 elements, 200 times during the home's load); the gutter
+     keeps the layout from jumping sideways when the scrollbar goes away */
+  html {
+    scrollbar-gutter: stable;
+  }
+  html[data-modal] {
+    overflow: hidden;
+  }
+
   ::selection {
+    background: var(--color-acid);
+    color: var(--color-acid-ink);
+  }
+  /* on the light and orange surfaces an orange highlight vanished (the contact section: the very same colour,
+     1:1; the lemon "Caso resolvido" card 1.8:1). There, selected text turns into the site's ink with lemon
+     letters — dark on light, orange on dark. Dark islands inside light sections keep the orange */
+  :where(#contato, .paper, .bg-paper, .bg-lemon, .bg-acid, .bg-white, [data-cap-row]) ::selection {
+    background: var(--color-acid-ink);
+    color: var(--color-lemon);
+  }
+  .bg-acid-ink::selection,
+  .bg-acid-ink ::selection {
     background: var(--color-acid);
     color: var(--color-acid-ink);
   }
@@ -55,6 +93,13 @@
   #clientes :focus-visible,
   #contato :focus-visible {
     outline: 3px solid var(--color-acid-ink);
+  }
+  /* the ring "focuses" like a magnifier finding its clue: it lands from wide and faint to tight in a snap, so the
+     eye can follow where Tab went. In the base layer, so components with an animation of their own keep it */
+  @media (prefers-reduced-motion: no-preference) {
+    :focus-visible {
+      animation: focus-snap 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.25);
+    }
   }
 
   html.lenis,
@@ -70,6 +115,28 @@
 }
 
 @layer components {
+  /* the message box is a detective's notepad: faint ruled lines under each line of text (they scroll with
+     the story via attachment:local) that ink in while the visitor writes; the caret is the orange pencil */
+  .notepad {
+    --rule: transparent;
+    background-image: linear-gradient(transparent calc(1.75rem - 1px), var(--rule) 0);
+    background-size: 100% 1.75rem;
+    background-origin: content-box;
+    background-clip: content-box;
+    background-position: 0 -0.2rem;
+    background-attachment: local;
+    caret-color: #c2410c;
+    transition: --rule 0.3s ease;
+  }
+  .notepad:focus,
+  .notepad:not(:placeholder-shown) {
+    --rule: rgb(26 15 46 / 0.14);
+  }
+  @media (forced-colors: active) {
+    .notepad {
+      background-image: none;
+    }
+  }
   .label {
     font-family: var(--font-mono);
     font-size: 0.72rem;
@@ -120,6 +187,10 @@
 @keyframes marquee {
   to { transform: translateX(-50%); }
 }
+/* "P" (Nav) holds every tape where it is; !important beats the play state Marquee writes inline */
+html[data-still] [data-marquee-track] {
+  animation-play-state: paused !important;
+}
 
 @keyframes blink {
   50% { opacity: 0; }
@@ -130,6 +201,9 @@
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
+    /* hover lifts, tilts, slides and screenshot pans were still gliding: states now change at once */
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
   }
 }
 
@@ -163,15 +237,38 @@
   border: 2.5px solid var(--color-toon);
   box-shadow: 4px 4px 0 var(--color-toon);
 }
+/* Toon buttons lift toward the pointer and squash flat when pressed, the shadow growing and shrinking as if the
+   button really left the page. The keyboard gets the same lift on focus (it had none); touch screens skip the
+   hover lift, which used to stay stuck after a tap; and the small variant moves in proportion to its smaller
+   shadow (it jumped 4 → 8 px, as big as the large one) */
 .toon-press {
   transition: transform 0.2s, box-shadow 0.2s;
 }
-.toon-press:hover {
+@media (hover: hover) {
+  .toon-press:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 var(--color-toon);
+  }
+  .toon-sm.toon-press:hover {
+    transform: translate(-1.5px, -1.5px);
+    box-shadow: 6px 6px 0 var(--color-toon);
+  }
+}
+.toon-press:focus-visible {
   transform: translate(-2px, -2px);
   box-shadow: 8px 8px 0 var(--color-toon);
 }
-.toon-press:active {
+.toon-sm.toon-press:focus-visible {
+  transform: translate(-1.5px, -1.5px);
+  box-shadow: 6px 6px 0 var(--color-toon);
+}
+.toon-press:active,
+.toon-press:focus-visible:active {
   transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 var(--color-toon);
+}
+.toon-sm.toon-press:active {
+  transform: translate(2.5px, 2.5px);
   box-shadow: 1px 1px 0 var(--color-toon);
 }
 
@@ -254,6 +351,74 @@
   text-shadow: none;
   box-shadow: inset -1.5px -1.5px 0 #7d7394, inset 1.5px 1.5px 0 #fff;
 }
+/* the one title-bar button that does something (GovTech's ×) is a ~18 px square: an invisible ring lifts its
+   target past 24 px (WCAG 2.5.8); its neighbours are decorative, so nothing else is covered */
+button.win-btn {
+  position: relative;
+}
+button.win-btn::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+
+/* service-page steps: the title-bar progress blocks fill one by one as each window scrolls in, like a copy dialog
+   catching up — scrubbed by the scroll, so it only moves when the reader does. Browsers without view timelines,
+   reduced motion and print keep the static blocks */
+@media screen and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-win-item] {
+      view-timeline: --win-step block;
+    }
+    [data-win-item] [data-prog-fill] {
+      animation: prog-fill linear both;
+      animation-timeline: --win-step;
+      animation-range: entry calc(25% + var(--j) * 14%) entry calc(37% + var(--j) * 14%);
+    }
+  }
+}
+@keyframes prog-fill {
+  from {
+    background-color: transparent;
+    scale: 1 0.4;
+  }
+}
+
+/* Studio rules and service-page steps: like a real desktop, the window under the pointer is the focused one — it lifts
+   toward you and keeps its colour bar, the others drop to the grey "inactive" bar of Windows 95.
+   `translate` (not transform) so it stacks with GSAP's inline transform; !important because GSAP also
+   writes an inline `translate: none` on the elements it tweens */
+@media (hover: hover) {
+  [data-principle],
+  [data-win-item] {
+    transition: translate 0.25s ease-out, box-shadow 0.25s ease-out;
+  }
+  [data-principle] .win-bar,
+  [data-win-item] .win-bar {
+    transition: filter 0.25s ease-out;
+  }
+  [data-principles]:hover [data-principle]:not(:hover) .win-bar,
+  [data-win-group]:hover [data-win-item]:not(:hover) .win-bar {
+    filter: grayscale(1) brightness(0.82);
+  }
+  [data-principle]:hover,
+  [data-win-item]:hover {
+    translate: -3px -3px !important;
+    box-shadow: inset -2px -2px 0 #7d7394, inset 2px 2px 0 #fff, 10px 10px 0 var(--color-toon);
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  [data-principle],
+  [data-principle] .win-bar,
+  [data-win-item],
+  [data-win-item] .win-bar {
+    transition: none;
+  }
+  [data-principle]:hover,
+  [data-win-item]:hover {
+    translate: none !important;
+  }
+}
 
 /* Crime-scene / mystery tape */
 .tape {
@@ -270,6 +435,42 @@
   color: transparent;
   -webkit-text-stroke: 2px var(--color-toon);
   filter: drop-shadow(6px 6px 0 var(--color-toon));
+}
+
+/* The footer wordmark plays like a keyboard: the letter under the pointer is pressed into its shadow
+   (the same move as .toon-press:active), its neighbours dip halfway. Decorative, pointer-only. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  [data-wordmark] > span {
+    transition: translate 0.16s cubic-bezier(0.3, 1.6, 0.5, 1), filter 0.16s;
+  }
+  [data-wordmark] > span:hover {
+    translate: 4px 4px;
+    filter: drop-shadow(2px 2px 0 var(--color-toon));
+  }
+  /* the left neighbour is marked by the footer (data-near): a `span:has(+ span:hover)` cost a restyle of the page on every write */
+  [data-wordmark] > span:hover + span,
+  [data-wordmark] > span[data-near] {
+    translate: 2px 2px;
+    filter: drop-shadow(4px 4px 0 var(--color-toon));
+  }
+}
+
+/* real keys press the wordmark's letters (Footer); typing "henaweb" rolls a wave across it */
+@media (prefers-reduced-motion: no-preference) {
+  [data-wordmark] > span {
+    transition: translate 0.16s cubic-bezier(0.3, 1.6, 0.5, 1), filter 0.16s;
+  }
+  [data-wordmark] > span[data-key] {
+    translate: 4px 4px;
+    filter: drop-shadow(2px 2px 0 var(--color-toon));
+  }
+  [data-wordmark].is-wave > span {
+    animation: wordmark-wave 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) calc(var(--i) * 0.06s) both;
+  }
+}
+@keyframes wordmark-wave {
+  0%, 100% { translate: 0 0; }
+  40% { translate: 0 -0.12em; }
 }
 
 /* Comic halftone paper for the light sections */
@@ -291,6 +492,19 @@
 @keyframes progress {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
+}
+
+/* failsafe: the intro is dismissed by script, so if the scripts never run (a chunk that fails to download on a
+   bad connection, a blocked CDN, an extension) it used to cover the whole page forever. After 8 s it fades away on
+   its own; normally the script has removed it long before (about 2.5 s on a first visit, at once on repeat ones) */
+[data-preloader] {
+  animation: preloader-failsafe 0.4s ease-out 8s forwards;
+}
+@keyframes preloader-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 /* repeat views: the inline script in the layout marks <html data-seen> before the first paint */
@@ -320,6 +534,1230 @@ html {
   background: #f9e27d;
 }
 
+/* symptom checklists (contact form, service pages): the tick lands like a rubber stamp instead of
+   just appearing; it plays when the class is added, i.e. on the click that marks it */
+@media (prefers-reduced-motion: no-preference) {
+  .check-pop {
+    animation: check-pop 0.32s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  }
+}
+/* the picked chip (symptoms, deadline) is inked in by a marker sweeping left to right instead of
+   flipping colour at once; its text turns light as the ink passes under it */
+@media (prefers-reduced-motion: no-preference) {
+  .chip-sweep {
+    background-image: linear-gradient(var(--color-acid-ink), var(--color-acid-ink));
+    background-repeat: no-repeat;
+    animation: chip-sweep 0.34s cubic-bezier(0.65, 0, 0.25, 1) both;
+  }
+}
+@keyframes chip-sweep {
+  0% { background-color: transparent; background-size: 0% 100%; color: var(--color-acid-ink); }
+  45% { color: var(--color-acid-ink); }
+  55% { color: var(--color-acid); }
+  99% { background-color: transparent; }
+  100% { background-color: var(--color-acid-ink); background-size: 100% 100%; }
+}
+@media (forced-colors: active) {
+  .chip-sweep { background-image: none; }
+}
+
+/* footer case list: the case's screenshot peeks beside its link, a little polaroid pinned askew (Footer.tsx) */
+[data-case-thumb] {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  a:is(:hover, :focus-visible) [data-case-thumb] {
+    display: block;
+    position: absolute;
+    /* beside the link, hanging down: the footer clips anything above its rounded top edge */
+    top: -0.4rem;
+    left: calc(100% + 0.9rem);
+    z-index: 10;
+    width: 15rem;
+    pointer-events: none;
+    overflow: hidden;
+    border: 5px solid var(--color-paper);
+    border-bottom-width: 18px;
+    border-radius: 3px;
+    background: var(--color-bg-2);
+    box-shadow: 5px 5px 0 var(--color-acid);
+    rotate: -2.5deg;
+  }
+  [data-case-thumb] img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  a:is(:hover, :focus-visible) [data-case-thumb] {
+    animation: thumb-pop 0.22s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+    transform-origin: 0 0.8rem;
+  }
+}
+@keyframes thumb-pop {
+  from { opacity: 0; transform: translateY(6px) scale(0.85); }
+}
+
+/* a dragged link's picture (DragFile.tsx): a Win95 file icon over its shortcut name, rendered off-screen just
+   long enough for the browser to take the drag image */
+.drag-file {
+  position: fixed;
+  top: -200px;
+  left: 0;
+  display: flex;
+  width: 13rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  pointer-events: none;
+}
+.drag-file span {
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0.1rem 0.35rem;
+  background: var(--color-acid-ink);
+  color: var(--color-paper);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  outline: 1px dotted var(--color-lemon);
+}
+
+/* 404 crime scene: the visitor's shoe prints (Footprints.tsx), pressed in and fading like dust settling */
+.footprint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  fill: rgb(253 243 225 / 0.16);
+  animation: footprint 1.8s ease-out forwards;
+}
+@keyframes footprint {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  60% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* floating windows move by their title bar (WinDrag.tsx): the bar says so with the move cursor, and a window in
+   flight gets a lighter shadow, as if lifted off the desk */
+@media (pointer: fine) {
+  dialog.win[open] > .win-bar,
+  .win.fixed > .win-bar,
+  .fixed > .win > .win-bar {
+    cursor: move;
+    user-select: none;
+  }
+}
+[data-dragging] {
+  opacity: 0.94;
+}
+
+/* /offline signal meter (Redial.tsx): four bars that light one after another while it searches, all lit once the
+   line is back; with reduced motion they just sit dim, then lit */
+.signal > span {
+  width: 4px;
+  background: rgb(26 15 46 / 0.2);
+}
+.signal[data-signal='back'] > span {
+  background: #1f6f63;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .signal:not([data-signal='back']) > span {
+    animation: signal-scan 1.2s steps(1, end) infinite;
+  }
+}
+@keyframes signal-scan {
+  0%, 60% { background: rgb(26 15 46 / 0.2); }
+  20%, 40% { background: var(--color-acid); }
+}
+
+/* footer start menu (StartMenu.tsx): the bevelled "Iniciar" button, a four-colour flag, the menu with its
+   vertical brand strip and items that highlight navy like Win95's */
+.start-btn {
+  background: #c9c3d8;
+  box-shadow: inset -2px -2px 0 #7d7394, inset 2px 2px 0 #fff;
+}
+.start-btn[aria-expanded='true'],
+.start-btn:active {
+  box-shadow: inset 2px 2px 0 #7d7394, inset -2px -2px 0 #fff;
+}
+.start-btn:focus-visible {
+  outline: 2px dotted var(--color-acid-ink);
+  outline-offset: -5px;
+}
+.start-flag {
+  width: 14px;
+  height: 12px;
+  background: conic-gradient(from 90deg at 50% 50%, #3cc6b4 0 25%, #f9e27d 0 50%, #8b5cc7 0 75%, #f7931e 0);
+  transform: skewX(-8deg);
+}
+.start-menu {
+  position: fixed;
+  inset: auto;
+  /* it sits inside the footer's mono caps line: the menu reads in the body face */
+  font-family: var(--font-sans);
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--color-acid-ink);
+}
+.start-side {
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+  padding: 0.6rem 0.35rem;
+  background: linear-gradient(#8b5cc7, #140c2e);
+  color: var(--color-paper);
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+}
+.start-item {
+  display: flex;
+  min-height: 2.25rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.9rem;
+  text-align: left;
+}
+.start-item:hover,
+.start-item:focus-visible {
+  background: #1e1442;
+  color: var(--color-paper);
+  outline: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .start-menu:popover-open {
+    animation: start-up 0.14s steps(3, end);
+  }
+}
+@keyframes start-up {
+  from { clip-path: inset(100% 0 0 0); }
+  to { clip-path: inset(0); }
+}
+
+/* the caret on the blank case file doesn't just blink: it taps out H-E-N-A-W-E-B in Morse, over and over
+   (65 units of 0.11s; a dot is 1 unit lit, a dash 3). Nobody has to notice; hena.ajuda() hints at it */
+@keyframes morse {
+  0.0% { opacity: 1; }
+  1.54% { opacity: 0; }
+  3.08% { opacity: 1; }
+  4.62% { opacity: 0; }
+  6.15% { opacity: 1; }
+  7.69% { opacity: 0; }
+  9.23% { opacity: 1; }
+  10.77% { opacity: 0; }
+  15.38% { opacity: 1; }
+  16.92% { opacity: 0; }
+  21.54% { opacity: 1; }
+  26.15% { opacity: 0; }
+  27.69% { opacity: 1; }
+  29.23% { opacity: 0; }
+  33.85% { opacity: 1; }
+  35.38% { opacity: 0; }
+  36.92% { opacity: 1; }
+  41.54% { opacity: 0; }
+  46.15% { opacity: 1; }
+  47.69% { opacity: 0; }
+  49.23% { opacity: 1; }
+  53.85% { opacity: 0; }
+  55.38% { opacity: 1; }
+  60.0% { opacity: 0; }
+  64.62% { opacity: 1; }
+  66.15% { opacity: 0; }
+  70.77% { opacity: 1; }
+  75.38% { opacity: 0; }
+  76.92% { opacity: 1; }
+  78.46% { opacity: 0; }
+  80.0% { opacity: 1; }
+  81.54% { opacity: 0; }
+  83.08% { opacity: 1; }
+  84.62% { opacity: 0; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .morse-caret {
+    animation: morse 7.15s steps(1, end) infinite;
+  }
+}
+
+/* the search's "no clue" ransom note (CommandPalette, RansomNote): the clippings land one after another, as if
+   glued on in a hurry */
+@media (prefers-reduced-motion: no-preference) {
+  .ransom > span {
+    animation: ransom-glue 0.22s calc(var(--i, 0) * 30ms) cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  }
+}
+@keyframes ransom-glue {
+  from { opacity: 0; scale: 1.6; }
+}
+
+/* the page is dark (color-scheme: dark, layout.tsx), but the contact form and the paper cards are light: there the
+   browser's own bits (autofill wash, spellcheck squiggles, the date/select pickers, scrollbars) must be the light
+   ones too, or an autofilled name turned into a navy slab with white letters on the cream form */
+#contato,
+.paper,
+.bg-paper {
+  color-scheme: light;
+}
+/* and a field the browser filled in for the visitor says so the site's way: marked in lemon highlighter over the
+   orange form, ink letters on top (the inset box-shadow is the only way past Chrome's forced autofill background) */
+#contato input:is(:autofill, :-webkit-autofill),
+#contato textarea:is(:autofill, :-webkit-autofill) {
+  -webkit-text-fill-color: var(--color-acid-ink);
+  caret-color: #c2410c;
+  box-shadow: inset 0 0 0 100vmax #f9e27d;
+  transition: background-color 9999s;
+}
+
+/* "g" pressed (Nav, GoHint): a fuse under the keys burns down over the one second the next key counts */
+.go-fuse {
+  height: 3px;
+  background: #c2410c;
+  transform-origin: left;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .go-fuse {
+    animation: go-fuse 1s linear both;
+  }
+}
+@keyframes go-fuse {
+  to { transform: scaleX(0); }
+}
+
+/* "Abrir no celular" QR window (PhoneQR.tsx): opens with the same zoom-from-nothing as the dialogs */
+@media (prefers-reduced-motion: no-preference) {
+  .phone-qr:popover-open {
+    animation: check-pop 0.25s cubic-bezier(0.3, 1.4, 0.5, 1);
+  }
+}
+
+/* "Ouvir o caso" (ListenCase.tsx): the tape reel turns while the case is being read aloud */
+@media (prefers-reduced-motion: no-preference) {
+  .reel {
+    animation: reel 1.6s linear infinite;
+  }
+}
+@keyframes reel {
+  to { rotate: 360deg; }
+}
+
+/* footer coordinates link: the pin drops onto the spot when pointed at */
+@media (prefers-reduced-motion: no-preference) {
+  .group\/map:is(:hover, :focus-visible) .map-pin {
+    animation: pin-drop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+}
+@keyframes pin-drop {
+  from { translate: 0 -0.6em; }
+}
+
+/* "continuar_leitura.exe" (ResumeReading.tsx) pops up from the bottom like a notification balloon */
+@media (prefers-reduced-motion: no-preference) {
+  .resume-pop {
+    animation: resume-pop 0.35s cubic-bezier(0.3, 1.4, 0.5, 1) both;
+  }
+}
+@keyframes resume-pop {
+  from { opacity: 0; transform: translateY(1.5rem); }
+}
+
+/* service-page steps that were minimized ("_" in their title bar, Deliverables): gone from the screen, waiting in the
+   taskbar under the list — but still on paper, so the printed dossier keeps every step */
+@media screen {
+  [data-win-item][data-min] {
+    display: none;
+  }
+}
+.deliv-bar[data-empty] {
+  height: 0;
+}
+.deliv-task {
+  display: inline-flex;
+  min-height: 1.75rem;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  background: #c9c3d8;
+  color: #12082a;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.75rem;
+  box-shadow: inset -1.5px -1.5px 0 #7d7394, inset 1.5px 1.5px 0 #fff;
+}
+.deliv-task:active {
+  box-shadow: inset 1.5px 1.5px 0 #7d7394, inset -1.5px -1.5px 0 #fff;
+  translate: 1px 1px;
+}
+.deliv-task:focus-visible {
+  outline: 2px dotted #12082a;
+  outline-offset: -4px;
+}
+/* a tiny notepad page: white sheet, a few ruled lines and the blue title strip */
+.deliv-ico {
+  width: 0.7rem;
+  height: 0.85rem;
+  border: 1px solid #12082a;
+  background: linear-gradient(#1e3a8a 0 22%, transparent 22%), repeating-linear-gradient(transparent 0 2px, #7d7394 2px 3px) 0 4px / 100% calc(100% - 4px) no-repeat, #fff;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-task] {
+    animation: deliv-in 0.22s ease-out;
+  }
+}
+@keyframes deliv-in {
+  from {
+    scale: 0.6 1;
+    opacity: 0;
+  }
+}
+
+/* /passatempo "enter your initials" (PlayerTag): the slot being edited glows and blinks its underline, like the cursor
+   on an arcade high-score table */
+.player-slot {
+  outline: none;
+  box-shadow: inset 0 -4px 0 transparent;
+}
+.player-slot:focus-visible,
+.player-slot:focus {
+  border-color: var(--color-acid);
+  box-shadow: inset 0 -4px 0 var(--color-acid), 0 0 0 3px rgb(18 8 42 / 0.9), 0 0 0 5px var(--color-acid);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .player-slot:focus {
+    animation: player-blink 0.9s steps(1, end) infinite;
+  }
+}
+@keyframes player-blink {
+  50% {
+    box-shadow: inset 0 -4px 0 transparent, 0 0 0 3px rgb(18 8 42 / 0.9), 0 0 0 5px var(--color-acid);
+  }
+}
+
+/* /casos "Exibir" switch (CaseView): Win95 toolbar buttons, the chosen one pushed in */
+.case-view-btn {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.7rem;
+  background: #c9c3d8;
+  color: #12082a;
+  font-size: 0.8rem;
+  box-shadow: inset -1.5px -1.5px 0 #7d7394, inset 1.5px 1.5px 0 #fff;
+}
+.case-view-btn[aria-pressed='true'] {
+  background: repeating-conic-gradient(#c9c3d8 0 25%, #e4dff0 0 50%) 0 0 / 2px 2px;
+  box-shadow: inset 1.5px 1.5px 0 #7d7394, inset -1.5px -1.5px 0 #fff;
+  /* no bolder weight: the pressed state is set after hydration, and a wider bold label nudged the switch sideways
+     (a small layout shift on every visit to /casos); the sunken bevel and the dither already say "pressed" */
+}
+.case-view-btn:focus-visible {
+  outline: 2px dotted #12082a;
+  outline-offset: -5px;
+}
+.case-view-ico {
+  width: 0.9rem;
+  height: 0.8rem;
+}
+.case-view-ico--grid {
+  background: conic-gradient(#12082a 0 0) 0 0 / 40% 42% no-repeat, conic-gradient(#12082a 0 0) 100% 0 / 40% 42% no-repeat,
+    conic-gradient(#12082a 0 0) 0 100% / 40% 42% no-repeat, conic-gradient(#12082a 0 0) 100% 100% / 40% 42% no-repeat;
+}
+.case-view-ico--rows {
+  background: repeating-linear-gradient(#12082a 0 2px, transparent 2px 4px) 0 0 / 100% 100% no-repeat;
+  background-size: 100% 11px;
+}
+
+/* "Detalhes": the archive as a file listing — no screenshots, one row per case: number, name, kind and the
+   problem (two lines at most). On screen only: the printed archive keeps its windows */
+@media screen {
+  [data-case-list][data-view='details'] {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    counter-reset: case-row;
+    border-top: 2px solid rgb(from var(--color-ink) r g b / 0.2);
+  }
+  [data-case-list][data-view='details'] > li {
+    counter-increment: case-row;
+    position: relative;
+    border-bottom: 1px solid rgb(from var(--color-ink) r g b / 0.15);
+  }
+  [data-case-list][data-view='details'] [data-case-window],
+  [data-case-list][data-view='details'] > li > ul {
+    display: none;
+  }
+  [data-case-list][data-view='details'] > li > a {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: baseline;
+    padding: 0.9rem 0.5rem;
+    transition: background-color 0.15s;
+  }
+  [data-case-list][data-view='details'] > li > a::before {
+    content: counter(case-row, decimal-leading-zero);
+    grid-row: 1 / span 3;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: rgb(from var(--color-ink) r g b / 0.6);
+  }
+  [data-case-list][data-view='details'] > li[data-case-read] > a::before {
+    content: counter(case-row, decimal-leading-zero) ' ✓';
+    color: var(--color-teal);
+  }
+  [data-case-list][data-view='details'] > li > a:hover,
+  [data-case-list][data-view='details'] > li > a:focus-visible {
+    background: rgb(from var(--color-ink) r g b / 0.06);
+  }
+  [data-case-list][data-view='details'] h2 {
+    margin-top: 0;
+    font-size: 1.35rem;
+  }
+  [data-case-list][data-view='details'] h2,
+  [data-case-list][data-view='details'] > li > a > p {
+    grid-column: 2;
+  }
+  [data-case-list][data-view='details'] > li > a > p {
+    margin-top: 0.15rem;
+  }
+  [data-case-list][data-view='details'] > li > a > p:last-of-type {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.95rem;
+  }
+  @media (min-width: 900px) {
+    [data-case-list][data-view='details'] > li > a {
+      grid-template-columns: 3.25rem minmax(10rem, 15rem) minmax(9rem, 13rem) minmax(0, 1fr);
+    }
+    [data-case-list][data-view='details'] > li > a::before {
+      grid-row: auto;
+    }
+    [data-case-list][data-view='details'] h2,
+    [data-case-list][data-view='details'] > li > a > p {
+      grid-column: auto;
+      margin-top: 0;
+    }
+    [data-case-list][data-view='details'] > li > a > p:first-of-type {
+      font-size: 1rem;
+    }
+    /* the column headers above the rows (casos/page.tsx), on the same grid as each row's link */
+    [data-case-cols]:has(+ [data-case-list][data-view='details']) {
+      display: grid;
+      grid-template-columns: 3.25rem minmax(10rem, 15rem) minmax(9rem, 13rem) minmax(0, 1fr);
+      column-gap: 0.75rem;
+      margin-top: 1rem;
+      padding: 0 0.5rem 0.45rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(from var(--color-ink) r g b / 0.6);
+    }
+    [data-case-cols] > span + span {
+      /* a column divider, like the grips between a details view's headers */
+      border-left: 1px solid rgb(from var(--color-ink) r g b / 0.2);
+      margin-left: -0.4rem;
+      padding-left: 0.4rem;
+    }
+    [data-case-cols]:has(+ [data-case-list][data-view='details']) + [data-case-list] {
+      margin-top: 0;
+    }
+  }
+}
+
+/* case page "Caso resolvido" (Declassify): each word sits under a black censor bar, slightly ragged like a marker
+   stroke; when the card is in view the bars wipe off left to right, one word after the other */
+@media screen {
+  [data-declassify] .redact {
+    background-image: linear-gradient(#140a26, #140a26);
+    background-repeat: no-repeat;
+    background-position: 100% 55%;
+    background-size: 100% 0.95em;
+    color: transparent;
+    border-radius: 1px;
+    transition: background-size 0.28s cubic-bezier(0.6, 0, 0.3, 1), color 0.2s ease-out;
+    transition-delay: calc(var(--i) * 32ms + 0.15s), calc(var(--i) * 32ms + 0.3s);
+  }
+  [data-declassify] .redact::selection {
+    color: #fff;
+  }
+  [data-declassify='open'] .redact {
+    background-size: 0% 0.95em;
+    color: inherit;
+  }
+}
+
+/* question lists (AccordionKeys): the keyboard-focused question gets a manicule, the pointing hand printers set in
+   the margin to say "read this", sliding in from the left of the card; with ↑/↓ it hops from question to question.
+   Wide screens only, where the margin has room for it */
+@media (min-width: 1024px) {
+  [data-acc] > details {
+    position: relative;
+  }
+  [data-acc] > details:has(> summary:focus-visible)::before {
+    content: '☞';
+    position: absolute;
+    top: 1.05rem;
+    left: -2.4rem;
+    font-family: 'Segoe UI Symbol', 'Apple Symbols', 'DejaVu Sans', serif;
+    font-size: 1.7rem;
+    line-height: 1;
+    color: #c2410c;
+    pointer-events: none;
+  }
+  main [data-acc] > details:has(> summary:focus-visible)::before {
+    color: var(--color-acid);
+  }
+  #perguntas.paper [data-acc] > details:has(> summary:focus-visible)::before {
+    color: #c2410c;
+  }
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  [data-acc] > details:has(> summary:focus-visible)::before {
+    animation: manicule-in 0.25s cubic-bezier(0.2, 0.8, 0.3, 1), manicule-tap 1.4s 0.25s ease-in-out infinite;
+  }
+}
+@keyframes manicule-in {
+  from {
+    opacity: 0;
+    translate: -0.8rem 0;
+  }
+}
+@keyframes manicule-tap {
+  50% {
+    translate: 0.3rem 0;
+  }
+}
+
+/* 404 "Seu arquivo de investigação" (CaseLedger): one manila folder per case. Opened ones carry a teal stamp,
+   the next unread one is lit and nudges like a tab being pulled out of the drawer */
+.ledger-folder {
+  position: relative;
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.375rem;
+  border: 2px solid rgb(from var(--color-ink) r g b / 0.25);
+  padding: 0.35rem 0.8rem 0.35rem 0.6rem;
+  font-size: 0.9rem;
+  color: rgb(from var(--color-ink) r g b / 0.8);
+  transition: translate 0.2s ease-out, border-color 0.2s, background-color 0.2s;
+}
+.ledger-folder:hover,
+.ledger-folder:focus-visible {
+  translate: 0 -2px;
+  border-color: var(--color-acid);
+  color: var(--color-ink);
+}
+.ledger-folder[data-read] {
+  border-color: rgb(60 198 180 / 0.55);
+  background: rgb(60 198 180 / 0.1);
+}
+.ledger-folder[data-next] {
+  border-color: var(--color-acid);
+  background: rgb(247 147 30 / 0.14);
+  color: var(--color-ink);
+}
+/* a folder drawn in CSS: tab on top, body below */
+.ledger-ico {
+  position: relative;
+  width: 1.1rem;
+  height: 0.8rem;
+  margin-top: 0.15rem;
+  border-radius: 0 2px 2px 2px;
+  background: #e8c27a;
+  box-shadow: inset 0 -2px 0 #c9993f;
+}
+.ledger-ico::before {
+  content: '';
+  position: absolute;
+  top: -0.2rem;
+  left: 0;
+  width: 0.5rem;
+  height: 0.25rem;
+  border-radius: 2px 2px 0 0;
+  background: #e8c27a;
+}
+.ledger-ok {
+  position: absolute;
+  top: -0.55rem;
+  right: -0.45rem;
+  display: grid;
+  width: 1.15rem;
+  height: 1.15rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--color-teal);
+  color: #12082a;
+  font-size: 0.7rem;
+  font-weight: 700;
+  rotate: -12deg;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ledger-folder {
+    animation: ledger-in 0.35s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+    animation-delay: calc(var(--i) * 45ms);
+  }
+  .ledger-folder[data-next] .ledger-ico {
+    animation: ledger-pull 1.6s 0.6s ease-in-out infinite;
+  }
+}
+@keyframes ledger-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+@keyframes ledger-pull {
+  0%,
+  60%,
+  100% {
+    translate: 0 0;
+  }
+  30% {
+    translate: 0 -3px;
+  }
+}
+
+/* the phone menu's "push it back up" grabber (Nav, curtainSwipe): only where fingers are the pointer */
+@media (pointer: coarse) {
+  .curtain-grab {
+    display: flex;
+  }
+}
+@media (pointer: coarse) and (prefers-reduced-motion: no-preference) {
+  html[data-menu='open'] .curtain-grab > span {
+    animation: curtain-nudge 2.4s 1.2s ease-in-out 2;
+  }
+}
+@keyframes curtain-nudge {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  40% {
+    translate: 0 -5px;
+  }
+}
+
+/* Clients strip (ClientsSplit): a pressed count keeps its own logos in colour and fades the rest as they pass;
+   pointing at a count previews it. Opacity + grayscale only, so the tape's motion and layout don't change */
+#clientes .client-logo {
+  transition: opacity 0.35s ease-out, filter 0.35s ease-out;
+}
+#clientes[data-show='public'] .client-logo[data-group='private'],
+#clientes[data-show='private'] .client-logo[data-group='public'] {
+  opacity: 0.18;
+  filter: grayscale(1);
+}
+@media (hover: hover) {
+  #clientes:not([data-show]):has([data-split='public']:hover) .client-logo[data-group='private'],
+  #clientes:not([data-show]):has([data-split='private']:hover) .client-logo[data-group='public'] {
+    opacity: 0.18;
+    filter: grayscale(1);
+  }
+}
+.clients-chip {
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.clients-chip:hover {
+  border-color: rgb(18 8 42 / 0.6);
+}
+.clients-chip[aria-pressed='true'] {
+  border-color: #12082a;
+  background: #12082a;
+  color: #fff;
+}
+
+/* Process menu lines: the dotted leader between a dish and its "price" (the time it takes) is drawn out by the pen as
+   that step comes up, and the other steps' leaders shrink back to a stub. Only once the scroll has lit a step
+   ([data-steps]:has(.is-active)), so without scripts or with reduced motion every leader stays whole */
+@media (prefers-reduced-motion: no-preference) {
+  .step-leader {
+    transform-origin: left center;
+    transition: scale 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s, border-color 0.5s;
+  }
+  [data-steps]:has(.is-active) [data-step]:not(.is-active) .step-leader {
+    scale: 0.12 1;
+  }
+  [data-step].is-active .step-leader {
+    border-color: rgb(194 65 12 / 0.55);
+  }
+}
+
+/* Manifesto: "sistema claro" is underlined by a single orange marker stroke, slightly crooked like a hand pulled
+   it. On browsers with scroll-driven animations the stroke is drawn left to right while the line rises through the
+   screen; elsewhere, with reduced motion and on paper it is simply there */
+.mf-key {
+  background: linear-gradient(176deg, transparent 0 46%, var(--color-acid) 46% 68%, transparent 68%) 0 100% / 100% 0.42em no-repeat;
+  padding-bottom: 0.06em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+@media screen and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .mf-key {
+      animation: mf-stroke linear both;
+      animation-timeline: view();
+      animation-range: entry 60% cover 45%;
+    }
+  }
+}
+@keyframes mf-stroke {
+  from {
+    background-size: 0% 0.42em;
+  }
+  to {
+    background-size: 100% 0.42em;
+  }
+}
+
+/* /acessibilidade control panel (YourSettings): a small indicator lamp per preference, lit teal when the browser asks
+   for it, dark when not; it glows a moment as it changes */
+.settings-lamp {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 2px solid #12082a;
+  background: radial-gradient(circle at 35% 35%, #8a8399, #3d3550 70%);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.settings-lamp[data-on] {
+  background: radial-gradient(circle at 35% 35%, #c9fff6, var(--color-teal) 55%, #1f6f63);
+  box-shadow: 0 0 0 3px rgb(60 198 180 / 0.25), 0 0 10px rgb(60 198 180 / 0.7);
+}
+.settings-lamp[data-unknown] {
+  background: repeating-linear-gradient(45deg, #c9c3d8 0 2px, #7d7394 2px 4px);
+}
+@media (forced-colors: active) {
+  .settings-lamp {
+    forced-color-adjust: none;
+    background: Canvas;
+    border-color: CanvasText;
+  }
+  .settings-lamp[data-on] {
+    background: Highlight;
+  }
+}
+
+/* home cases: the tab of the case the visitor just came back from glows once (Work.tsx) */
+[role='tab'][data-returned]::after {
+  content: '';
+  position: absolute;
+  inset: 0.25rem -0.75rem;
+  border-radius: 0.6rem;
+  box-shadow: 0 0 0 2px var(--color-acid);
+  pointer-events: none;
+  animation: returned-ring 2.4s ease-out forwards;
+}
+@keyframes returned-ring {
+  0%, 55% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [role='tab'][data-returned]::after { animation-duration: 0.01s; animation-delay: 2.4s; animation-fill-mode: both; }
+}
+
+/* service steps: a maximized window (Deliverables "□") spans the row and reads at a larger size */
+[data-win-item][data-max] h3 {
+  font-size: clamp(1.75rem, 2.6vw, 2.4rem);
+}
+[data-win-item][data-max] p {
+  font-size: 1.125rem;
+  max-width: 62ch;
+}
+/* paper shows the steps as written, not as arranged on screen: a maximized window prints at its normal place and
+   size (minimized ones already print, see [data-min]) */
+@media print {
+  [data-win-item][data-max] {
+    grid-column: auto;
+  }
+  [data-win-item][data-max] h3,
+  [data-win-item][data-max] p {
+    font-size: revert-layer;
+    max-width: none;
+  }
+}
+
+/* case page: the red thread between "O mistério" and "Caso resolvido", and the two push pins holding it */
+.case-pin {
+  z-index: 2;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff8a65 0 22%, #c2410c 48%, #7a1f05 100%);
+  box-shadow: 1px 2px 0 rgb(20 10 38 / 0.45);
+}
+.case-thread {
+  z-index: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    /* revealed left to right with a clip (a pathLength dash breaks into pieces on a non-scaling stroke in Chrome) */
+    .case-thread {
+      animation: case-thread-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 60% cover 45%;
+    }
+  }
+}
+@keyframes case-thread-draw {
+  from { clip-path: inset(-20px 62% -20px 37%); }
+  to { clip-path: inset(-20px 35% -20px 37%); }
+}
+
+/* case page, on paper: Chromium's print layout gave up on the phone mock-up's size container (container-type plus
+   cqw units under the status bar), and the whole printed dossier came out as blank pages. On paper the phone is a
+   plain frame: no size container, no status bar (its clock means nothing in print), the screenshot from the top */
+@media print {
+  [data-case-phone] {
+    container-type: normal;
+  }
+  [data-case-phone] [data-phone-status] {
+    display: none;
+  }
+  [data-case-phone] > div:first-child {
+    top: 0;
+  }
+  /* the evidence letters and the push pins are drawn with backgrounds, which printers usually drop (a lone letter
+     floating off each tag); the red thread is a stroke and stays */
+  .evidence-tag::after,
+  .case-pin {
+    display: none;
+  }
+}
+
+/* service page: every symptom ticked, a verdict stamped beside the "levar para o contato" button */
+.symptoms-stamp {
+  display: inline-block;
+  padding: 0.35rem 0.7rem;
+  border: 2.5px solid var(--color-acid);
+  border-radius: 4px;
+  color: var(--color-acid);
+  rotate: -4deg;
+  mask-image: radial-gradient(circle at 30% 40%, #000 60%, rgb(0 0 0 / 0.75) 100%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .symptoms-stamp {
+    animation: symptoms-stamp 0.32s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  }
+}
+@keyframes symptoms-stamp {
+  from { scale: 2.2; opacity: 0; rotate: -12deg; }
+}
+
+/* a Win95 window's status bar: sunken panels under the content (/links) */
+.win-status {
+  display: flex;
+  gap: 3px;
+  margin: 0 0.375rem 0.375rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: #12082a;
+}
+.win-status > span {
+  padding: 2px 6px;
+  border: 1px solid;
+  border-color: #7d7394 #fff #fff #7d7394;
+}
+.win-status > span:first-child {
+  flex: 1;
+}
+@media print {
+  .win-status { display: none; }
+}
+
+/* GovTech "Art. 1º…": a highlighter stroke runs under the article's title while it is pointed at */
+.pillar-k {
+  /* a pale marker: #c2410c on it stays at 4.58:1 (the 18px title is not "large text" for WCAG) */
+  background: linear-gradient(174deg, transparent 0 48%, #fff2b0 48% 82%, transparent 82%) 0 100% / 0% 100% no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+@media (hover: hover) {
+  [data-pillar]:hover .pillar-k {
+    background-size: 100% 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pillar-k {
+    transition: none;
+  }
+}
+@media print, (forced-colors: active) {
+  .pillar-k {
+    background: none;
+  }
+}
+
+/* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
+   highlighter, instead of the browser's default purple */
+::target-text {
+  background: var(--color-lemon);
+  color: var(--color-acid-ink);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .quote-pop {
+    animation: check-pop 0.28s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  }
+}
+
+/* …and the tick inside is a pen stroke that inks itself in, just behind the stamp (Tick.tsx) */
+.tick-draw path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tick-draw path {
+    animation: tick-draw 0.26s 0.08s cubic-bezier(0.6, 0, 0.4, 1) both;
+  }
+}
+@keyframes tick-draw {
+  from { stroke-dashoffset: 1; }
+}
+@keyframes check-pop {
+  0% { transform: scale(0.35) rotate(-25deg); }
+  60% { transform: scale(1.3) rotate(8deg); }
+  100% { transform: none; }
+}
+
+/* Manifesto facts: cards pinned slightly askew; the one under the pointer straightens and lifts (its number
+   rolls again, Manifesto.tsx). Not !important: while GSAP animates a card in it folds this tilt into the
+   inline transform (and writes `rotate: none`), then clearProps hands it back; forcing it doubled the tilt */
+.fact-card:nth-child(odd) { rotate: -1deg; }
+.fact-card:nth-child(even) { rotate: 1deg; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .fact-card {
+    transition: rotate 0.3s cubic-bezier(0.3, 1.6, 0.5, 1), translate 0.3s ease-out;
+  }
+  .fact-card:nth-child(n):hover {
+    rotate: 0deg !important;
+    translate: 0 -4px !important;
+  }
+}
+
+/* the counter bell answers the pointer: a little shiver says "ring me"; keyboard focus gets a dashed ring.
+   `rotate` (not transform) so it doesn't fight GSAP's ringing swing */
+.diner [data-bell-ring] {
+  transition: opacity 0.2s;
+}
+.diner [data-bell-btn]:focus-visible [data-bell-ring] {
+  opacity: 1;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  /* data-bell-hover is set by the bell's hit area (Process); a :has() here restyled the whole diner subtree on every GSAP frame */
+  .diner[data-bell-hover] [data-bell] {
+    animation: bell-shiver 0.5s ease-in-out infinite;
+  }
+}
+@keyframes bell-shiver {
+  0%, 100% { rotate: 0deg; }
+  25% { rotate: -5deg; }
+  75% { rotate: 5deg; }
+}
+
+/* Mystery board: evidence hangs from its pin and swings when the pointer brushes it (desktop, motion ok).
+   `rotate`, not transform, so it adds to the scene's GSAP transforms on the card around it */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .evidence-swing {
+    transform-origin: 50% 0;
+  }
+  [data-evidence]:hover .evidence-swing {
+    animation: evidence-swing 1.2s ease-out;
+  }
+}
+/* Mystery board: the evidence under the mouse pulls its own thread taut and bright, the others go slack and fade.
+   Only colour and width change, so it also runs with reduced motion; the threads only show once the scene draws them */
+[data-board] [data-string] {
+  transition: stroke-opacity 0.25s ease-out, stroke-width 0.25s ease-out, stroke 0.25s ease-out;
+}
+/* the pulled thread is drawn over the cards (pin to suspect, end to end); the slack ones fade almost out */
+[data-board][data-pulling] [data-threads] {
+  z-index: 4;
+}
+[data-board][data-pulling] [data-string] {
+  stroke-opacity: 0.12;
+}
+[data-board][data-pulling] [data-string][data-pulled] {
+  stroke: #ff3b52;
+  stroke-opacity: 1;
+  stroke-width: 5px;
+  /* Chrome breaks a pathLength=1 dash into pieces once the stroke is non-scaling: the pulled thread is drawn whole */
+  stroke-dasharray: none;
+}
+/* the phone file has no hover: a tap sets one card swinging (Mystery adds data-swing) */
+@media (prefers-reduced-motion: no-preference) {
+  .evidence-swing[data-swing] {
+    transform-origin: 50% 0;
+    animation: evidence-swing 1.2s ease-out;
+  }
+}
+/* 404: pressing the × of ERRO_404.exe — the window refuses to close */
+@media (prefers-reduced-motion: no-preference) {
+  .win[data-shake] {
+    animation: win-shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  }
+}
+@keyframes win-shake {
+  10%, 90% { translate: -2px 0; }
+  20%, 80% { translate: 4px 0; }
+  30%, 50%, 70% { translate: -7px 0; }
+  40%, 60% { translate: 7px 0; }
+}
+
+@keyframes evidence-swing {
+  0%, 100% { rotate: 0deg; }
+  18% { rotate: 3.5deg; }
+  42% { rotate: -2.2deg; }
+  66% { rotate: 1deg; }
+  84% { rotate: -0.4deg; }
+}
+
+/* "Principais recursos" on a case page: evidence tags, each hung a little askew with a punched hole
+   (the page's own background showing through); pointing at one straightens it */
+.evidence-tag {
+  rotate: -1.4deg;
+  transition: rotate 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.evidence-tag:nth-child(even) { rotate: 1.1deg; }
+.evidence-tag:nth-child(3n) { rotate: -0.5deg; }
+.evidence-tag:hover { rotate: 0deg; }
+.evidence-tag::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 7px;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border: 1.5px solid var(--color-toon);
+  border-radius: 50%;
+  background: var(--color-bg);
+  /* a metal grommet around the hole, so it reads as punched rather than as a bullet */
+  box-shadow: 0 0 0 2px #e3b44f;
+}
+@media (min-width: 40rem) {
+  .evidence-tag::before { left: 11px; width: 8px; height: 8px; margin-top: -4px; box-shadow: 0 0 0 2.5px #e3b44f; }
+}
+@media print {
+  .evidence-tag { rotate: none; }
+  .evidence-tag::before { background: #fff; }
+}
+/* each feature also gets a numbered evidence marker, the yellow tent a forensics team drops beside a clue (A, B,
+   C…), clipped to the tag's corner. Decorative: the alt text "/ ''" keeps screen readers from reading the letter
+   (browsers without that syntax fall back to the first declaration) */
+ul:has(> .evidence-tag) {
+  counter-reset: evidence;
+}
+.evidence-tag {
+  counter-increment: evidence;
+}
+.evidence-tag::after {
+  content: counter(evidence, upper-alpha);
+  content: counter(evidence, upper-alpha) / '';
+  position: absolute;
+  top: -9px;
+  right: -5px;
+  display: grid;
+  width: 17px;
+  height: 15px;
+  padding-top: 3px;
+  place-items: center;
+  background: #f9d34a;
+  color: #140a26;
+  font: 700 8.5px/1 var(--font-mono);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  filter: drop-shadow(0 1px 0 #140a26);
+  rotate: 4deg;
+  pointer-events: none;
+}
+.evidence-tag:nth-child(even)::after { rotate: -5deg; }
+/* forced colors drop the tent's yellow fill, leaving a stray letter floating off each tag: the markers (and the case
+   thread's pins, drawn the same way) step aside, and the thread takes the system's text colour */
+@media (forced-colors: active) {
+  .evidence-tag::after,
+  .case-pin {
+    display: none;
+  }
+  .case-thread path {
+    stroke: CanvasText;
+  }
+}
+
+/* case page dots: while the pointer is on the strip, only the hovered dot shows its name (a dot that
+   still has keyboard focus used to keep its label up next to it) */
+nav[aria-label='Casos do arquivo']:hover a:not(:hover) .dot-tip {
+  opacity: 0;
+}
+
+/* contact: when the required clues are in, the submit button sends out two rings, like a bell on the desk */
+@media (prefers-reduced-motion: no-preference) {
+  button[data-ready]::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 9999px;
+    border: 3px solid var(--color-acid-ink);
+    pointer-events: none;
+    animation: ready-ring 0.9s ease-out 2 both;
+  }
+}
+@keyframes ready-ring {
+  from { opacity: 0.7; scale: 1; }
+  to { opacity: 0; scale: 1.25 1.6; }
+}
+
+/* Studio: the founder's name gets signed when the polaroid develops (hover / .is-developed on touch) */
+.sig-line path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.6, 0, 0.3, 1) 0.25s;
+}
+[data-portrait-card]:hover .sig-line path,
+[data-portrait-card]:focus-within .sig-line path,
+[data-portrait-card].is-developed .sig-line path {
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sig-line path { stroke-dashoffset: 0; }
+}
+
+/* hero: "role para investigar ↓" */
+@keyframes cue-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 4px; }
+}
+
+/* Processo: as a step becomes the one being cooked, its ingredients hop onto the counter one by one
+   (the class is only toggled when motion is welcome; GSAP skips it under reduced motion) */
+@media (prefers-reduced-motion: no-preference) {
+  #processo [data-step].is-active [data-ingredient] {
+    animation: ingredient-hop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+    animation-delay: calc(var(--i, 0) * 80ms + 120ms);
+  }
+}
+@keyframes ingredient-hop {
+  0% { translate: 0 0; }
+  40% { translate: 0 -7px; }
+  100% { translate: 0 0; }
+}
+
+/* Setor público: the audit trail ends in a blinking terminal cursor (steady with reduced motion) */
+@media (prefers-reduced-motion: no-preference) {
+  .log-cursor {
+    animation: log-cursor 1.1s steps(1, end) infinite;
+  }
+}
+@keyframes log-cursor {
+  50% { opacity: 0; }
+}
+
 /* burger sparkles */
 .sparkle {
   animation: sparkle 2.4s ease-in-out infinite;
@@ -332,6 +1770,614 @@ html {
 }
 @media (prefers-reduced-motion: reduce) {
   .sparkle { animation: none; opacity: 0.9; transform: none; }
+}
+
+/* an image that failed to load (layout's IMG_FAIL_SCRIPT): no broken-picture icon or stray alt text, the frame shows
+   a quiet hatched plate instead; the picture comes back by itself when the connection does */
+img[data-failed] {
+  visibility: hidden;
+}
+[data-img-failed]::after {
+  content: 'imagem fora do ar';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.55);
+  background: repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.04) 0 10px, transparent 10px 20px);
+  pointer-events: none;
+}
+
+/* footer chase: the night sky twinkles, and a shooting star crosses it every 14 s (pauses off screen with the
+   rest; still sky with reduced motion) */
+[data-star] {
+  opacity: 0.75;
+  box-shadow: 0 0 4px rgb(255 246 214 / 0.6);
+}
+[data-shooting-star] {
+  opacity: 0;
+  rotate: 18deg;
+  background: linear-gradient(90deg, transparent, #fff6d6);
+  border-radius: 999px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-star] {
+    animation: star-twinkle 3s ease-in-out infinite alternate;
+  }
+  [data-shooting-star] {
+    animation: shooting-star 14s linear 3s infinite;
+  }
+}
+@keyframes star-twinkle {
+  from { opacity: 0.85; }
+  to { opacity: 0.25; }
+}
+@keyframes shooting-star {
+  0% { opacity: 0; translate: 0 0; }
+  1% { opacity: 1; }
+  6% { opacity: 0; translate: 22vw 7vw; }
+  100% { opacity: 0; translate: 22vw 7vw; }
+}
+
+/* /passatempo: each cabinet's tube switches on when the page opens (without JavaScript the page's <noscript> hides it) — a bright line across the middle that opens up to the
+   picture, 0.25 s after its left-hand neighbour */
+.crt-power {
+  display: none;
+}
+@media screen and (prefers-reduced-motion: no-preference) {
+  /* the tubes stay dark until the opening curtain (Preloader) has lifted — html[data-ready] — so a first visit sees
+     them switch on instead of it happening behind the curtain */
+  .crt-power {
+    display: block;
+    background: #08040f;
+  }
+  html[data-ready] .crt-power {
+    animation: crt-open 0.55s cubic-bezier(0.7, 0, 0.3, 1) calc(0.2s + var(--i) * 0.25s) both;
+  }
+  .crt-power::after {
+    content: '';
+    position: absolute;
+    inset: calc(50% - 1px) 6%;
+    scale: 0 1;
+    background: #fff;
+    box-shadow: 0 0 10px 2px rgb(255 255 255 / 0.8);
+  }
+  html[data-ready] .crt-power::after {
+    animation: crt-line 0.55s ease-out calc(0.2s + var(--i) * 0.25s) both;
+  }
+}
+@keyframes crt-open {
+  0%, 45% { clip-path: inset(0); }
+  100% { clip-path: inset(50% 0 50% 0); }
+}
+@keyframes crt-line {
+  0% { scale: 0 1; opacity: 1; }
+  40% { scale: 1 1; opacity: 1; }
+  100% { scale: 1 40; opacity: 0; }
+}
+
+/* diner sign (Process): the neon "&" buzzes off and on for a moment every 9 s — fill-opacity, since the glow filter
+   is built from the glyph and dims with it. A still sign with reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  [data-neon-buzz] {
+    animation: neon-buzz 9s steps(1, end) 2.5s infinite;
+  }
+}
+@keyframes neon-buzz {
+  0%, 100% { fill-opacity: 1; }
+  91% { fill-opacity: 0.15; }
+  92% { fill-opacity: 1; }
+  93% { fill-opacity: 0.25; }
+  94.5% { fill-opacity: 0.9; }
+  95.5% { fill-opacity: 0.1; }
+  97% { fill-opacity: 1; }
+}
+
+/* header logo: pointing at it (or tabbing to it) sends a hop through the letters, left to right, 45 ms apart.
+   `translate` on inline-blocks, so the text shadow travels with each letter */
+[data-logo-letter] {
+  display: inline-block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  @media (hover: hover) {
+    [data-logo]:hover [data-logo-letter] {
+      animation: logo-hop 0.42s cubic-bezier(0.3, 0.7, 0.4, 1.4) calc(var(--i) * 45ms) both;
+    }
+  }
+  [data-logo]:focus-visible [data-logo-letter] {
+    animation: logo-hop 0.42s cubic-bezier(0.3, 0.7, 0.4, 1.4) calc(var(--i) * 45ms) both;
+  }
+}
+@keyframes logo-hop {
+  0%, 100% { translate: 0 0; }
+  45% { translate: 0 -0.28em; rotate: -6deg; }
+}
+
+/* COOKIES.TXT: the title-bar cookie loses a bite when the visitor accepts (the window is sliding away meanwhile) */
+[data-cookie] .cookie-bite {
+  scale: 0;
+  transform-origin: 15px 2px;
+  transform-box: view-box;
+}
+[data-cookie='bitten'] .cookie-bite {
+  scale: 1;
+  transition: scale 0.18s cubic-bezier(0.3, 0.7, 0.4, 1.5);
+}
+
+/* floating WhatsApp (phones): on its first appearance in a visit the icon rings once — a quick buzz, then still.
+   Starts after the button's own 0.5 s slide-in */
+@media (prefers-reduced-motion: no-preference) {
+  [data-ring] {
+    animation: phone-ring 0.9s ease-in-out 0.55s;
+    transform-origin: 50% 60%;
+  }
+}
+@keyframes phone-ring {
+  0%, 100% { rotate: 0deg; scale: 1; }
+  10%, 30%, 50%, 70% { rotate: -16deg; scale: 1.12; }
+  20%, 40%, 60%, 80% { rotate: 16deg; scale: 1.12; }
+}
+
+/* footer file tree: branch glyphs, the last entry of each folder closing the branch */
+[data-tree]::before {
+  content: '├─';
+}
+li:last-child > a > [data-tree]::before {
+  content: '└─';
+}
+
+/* /casos: the case window under the pointer (or keyboard focus) is the active one, the others drop to the grey
+   inactive title bar of Windows 95 — the same desktop rule as the Studio and service-page windows. :has() on the
+   case list only (seven cards, no GSAP), so pointing at the gap between cards changes nothing */
+[data-case-list] .win-bar {
+  transition: filter 0.25s ease-out;
+}
+@media (hover: hover) {
+  [data-case-list]:has(> li > a:hover) > li:not(:has(> a:hover)) .win-bar {
+    filter: grayscale(1) brightness(0.82);
+  }
+}
+[data-case-list]:has(> li > a:focus-visible) > li:not(:has(> a:focus-visible)) .win-bar {
+  filter: grayscale(1) brightness(0.82);
+}
+
+/* case page: the phone held over the desktop window drifts a little faster than the page as it scrolls past —
+   two layers at different depths. Scroll-driven, so it only moves with the reader; static without view timelines,
+   with reduced motion and on paper */
+@media screen and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-case-phone] {
+      animation: phone-drift linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+@keyframes phone-drift {
+  from { translate: 0 28px; }
+  to { translate: 0 -28px; }
+}
+
+/* home "sheets": each rounded section slides over the one before it (-mt-8, rounded top). As its top edge rises
+   from the bottom of the screen, a shadow grows above that edge onto the section underneath, so the cut between
+   sections reads as one card landing on the stack rather than a flat seam. Shadow only (no transform: Mystery and
+   the others pin with GSAP). Scroll-driven; reduced motion and browsers without view timelines keep the flat seam */
+@media screen and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-sheet] {
+      animation: sheet-land linear both;
+      animation-timeline: view(block);
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+@keyframes sheet-land {
+  from {
+    box-shadow: 0 0 0 0 rgb(13 8 32 / 0);
+  }
+  to {
+    box-shadow: 0 -22px 44px -10px rgb(13 8 32 / 0.55);
+  }
+}
+
+@keyframes focus-snap {
+  from {
+    outline-offset: 10px;
+    outline-color: transparent;
+  }
+}
+
+/* Clock (hero and footer): blinking colons and a rolling last digit, like a desk clock */
+@media (prefers-reduced-motion: no-preference) {
+  [data-clock-colon] {
+    animation: clock-blink 1s steps(1, end) infinite;
+  }
+  [data-clock-roll] {
+    animation: clock-roll 0.32s cubic-bezier(0.2, 0.8, 0.3, 1.2);
+  }
+}
+@keyframes clock-blink {
+  50% { opacity: 0.25; }
+}
+@keyframes clock-roll {
+  from {
+    translate: 0 -0.6em;
+    opacity: 0;
+  }
+}
+
+/* hero placard: minimized, the window keeps its space (no jump in the clock below) and folds toward its corner,
+   where the task button pops up to bring it back */
+[data-placard='min'] {
+  visibility: hidden;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-placard] {
+    transition: scale 0.2s ease-in, opacity 0.2s ease-in, visibility 0s;
+    transform-origin: 100% 100%;
+  }
+  [data-placard='min'] {
+    scale: 0.15;
+    opacity: 0;
+    transition: scale 0.2s ease-in, opacity 0.2s ease-in, visibility 0s 0.2s;
+  }
+  [data-placard-task] {
+    animation: placard-task 0.26s 0.12s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+  }
+}
+@keyframes placard-task {
+  from { scale: 0.6; opacity: 0; }
+}
+
+/* CopyEmail: the carbon copy of the address that floats off the button. With reduced motion it simply
+   isn't drawn (the ✓ copiado label already says it) */
+[data-copy-ghost] {
+  display: none;
+  translate: -50% 0;
+  color: currentColor;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-copy-ghost] {
+    display: block;
+    animation: copy-ghost 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  }
+}
+@keyframes copy-ghost {
+  0% { translate: -50% 6px; opacity: 0; scale: 0.9; }
+  20% { opacity: 0.9; }
+  100% { translate: -50% -26px; opacity: 0; scale: 1.05; rotate: -3deg; }
+}
+
+/* Social buttons: a small act per icon on hover / focus, and for keyboard users (who don't get the custom
+   cursor's label bubble) a tag naming the network and the handle */
+[data-social]:focus-visible [data-social-tag] {
+  display: block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-social]:focus-visible [data-social-tag] {
+    animation: social-tag 0.18s ease-out;
+  }
+  [data-social='instagram']:is(:hover, :focus-visible) [data-lens] {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: social-lens 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+  [data-social='instagram']:is(:hover, :focus-visible) [data-flash] {
+    animation: social-flash 0.5s ease-out;
+  }
+  [data-social='linkedin']:is(:hover, :focus-visible) [data-social-icon] {
+    animation: social-hop 0.45s cubic-bezier(0.3, 0.7, 0.4, 1);
+  }
+  [data-social='github']:is(:hover, :focus-visible) [data-social-icon] {
+    transform-origin: 50% 90%;
+    animation: social-wave 0.6s ease-in-out;
+  }
+}
+@keyframes social-tag {
+  from { opacity: 0; translate: -50% 4px; }
+}
+@keyframes social-lens {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.55); }
+  100% { transform: scale(1); }
+}
+@keyframes social-flash {
+  0%, 100% { r: 1; }
+  25% { r: 3; }
+}
+@keyframes social-hop {
+  0%, 100% { translate: 0 0; }
+  40% { translate: 0 -5px; }
+  70% { translate: 0 1px; }
+}
+@keyframes social-wave {
+  0%, 100% { rotate: 0deg; }
+  25% { rotate: -14deg; }
+  55% { rotate: 10deg; }
+  80% { rotate: -4deg; }
+}
+
+/* NetStatus: the "sem sinal" chip drops in from under the header; with reduced motion it just appears */
+@media (prefers-reduced-motion: no-preference) {
+  [data-net] {
+    animation: net-drop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  }
+}
+@keyframes net-drop {
+  from { translate: 0 -14px; opacity: 0; }
+}
+
+/* modal windows (search, shortcuts, full screenshot): they used to pop in at once. Now they open like a Win95
+   window: a dotted "zoom rectangle" closes in on the frame while the window settles from slightly small, and
+   the dimmed backdrop fades in. Opening only (closing stays instant, so Esc feels immediate) */
+@media (prefers-reduced-motion: no-preference) {
+  dialog.win[open] {
+    animation: win-open 0.26s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+  }
+  dialog.win[open]::backdrop {
+    animation: win-backdrop 0.26s ease-out;
+  }
+}
+@keyframes win-open {
+  0% {
+    scale: 0.94;
+    opacity: 0;
+    outline: 2px dotted rgb(253 243 225 / 0.9);
+    outline-offset: 48px;
+  }
+  60% {
+    opacity: 1;
+    outline: 2px dotted rgb(253 243 225 / 0.6);
+    outline-offset: 6px;
+  }
+  100% {
+    scale: 1;
+    outline: 2px dotted rgb(253 243 225 / 0);
+    outline-offset: 0;
+  }
+}
+@keyframes win-backdrop {
+  from { opacity: 0; }
+}
+
+/* MockUI "raffle" (the Dropcota case art): the drawn numbers pulse one after another, a ring flashing around
+   each like the live draw calling it. Eight numbers, 0.75 s apart, on a 6 s loop; paused off screen by
+   OffscreenPause like the other endless loops */
+@media (prefers-reduced-motion: no-preference) {
+  [data-raffle-hit] {
+    animation: raffle-call 6s ease-out infinite;
+    animation-delay: calc(var(--k) * 0.75s);
+  }
+}
+@keyframes raffle-call {
+  0% { scale: 1; box-shadow: 0 0 0 0 rgb(255 255 255 / 0); }
+  3% { scale: 1.22; box-shadow: 0 0 0 3px rgb(255 255 255 / 0.75), 0 0 18px var(--h); }
+  9%, 100% { scale: 1; box-shadow: 0 0 0 0 rgb(255 255 255 / 0); }
+}
+
+/* Work on phones/tablets: in the swipeable case strip, the card in the middle is the one in focus; its
+   neighbours peeking at the edges sit a little smaller and dimmer, growing as the swipe brings them to the
+   centre (scroll-driven on the strip's own horizontal scroll, so it follows the finger exactly) */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-work-strip] > li {
+      animation: strip-focus linear both;
+      animation-timeline: view(inline);
+    }
+  }
+}
+@keyframes strip-focus {
+  0%, 100% { scale: 0.9; opacity: 0.55; }
+  50% { scale: 1; opacity: 1; }
+}
+
+/* scroll shadows for short scrolling panes (the search results): a soft shade appears at the top once the list
+   has scrolled and at the bottom while there's more below, so a cut-off list reads as "keeps going" instead of
+   "that's all". Pure CSS: the covers scroll with the content (local), the shades stay put (scroll) */
+.scroll-shadows {
+  --cover: var(--color-paper);
+  background:
+    linear-gradient(var(--cover) 40%, transparent) center top / 100% 2.2rem no-repeat local,
+    linear-gradient(transparent, var(--cover) 60%) center bottom / 100% 2.2rem no-repeat local,
+    radial-gradient(farthest-side at 50% 0, rgb(26 15 46 / 0.22), transparent) center top / 100% 0.8rem no-repeat scroll,
+    radial-gradient(farthest-side at 50% 100%, rgb(26 15 46 / 0.22), transparent) center bottom / 100% 0.8rem no-repeat scroll;
+  background-color: var(--cover);
+}
+
+/* the mobile menu's neon floor only scrolls while the menu is open */
+#menu-mobile[inert] .grid-floor::before {
+  animation-play-state: paused;
+}
+
+/* FullShot while the long capture downloads: Win95 progress blocks marching across the bar (static blocks
+   with reduced motion) */
+[data-shot-bar] {
+  background: repeating-linear-gradient(90deg, #12082a 0 10px, transparent 10px 13px);
+  background-size: 52px 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-shot-bar] {
+    animation: shot-bar 0.9s steps(4) infinite;
+  }
+}
+@keyframes shot-bar {
+  to { background-position: 52px 0; }
+}
+
+/* BackToTop: slides in from the bottom-left corner while heading up, gone otherwise */
+[data-back-top] {
+  transition: translate 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.1), opacity 0.25s;
+}
+[data-back-top='off'] {
+  translate: 0 calc(100% + 1.5rem);
+  opacity: 0;
+  pointer-events: none;
+}
+/* the ring around the arrow fills with how deep in the page the visitor is */
+[data-back-ring] {
+  background: conic-gradient(#f7931e var(--depth, 0%), rgb(26 15 46 / 0.15) 0);
+}
+html[data-menu='open'] [data-back-top] {
+  display: none;
+}
+
+/* /links: the buttons drop into place one by one once the Preloader curtain lifts (html[data-ready]);
+   without JS (noscript in the page) or with reduced motion they are simply there */
+@media (prefers-reduced-motion: no-preference) {
+  /* screen only: print turns animations off, and this starting opacity used to leave /links' buttons invisible on
+     paper (blank "Serviços" and "Mais" lists) */
+  @media screen {
+    .links-pop {
+      opacity: 0;
+    }
+  }
+  html[data-ready] .links-pop {
+    animation: links-pop 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.25) calc(0.1s + var(--i) * 0.06s) both;
+  }
+}
+@keyframes links-pop {
+  from { opacity: 0; translate: 0 10px; scale: 0.96; }
+  to { opacity: 1; }
+}
+
+/* the "elementar" easter egg note drops in from the corner */
+@media (prefers-reduced-motion: no-preference) {
+  [data-elementar] {
+    animation: elementar-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.25);
+  }
+}
+@keyframes elementar-in {
+  from { translate: 0 -12px; rotate: -3deg; opacity: 0; }
+}
+
+/* case page: the latent print in the corner of "O mistério" is dusted darker when the card is pointed at;
+   a phone has no hover, so there the dust settles on it as the card scrolls up into the middle of the screen */
+@media (hover: none) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    /* the card clips its corner (overflow hidden makes it a scroll container), so view() on the print itself
+       never moves: the timeline is taken from the card's own place in the page instead */
+    :has(> [data-fingerprint]) {
+      view-timeline: --print block;
+    }
+    [data-fingerprint] {
+      animation: print-dust linear both;
+      animation-timeline: --print;
+      animation-range: entry 40% cover 55%;
+    }
+  }
+}
+@keyframes print-dust {
+  from { opacity: 0.13; }
+  to { opacity: 0.32; }
+}
+
+/* the idle screensaver fades in like a monitor dimming */
+[data-screensaver] {
+  animation: saver-in 0.8s ease-out;
+}
+@keyframes saver-in {
+  from { opacity: 0; }
+}
+
+/* case window: the magnifying glass shows only while a mouse is over the capture */
+[data-lens] {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+[data-lens][data-on] {
+  opacity: 1;
+}
+@media (hover: none) {
+  [data-lens] {
+    display: none;
+  }
+}
+
+/* NavPending: between a click on a page link and the next page, a striped bar runs along the very top, above the
+   reading bar (with reduced motion the stripes stand still: the bar alone says "loading") */
+[data-nav-pending] {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 61;
+  height: 3px;
+  pointer-events: none;
+  opacity: 0;
+  background: repeating-linear-gradient(90deg, #f7931e 0 18px, #f9e27d 18px 30px, #3cc6b4 30px 48px);
+  background-size: 48px 100%;
+  transition: opacity 0.2s;
+}
+html[data-navigating] [data-nav-pending] {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html[data-navigating] [data-nav-pending] {
+    animation: nav-pending 0.6s linear infinite;
+  }
+}
+@keyframes nav-pending {
+  to { background-position: 48px 0; }
+}
+
+/* closing call to action: "Caso nº 08 · em aberto · cliente: você" types itself, letter by letter, as its window
+   scrolls into view (scroll-driven: it only types while the reader scrolls). One line from md up; phones, reduced
+   motion and browsers without view timelines show it whole */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-typed] {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      vertical-align: bottom;
+      animation: typed steps(var(--n)) both;
+      animation-timeline: view();
+      animation-range: entry 40% cover 45%;
+    }
+  }
+}
+@keyframes typed {
+  from { width: 0; }
+  to { width: calc(var(--n) * (1ch + 0.2em)); }
+}
+
+/* sections out of view stop their endless CSS loops (OffscreenPause) */
+[data-offscreen],
+[data-offscreen] * {
+  animation-play-state: paused !important;
+}
+
+/* /casos 🎲: the die spins and the drawn card lights up before its page opens (RandomCase) */
+@keyframes dice-roll {
+  0% { rotate: 0deg; scale: 1; }
+  50% { scale: 1.35; }
+  100% { rotate: 720deg; scale: 1; }
+}
+li[data-picked] .win {
+  outline: 4px solid var(--color-acid);
+  outline-offset: 6px;
+  transition: outline-offset 0.3s ease-out;
+}
+
+/* /casos: "nothing left here" notice, only when the filters leave the grid empty (CasesEmpty) */
+[data-case-empty] {
+  display: none;
+}
+/* anchored on [data-case-zone] (only on /casos), not on main: a :has() on every page's main made each style
+   write on the home restyle the whole page */
+:root:not([data-only-unread]) [data-case-zone]:not(:has([data-case-list] > li:not([hidden]))) [data-case-empty],
+:root[data-only-unread] [data-case-zone]:not(:has([data-case-list] > li:not([hidden]):not([data-case-read]))) [data-case-empty] {
+  display: block;
+}
+
+/* /casos "mostrar só os que faltam" (ReadProgress) */
+:root[data-only-unread] li[data-case-read] {
+  display: none;
 }
 
 /* FAQ: answers slide open instead of snapping (browsers without ::details-content just snap) */
@@ -363,6 +2409,133 @@ details[open]::details-content {
   animation: ghost-bob 4.5s ease-in-out infinite;
 }
 
+/* /casos: the verdict stamp lands on a case card's screen while it is pointed at or focused */
+.case-stamp {
+  opacity: 0;
+  rotate: -12deg;
+  transition: opacity 0.2s;
+}
+a:focus-visible .case-stamp {
+  opacity: 0.92;
+}
+@media (hover: hover) {
+  a:hover .case-stamp {
+    opacity: 0.92;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  a:focus-visible .case-stamp {
+    animation: case-stamp 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  a:hover .case-stamp {
+    animation: case-stamp 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+@keyframes case-stamp {
+  0% { scale: 2.2; opacity: 0; }
+  60% { scale: 0.92; opacity: 0.92; }
+  100% { scale: 1; opacity: 0.92; }
+}
+@media print {
+  .case-stamp { display: none; }
+}
+
+/* Process order slip: when the order is up the stamp is re-applied, "PRONTO ✓" thumping over "EM PREPARO" */
+@media (prefers-reduced-motion: no-preference) {
+  [data-served] [data-order-stamp] {
+    animation: order-stamp 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+/* starts at 1.3, not ~2: the slip sits at the screen's right edge on phones, and a bigger first frame
+   (held while the section is off screen) made the page 13px wider than a 390px viewport */
+/* Process ticket: the barcode is the order link; pointing at it sweeps a scanner line across the bars
+   (reduced motion: the line just shows, centred, without moving) */
+.scan:hover .scan-laser,
+.scan:focus-visible .scan-laser { opacity: 1; left: 50%; }
+@media (prefers-reduced-motion: no-preference) {
+  .scan:hover .scan-laser,
+  .scan:focus-visible .scan-laser { animation: scan-sweep 0.9s ease-in-out infinite alternate; }
+}
+@keyframes scan-sweep {
+  from { left: 0; }
+  to { left: calc(100% - 3px); }
+}
+@keyframes order-stamp {
+  0% { scale: 1.3; opacity: 0; }
+  60% { scale: 0.94; opacity: 0.85; }
+  100% { scale: 1; opacity: 0.8; }
+}
+
+/* /passatempo: pointing at a cabinet "inserts a coin" — the sunset grid starts rolling toward you and the sun rises */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .arcade-sun {
+    transition: translate 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  a:hover .arcade-sun,
+  a:focus-visible .arcade-sun {
+    translate: -50% -10px; /* keeps the -translate-x-1/2 centring */
+  }
+  a:hover .arcade-floor,
+  a:focus-visible .arcade-floor {
+    animation: arcade-roll 0.6s linear infinite;
+  }
+}
+/* /passatempo roulette (PickPastime): the hop lights a cabinet, the pick keeps a marquee glow */
+.pastime-slot {
+  transition: box-shadow 0.12s;
+}
+.pastime-slot[data-spin] {
+  box-shadow: 0 0 0 4px var(--color-acid), 0 0 32px rgb(247 147 30 / 0.55);
+}
+.pastime-slot[data-picked] {
+  box-shadow: 0 0 0 4px var(--color-acid), 0 0 48px rgb(247 147 30 / 0.7);
+}
+/* the cabinet opened last (LastPlayed): CONTINUE? instead of PRESS START, and a 1UP badge in the corner */
+.arcade-continue,
+.arcade-1up { display: none; }
+li[data-played] .arcade-start { display: none; }
+li[data-played] .arcade-continue { display: inline; }
+li[data-played] .arcade-1up {
+  display: inline;
+  padding: 0 0.35em;
+  background: var(--color-acid);
+  color: var(--color-acid-ink);
+}
+
+/* the control deck under each cabinet: the coin drops through the slot, the stick leans, the buttons press,
+   and the marquee text flips to a credit — the text swap also runs with reduced motion, since nothing moves */
+.arcade-coin { opacity: 0; }
+a:hover .arcade-credit,
+a:focus-visible .arcade-credit { color: var(--a); }
+a:hover .arcade-credit::after,
+a:focus-visible .arcade-credit::after { content: ' · 01'; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .arcade-stick { transition: rotate 0.25s cubic-bezier(0.3, 1.6, 0.5, 1); transform-origin: 50% 100%; }
+  a:hover .arcade-stick,
+  a:focus-visible .arcade-stick { rotate: -14deg; }
+  a:hover .arcade-btn,
+  a:focus-visible .arcade-btn { animation: arcade-tap 0.9s steps(1, end) infinite; }
+  a:hover .arcade-btn + .arcade-btn,
+  a:focus-visible .arcade-btn + .arcade-btn { animation-delay: 0.45s; }
+  a:hover .arcade-coin,
+  a:focus-visible .arcade-coin { animation: arcade-coin 0.55s cubic-bezier(0.5, 0, 0.9, 0.6) both; }
+}
+@keyframes arcade-tap {
+  0% { translate: 0 2px; box-shadow: 0 0 0 rgb(0 0 0 / 0.55); }
+  30% { translate: 0 0; box-shadow: 0 2px 0 rgb(0 0 0 / 0.55); }
+}
+@keyframes arcade-coin {
+  0% { opacity: 1; translate: 0 0; }
+  70% { opacity: 1; }
+  100% { opacity: 0; translate: 0 22px; }
+}
+@keyframes arcade-roll {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 0 22px, 0 0; }
+}
+
 /* contact: the rubber stamp thumps onto the confirmation */
 @keyframes stamp-in {
   0% { transform: scale(2.2) rotate(-12deg); opacity: 0; }
@@ -371,6 +2544,18 @@ details[open]::details-content {
 }
 .stamp-in {
   animation: stamp-in 0.5s 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* FAQ: once every answer has been opened, the "N de M lidas" count turns into a small stamp (a gentler thump than
+   the contact's: it sits beside a button and must not overflow a phone screen) */
+.faq-stamp {
+  rotate: -3deg;
+  animation: faq-stamp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes faq-stamp {
+  0% { scale: 1.5; opacity: 0; }
+  70% { scale: 0.95; opacity: 1; }
+  100% { scale: 1; opacity: 1; }
 }
 
 /* ───────────── Page-to-page transitions (cross-document View Transitions) ─────────────
@@ -408,6 +2593,39 @@ details[open]::details-content {
   }
 }
 
+/* case → next / previous case, service → next / previous service: the swap slides sideways, the way the
+   reader walks the ring (the type is set on pagereveal, see lib/stepTransition); case windows ride along */
+html:active-view-transition-type(step-next)::view-transition-old(root),
+html:active-view-transition-type(step-next)::view-transition-old(*.case-window) {
+  animation: vt-off-left 0.42s cubic-bezier(0.55, 0, 1, 0.45) both;
+}
+html:active-view-transition-type(step-next)::view-transition-new(root),
+html:active-view-transition-type(step-next)::view-transition-new(*.case-window) {
+  animation: vt-on-right 0.6s 0.06s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+html:active-view-transition-type(step-prev)::view-transition-old(root),
+html:active-view-transition-type(step-prev)::view-transition-old(*.case-window) {
+  animation: vt-off-right 0.42s cubic-bezier(0.55, 0, 1, 0.45) both;
+}
+html:active-view-transition-type(step-prev)::view-transition-new(root),
+html:active-view-transition-type(step-prev)::view-transition-new(*.case-window) {
+  animation: vt-on-left 0.6s 0.06s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes vt-off-left {
+  to { opacity: 0.2; transform: translateX(-6%) scale(0.98); }
+}
+@keyframes vt-off-right {
+  to { opacity: 0.2; transform: translateX(6%) scale(0.98); }
+}
+@keyframes vt-on-right {
+  from { opacity: 0; transform: translateX(9%); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes vt-on-left {
+  from { opacity: 0; transform: translateX(-9%); }
+  to { opacity: 1; transform: none; }
+}
+
 /* /casos ↔ /casos/[slug]: the case card and the case page window share a name, so the card grows
    into the big window (and shrinks back on the way out) above the page wipe */
 ::view-transition-group(*.case-window) {
@@ -418,6 +2636,52 @@ details[open]::details-content {
   overflow: hidden;
 }
 
+/* Studio: the founder's polaroid shakes when clicked (transform, so it stacks on the Tailwind `rotate`) */
+@keyframes polaroid-shake {
+  0%, 100% { transform: none; }
+  15% { transform: translateX(-5px) rotate(-4deg); }
+  30% { transform: translateX(5px) rotate(3.5deg); }
+  45% { transform: translateX(-4px) rotate(-3deg); }
+  60% { transform: translateX(3px) rotate(2deg); }
+  75% { transform: translateX(-2px) rotate(-1deg); }
+}
+.is-shaking {
+  animation: polaroid-shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* Process: the kitchen's reply bubble when the bell is rung over and over */
+.kitchen-reply {
+  opacity: 0;
+  translate: 0 6px;
+  transition: opacity 0.2s, translate 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.kitchen-reply:empty {
+  visibility: hidden;
+}
+.kitchen-reply.is-on {
+  opacity: 1;
+  translate: 0 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kitchen-reply {
+    translate: none;
+    transition: none;
+  }
+}
+
+/* scroll progress: chapter notches where each home section starts (ScrollProgress) */
+.progress-mark {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  translate: -1px 0;
+  background: rgb(125 115 148 / 0.6); /* the window-border lilac: visible on the night sky and on paper */
+}
+.progress-mark[data-on] {
+  background: rgb(20 10 38 / 0.7);
+}
+
 /* ───────────── Print: the page becomes a case dossier ─────────────
    Prospects save case and service pages as PDF to pass around (procurement, partners). On paper the
    night sky, the 3D scenes and the floating UI go; the cartoon outlines stay; a stamped header and
@@ -426,6 +2690,40 @@ details[open]::details-content {
   @page {
     size: A4;
     margin: 16mm 14mm;
+  }
+  /* pinned scroll scenes reserve screens of empty scroll room (GSAP pin spacers): on paper that was
+     whole blank pages; the scene itself still prints once */
+  .pin-spacer {
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .pin-spacer > * {
+    position: static !important;
+    transform: none !important;
+    top: auto !important;
+    left: auto !important;
+    max-height: none !important;
+  }
+  /* scroll-scene heights (one process step per screen, a manifesto that fills the viewport) mean nothing
+     on paper: blocks shrink to their content; the diner stage is a 3D canvas that prints blank */
+  main * {
+    min-height: 0 !important;
+  }
+  #processo .sticky {
+    display: none !important;
+  }
+  /* the hero is one viewport tall on screen (h-[100svh], not a min-height): on paper that was a whole
+     page with the headline pushed to its foot; it now takes only its content */
+  #topo {
+    height: auto !important;
+  }
+  #topo [data-hero-inner] {
+    padding-top: 0 !important;
+  }
+  #processo [data-step] {
+    padding-block: 1.25rem !important;
+    opacity: 1 !important;
   }
   html,
   body {
@@ -453,6 +2751,10 @@ details[open]::details-content {
     animation: none !important;
     transition: none !important;
   }
+  /* clip-path reveals (Manifesto quote, Studio portrait, order ticket) that never ran print uncut */
+  [style*='clip-path: inset'] {
+    clip-path: none !important;
+  }
   /* reveal-on-scroll content that the reader never scrolled to */
   [style*='visibility: hidden'],
   [style*='opacity: 0'] {
@@ -475,10 +2777,16 @@ details[open]::details-content {
   .win-bar {
     border-bottom: 2px solid #140a26;
   }
-  section,
+  /* small blocks stay whole; whole sections may split, or a long one jumps to the next page and leaves a blank half */
   .win,
+  .toon,
   li {
     break-inside: avoid;
+  }
+  /* the mystery's cork strip is a whole page tall: kept whole, it jumped past the section's title and left that
+     page almost empty. It may split between its pieces of evidence (each one still stays whole) */
+  [data-cork] {
+    break-inside: auto;
   }
   h1,
   h2,
@@ -496,6 +2804,67 @@ details[open]::details-content {
     margin-top: 4mm;
     opacity: 1 !important;
     transform: rotate(-4deg) !important;
+  }
+  /* service and case pages: the screen's 6rem breathing room between sections (and under the article) is
+     wasted paper; headings still keep their content with them */
+  main > article > section {
+    margin-top: 9mm !important;
+  }
+  main > article {
+    padding-bottom: 0 !important;
+  }
+  /* the deliverable windows ("O que você recebe") keep their screen padding and 1.5rem titles on paper: with the
+     heading held to its first row, that pushed the section, then "Exemplos", a page down. Tighter, every
+     service page prints on 3 A4 pages instead of 4 */
+  main > article [data-win-item] > div:last-child {
+    padding: 4mm !important;
+  }
+  main > article [data-win-item] h3 {
+    font-size: 1.25rem !important;
+  }
+  /* /casos on paper: three files to a row with shorter screenshots (3 A4 pages → 2, the last one no longer just
+     the contact line), and each file carries its address, since a printed "Diconta →" leads nowhere */
+  [data-case-list] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 5mm !important;
+    margin-top: 6mm !important;
+  }
+  [data-case-list] [data-case-window] > div:last-child {
+    aspect-ratio: 16 / 7 !important;
+  }
+  [data-case-list] h2 {
+    margin-top: 2.5mm !important;
+    font-size: 1.2rem !important;
+  }
+  [data-case-list] h2 [aria-hidden] {
+    display: none;
+  }
+  [data-case-list] p {
+    font-size: 0.85rem !important;
+  }
+  [data-case-list] li > a::after {
+    content: 'henaweb.com' attr(href);
+    display: block;
+    margin-top: 1.5mm;
+    font-family: var(--font-mono);
+    font-size: 7.5pt;
+  }
+  /* home capabilities: only the open row's description printed (the other three panels are collapsed to 0 px on
+     screen), so three of the four services reached paper as a bare title; all of them print open, without the "+" */
+  [id^='cap-panel-'] {
+    grid-template-rows: 1fr !important;
+    opacity: 1 !important;
+    display: grid !important;
+  }
+  [data-cap-row] button > span[aria-hidden]:last-child {
+    display: none !important;
+  }
+  [data-cap-links] {
+    display: flex !important;
+  }
+  /* the FAQ's open/close "+" is a control; on paper every answer is already open */
+  summary > [aria-hidden]:last-child {
+    display: none !important;
   }
   /* FAQ answers print open */
   details::details-content {
@@ -547,17 +2916,90 @@ details[open]::details-content {
     text-decoration: underline 2px;
     text-underline-offset: 4px;
   }
+  /* position dots (case strip, carousel, reading progress) are drawn only with a fill: flattened, they vanished.
+     Plain dots take the text color; the current / read one the highlight color */
+  [data-dot] {
+    background: CanvasText !important;
+  }
+  [data-dot='on'] {
+    background: Highlight !important;
+  }
+  /* other fill-only marks: the reading bar at the top (a gradient, dropped entirely) and its chapter notches,
+     the rail joining the public-process steps, and the step ↔ audit-line pair lit by pointing or tapping */
+  [data-progress-bar] {
+    background: Highlight !important;
+  }
+  .progress-mark {
+    background: CanvasText !important;
+  }
+  [data-seg] {
+    background: CanvasText !important;
+  }
+  [data-step][data-on],
+  [data-log][data-on] {
+    outline: 2px solid Highlight !important;
+    outline-offset: 2px;
+  }
+  /* marks added since, also drawn only with a fill: the page-loading stripe (NavPending), the service steps'
+     filled progress blocks (the empty ones keep just their border), and the phone status bar's signal bars and
+     battery level */
+  [data-nav-pending] {
+    background: Highlight !important;
+  }
+  [data-prog-fill],
+  [data-fc-fill] {
+    background: CanvasText !important;
+  }
+  /* and the newest: the full-capture download bar, the back-to-top depth ring (a conic fill: shown as a plain
+     ring instead), the drawn numbers of the raffle art, and the "sem sinal" chip's live bar */
+  [data-shot-bar],
+  [data-raffle-hit],
+  [data-net-bar='on'] {
+    background: CanvasText !important;
+  }
+  [data-raffle-hit] {
+    color: Canvas !important;
+  }
+  [data-back-ring] {
+    background: none !important;
+    border: 2px solid CanvasText;
+  }
 }
 
 /* "Increase contrast" (macOS/iOS, Windows contrast themes): the design leans on translucent text
-   (ink/45 … ink/80) for hierarchy; for visitors who asked for more contrast, every one of those goes solid. */
+   (ink/45 … ink/80) for hierarchy; for visitors who asked for more contrast, every one of those goes solid,
+   the muted lilac labels lighten, hairlines firm up and the film grain goes. */
 @media (prefers-contrast: more) {
+  :root {
+    --color-muted: #d6d0ea;
+    --color-line: rgb(253 243 225 / 0.4);
+  }
   [class*='text-ink/'] {
     color: var(--color-ink) !important;
   }
   [class*='text-acid-ink/'] {
     color: var(--color-acid-ink) !important;
   }
+  [class*='text-bg/'] {
+    color: var(--color-bg) !important;
+  }
+  .grain {
+    display: none;
+  }
+  /* newer bits that leaned on faintness: the resting dotted underline of text links goes solid and full
+     strength, and the case strip's side cards stay readable instead of fading to 55% */
+  .pen-link:not(:hover, :focus-visible) {
+    text-decoration: underline solid 1.5px currentColor !important;
+  }
+}
+@media (prefers-reduced-motion: no-preference) and ((prefers-contrast: more) or (prefers-reduced-transparency: reduce)) {
+  [data-work-strip] > li {
+    animation-name: strip-focus-contrast !important;
+  }
+}
+@keyframes strip-focus-contrast {
+  0%, 100% { scale: 0.94; opacity: 0.9; }
+  50% { scale: 1; opacity: 1; }
 }
 
 /* "Reduce transparency": frosted glass becomes solid (sticky header, government panel, dialog backdrops) */
@@ -572,9 +3014,109 @@ details[open]::details-content {
     backdrop-filter: none !important;
     background-color: #0d0820 !important;
   }
+  /* and the see-through layers on top of content: the film grain over everything and the dimmed side cards
+     of the case strip (which keep their size cue, not the fade) */
+  .grain {
+    display: none;
+  }
 }
 
 /* section links (#entregas, #perguntas…) land with the title below the fixed header, not under it */
 h2[id] {
   scroll-margin-top: 6rem;
+}
+/* the home's nav links (/#clientes…) land 40px below the top when the smooth scroller runs (Lenis anchors offset);
+   with reduced motion there is no Lenis and they landed at 0, so going back up (header shown) put the Clientes
+   title under the bar. The same 40px, given natively */
+@media (prefers-reduced-motion: reduce) {
+  section[id] {
+    scroll-margin-top: 2.5rem;
+  }
+}
+
+/* arriving at a section from "Nesta página" or a copied #link: a marker stroke sweeps under the title
+   once the smooth scroll has landed, then fades, so the eye finds where the jump ended. It sits on an
+   inline span (data-mark) so it follows the words line by line instead of the whole column */
+h2[id]:target [data-mark] {
+  background-image: linear-gradient(rgb(247 147 30 / 0.45), rgb(247 147 30 / 0.45));
+  background-repeat: no-repeat;
+  background-position: 0 92%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  animation: target-mark 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
+}
+
+/* the same "you landed here" cue for the home's chapters (menu links, /#capacidades from another page): once the
+   glide ends, the chapter's title gets a thick orange underline that follows its words line by line, holds,
+   then fades. Reduced motion skips it (the jump itself is instant there) */
+@media (prefers-reduced-motion: no-preference) {
+  section[id]:target h2:not(.label) {
+    text-decoration-line: underline;
+    text-decoration-thickness: 0.09em;
+    text-underline-offset: 0.12em;
+    text-decoration-skip-ink: none;
+    text-decoration-color: transparent;
+    animation: target-underline 2.6s ease 0.6s both;
+  }
+}
+@keyframes target-underline {
+  0% { text-decoration-color: rgb(247 147 30 / 0); }
+  18%, 70% { text-decoration-color: rgb(247 147 30 / 0.85); }
+  100% { text-decoration-color: rgb(247 147 30 / 0); }
+}
+
+@keyframes target-mark {
+  0% { background-size: 0% 0.32em; }
+  30% { background-size: 100% 0.32em; }
+  75% { background-size: 100% 0.32em; }
+  100% { background-size: 100% 0; }
+}
+
+/* "Pen" text links: the plain "Ver caso →" links were told apart from the text only by color until hovered
+   (WCAG 1.4.1). At rest they now carry a faint dotted underline; on hover / keyboard focus a hand-drawn
+   squiggle is inked from left to right under the words, like an investigator underlining a clue.
+   The squiggle is a mask over currentColor, so it follows each link's color. For one-line links only (w-fit). */
+.pen-link {
+  position: relative;
+  text-decoration: underline dotted 1.5px color-mix(in oklab, currentColor 45%, transparent);
+  text-underline-offset: 5px;
+}
+.pen-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.3em;
+  height: 0.38em;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 6'%3E%3Cpath d='M0 3.2Q3 .4 6 3.2T12 3.2' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E") 0 50% / 0.62em 100% repeat-x;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 6'%3E%3Cpath d='M0 3.2Q3 .4 6 3.2T12 3.2' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E") 0 50% / 0.62em 100% repeat-x;
+  clip-path: inset(0 100% 0 0);
+  pointer-events: none;
+}
+.pen-link:focus-visible,
+.pen-link:hover {
+  text-decoration-color: transparent;
+}
+.pen-link:focus-visible::after,
+.pen-link:hover::after {
+  clip-path: inset(0 0 0 0);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pen-link {
+    transition: text-decoration-color 0.2s;
+  }
+  .pen-link::after {
+    transition: clip-path 0.38s cubic-bezier(0.3, 0.7, 0.2, 1);
+  }
+}
+@media (forced-colors: active) {
+  /* masks over a background are flattened away: fall back to a real solid underline on hover / focus */
+  .pen-link::after {
+    display: none;
+  }
+  .pen-link:hover,
+  .pen-link:focus-visible {
+    text-decoration: underline solid 2px currentColor;
+  }
 }

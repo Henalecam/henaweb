@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { copyText } from '@/lib/clipboard';
 
 /** "Copy link" for one FAQ answer, so a question can be sent straight to a partner or a client. */
 export function FaqCopyLink({ id }: { id: string }) {
@@ -8,12 +9,11 @@ export function FaqCopyLink({ id }: { id: string }) {
 
   const copy = async () => {
     const url = `${location.origin}${location.pathname}#${id}`;
-    try {
-      await navigator.clipboard.writeText(url);
+    if (await copyText(url)) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2200);
-    } catch {
-      // no clipboard (insecure context, old browser): put the link in the address bar instead
+    } else {
+      // nothing could copy (very old browser): put the link in the address bar instead
       history.replaceState(null, '', `#${id}`);
     }
   };
@@ -48,4 +48,74 @@ export function FaqHashOpener() {
     return () => window.removeEventListener('hashchange', open);
   }, []);
   return null;
+}
+
+/**
+ * "Abrir todas / fechar todas" for a list of FAQ answers: someone comparing studios wants to skim
+ * every answer at once instead of clicking eight times. Stays in sync when answers are opened one
+ * by one (the `toggle` event doesn't bubble, so it's caught in the capture phase).
+ */
+export function FaqToggleAll() {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [allOpen, setAllOpen] = useState(false);
+  // how many answers this visit has opened at least once: each keeps a ✓ by its number (data-seen),
+  // so a reader skimming the list knows which they still haven't read. In memory only.
+  const [seen, setSeen] = useState({ n: 0, of: 0 });
+
+  useEffect(() => {
+    const list = ref.current?.closest('section');
+    if (!list) return;
+    const sync = () => {
+      const items = [...list.querySelectorAll('details')];
+      setAllOpen(items.length > 0 && items.every((d) => d.open));
+      items.forEach((d) => d.open && d.setAttribute('data-seen', ''));
+      setSeen({ n: items.filter((d) => d.hasAttribute('data-seen')).length, of: items.length });
+    };
+    list.addEventListener('toggle', sync, true);
+    return () => list.removeEventListener('toggle', sync, true);
+  }, []);
+
+  const flip = () => {
+    const list = ref.current?.closest('section');
+    list?.querySelectorAll('details').forEach((d) => (d.open = !allOpen));
+  };
+
+  return (
+    <span className="inline-flex items-center gap-3">
+      {seen.n > 0 &&
+        (seen.n === seen.of ? (
+          // every answer read: the count becomes a little rubber stamp closing the interrogation (in the section's own
+          // ink, so it reads on the dark service pages and on the light home section alike)
+          <span
+            aria-hidden
+            data-faq-done
+            className="faq-stamp inline-block rounded-sm border-2 border-current px-1.5 py-0.5 font-mono text-[0.68rem] font-bold tracking-wider uppercase"
+          >
+            ✓ interrogatório completo
+          </span>
+        ) : (
+          // visual only: screen readers already hear each answer's expanded state. One notch per question,
+          // filled as it is read, beside the count
+          <span aria-hidden className="inline-flex items-center gap-2 font-mono text-xs tracking-wider opacity-70">
+            <span className="flex gap-[3px]" data-faq-notches>
+              {Array.from({ length: seen.of }, (_, i) => (
+                <span key={i} className={`h-2.5 w-1.5 rounded-[1px] border border-current ${i < seen.n ? 'bg-current' : 'opacity-60'}`} />
+              ))}
+            </span>
+            {seen.n} de {seen.of} lidas
+          </span>
+        ))}
+      <button
+        ref={ref}
+        type="button"
+        onClick={flip}
+        aria-expanded={allOpen}
+        data-print-hide
+        className="label inline-flex min-h-8 items-center gap-1.5 rounded-full !text-current opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100"
+      >
+        <span aria-hidden>{allOpen ? '⊟' : '⊞'}</span>
+        {allOpen ? 'Fechar todas' : 'Abrir todas'}
+      </button>
+    </span>
+  );
 }

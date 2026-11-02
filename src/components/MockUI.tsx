@@ -1,6 +1,8 @@
 import type { CSSProperties } from 'react';
 import type { MockVariant } from '@/lib/content';
 
+const HITS = [3, 14, 22, 27, 38, 41, 49, 55];
+
 /** Stylized, data-free product UI used as case artwork. Purely decorative. */
 export default function MockUI({ variant, hue }: { variant: MockVariant; hue: number }) {
   const style = {
@@ -56,14 +58,23 @@ function body(variant: MockVariant) {
     case 'raffle':
       return (
         <div className="grid h-full grid-cols-10 content-center gap-[1.2%]">
+          {/* the drawn numbers light up one after another, round and round, like a live draw (CSS, motion-safe) */}
           {Array.from({ length: 60 }).map((_, i) => {
-            const hit = [3, 14, 22, 27, 38, 41, 49, 55].includes(i);
+            const k = HITS.indexOf(i);
+            const hit = k >= 0;
             const sold = (i * 7) % 5 === 0;
             return (
               <div
                 key={i}
+                data-raffle-hit={hit ? '' : undefined}
                 className="flex aspect-square items-center justify-center rounded-md border border-line font-mono text-[clamp(0.45rem,0.9vw,0.75rem)]"
-                style={hit ? { background: 'var(--h)', color: '#0b0b0b', borderColor: 'transparent' } : sold ? { background: 'rgb(236 235 228 / .08)' } : undefined}
+                style={
+                  hit
+                    ? ({ background: 'var(--h)', color: '#0b0b0b', borderColor: 'transparent', '--k': k } as CSSProperties)
+                    : sold
+                      ? { background: 'rgb(236 235 228 / .08)' }
+                      : undefined
+                }
               >
                 {String(i + 1).padStart(2, '0')}
               </div>
