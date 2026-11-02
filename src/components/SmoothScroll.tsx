@@ -6,6 +6,20 @@ import { prefersReducedMotion } from '@/lib/motion';
 import { withScrollTrigger } from '@/lib/scrollBridge';
 
 export default function SmoothScroll() {
+  // a modal (search, shortcuts, full screenshot) freezes the page behind it. This lived inside the Lenis effect
+  // below, which reduced motion skips, so with reduced motion the wheel over a dialog's backdrop kept scrolling the
+  // page underneath; it now runs for everyone, and Lenis (when it runs) also stops and starts with it
+  useEffect(() => {
+    const sync = () => document.documentElement.toggleAttribute('data-modal', !!document.querySelector('dialog[open]'));
+    sync();
+    const watch = new MutationObserver(sync);
+    watch.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['open'] });
+    return () => {
+      watch.disconnect();
+      document.documentElement.removeAttribute('data-modal');
+    };
+  }, []);
+
   useEffect(() => {
     if (prefersReducedMotion()) return;
 
@@ -18,12 +32,9 @@ export default function SmoothScroll() {
       unhook = () => lenis.off('scroll', st.update);
     });
 
-    // a modal (search, shortcuts, full screenshot) freezes the page behind it: without this the
-    // wheel over the backdrop kept gliding the page underneath
+    // with a modal open, Lenis stops too: without this the wheel over the backdrop kept gliding the page underneath
     const syncDialogs = () => {
-      const open = !!document.querySelector('dialog[open]');
-      document.documentElement.toggleAttribute('data-modal', open); // html[data-modal] { overflow: hidden }
-      if (open) lenis.stop();
+      if (document.querySelector('dialog[open]')) lenis.stop();
       else lenis.start();
     };
     const watch = new MutationObserver(syncDialogs);
