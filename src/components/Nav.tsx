@@ -322,7 +322,9 @@ export default function Nav() {
               onClick={() => openSearch()}
               onPointerEnter={warmPalette}
               onFocus={warmPalette}
-              aria-label="Buscar no site"
+              // WCAG 2.5.3 (label in name): the button shows only "Ctrl K" (or "⌘K"), so a voice-control user who says
+              // "click Ctrl K" needs those words in its name too
+              aria-label={`Buscar no site, ${mac ? '⌘K' : 'Ctrl K'}`}
               aria-keyshortcuts="Meta+K Control+K /"
               className="hidden items-center gap-2 rounded-full border border-line px-3 py-2 font-mono text-xs whitespace-nowrap xl:flex text-ink/70 transition-colors hover:border-acid hover:text-acid"
             >
