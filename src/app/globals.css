@@ -2134,8 +2134,12 @@ html[data-menu='open'] [data-back-top] {
 /* /links: the buttons drop into place one by one once the Preloader curtain lifts (html[data-ready]);
    without JS (noscript in the page) or with reduced motion they are simply there */
 @media (prefers-reduced-motion: no-preference) {
-  .links-pop {
-    opacity: 0;
+  /* screen only: print turns animations off, and this starting opacity used to leave /links' buttons invisible on
+     paper (blank "Serviços" and "Mais" lists) */
+  @media screen {
+    .links-pop {
+      opacity: 0;
+    }
   }
   html[data-ready] .links-pop {
     animation: links-pop 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.25) calc(0.1s + var(--i) * 0.06s) both;
