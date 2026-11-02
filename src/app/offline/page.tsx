@@ -35,8 +35,18 @@ export default function Offline() {
             <OfflineList />
             <Redial />
             <OfflineRunner />
-            <p className="mt-6 font-mono text-xs text-acid-ink/70">
-              Prefere falar direto? {site.whatsappDisplay} · {site.email}
+            {/* the contact line used to be plain text, on the one page where the web can't reach us: a phone call
+                needs no data plan (the number is the voice line in henaweb.vcf), and the mail app keeps the draft */}
+            <p className="mt-6 font-mono text-xs leading-relaxed text-acid-ink/70">
+              Uma ligação comum não precisa de internet:{' '}
+              <a href={`tel:+${site.whatsapp}`} className="font-bold whitespace-nowrap text-acid-ink underline decoration-2 underline-offset-2 hover:text-[#c2410c]">
+                <span aria-hidden>☎ </span>
+                {site.whatsappDisplay}
+              </a>{' '}
+              · ou escreva para{' '}
+              <a href={`mailto:${site.email}`} className="text-acid-ink underline underline-offset-2 hover:text-[#c2410c]">
+                {site.email}
+              </a>
             </p>
           </div>
         </div>
