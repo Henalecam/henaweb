@@ -1451,6 +1451,27 @@ html {
   from { scale: 2.2; opacity: 0; rotate: -12deg; }
 }
 
+/* a Win95 window's status bar: sunken panels under the content (/links) */
+.win-status {
+  display: flex;
+  gap: 3px;
+  margin: 0 0.375rem 0.375rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: #12082a;
+}
+.win-status > span {
+  padding: 2px 6px;
+  border: 1px solid;
+  border-color: #7d7394 #fff #fff #7d7394;
+}
+.win-status > span:first-child {
+  flex: 1;
+}
+@media print {
+  .win-status { display: none; }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

@@ -119,6 +119,12 @@ export default function Links() {
               ))}
             </ul>
           </div>
+          {/* the window's status bar, as in a 95 folder: how many shortcuts it holds and where it lives. The count is
+              the buttons above (k, once they have all rendered) plus the social links, so it follows the data */}
+          <p className="win-status" aria-hidden>
+            <span>{k + site.social.length} atalhos</span>
+            <span>{site.url.replace(/^https?:\/\//, '')}/links</span>
+          </p>
         </div>
         {/* on a computer, the page is usually opened to pass on to a phone: a QR of the same address, beside the
             window (public/links-qr.svg encodes https://henaweb.com/links; regenerate it if the address changes) */}
