@@ -1,7 +1,21 @@
+import { statSync } from 'node:fs';
+import { join } from 'node:path';
 import { projects, site } from '@/lib/content';
 
 // built once with the site: the archive only changes on a deploy
 export const dynamic = 'force-static';
+
+// a feed reader shows a card's picture from the item's enclosure: the top of the case's screenshot, the same crop the
+// archive and the footer use (RSS wants its byte length, read from the file at build)
+const enclosure = (path: string | undefined) => {
+  if (!path) return '';
+  try {
+    const { size } = statSync(join(process.cwd(), 'public', path));
+    return `\n      <enclosure url="${site.url}${path}" length="${size}" type="image/jpeg" />`;
+  } catch {
+    return '';
+  }
+};
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -19,7 +33,7 @@ export function GET() {
       <link>${url}</link>
       <guid isPermaLink="true">${url}</guid>
       <category>${esc(p.kind)}</category>
-      <description>${esc(p.summary)}</description>
+      <description>${esc(p.summary)}</description>${enclosure(p.shot?.desktop.replace(/\.jpg$/, '-top.jpg'))}
     </item>`;
     })
     .join('\n');
@@ -32,6 +46,11 @@ export function GET() {
     <description>Sistemas, plataformas e sites entregues pela HenaWeb, um caso por item.</description>
     <language>pt-BR</language>
     <lastBuildDate>${updated}</lastBuildDate>
+    <image>
+      <url>${site.url}/icon-192.png</url>
+      <title>HenaWeb · Casos resolvidos</title>
+      <link>${site.url}/casos</link>
+    </image>
 ${items}
   </channel>
 </rss>
