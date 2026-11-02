@@ -1472,6 +1472,30 @@ html {
   .win-status { display: none; }
 }
 
+/* GovTech "Art. 1º…": a highlighter stroke runs under the article's title while it is pointed at */
+.pillar-k {
+  /* a pale marker: #c2410c on it stays at 4.58:1 (the 18px title is not "large text" for WCAG) */
+  background: linear-gradient(174deg, transparent 0 48%, #fff2b0 48% 82%, transparent 82%) 0 100% / 0% 100% no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+@media (hover: hover) {
+  [data-pillar]:hover .pillar-k {
+    background-size: 100% 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pillar-k {
+    transition: none;
+  }
+}
+@media print, (forced-colors: active) {
+  .pillar-k {
+    background: none;
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {

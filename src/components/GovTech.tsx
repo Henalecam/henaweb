@@ -286,7 +286,8 @@ export default function GovTech() {
                 <span aria-hidden className="mr-2 align-[0.12em] font-mono text-[0.7rem] tracking-wide text-acid-ink/70 uppercase">
                   Art. {i + 1}º
                 </span>
-                <span className="font-groovy text-base text-[#c2410c] sm:text-lg">{p.k}</span>
+                {/* pointing at an article marks its title with a highlighter, the way a law gets read (globals.css .pillar-k) */}
+                <span className="pillar-k font-groovy text-base text-[#c2410c] sm:text-lg">{p.k}</span>
                 <p className="mt-0.5 text-[0.95rem] leading-snug text-acid-ink/80 sm:mt-1 sm:text-base sm:leading-normal">{p.v}</p>
               </li>
             ))}
