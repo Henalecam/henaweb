@@ -6,6 +6,7 @@ import NewTab from '@/components/NewTab';
 import ShareCase from '@/components/ShareCase';
 import InstallApp from '@/components/InstallApp';
 import InAppHint from '@/components/InAppHint';
+import StatusHint from '@/components/StatusHint';
 
 const description = 'Todos os caminhos da HenaWeb num lugar só: WhatsApp, e-mail, serviços, casos resolvidos e redes.';
 
@@ -131,7 +132,8 @@ export default function Links() {
               the buttons above (k, once they have all rendered) plus the social links, so it follows the data */}
           <p className="win-status" aria-hidden>
             <span>{k + site.social.length} atalhos</span>
-            <span>{site.url.replace(/^https?:\/\//, '')}/links</span>
+            {/* where the pointed-at (or focused) link goes, as a 95 browser's status bar showed it (StatusHint) */}
+            <StatusHint rest={`${site.url.replace(/^https?:\/\//, '')}/links`} />
           </p>
         </div>
         {/* on a computer, the page is usually opened to pass on to a phone: a QR of the same address, beside the
