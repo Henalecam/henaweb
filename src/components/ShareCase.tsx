@@ -47,7 +47,7 @@ export default function ShareCase({
       onClick={share}
       className="toon toon-press rounded-full bg-paper px-6 py-4 font-medium text-acid-ink"
     >
-      <span aria-live="polite">{copied ? '✓ Link copiado' : label}</span>
+      <span aria-live="polite">{copied ? '✓ Link copiado' : label.replace(/ (\S+)$/, '\u00a0$1') /* the ↗ never wraps onto a line alone */}</span>
     </button>
   );
 }

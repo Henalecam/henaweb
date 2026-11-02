@@ -142,7 +142,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
               className="mt-5 inline-flex min-h-8 items-baseline gap-2 py-1 font-mono text-sm text-ink/80 underline decoration-acid decoration-2 underline-offset-4 hover:text-ink hover:decoration-4"
             >
               <span aria-hidden className="text-acid">✓</span>
-              {caseCount === 1 ? '1 caso resolvido' : `${caseCount} casos resolvidos`} neste serviço, no arquivo →
+              {caseCount === 1 ? '1 caso resolvido' : `${caseCount} casos resolvidos`} neste serviço, no arquivo{'\u00a0'}→
             </a>
           )}
           <div className="mt-10 flex flex-wrap gap-3" data-print-hide>
@@ -280,7 +280,7 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                 data-print-hide
                 className="mt-8 inline-flex items-center gap-2 font-medium text-acid underline-offset-4 hover:underline"
               >
-                Ver {caseCount === 1 ? 'o caso' : `os ${caseCount} casos`} de {s.name} no arquivo →
+                Ver {caseCount === 1 ? 'o caso' : `os ${caseCount} casos`} de {s.name} no arquivo{'\u00a0'}→
               </a>
             )}
           </section>
