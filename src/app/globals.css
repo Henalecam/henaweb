@@ -1618,6 +1618,17 @@ html {
   border: 1px solid;
   border-color: #7d7394 #fff #fff #7d7394;
 }
+/* on paper it is just a line under the list: "3 casos de 7 · Sites & produtos · ordem: nome ↑" */
+@media print {
+  .case-status > span {
+    border: 0;
+    padding: 0 1rem 0 0;
+    flex: none;
+  }
+  .case-status > span:last-child:not([class*='hidden']) {
+    display: inline;
+  }
+}
 
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { serviceLinks } from '@/lib/serviceLinks';
 
 /**
  * /casos: the archive's status bar, like the one along the bottom of an Explorer window. How many cases are
@@ -8,7 +9,7 @@ import { useEffect, useState } from 'react';
  * many the archive holds, and the order when the details view's headers changed it. Read from the list itself and kept in step with the filter and the read marks.
  */
 export default function CaseStatus() {
-  const [s, setS] = useState<{ shown: number; read: number; total: number; sort?: string; onlyUnread?: boolean } | null>(null);
+  const [s, setS] = useState<{ shown: number; read: number; total: number; sort?: string; onlyUnread?: boolean; filter?: string } | null>(null);
 
   useEffect(() => {
     const list = document.querySelector<HTMLElement>('[data-case-list]');
@@ -22,7 +23,11 @@ export default function CaseStatus() {
       const visible = onlyUnread ? shown.length - readCount : shown.length;
       // the empty folder that fills an odd grid (globals.css data-odd) follows what is really on screen
       list.toggleAttribute('data-odd', visible % 2 === 1);
-      setS({ shown: visible, read: readCount, total: rows.length, sort: list.dataset.sort, onlyUnread });
+      // a service filter (CaseFilter) leaves only that service's rows: name it, so the bar (and the printout, where
+      // the chips don't print) says which part of the archive this is
+      const kinds = new Set(shown.map((li) => li.dataset.caseService));
+      const filter = shown.length < rows.length && kinds.size === 1 ? serviceLinks.find((x) => kinds.has(x.slug))?.name : undefined;
+      setS({ shown: visible, read: readCount, total: rows.length, sort: list.dataset.sort, onlyUnread, filter });
     };
     read();
     const obs = new MutationObserver(read);
@@ -35,13 +40,15 @@ export default function CaseStatus() {
 
   if (!s) return null;
   return (
-    <p className="case-status mt-6 flex gap-[3px] border-2 border-[#7d7394] bg-[#c9c3d8] p-[3px] font-mono text-[0.68rem] text-[#12082a] shadow-[inset_1px_1px_0_#fff] print:hidden">
+    <p className="case-status mt-6 flex gap-[3px] border-2 border-[#7d7394] bg-[#c9c3d8] p-[3px] font-mono text-[0.68rem] text-[#12082a] shadow-[inset_1px_1px_0_#fff] print:mt-4 print:border-0 print:bg-transparent print:p-0 print:shadow-none">
       <span className="flex-1">
         {s.shown} {s.shown === 1 ? 'caso' : 'casos'}
         {s.shown < s.total && ` de ${s.total}`}
+        {s.filter && ` · ${s.filter}`}
         {s.onlyUnread && ' · só os que faltam'}
       </span>
-      <span>
+      {/* what this browser read is nobody's business on paper */}
+      <span className="print:hidden">
         {s.read} {s.read === 1 ? 'investigado' : 'investigados'}
       </span>
       {/* the order picked in the details view's headers (CaseSort), or the archive's name when it's the usual one */}
