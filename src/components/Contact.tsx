@@ -609,7 +609,9 @@ export default function Contact() {
 
               <fieldset>
                 <legend className="label mb-4 !text-acid-ink/60">2 · Prazo</legend>
-                <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Prazo">
+                {/* the fieldset and its legend already group the radios: an extra radiogroup named "Prazo" had the deadline
+                    announced twice ("2 · Prazo, grupo; Prazo, grupo de opções") */}
+                <div className="flex flex-wrap gap-2">
                   {timelines.map((o) => (
                     <label
                       key={o}

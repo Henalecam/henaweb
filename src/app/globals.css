@@ -1067,6 +1067,34 @@ html {
       margin-top: 0;
     }
   }
+  /* narrower than the column grid, the details view still sorts (CaseSort): the headers fold into one toolbar,
+     "Ordenar: Nº · Nome · Tipo", without the problem's column, which isn't sortable */
+  @media (max-width: 899px) {
+    [data-case-cols]:has(+ [data-case-list][data-view='details']) {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.25rem 1rem;
+      margin-top: 1rem;
+      padding: 0 0.5rem 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(from var(--color-ink) r g b / 0.7);
+    }
+    [data-case-cols]:has(+ [data-case-list][data-view='details'])::before {
+      content: 'Ordenar:' / '';
+    }
+    [data-case-cols] > span + span {
+      border: 0;
+      margin: 0;
+      padding: 0;
+    }
+    [data-case-cols] > span:nth-child(4) {
+      display: none;
+    }
+  }
 }
 
 /* case page "Caso resolvido" (Declassify): each word sits under a black censor bar, slightly ragged like a marker
