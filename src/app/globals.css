@@ -1389,6 +1389,27 @@ html {
   to { clip-path: inset(-20px 35% -20px 37%); }
 }
 
+/* case page, on paper: Chromium's print layout gave up on the phone mock-up's size container (container-type plus
+   cqw units under the status bar), and the whole printed dossier came out as blank pages. On paper the phone is a
+   plain frame: no size container, no status bar (its clock means nothing in print), the screenshot from the top */
+@media print {
+  [data-case-phone] {
+    container-type: normal;
+  }
+  [data-case-phone] [data-phone-status] {
+    display: none;
+  }
+  [data-case-phone] > div:first-child {
+    top: 0;
+  }
+  /* the evidence letters and the push pins are drawn with backgrounds, which printers usually drop (a lone letter
+     floating off each tag); the red thread is a stroke and stays */
+  .evidence-tag::after,
+  .case-pin {
+    display: none;
+  }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
