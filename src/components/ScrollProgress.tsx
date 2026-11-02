@@ -54,7 +54,10 @@ export default function ScrollProgress() {
       for (const s of stops) s.el.toggleAttribute('data-on', p >= s.at);
       const t = tag.current;
       if (!t || !wayfind || !stops.length) return;
-      const here = [...stops].reverse().find((s) => p >= s.at - 0.002);
+      // the section being read is the one that has reached the upper third of the screen, not the very top edge:
+      // a section that already fills the view (its title 40px down) used to keep the previous section's name
+      const ahead = max > 0 ? (window.innerHeight * 0.35) / max : 0;
+      const here = [...stops].reverse().find((s) => p >= s.at - ahead);
       const name = here?.name ?? '';
       if (name !== shown) t.textContent = shown = name;
       // follow the bar's edge, kept on screen: right-aligned near the end, left-aligned near the start
