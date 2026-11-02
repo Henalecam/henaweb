@@ -49,7 +49,7 @@ const FEATURES: [string, string][] = [
   ['Alvos de toque', 'Botões e links isolados têm pelo menos 24 × 24 px de área de toque (WCAG 2.5.8), inclusive os botõezinhos das janelas.'],
   ['Leitores de tela', 'Imagens têm texto alternativo; desenhos e enfeites ficam ocultos para leitores de tela, e mensagens que mudam sozinhas são anunciadas.'],
   ['Formulário que ajuda', 'Rótulos sempre visíveis, erros explicados em português, sugestão para e-mail digitado errado e rascunho guardado na aba se você sair no meio.'],
-  ['Telas pequenas e sem sinal', 'As páginas cabem em telas de 320 px sem rolagem lateral, e as páginas que você já leu abrem mesmo sem internet.'],
+  ['Telas pequenas e sem sinal', 'As páginas cabem em telas de 320 px sem rolagem lateral, e as páginas que você já leu abrem mesmo sem internet. Com a economia de dados do navegador ligada, as cenas 3D nem são baixadas.'],
 ];
 
 /**
@@ -63,7 +63,7 @@ export default function Acessibilidade() {
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     <main id="conteudo" tabIndex={-1} className="sky relative min-h-[100svh] overflow-x-clip text-ink">
       <div className="grid-floor !h-[22%] opacity-40" aria-hidden />
-      <article className="gutter relative mx-auto max-w-3xl pt-36 pb-28">
+      <article className="gutter relative mx-auto max-w-3xl pt-36 pb-28 print:pt-4 print:pb-0">
         <p className="label !text-teal">Declaração de acessibilidade</p>
         <h1 className="mt-4 text-[clamp(2.4rem,6vw,4.5rem)] leading-[0.95] font-medium tracking-[-0.045em]">
           Um site para <span className="font-groovy text-[0.85em] tracking-normal text-acid">todo mundo.</span>
@@ -109,7 +109,8 @@ export default function Acessibilidade() {
         <p className="mt-3 leading-relaxed text-ink/75">
           Conte o que aconteceu, em qual página e com qual navegador ou leitor de tela. A gente corrige e responde.
         </p>
-        <p className="mt-6 flex flex-wrap gap-3">
+        {/* on paper the two buttons can't be pressed; the printout's own footer line carries the e-mail and WhatsApp */}
+        <p data-print-hide className="mt-6 flex flex-wrap gap-3">
           <a
             href={`mailto:${site.email}?subject=${encodeURIComponent('Barreira de acessibilidade no site')}`}
             className="toon toon-press rounded-full bg-acid px-6 py-3 font-medium text-acid-ink"
