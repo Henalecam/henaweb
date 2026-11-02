@@ -380,7 +380,15 @@ export default function Work() {
 
         {/* mobile / tablet: swipeable cards */}
         <div className="-mx-[clamp(1rem,4vw,3.5rem)] mt-12 lg:hidden">
-          <ol ref={strip} onScroll={onStrip} data-work-strip className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-[clamp(1rem,4vw,3.5rem)] pb-10 [scrollbar-width:none]">
+          {/* on paper the row can't be swiped: the second card used to print cut at the page edge, its window blank
+              (its screenshot mounts with the cards layout, too late for the print pass); only the first card prints,
+              at full width, and the index below names all seven */}
+          <ol
+            ref={strip}
+            onScroll={onStrip}
+            data-work-strip
+            className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-[clamp(1rem,4vw,3.5rem)] pb-10 [scrollbar-width:none] print:overflow-visible print:pb-4 print:[&>li:not(:first-child)]:hidden print:[&>li]:w-full"
+          >
             {projects.map((item, i) => (
               // a keyboard reaching this card's link (Tab) centres the card, as a swipe would: the browser only
               // nudged a half-visible link into view, leaving the card cut at the screen's edge
