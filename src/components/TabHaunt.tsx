@@ -139,7 +139,7 @@ function toggleFlashlight(force?: boolean) {
   };
   score();
   document.body.appendChild(tally);
-  const move = (e: PointerEvent) => {
+  const move = (e: { clientX: number; clientY: number }) => {
     el.style.setProperty('--lx', `${e.clientX}px`);
     el.style.setProperty('--ly', `${e.clientY}px`);
     // found = the beam's fully clear centre (about 100 px) reached the note's middle
@@ -159,6 +159,17 @@ function toggleFlashlight(force?: boolean) {
     el.remove();
     clues.remove();
   };
+  // the Konami code is typed, so whoever turned the lights off may well be on the keyboard: the beam follows Tab,
+  // landing on the focused link or button (the scroll that brings it into view runs first, hence the frame)
+  const follow = (e: FocusEvent) => {
+    const t = e.target;
+    if (!(t instanceof HTMLElement) || !t.matches(':focus-visible')) return;
+    requestAnimationFrame(() => {
+      const r = t.getBoundingClientRect();
+      if (r.width || r.height) move({ clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 });
+    });
+  };
+  window.addEventListener('focusin', follow);
   window.addEventListener('pointermove', move, { passive: true });
   // touch screens have no hover: the beam jumps to wherever the finger lands
   window.addEventListener('pointerdown', move, { passive: true });
@@ -169,6 +180,7 @@ function toggleFlashlight(force?: boolean) {
     tally.remove();
     window.removeEventListener('pointermove', move);
     window.removeEventListener('pointerdown', move);
+    window.removeEventListener('focusin', follow);
     window.removeEventListener('keydown', off);
     obs.disconnect();
   }).observe(document.body, { childList: true });
