@@ -48,6 +48,7 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
   const p = bySlug(slug);
   if (!p) notFound();
   const service = serviceBySlug(p.service);
+  const siblings = projects.filter((c) => c.service === p.service);
   const url = `${site.url}/casos/${p.slug}`;
   const i = projects.indexOf(p);
   const next = projects[(i + 1) % projects.length];
@@ -286,8 +287,24 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
               <span className="mt-2 block text-2xl font-medium tracking-tight">← {prev.name}</span>
             </a>
             {service && (
-              <a href={`/servicos/${service.slug}`} className="toon-sm toon-press flex flex-col justify-center rounded-2xl bg-bg-2/80 p-6">
-                <span className="label">Serviço</span>
+              <a href={`/servicos/${service.slug}`} className="toon-sm toon-press group flex flex-col justify-center rounded-2xl bg-bg-2/80 p-6">
+                {/* the service as the drawer this file came from: one folder tab per case filed under it, this
+                    one pulled up and lit, standing where the neighbours show their screenshot */}
+                <span aria-hidden className="mb-5 flex items-end gap-1 border-b-2 border-acid/60">
+                  {siblings.map((c) => (
+                    <span
+                      key={c.slug}
+                      className={`min-w-0 truncate rounded-t-md px-2.5 font-mono text-[0.68rem] tracking-wide transition-[padding] duration-300 ${
+                        c.slug === p.slug ? 'bg-acid pt-2 pb-1 text-acid-ink' : 'bg-ink/10 pt-1 pb-0.5 text-ink/70 group-hover:pt-1.5'
+                      }`}
+                    >
+                      {c.name}
+                    </span>
+                  ))}
+                </span>
+                <span className="label">
+                  Serviço · {siblings.length} {siblings.length === 1 ? 'caso' : 'casos'}
+                </span>
                 <span className="mt-2 block text-2xl font-medium tracking-tight">{service.name} →</span>
               </a>
             )}
