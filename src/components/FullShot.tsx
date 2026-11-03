@@ -36,6 +36,9 @@ export function ZoomArea({ src }: { src?: string }) {
     const r = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - r.left;
     const y = e.clientY - r.top;
+    // the full-size capture is only fetched once a mouse actually moves over the window: as an inline style it was
+    // downloaded with every case page, phones included, where the lens never shows (84 KB of JPEG on Diconta)
+    if (!l.style.backgroundImage) l.style.backgroundImage = `url(${src})`;
     l.style.translate = `${x - LENS / 2}px ${y - LENS / 2}px`;
     l.style.backgroundSize = `${r.width * ZOOM}px auto`;
     l.style.backgroundPosition = `${-(x * ZOOM - LENS / 2)}px ${-(y * ZOOM - LENS / 2)}px`;
@@ -57,7 +60,7 @@ export function ZoomArea({ src }: { src?: string }) {
           ref={lens}
           data-lens
           className="pointer-events-none absolute top-0 left-0 rounded-full border-[3px] border-toon bg-no-repeat shadow-[4px_4px_0_#12082a,inset_0_0_0_2px_rgb(255_255_255/0.6)]"
-          style={{ width: LENS, height: LENS, backgroundImage: `url(${src})` }}
+          style={{ width: LENS, height: LENS }}
         />
       )}
     </button>
