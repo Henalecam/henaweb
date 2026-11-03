@@ -1347,6 +1347,21 @@ html {
     border-color: rgb(194 65 12 / 0.55);
   }
 }
+/* …and when the pen reaches the "price" (the step's time), the tag swings on its pin once, like a price tag
+   flicked on a menu board: it pivots from its left end, where the leader meets it */
+@media (prefers-reduced-motion: no-preference) {
+  [data-step].is-active [data-step-time] {
+    transform-origin: 0.6rem 50%;
+    animation: price-swing 0.9s cubic-bezier(0.3, 1.4, 0.5, 1) 0.75s both;
+  }
+}
+@keyframes price-swing {
+  0% { rotate: 0deg; }
+  25% { rotate: -9deg; }
+  55% { rotate: 5deg; }
+  80% { rotate: -2deg; }
+  100% { rotate: 0deg; }
+}
 
 /* Manifesto: "sistema claro" is underlined by a single orange marker stroke, slightly crooked like a hand pulled
    it. On browsers with scroll-driven animations the stroke is drawn left to right while the line rises through the
