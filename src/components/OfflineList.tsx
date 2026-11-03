@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 
-type Kept = { path: string; title: string };
+type Kept = { path: string; title: string; at: number };
+
+const when = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 
 /**
  * The pages this browser kept for offline reading (the service worker's "pages-*" cache), each with the title
@@ -20,11 +22,15 @@ export default function OfflineList() {
         for (const req of await cache.keys()) {
           const path = new URL(req.url).pathname;
           if (path === '/offline') continue;
-          const html = (await (await cache.match(req))?.text()) ?? '';
+          const res = await cache.match(req);
+          const html = (await res?.text()) ?? '';
           const title = html.match(/<title>([^<]*)<\/title>/)?.[1]?.replace(/&amp;/g, '&').replace(/ · HenaWeb$/, '') ?? path;
-          out.push({ path, title: path === '/' ? 'Página inicial' : title });
+          // when this copy was kept: the date the server answered with, refreshed on every online visit
+          const at = Date.parse(res?.headers.get('date') ?? '') || 0;
+          out.push({ path, title: path === '/' ? 'Página inicial' : title, at });
         }
-        setKept(out);
+        // the freshest copies first: the page read last is the likeliest one to be wanted again
+        setKept(out.sort((a, b) => b.at - a.at));
       } catch {
         setKept([]);
       }
@@ -49,8 +55,19 @@ export default function OfflineList() {
               "Acessibilid…"); the drawer then shows two and a half rows, the cut-off one hinting that it scrolls */}
           <a href={k.path} className="toon-sm toon-press flex min-h-11 flex-col justify-center rounded-xl bg-white px-4 py-2 font-medium sm:flex-row sm:items-center sm:justify-between sm:gap-3">
             <span className="truncate">{k.title}</span>
-            <span aria-hidden className="truncate font-mono text-xs text-acid-ink/60 sm:shrink-0">
-              {k.path}
+            <span className="truncate font-mono text-xs text-acid-ink/60 sm:shrink-0">
+              {/* phones: the date alone (the title already says which page); the address joins it from sm up */}
+              <span aria-hidden className={k.at > 0 ? 'hidden sm:inline' : ''}>
+                {k.path}
+              </span>
+              {k.at > 0 && (
+                <>
+                  <span aria-hidden className="hidden sm:inline"> · </span>
+                  {/* "guardada 03/11, 05:08": how old the copy that opens without signal is */}
+                  <span className="sr-only">, </span>guardada{' '}
+                  <time dateTime={new Date(k.at).toISOString()}>{when.format(k.at).replace(', ', ' às ')}</time>
+                </>
+              )}
             </span>
           </a>
         </li>
