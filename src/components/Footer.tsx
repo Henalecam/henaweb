@@ -8,6 +8,7 @@ import { projectLinks } from '@/lib/projectLinks';
 import { serviceLinks } from '@/lib/serviceLinks';
 import { CONSENT_OPEN } from '@/lib/consent';
 import Clock from './Clock';
+import CopyFeed from './CopyFeed';
 import Chase from './Chase';
 import Social from './Social';
 import CopyEmail from './CopyEmail';
@@ -175,7 +176,8 @@ export default function Footer() {
               Ver todos →
             </FooterLink>
             {/* the archive as a feed, for reader apps: listed like the file it is */}
-            <FooterLink href="/casos/feed.xml">
+            {/* a browser only shows a feed's raw XML: the address, copied, is what a reader app wants (CopyFeed) */}
+            <FooterLink href="/casos/feed.xml" after={<CopyFeed />}>
               <span className="font-mono text-sm">feed.xml</span> <span className="font-mono text-[0.7rem] text-ink/50">(RSS)</span>
             </FooterLink>
           </FooterColumn>
@@ -304,7 +306,7 @@ function FooterColumn({
   );
 }
 
-function FooterLink({ href, children, accent = false }: { href: string; children: React.ReactNode; accent?: boolean }) {
+function FooterLink({ href, children, accent = false, after }: { href: string; children: React.ReactNode; accent?: boolean; after?: React.ReactNode }) {
   // the file tree marks the page you are on, like an open file in an editor
   const here = usePathname() === href;
   return (
@@ -333,6 +335,7 @@ function FooterLink({ href, children, accent = false }: { href: string; children
           {here && <span aria-hidden className="ml-2 inline-block font-mono text-[0.65rem] tracking-wide whitespace-nowrap text-ink/55">(aberto)</span>}
         </span>
       </a>
+      {after}
     </li>
   );
 }
