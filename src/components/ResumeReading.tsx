@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { focusInstead } from '@/lib/focusInstead';
+import { useEffect, useRef, useState } from 'react';
 import WinClose from './WinClose';
 
 const KEY = 'hena:resume';
@@ -35,6 +36,7 @@ function sectionHere(): string | null {
  */
 export default function ResumeReading() {
   const [at, setAt] = useState<string | null>(null);
+  const box = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // remember: the section in view when the visitor leaves (not the pixel offset: the layout may differ next time)
@@ -69,8 +71,12 @@ export default function ResumeReading() {
   // ignored, it goes away on its own; scrolling down on one's own also answers it
   useEffect(() => {
     if (!at) return;
-    const t = window.setTimeout(() => setAt(null), 12000);
-    const onScroll = () => scrollY > innerHeight && setAt(null);
+    const close = () => {
+      focusInstead(box.current);
+      setAt(null);
+    };
+    const t = window.setTimeout(close, 12000);
+    const onScroll = () => scrollY > innerHeight && close();
     addEventListener('scroll', onScroll, { passive: true });
     return () => {
       clearTimeout(t);
@@ -81,6 +87,8 @@ export default function ResumeReading() {
   if (!at) return null;
   const go = () => {
     const el = document.getElementById(at);
+    // the keyboard goes along to the section the reading resumes at, not back to the top of the page
+    focusInstead(box.current, el);
     setAt(null);
     if (!el) return;
     const y = el.getBoundingClientRect().top + scrollY - 80;
@@ -88,10 +96,15 @@ export default function ResumeReading() {
     if (!handled) window.scrollTo({ top: y, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   };
   return (
-    <div role="dialog" aria-label="Continuar a leitura" data-resume className="resume-pop win fixed bottom-20 left-1/2 z-[56] w-[min(calc(100vw-2rem),21rem)] -translate-x-1/2 text-acid-ink md:bottom-6">
+    <div ref={box} role="dialog" aria-label="Continuar a leitura" data-resume className="resume-pop win fixed bottom-20 left-1/2 z-[56] w-[min(calc(100vw-2rem),21rem)] -translate-x-1/2 text-acid-ink md:bottom-6">
       <div className="win-bar">
         <span>continuar_leitura.exe</span>
-        <WinClose onClick={() => setAt(null)} label="Fechar: começar do início" className="ml-auto" />
+        <WinClose
+          onClick={() => {
+            focusInstead(box.current);
+            setAt(null);
+          }}
+          label="Fechar: começar do início" className="ml-auto" />
       </div>
       <div className="m-1.5 flex items-center justify-between gap-3 border-2 border-[#7d7394] bg-paper px-3 py-2.5">
         <p className="text-sm leading-snug">
