@@ -1,3 +1,4 @@
+import SimilarCase from '@/components/SimilarCase';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
@@ -255,9 +256,8 @@ export default async function CasePage({ params }: PageProps<'/casos/[slug]'>) {
             <a href={p.href} target="_blank" rel="noopener noreferrer" className="toon toon-press rounded-full bg-acid px-6 py-4 font-medium text-acid-ink">
               Visitar {p.name} ↗
             </a>
-            <a href="/#contato" className="toon toon-press rounded-full bg-cyan px-6 py-4 font-medium text-acid-ink">
-              Abrir um caso parecido →
-            </a>
+            {/* the form opens with this case named in the message (SimilarCase) */}
+            <SimilarCase name={p.name} className="toon toon-press rounded-full bg-cyan px-6 py-4 font-medium text-acid-ink" />
             <ShareCase title={`${p.name} · caso resolvido pela HenaWeb`} text={p.summary} />
           </div>
           {/* the page's own tools, on one wrapping line: PDF, listen, phone */}

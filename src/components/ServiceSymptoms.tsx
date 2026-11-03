@@ -4,22 +4,13 @@ import { useEffect, useState } from 'react';
 import { track } from '@/lib/track';
 import Tick from './Tick';
 import { buzz } from '@/lib/haptic';
-
-const DRAFT = 'hena:draft';
+import { addToDraft } from '@/lib/draft';
 
 /** The ticked symptoms as the line they become in a message ("Sintomas que reconheci (Automação e IA): ..."). */
 export const symptomsBlock = (picked: string[], service: string) => `Sintomas que reconheci (${service}):\n${picked.map((p) => `- ${p}`).join('\n')}`;
 
 /** Puts the ticked symptoms in the same-tab contact draft (Contact reads it), once. */
-export function carrySymptoms(picked: string[], service: string) {
-  const block = symptomsBlock(picked, service);
-  try {
-    const d = JSON.parse(sessionStorage.getItem(DRAFT) ?? 'null') ?? { picked: [], timeline: '', fields: {} };
-    const msg: string = d.fields?.message ?? '';
-    d.fields = { ...d.fields, message: msg.includes(block) ? msg : [msg, block].filter(Boolean).join('\n\n') };
-    sessionStorage.setItem(DRAFT, JSON.stringify(d));
-  } catch {}
-}
+export const carrySymptoms = (picked: string[], service: string) => addToDraft(symptomsBlock(picked, service));
 
 /**
  * "Sintomas que resolvemos" as a checklist: the visitor ticks what happens in their company and
