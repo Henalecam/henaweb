@@ -78,16 +78,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
     }
 
+    // the optional fields had no ceiling: a scripted request could stuff kilobytes into the e-mail's rows. They are
+    // cut, not refused, so a real lead whose origin carries long campaign tags still arrives
+    const cap = (v: unknown) => (v == null ? '' : String(v).trim().slice(0, 300));
     const rows = [
       ['Nome', name],
       ['E-mail', email],
-      ['WhatsApp', whatsapp],
-      ['Empresa / órgão', org],
+      ['WhatsApp', cap(whatsapp)],
+      ['Empresa / órgão', cap(org)],
       ['Tipo', subject],
-      ['Prazo', timeline],
-      ['Origem', origin],
+      ['Prazo', cap(timeline)],
+      ['Origem', cap(origin)],
     ]
-      .filter(([, v]) => v)
+      .filter(([, v]) => String(v ?? '').trim())
       .map(([k, v]) => `<p><strong>${k}:</strong> ${escape(v)}</p>`)
       .join('');
 

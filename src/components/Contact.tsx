@@ -386,6 +386,9 @@ export default function Contact() {
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
+    // typed values without the stray spaces of a paste or autofill (" Ana Paula ", an "Empresa" of only spaces):
+    // they went out as typed, into the e-mail's subject and the WhatsApp fallback
+    const val = (k: string) => String(data.get(k) ?? '').trim();
     const report = chosen.length
       ? `Sintomas: ${chosen.map((c) => c.label).join('; ')}\nDiagnóstico preliminar: ${capabilities.join(' + ')}\n\n`
       : '';
@@ -394,8 +397,8 @@ export default function Contact() {
     setFallback(
       [
         `Olá! Quero abrir um caso com a HenaWeb (ficha nº ${caseNo}).`,
-        `Nome: ${data.get('name') ?? ''}`,
-        data.get('org') ? `Empresa ou órgão: ${data.get('org')}` : '',
+        `Nome: ${val('name')}`,
+        val('org') ? `Empresa ou órgão: ${val('org')}` : '',
         `Prazo: ${timeline}`,
         message,
       ]
@@ -416,10 +419,10 @@ export default function Contact() {
         signal: ctrl.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: data.get('name'),
-          email: data.get('email'),
-          whatsapp: data.get('whatsapp'),
-          org: data.get('org'),
+          name: val('name'),
+          email: val('email'),
+          whatsapp: val('whatsapp'),
+          org: val('org'),
           subject: capabilities[0] ?? 'Novo caso',
           timeline,
           message: message || 'Sem detalhes adicionais.',
