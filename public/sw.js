@@ -1,7 +1,8 @@
 /*
  * HenaWeb service worker: the case archive keeps working without signal.
  * - pages (navigations): network first, so a visitor online always gets the current site; each page read is
- *   kept, and offline it comes back from that copy, or the "sem_sinal.exe" page (/offline) when it was never read
+ *   kept, and offline it comes back from that copy, or the "sem_sinal.exe" page (/offline) when it was never read;
+ *   a network that never answers gets the same, after 6 s (with a copy) or 12 s (without)
  * - Next's hashed build files (/_next/static): cache first, they never change under the same name
  * - same-origin images: served from the copy while a fresh one is fetched behind it
  * Every cache is capped, oldest out first. Nothing cross-origin (analytics, WhatsApp) is touched.
@@ -57,20 +58,27 @@ self.addEventListener('fetch', (event) => {
   if (req.mode === 'navigate') {
     event.respondWith(
       (async () => {
-        try {
+        const cache = await caches.open(PAGES);
+        const network = (async () => {
           // the preloaded response when there is one (see activate), else a normal fetch
           const res = (await Promise.resolve(event.preloadResponse).catch(() => undefined)) || (await fetch(req));
           // keep a copy of real pages (not error pages, not redirects), keyed without query or hash
           if (res.ok && res.type === 'basic' && (res.headers.get('content-type') || '').includes('text/html')) {
-            const cache = await caches.open(PAGES);
             await cache.put(url.pathname, res.clone());
             trim(PAGES);
           }
           return res;
-        } catch {
-          const cache = await caches.open(PAGES);
-          return (await cache.match(url.pathname)) || (await cache.match(OFFLINE)) || Response.error();
-        }
+        })();
+        // keep fetching (and refreshing the copy) even when the answer below doesn't wait for it
+        event.waitUntil(network.catch(() => {}));
+        const copy = await cache.match(url.pathname);
+        const fallback = async () => copy || (await cache.match(OFFLINE)) || Response.error();
+        // a connection that connects but never answers ("lie-fi": a weak signal, a captive Wi-Fi) used to leave the
+        // page blank for as long as the browser cared to wait. The network still goes first; only if no answer has
+        // started after a while does the reader get the copy this browser kept (6 s), or "sem_sinal.exe" for a page
+        // never read here (12 s, so a merely slow server still gets its chance)
+        const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        return Promise.race([network.catch(fallback), wait(copy ? 6000 : 12000).then(fallback)]);
       })(),
     );
     return;
