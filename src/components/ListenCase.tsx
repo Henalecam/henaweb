@@ -11,6 +11,9 @@ import { useEffect, useRef, useState } from 'react';
 export default function ListenCase({ lines }: { lines: string[] }) {
   const [ok, setOk] = useState(false);
   const [playing, setPlaying] = useState(false);
+  // which passage the voice is on, as a tape counter ("faixa 2/5"): a long file read aloud otherwise gives no
+  // sense of how much is left
+  const [track, setTrack] = useState(0);
   const voice = useRef<SpeechSynthesisVoice | null>(null);
 
   useEffect(() => {
@@ -36,11 +39,13 @@ export default function ListenCase({ lines }: { lines: string[] }) {
       return;
     }
     speechSynthesis.cancel();
+    setTrack(1);
     lines.forEach((text, i) => {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'pt-BR';
       u.voice = voice.current;
       u.rate = 1;
+      u.onstart = () => setTrack(i + 1);
       if (i === lines.length - 1) u.onend = () => setPlaying(false);
       u.onerror = () => setPlaying(false);
       speechSynthesis.speak(u);
@@ -59,6 +64,11 @@ export default function ListenCase({ lines }: { lines: string[] }) {
         ✇
       </span>
       {playing ? '■ Parar a gravação' : '▶ Ouvir o caso'}
+      {playing && lines.length > 1 && (
+        <span aria-hidden className="font-mono tabular-nums !text-ink/50">
+          · faixa {track}/{lines.length}
+        </span>
+      )}
     </button>
   );
 }
