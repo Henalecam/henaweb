@@ -2602,9 +2602,15 @@ html[data-navigating] [data-nav-pending] {
 
 /* sections out of view stop their endless CSS loops (OffscreenPause) */
 [data-offscreen],
-[data-offscreen] * {
+[data-offscreen] *,
+[data-offscreen]::before,
+[data-offscreen]::after,
+[data-offscreen] *::before,
+[data-offscreen] *::after {
   animation-play-state: paused !important;
 }
+/* `*` never matches a pseudo-element: the synthwave grid floors (.grid-floor::before, a background-position loop
+   that repaints every frame) kept scrolling in sections far off screen until the pseudo-elements were listed */
 
 /* /casos 🎲: the die spins and the drawn card lights up before its page opens (RandomCase) */
 @keyframes dice-roll {

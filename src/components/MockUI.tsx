@@ -11,7 +11,7 @@ export default function MockUI({ variant, hue }: { variant: MockVariant; hue: nu
   } as CSSProperties;
 
   return (
-    <div style={style} aria-hidden className="relative flex h-full w-full overflow-hidden bg-[#0c0c0e] text-ink">
+    <div style={style} aria-hidden data-pause-offscreen className="relative flex h-full w-full overflow-hidden bg-[#0c0c0e] text-ink">
       <div
         className="pointer-events-none absolute -top-1/3 -right-1/4 h-[90%] w-[70%] rounded-full blur-[90px]"
         style={{ background: 'var(--hs)' }}

@@ -9,7 +9,9 @@ import { useEffect } from 'react';
  */
 export default function OffscreenPause() {
   useEffect(() => {
-    const blocks = document.querySelectorAll<HTMLElement>('main > *, main > div > *, footer');
+    // the top-level blocks, plus loops that live inside one tall block (a case card's art on /casos sat in a list
+    // three screens long, so its section never left the view while the draw kept calling numbers far below)
+    const blocks = document.querySelectorAll<HTMLElement>('main > *, main > div > *, footer, [data-pause-offscreen]');
     const io = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.target.toggleAttribute('data-offscreen', !e.isIntersecting)),
       { rootMargin: '200px 0px' },
