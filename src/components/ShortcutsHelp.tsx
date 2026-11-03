@@ -76,9 +76,10 @@ export default function ShortcutsHelp({ open, onClose }: { open: boolean; onClos
           {ROWS.map((r) => {
             const local = r.here ? r.here(path) : null;
             // rows for other pages are dimmed by colour, not by opacity on the whole row: at 55% the row's text fell under
-            // 4.5:1 on the paper (axe, at 390 px); the keycaps alone keep a lighter look
+            // 4.5:1 on the paper (axe, at 390 px); the keycaps alone keep a lighter look, by a fainter outline and ink (an
+            // opacity on them had the same problem: their letters fell under 4.5:1, axe in the 530 sweep)
             return (
-            <div key={r.what} data-here={local === null ? undefined : String(local)} className={`flex items-center justify-between gap-4 py-2.5 ${local === false ? 'text-acid-ink/75 [&_kbd]:opacity-60' : ''}`}>
+            <div key={r.what} data-here={local === null ? undefined : String(local)} className={`flex items-center justify-between gap-4 py-2.5 ${local === false ? 'text-acid-ink/75 [&_kbd]:border-acid-ink/40 [&_kbd]:text-acid-ink/80' : ''}`}>
               <dt className="flex flex-wrap items-center gap-1.5">
                 {r.keys.map((combo, i) => (
                   <span key={i} className="flex items-center gap-1">
