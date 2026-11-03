@@ -52,6 +52,8 @@ export default function ConsentBanner({ tools }: { tools: string[] }) {
   const [bitten, setBitten] = useState(false);
   const box = useRef<HTMLElement>(null);
   const focusOnShow = useRef(false);
+  // where the keyboard was when the choice was asked for (the footer's "Cookies" button), to go back there after
+  const opener = useRef<HTMLElement | null>(null);
 
   // while the notice is up it covers the bottom of the screen (a fifth of a phone): Tab used to land on links
   // hidden right under it (36 of 76 on the home page at 390 px). The page's scroll padding grows by the
@@ -90,6 +92,8 @@ export default function ConsentBanner({ tools }: { tools: string[] }) {
     // not left behind on the closed search or at the top of the page
     const reopen = () => {
       focusOnShow.current = true;
+      const at = document.activeElement as HTMLElement | null;
+      opener.current = at && at !== document.body && !at.closest('dialog, [role=dialog]') ? at : null;
       setOpen(true);
     };
     window.addEventListener(CONSENT_OPEN, reopen);
@@ -124,8 +128,17 @@ export default function ConsentBanner({ tools }: { tools: string[] }) {
     saveConsent(c);
     // the answer is saved at once; on "Aceitar" the window waits a beat so the bite is seen before it slides away
     const linger = c === 'granted' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 280 : 0;
+    // the window unmounts with the keyboard inside it, which dropped focus onto <body> (the next Tab started over
+    // from the top of the page): it goes back to whatever opened the choice, or to the start of the content
+    const hadFocus = !!box.current?.contains(document.activeElement);
     setTimeout(() => setShown(false), linger);
-    setTimeout(() => setOpen(false), linger + 300);
+    setTimeout(() => {
+      setOpen(false);
+      if (!hadFocus) return;
+      const back = opener.current?.isConnected && opener.current.getClientRects().length ? opener.current : document.getElementById('conteudo');
+      opener.current = null;
+      back?.focus({ preventScroll: true });
+    }, linger + 300);
   };
 
   return (
