@@ -24,6 +24,7 @@ import AccordionKeys from '@/components/AccordionKeys';
 import SwRegister from '@/components/SwRegister';
 import PrintImages from '@/components/PrintImages';
 import SearchMarks from '@/components/SearchMarks';
+import SkipContact from '@/components/SkipContact';
 import DragFile from '@/components/DragFile';
 import WinDrag from '@/components/WinDrag';
 import TabProgress from '@/components/TabProgress';
@@ -213,13 +214,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Pular para o conteúdo
         </a>
-        {/* the second skip link: the home holds ~60 stops before its contact form, and every other page links there */}
-        <a
-          href="/#contato"
-          className="toon-sm sr-only z-[200] rounded-full bg-acid px-5 py-3 font-medium text-acid-ink focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:px-5 focus:py-3"
-        >
-          Pular para o contato
-        </a>
+        {/* the second skip link: the home holds ~60 stops before its contact form, and every other page links there
+            (or to its own contact line, see SkipContact) */}
+        <SkipContact />
         </nav>
         {/* repeat views in the same tab skip the intro: hide the overlay before the first paint instead
             of holding the page under it until hydration fades it out */}

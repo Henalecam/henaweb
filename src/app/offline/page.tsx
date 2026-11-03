@@ -37,7 +37,7 @@ export default function Offline() {
             <OfflineRunner />
             {/* the contact line used to be plain text, on the one page where the web can't reach us: a phone call
                 needs no data plan (the number is the voice line in henaweb.vcf), and the mail app keeps the draft */}
-            <p className="mt-6 font-mono text-xs leading-relaxed text-acid-ink/70">
+            <p id="sem-sinal-contato" data-skip-contact tabIndex={-1} className="mt-6 scroll-mt-24 font-mono text-xs leading-relaxed text-acid-ink/70 outline-none">
               Uma ligação comum não precisa de internet:{' '}
               <a href={`tel:+${site.whatsapp}`} className="font-bold whitespace-nowrap text-acid-ink underline decoration-2 underline-offset-2 hover:text-[#c2410c]">
                 <span aria-hidden>☎ </span>
