@@ -3,6 +3,7 @@ import { site } from '@/lib/site';
 import Footer from '@/components/Footer';
 import ShowShortcuts from '@/components/ShowShortcuts';
 import YourSettings from '@/components/YourSettings';
+import SectionLink from '@/components/SectionLink';
 
 const description = 'O que o site da HenaWeb faz para ser usado por todo mundo, o que ainda pode falhar e como avisar a gente de uma barreira.';
 
@@ -105,36 +106,46 @@ export default function Acessibilidade() {
 
         <YourSettings />
 
-        <h2 className="mt-14 text-2xl font-medium tracking-tight">Como verificamos</h2>
-        <p className="mt-3 leading-relaxed text-ink/75">
-          Cada mudança é testada em celular (390 px) e computador (1440 px), com e sem “reduzir movimento”. Na última verificação automática com o
-          axe-core, em 3 de novembro de 2026, as dez páginas principais (inclusive a de erro e a de sem conexão) e as janelas interativas não tiveram
-          nenhuma violação encontrada. Na mesma rodada conferimos a versão impressa (PDF) das páginas, o modo de alto contraste do sistema e o tamanho
-          dos alvos de toque.
-        </p>
+        {/* each part can be sent on its own ("o que ainda pode falhar"): the shared "# link" of the service pages */}
+        <section className="group relative mt-14" aria-labelledby="como-verificamos">
+          <h2 id="como-verificamos" className="scroll-mt-28 pr-24 text-2xl font-medium tracking-tight">Como verificamos</h2>
+          <SectionLink id="como-verificamos" title="Como verificamos" />
+          <p className="mt-3 leading-relaxed text-ink/75">
+            Cada mudança é testada em celular (390 px) e computador (1440 px), com e sem “reduzir movimento”. Na última verificação automática com o
+            axe-core, em 3 de novembro de 2026, as dez páginas principais (inclusive a de erro e a de sem conexão) e as janelas interativas não tiveram
+            nenhuma violação encontrada. Na mesma rodada conferimos a versão impressa (PDF) das páginas, o modo de alto contraste do sistema e o tamanho
+            dos alvos de toque.
+          </p>
+        </section>
 
-        <h2 className="mt-12 text-2xl font-medium tracking-tight">O que ainda pode falhar</h2>
-        <p className="mt-3 leading-relaxed text-ink/75">
-          Testes automáticos não pegam tudo, e este site ainda não passou por uma auditoria manual com pessoas que usam tecnologia assistiva, então não
-          declaramos conformidade formal. Os jogos do Passa tempo são projetos à parte e podem não seguir estes mesmos cuidados.
-        </p>
+        <section className="group relative mt-12" aria-labelledby="o-que-pode-falhar">
+          <h2 id="o-que-pode-falhar" className="scroll-mt-28 pr-24 text-2xl font-medium tracking-tight">O que ainda pode falhar</h2>
+          <SectionLink id="o-que-pode-falhar" title="O que ainda pode falhar" />
+          <p className="mt-3 leading-relaxed text-ink/75">
+            Testes automáticos não pegam tudo, e este site ainda não passou por uma auditoria manual com pessoas que usam tecnologia assistiva, então não
+            declaramos conformidade formal. Os jogos do Passa tempo são projetos à parte e podem não seguir estes mesmos cuidados.
+          </p>
+        </section>
 
-        <h2 className="mt-12 text-2xl font-medium tracking-tight">Encontrou uma barreira?</h2>
-        <p className="mt-3 leading-relaxed text-ink/75">
-          Conte o que aconteceu, em qual página e com qual navegador ou leitor de tela. A gente corrige e responde.
-        </p>
-        {/* on paper the two buttons can't be pressed; the printout's own footer line carries the e-mail and WhatsApp */}
-        <p data-print-hide className="mt-6 flex flex-wrap gap-3">
-          <a
-            href={`mailto:${site.email}?subject=${encodeURIComponent('Barreira de acessibilidade no site')}`}
-            className="toon toon-press rounded-full bg-acid px-6 py-3 font-medium text-acid-ink"
-          >
-            Avisar por e-mail
-          </a>
-          <a href="/#contato" className="toon toon-press rounded-full bg-paper px-6 py-3 font-medium text-acid-ink">
-            Ou pelo formulário →
-          </a>
-        </p>
+        <section className="group relative mt-12" aria-labelledby="barreira">
+          <h2 id="barreira" className="scroll-mt-28 pr-24 text-2xl font-medium tracking-tight">Encontrou uma barreira?</h2>
+          <SectionLink id="barreira" title="Encontrou uma barreira?" />
+          <p className="mt-3 leading-relaxed text-ink/75">
+            Conte o que aconteceu, em qual página e com qual navegador ou leitor de tela. A gente corrige e responde.
+          </p>
+          {/* on paper the two buttons can't be pressed; the printout's own footer line carries the e-mail and WhatsApp */}
+          <p data-print-hide className="mt-6 flex flex-wrap gap-3">
+            <a
+              href={`mailto:${site.email}?subject=${encodeURIComponent('Barreira de acessibilidade no site')}`}
+              className="toon toon-press rounded-full bg-acid px-6 py-3 font-medium text-acid-ink"
+            >
+              Avisar por e-mail
+            </a>
+            <a href="/#contato" className="toon toon-press rounded-full bg-paper px-6 py-3 font-medium text-acid-ink">
+              Ou pelo formulário →
+            </a>
+          </p>
+        </section>
       </article>
     </main>
     <Footer />
