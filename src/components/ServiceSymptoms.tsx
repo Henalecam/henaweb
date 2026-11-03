@@ -9,8 +9,29 @@ import { addToDraft } from '@/lib/draft';
 /** The ticked symptoms as the line they become in a message ("Sintomas que reconheci (Automação e IA): ..."). */
 export const symptomsBlock = (picked: string[], service: string) => `Sintomas que reconheci (${service}):\n${picked.map((p) => `- ${p}`).join('\n')}`;
 
-/** Puts the ticked symptoms in the same-tab contact draft (Contact reads it), once. */
-export const carrySymptoms = (picked: string[], service: string) => addToDraft(symptomsBlock(picked, service));
+/** A service page's symptom → the contact form's own symptom chip it is a case of (content.ts symptoms), so the
+ * form opens with that chip ticked and its "ficha do caso" already reading the clue. Symptoms with no close chip
+ * travel as text only. Keyed by the text in services.ts: a reworded symptom simply stops ticking a chip. */
+const CHIP: Record<string, string> = {
+  'Informação espalhada em planilhas, e-mails e grupos de mensagem': 'planilhas',
+  'Retrabalho para consolidar dados e gerar relatórios': 'retrabalho',
+  'Sistema antigo que ninguém tem coragem de mexer': 'legado',
+  'Processos de aprovação que dependem de papel, e-mail e planilha': 'aprovacao',
+  'Sistemas legados sem acessibilidade e difíceis de manter': 'legado',
+  'Dados que não conversam entre secretarias e órgãos': 'planilhas',
+  'WhatsApp lotado de perguntas repetidas': 'atendimento',
+  'Relatórios montados à mão toda semana': 'retrabalho',
+  'Sistemas que não conversam e exigem copia e cola': 'retrabalho',
+  'Site que não traz contatos': 'presenca',
+  'Empresa que não aparece nas buscas do Google': 'presenca',
+};
+
+/** Puts the ticked symptoms in the same-tab contact draft (Contact reads it), once, ticking the matching chips. */
+export const carrySymptoms = (picked: string[], service: string) =>
+  addToDraft(
+    symptomsBlock(picked, service),
+    picked.map((p) => CHIP[p]).filter((id): id is string => Boolean(id)),
+  );
 
 /**
  * "Sintomas que resolvemos" as a checklist: the visitor ticks what happens in their company and
