@@ -54,6 +54,16 @@ export default function SearchMarks() {
   const ranges = useRef<Range[]>([]);
   const at = useRef(-1);
 
+  const next = () => {
+    const rs = ranges.current;
+    if (!rs.length) return;
+    at.current = (at.current + 1) % rs.length;
+    const el = rs[at.current].startContainer.parentElement;
+    el?.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    // the current one in a stronger ink
+    CSS.highlights.set(`${NAME}-atual`, new Highlight(rs[at.current]));
+  };
+
   useEffect(() => {
     if (!('highlights' in CSS)) return;
     const clear = () => {
@@ -80,7 +90,14 @@ export default function SearchMarks() {
     // a section of this same page: wait for the palette to close and the glide to start
     const onMarks = (e: Event) => setTimeout(() => apply((e as CustomEvent<string[]>).detail), 300);
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && CSS.highlights.has(NAME) && !document.querySelector('[role="dialog"][aria-modal="true"]')) clear();
+      if (!CSS.highlights.has(NAME) || document.querySelector('[role="dialog"][aria-modal="true"], dialog[open]')) return;
+      if (e.key === 'Escape') clear();
+      // N steps to the next mark, like "próxima ↓" (not while typing, nor with a modifier: Ctrl+N is a new window)
+      const t = e.target as HTMLElement;
+      if ((e.key === 'n' || e.key === 'N') && !e.ctrlKey && !e.metaKey && !e.altKey && !t.closest('input, textarea, select, [contenteditable]')) {
+        e.preventDefault();
+        next();
+      }
     };
     window.addEventListener('hena:marks', onMarks);
     window.addEventListener('hena:marks-clear', clear);
@@ -94,15 +111,6 @@ export default function SearchMarks() {
 
   if (!marks) return null;
 
-  const next = () => {
-    const rs = ranges.current;
-    if (!rs.length) return;
-    at.current = (at.current + 1) % rs.length;
-    const el = rs[at.current].startContainer.parentElement;
-    el?.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-    // the current one in a stronger ink
-    CSS.highlights.set(`${NAME}-atual`, new Highlight(rs[at.current]));
-  };
   const wipe = () => {
     window.dispatchEvent(new Event('hena:marks-clear'));
   };
@@ -118,7 +126,7 @@ export default function SearchMarks() {
         <span className="truncate">“{marks.words[0]}”</span>
         <span className="shrink-0 whitespace-pre"> marcado {marks.n}×</span>
       </span>
-      <button type="button" onClick={next} className="min-h-8 shrink-0 rounded-full px-2.5 underline underline-offset-2 hover:bg-acid-ink/10">
+      <button type="button" onClick={next} aria-keyshortcuts="N" title="Próxima marca (tecla N)" className="min-h-8 shrink-0 rounded-full px-2.5 underline underline-offset-2 hover:bg-acid-ink/10">
         próxima ↓
       </button>
       <button type="button" onClick={wipe} aria-label="Apagar as marcas da busca" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-acid-ink/10">
