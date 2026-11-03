@@ -52,6 +52,14 @@ const FEATURES: [string, string][] = [
   ['Telas pequenas e sem sinal', 'As páginas cabem em telas de 320 px sem rolagem lateral, e as páginas que você já leu abrem mesmo sem internet. Com a economia de dados do navegador ligada, as cenas 3D nem são baixadas.'],
 ];
 
+// the cards that answer a setting this browser can report through CSS: their title bar lights up when it is on
+// (the "painel_de_controle.exe" below lists the same settings)
+const PREF_OF: Record<string, string> = {
+  'Menos movimento': 'motion',
+  'Alto contraste': 'contrast',
+  'Alvos de toque': 'touch',
+};
+
 /**
  * /acessibilidade: an accessibility statement for a studio that builds public-sector systems to eMAG/WCAG. It
  * lists what the site actually does, says plainly what automated checks can't promise, and gives a way to report
@@ -75,9 +83,15 @@ export default function Acessibilidade() {
         <h2 className="sr-only">O que o site faz</h2>
         <ul className="mt-10 grid gap-4 sm:grid-cols-2">
           {FEATURES.map(([title, body]) => (
-            <li key={title} className="win">
+            <li key={title} className="win" data-pref={PREF_OF[title]}>
               <div className="win-bar">
                 <span aria-hidden>✓ ok</span>
+                {/* the card whose setting this browser has on says so in its title bar (globals.css [data-pref]) */}
+                {PREF_OF[title] && (
+                  <span aria-hidden data-pref-on className="ml-auto hidden rounded-sm bg-paper px-1.5 font-bold text-acid-ink">
+                    ● em uso aqui
+                  </span>
+                )}
               </div>
               <div className="m-1.5 h-[calc(100%-2.6rem)] border-2 border-[#7d7394] bg-paper p-4 text-acid-ink">
                 <h3 className="font-medium">{title}</h3>

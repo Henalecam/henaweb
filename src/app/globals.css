@@ -1648,6 +1648,21 @@ html {
   }
 }
 
+/* /acessibilidade: a feature card whose setting is on in this browser says "● em uso aqui" in its title bar,
+   matching the live "painel_de_controle.exe" below it */
+@media (prefers-reduced-motion: reduce) {
+  [data-pref='motion'] [data-pref-on] { display: inline; }
+}
+@media (prefers-contrast: more), (forced-colors: active), (prefers-reduced-transparency: reduce) {
+  [data-pref='contrast'] [data-pref-on] { display: inline; }
+}
+@media (pointer: coarse) {
+  [data-pref='touch'] [data-pref-on] { display: inline; }
+}
+@media print {
+  [data-pref-on] { display: none !important; }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
