@@ -361,6 +361,10 @@ export default function Nav() {
       <div
         id="menu-mobile"
         inert={!open}
+        // a landmark of its own: the search button and the social links under the menu's links sat outside every
+        // landmark (axe "region", with the menu open on a phone)
+        role="region"
+        aria-label="Menu"
         // on a short screen (a 375×667 phone under the browser's bars, any phone held sideways) seven 2.25rem links
         // and the footer row are taller than the window: pinned to the bottom with justify-end, the first ones sat
         // above the screen, out of reach. Now the list still rests at the bottom (mt-auto) but starts below the
