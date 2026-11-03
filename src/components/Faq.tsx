@@ -25,7 +25,7 @@ export default function Faq() {
                 <span className="flex items-baseline gap-3">
                   <span aria-hidden className="shrink-0 font-mono text-xs text-bg/70">
                     {String(i + 1).padStart(2, '0')}
-                    <span className="invisible ml-0.5 text-[#15803d] group-data-seen:visible">✓</span>
+                    <span data-seen-tick className="invisible ml-0.5 inline-block text-[#15803d] group-data-seen:visible">✓</span>
                   </span>
                   <span>{f.q}</span>
                 </span>
