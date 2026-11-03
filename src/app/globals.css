@@ -1663,6 +1663,25 @@ html {
   [data-pref-on] { display: none !important; }
 }
 
+/* service pages: the hollow chapter numeral behind the title (I–IV) fills with orange from the bottom as the page
+   scrolls past the hero, like ink rising in a carved letter; scroll-driven, so it follows the reader exactly.
+   Browsers without scroll timelines, and reduced motion, keep the outline alone */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    [data-service-numeral] {
+      background: linear-gradient(to bottom, transparent 50%, rgb(247 147 30 / 0.2) 50%) 0 0 / 100% 200% no-repeat;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: numeral-ink linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 60vh;
+    }
+  }
+}
+@keyframes numeral-ink {
+  to { background-position: 0 100%; }
+}
+
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
    highlighter, instead of the browser's default purple */
 ::target-text {
