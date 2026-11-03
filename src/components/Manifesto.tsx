@@ -120,7 +120,10 @@ export default function Manifesto() {
                 <>
                   {manifesto.slice(0, at)}
                   <span className="mf-key">{key}</span>
-                  {manifesto.slice(at + key.length)}
+                  {/* the last two words are tied (no-break space): "agradece." used to end the paragraph alone on
+                      its own line at most widths. The word split above treats them as one word, so they stay together
+                      in the animated version too */}
+                  {manifesto.slice(at + key.length).replace(/ (\S+)$/, '\u00a0$1')}
                 </>
               );
             })()}
