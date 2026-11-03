@@ -22,6 +22,15 @@ const ITEMS: Item[] = [
   { group: 'Seções', label: 'Contato', hint: 'Abrir um caso', href: '/#contato' },
   { group: 'Seções', label: 'Arquivo de casos', hint: 'Todos os projetos', href: '/casos' },
   { group: 'Seções', label: 'Passa tempo', hint: 'Jogos e experimentos', href: '/passatempo', keywords: `jogos jogo games fliperama ${pastimes.map((p) => p.name).join(' ')}` },
+  // the accessibility statement wasn't findable from ⌘K at all (only from the footer): "leitor de tela" or
+  // "alto contraste" now lead to it, and "barreira" straight to the part about reporting one
+  {
+    group: 'Seções',
+    label: 'Acessibilidade',
+    hint: 'Declaração e preferências',
+    href: '/acessibilidade',
+    keywords: 'leitor de tela alto contraste teclado reduzir movimento wcag emag deficiência',
+  },
   ...projects.map((p) => ({
     group: 'Casos',
     label: p.name,
@@ -59,6 +68,13 @@ const ITEMS: Item[] = [
     external: true,
   },
   { group: 'Ações', label: 'Mandar um e-mail', hint: site.email, href: `mailto:${site.email}` },
+  {
+    group: 'Ações',
+    label: 'Relatar uma barreira de acessibilidade',
+    hint: 'Algo não funcionou?',
+    href: '/acessibilidade#barreira',
+    keywords: 'problema bug erro leitor de tela acessível não consigo',
+  },
   { group: 'Ações', label: 'Salvar contato no celular', hint: 'henaweb.vcf', href: '/henaweb.vcf', keywords: 'vcard agenda contatos telefone' },
   // the side projects, last: "arena" in the search opens the game itself (new tab), not just the arcade page
   ...pastimes.map((p) => ({
