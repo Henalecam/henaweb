@@ -28,6 +28,8 @@ export default function GovTech() {
   // the _ of the title bar works: the process window rolls up to its title bar (like a Win95 window shade)
   // and the same button, now ▭, rolls it back down
   const [rolled, setRolled] = useState(false);
+  const [saved, setSaved] = useState(0);
+  const savedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const tryClose = () => {
     const now = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }).format(new Date());
     setAttempts((a) => [...a, now].slice(-3));
@@ -48,6 +50,10 @@ export default function GovTech() {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+    // a download gives no sign on the page (some browsers show nothing at all): the link says what left, for a moment
+    setSaved(rows.length - 1);
+    clearTimeout(savedTimer.current);
+    savedTimer.current = setTimeout(() => setSaved(0), 2600);
   };
   const traceProps = (i: number) => ({
     'data-on': trace === i ? '' : undefined,
@@ -257,12 +263,16 @@ export default function GovTech() {
                   type="button"
                   onClick={exportTrail}
                   data-export-trail
-                  className="mt-5 inline-flex min-h-8 items-center gap-1.5 font-mono text-[0.68rem] text-mint underline decoration-mint/40 decoration-dotted underline-offset-4 transition-colors hover:text-ink hover:decoration-solid"
+                  className="group mt-5 inline-flex min-h-8 flex-wrap items-center gap-x-1.5 font-mono text-[0.68rem] text-mint transition-colors hover:text-ink"
                 >
-                  <span aria-hidden>⤓</span> exportar_trilha.csv
+                  <span aria-hidden>{saved ? '✓' : '⤓'}</span>
+                  <span className="underline decoration-mint/40 decoration-dotted underline-offset-4 group-hover:decoration-solid">exportar_trilha.csv</span>
+                  {saved > 0 && <span className="whitespace-nowrap text-mint/75">· {saved} linhas baixadas</span>}
                 </button>
                 <p className="sr-only" aria-live="polite">
-                  {attempts.length > 0 && 'Processos públicos não se fecham: a tentativa ficou registrada na trilha de auditoria.'}
+                  {saved > 0
+                    ? `Trilha de auditoria baixada: ${saved} linhas em CSV.`
+                    : attempts.length > 0 && 'Processos públicos não se fecham: a tentativa ficou registrada na trilha de auditoria.'}
                 </p>
               </div>
             </div>
