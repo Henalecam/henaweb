@@ -59,7 +59,8 @@ export async function POST(request: Request) {
     // Honeypot: bots fill the hidden field. Pretend success.
     if (company) return NextResponse.json({ ok: true });
 
-    if (!name || !email || !subject || !message) {
+    // a name of only spaces is no name: the e-mail would read "Novo briefing de    "
+    if (!String(name ?? '').trim() || !email || !subject || !message) {
       return NextResponse.json({ error: 'Name, email, subject and message are required' }, { status: 400 });
     }
 

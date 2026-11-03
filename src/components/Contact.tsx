@@ -133,7 +133,8 @@ function Floating({ label, children, className = '', check = false }: { label: s
 // browser validation bubbles in our own words (and always in Portuguese)
 const explain = (e: FormEvent<HTMLInputElement>) => {
   const el = e.currentTarget;
-  if (el.validity.valueMissing) el.setCustomValidity(el.type === 'email' ? 'Precisamos do seu e-mail para responder o caso.' : 'Como podemos te chamar?');
+  // a name of only spaces passes `required`: the pattern asks for one letter, and gets the same question
+  if (el.validity.valueMissing || el.validity.patternMismatch) el.setCustomValidity(el.type === 'email' ? 'Precisamos do seu e-mail para responder o caso.' : 'Como podemos te chamar?');
   else if (el.validity.typeMismatch) el.setCustomValidity('Esse e-mail parece incompleto. Confere pra gente?');
 };
 const clear = (e: FormEvent<HTMLInputElement>) => e.currentTarget.setCustomValidity('');
@@ -640,7 +641,7 @@ export default function Contact() {
                   <Floating label="Seu nome" check>
                     {/* names and company names aren't dictionary words: no red squiggle under "Henrique" or "Neodent", and
                         phones start each word capitalised */}
-                    <input name="name" enterKeyHint="next" required maxLength={120} placeholder=" " autoComplete="name" autoCapitalize="words" spellCheck={false} className={`${field} pr-7`} onInvalid={explain} onInput={clear} />
+                    <input name="name" enterKeyHint="next" required pattern=".*\S.*" maxLength={120} placeholder=" " autoComplete="name" autoCapitalize="words" spellCheck={false} className={`${field} pr-7`} onInvalid={explain} onInput={clear} />
                   </Floating>
                   <div className="min-w-0">
                     <Floating label="E-mail" check>
