@@ -9,7 +9,10 @@ import { useEffect, useState } from 'react';
  * form keeps its own detailed message about a send that failed offline.
  */
 export default function NetStatus() {
-  const [net, setNet] = useState<'ok' | 'off' | 'back'>('ok');
+  const [net, setNet] = useState<'ok' | 'off' | 'back' | 'copy'>('ok');
+  // when the network never answered, the service worker serves the copy this browser kept and marks it (public/sw.js,
+  // Server-Timing "hena-copy" with the date it was saved): the reader is told, with a way to try again
+  const [kept, setKept] = useState('');
 
   useEffect(() => {
     let timer = 0;
@@ -23,6 +26,19 @@ export default function NetStatus() {
       timer = window.setTimeout(() => setNet('ok'), 3000);
     };
     if (!navigator.onLine) off();
+    else {
+      const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+      const mark = nav?.serverTiming?.find((t) => t.name === 'hena-copy');
+      if (mark) {
+        const when = new Date(mark.description);
+        setKept(
+          Number.isNaN(when.getTime())
+            ? ''
+            : new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(when).replace(', ', ' às '),
+        );
+        setNet('copy');
+      }
+    }
     window.addEventListener('offline', off);
     window.addEventListener('online', on);
     return () => {
@@ -39,19 +55,32 @@ export default function NetStatus() {
         <p
           key={net}
           data-net={net}
-          className={`toon-sm flex max-w-md items-center gap-2.5 rounded-2xl px-4 py-2 font-mono text-xs ${net === 'off' ? 'bg-paper text-acid-ink' : 'bg-[#3cc6b4] text-acid-ink'}`}
+          className={`toon-sm flex max-w-md items-center gap-2.5 rounded-2xl px-4 py-2 font-mono text-xs ${net === 'off' || net === 'copy' ? 'bg-paper text-acid-ink' : 'bg-[#3cc6b4] text-acid-ink'}`}
         >
           <span aria-hidden className="flex items-end gap-[2px]">
             {[4, 7, 10, 13].map((h, i) => (
               <span
                 key={h}
-                data-net-bar={net === 'off' && i > 0 ? 'off' : 'on'}
-                className={`w-[3px] rounded-[1px] ${net === 'off' && i > 0 ? 'bg-acid-ink/20' : 'bg-acid-ink'}`}
+                data-net-bar={net !== 'back' && i > 0 && (net === 'off' || i > 1) ? 'off' : 'on'}
+                className={`w-[3px] rounded-[1px] ${net !== 'back' && i > 0 && (net === 'off' || i > 1) ? 'bg-acid-ink/20' : 'bg-acid-ink'}`}
                 style={{ height: h }}
               />
             ))}
           </span>
-          {net === 'off' ? 'Sem sinal: o que já abriu continua aqui, páginas novas podem não carregar.' : 'Conexão de volta.'}
+          {net === 'off' ? (
+            'Sem sinal: o que já abriu continua aqui, páginas novas podem não carregar.'
+          ) : net === 'copy' ? (
+            <>
+              <span>
+                A rede não respondeu: esta é a cópia guardada neste navegador{kept && ` (de ${kept})`}.
+              </span>
+              <button type="button" onClick={() => location.reload()} className="pointer-events-auto min-h-8 shrink-0 font-bold underline underline-offset-2">
+                Tentar de novo
+              </button>
+            </>
+          ) : (
+            'Conexão de volta.'
+          )}
         </p>
       )}
     </div>

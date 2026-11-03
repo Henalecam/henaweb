@@ -72,7 +72,14 @@ self.addEventListener('fetch', (event) => {
         // keep fetching (and refreshing the copy) even when the answer below doesn't wait for it
         event.waitUntil(network.catch(() => {}));
         const copy = await cache.match(url.pathname);
-        const fallback = async () => copy || (await cache.match(OFFLINE)) || Response.error();
+        // the copy says it is one: a Server-Timing entry the page reads back (NetStatus) to tell the reader they are
+        // looking at the version kept on <date>, with a way to try the network again
+        const marked = () => {
+          const headers = new Headers(copy.headers);
+          headers.set('Server-Timing', `hena-copy;desc="${copy.headers.get('date') || ''}"`);
+          return new Response(copy.body, { status: copy.status, statusText: copy.statusText, headers });
+        };
+        const fallback = async () => (copy ? marked() : (await cache.match(OFFLINE)) || Response.error());
         // a connection that connects but never answers ("lie-fi": a weak signal, a captive Wi-Fi) used to leave the
         // page blank for as long as the browser cared to wait. The network still goes first; only if no answer has
         // started after a while does the reader get the copy this browser kept (6 s), or "sem_sinal.exe" for a page
