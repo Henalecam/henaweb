@@ -19,6 +19,10 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: 'pt-BR',
     dir: 'ltr',
     categories: ['business', 'productivity'],
+    // installed, a shortcut, a shared link or a henaweb.com link opens in the app's window that is already open,
+    // instead of stacking a new one: the contact draft lives in that window's tab (sessionStorage), so something
+    // shared into the app lands under what the visitor had already written instead of in an empty form
+    launch_handler: { client_mode: ['navigate-existing', 'auto'] },
     // installed, the app shows up in the phone's share sheet: a link or a note shared to HenaWeb lands in the
     // contact form's message ("Vi isto e quero algo parecido"), see app/compartilhado
     share_target: {
