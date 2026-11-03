@@ -271,6 +271,16 @@ html[data-still] [data-marquee-track] {
   transform: translate(2.5px, 2.5px);
   box-shadow: 1px 1px 0 var(--color-toon);
 }
+/* high-contrast themes drop every box-shadow, so the lift above left a toon button with no hover sign but a 2 px
+   nudge: there the border takes the system's highlight colour and the label underlines, the high-contrast norm for
+   hover (pointer hover only; focus keeps its ring) */
+@media (forced-colors: active) and (hover: hover) {
+  .toon-press:hover {
+    border-color: Highlight;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
 
 /* Sunset sky used by every dark section */
 .sky {
