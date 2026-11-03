@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { addToDraft } from '@/lib/draft';
 
 /** Puts what was shared into the contact draft (same-tab sessionStorage, as Contact keeps it) and opens the form. */
 export default function SharedIn() {
@@ -14,14 +15,8 @@ export default function SharedIn() {
     const parts = [title, text, link && !text.includes(link) ? link : ''].filter(Boolean);
     if (parts.length) {
       const line = `Vi isto e quero algo parecido:\n${parts.join('\n')}`;
-      try {
-        const d = JSON.parse(sessionStorage.getItem('hena:draft') ?? 'null') ?? { picked: [], timeline: '', fields: {} };
-        const msg: string = d.fields?.message ?? '';
-        d.fields = { ...d.fields, message: msg.includes(line) ? msg : [msg, line].filter(Boolean).join('\n\n') };
-        sessionStorage.setItem('hena:draft', JSON.stringify(d));
-      } catch {
-        // no storage: the form still opens, empty
-      }
+      // (without storage the form still opens, empty)
+      addToDraft(line);
     }
     location.replace('/#mensagem');
   }, []);

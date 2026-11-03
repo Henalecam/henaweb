@@ -6,6 +6,7 @@ import { services } from '@/lib/services';
 import { faqId } from '@/lib/slug';
 import { pastimes } from '@/lib/pastimes';
 import WinClose from './WinClose';
+import { addToDraft } from '@/lib/draft';
 
 // keywords are searched but not shown: a case is found by what it does, not only by its name
 type Item = { group: string; label: string; hint?: string; href: string; external?: boolean; keywords?: string };
@@ -374,12 +375,7 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
       } else location.hash = 'mensagem';
       return;
     }
-    try {
-      const d = JSON.parse(sessionStorage.getItem('hena:draft') ?? 'null') ?? { picked: [], timeline: '', fields: {} };
-      const msg: string = d.fields?.message ?? '';
-      d.fields = { ...d.fields, message: msg.includes(line) ? msg : [msg, line].filter(Boolean).join('\n\n') };
-      sessionStorage.setItem('hena:draft', JSON.stringify(d));
-    } catch {}
+    addToDraft(line);
     location.href = '/#mensagem';
   };
 
