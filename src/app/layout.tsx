@@ -173,7 +173,16 @@ const IMG_FAIL_SCRIPT = `(()=>{const mark=(i)=>{if(i.dataset.failed!==undefined)
 const SPECULATION_RULES = JSON.stringify({
   prefetch: [
     {
-      where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/api/*' } }] },
+      // pages only: not the API, nor files (the contact card .vcf, the RSS feed, QR codes: anything with a dot in its
+      // path), nor links that download or open a new tab. Pointing at "Salvar contato" used to fetch the .vcf
+      where: {
+        and: [
+          { href_matches: '/*' },
+          { not: { href_matches: '/api/*' } },
+          { not: { href_matches: '/*.*' } },
+          { not: { selector_matches: '[download], [target="_blank"]' } },
+        ],
+      },
       eagerness: 'moderate',
     },
   ],
