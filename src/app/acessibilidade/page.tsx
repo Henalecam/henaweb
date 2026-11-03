@@ -42,10 +42,10 @@ const jsonLd = {
 
 // each line is something this site really does (see the components named in the comments), not a promise
 const FEATURES: [string, string][] = [
-  ['Teclado do começo ao fim', 'Todo link, botão e campo é alcançável pelo Tab, com foco visível. "Pular para o conteúdo" e "Pular para o contato" são os primeiros itens da página, e a tecla ? lista os atalhos.'],
-  ['Menos movimento', 'Com "reduzir movimento" ligado no sistema, as animações de entrada, as faixas que correm sozinhas, os sons e as vibrações ficam parados ou desligados.'],
+  ['Teclado do começo ao fim', 'Todo link, botão e campo é alcançável pelo Tab, com foco visível. “Pular para o conteúdo” e “Pular para o contato” são os primeiros itens da página, e a tecla ? lista os atalhos.'],
+  ['Menos movimento', 'Com “reduzir movimento” ligado no sistema, as animações de entrada, as faixas que correm sozinhas, os sons e as vibrações ficam parados ou desligados.'],
   ['Pausar o que se mexe', 'A tecla P pausa e retoma as faixas animadas da página inicial; um toque faz o mesmo no celular.'],
-  ['Alto contraste', 'No modo de alto contraste do Windows o site usa as cores do sistema. Com "mais contraste" ou "menos transparência" ligados, sublinhados ficam sólidos e texturas somem.'],
+  ['Alto contraste', 'No modo de alto contraste do Windows o site usa as cores do sistema. Com “mais contraste” ou “menos transparência” ligados, sublinhados ficam sólidos e texturas somem.'],
   ['Alvos de toque', 'Botões e links isolados têm pelo menos 24 × 24 px de área de toque (WCAG 2.5.8), inclusive os botõezinhos das janelas.'],
   ['Leitores de tela', 'Imagens têm texto alternativo; desenhos e enfeites ficam ocultos para leitores de tela, e mensagens que mudam sozinhas são anunciadas.'],
   ['Formulário que ajuda', 'Rótulos sempre visíveis, erros explicados em português, sugestão para e-mail digitado errado e rascunho guardado na aba se você sair no meio.'],
@@ -107,7 +107,7 @@ export default function Acessibilidade() {
 
         <h2 className="mt-14 text-2xl font-medium tracking-tight">Como verificamos</h2>
         <p className="mt-3 leading-relaxed text-ink/75">
-          Cada mudança é testada em celular (390 px) e computador (1440 px), com e sem &quot;reduzir movimento&quot;. Na última verificação automática com o
+          Cada mudança é testada em celular (390 px) e computador (1440 px), com e sem “reduzir movimento”. Na última verificação automática com o
           axe-core, em 1º de novembro de 2026, as dez páginas principais (inclusive a de erro e a de sem conexão) e as janelas interativas não tiveram
           nenhuma violação encontrada. Na mesma rodada conferimos a versão impressa (PDF) das páginas, o modo de alto contraste do sistema e o tamanho
           dos alvos de toque.
