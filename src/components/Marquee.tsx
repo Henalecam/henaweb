@@ -49,7 +49,11 @@ export default function Marquee({
       target += (1 - target) * (1 - Math.exp(-dt / 280));
       rate += (target - rate) * (1 - Math.exp(-dt / 80));
       if (anim) anim.playbackRate = rate;
-      if (Math.abs(rate - 1) > 0.01 || Math.abs(target - 1) > 0.01) raf = requestAnimationFrame(tick);
+      // a long jump (End, the footer's "back to top", a ⌘K result) boosts every tape it flies past before
+      // OffscreenPause marks them: one that is now off screen drops the boost at once instead of easing it for 3 s
+      const gone = !!el.closest('[data-offscreen]');
+      if (gone) target = rate = 1;
+      if (!gone && (Math.abs(rate - 1) > 0.01 || Math.abs(target - 1) > 0.01)) raf = requestAnimationFrame(tick);
       else {
         if (anim) anim.playbackRate = 1;
         raf = 0;
