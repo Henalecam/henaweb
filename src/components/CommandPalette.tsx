@@ -9,7 +9,8 @@ import WinClose from './WinClose';
 import { addToDraft } from '@/lib/draft';
 
 // keywords are searched but not shown: a case is found by what it does, not only by its name
-type Item = { group: string; label: string; hint?: string; href: string; external?: boolean; keywords?: string };
+// `event`: an action on this page rather than a place (fired on window once the palette has closed)
+type Item = { group: string; label: string; hint?: string; href: string; external?: boolean; keywords?: string; event?: string };
 
 const fold = (s: string) =>
   s
@@ -68,6 +69,16 @@ const ITEMS: Item[] = [
     external: true,
   },
   { group: 'Ações', label: 'Mandar um e-mail', hint: site.email, href: `mailto:${site.email}` },
+  // the "?" list was only reachable by knowing "?" (or from /acessibilidade): someone typing "atalho" in the
+  // search is asking for exactly it
+  {
+    group: 'Ações',
+    label: 'Atalhos do teclado',
+    hint: 'tecla ?',
+    href: '/acessibilidade',
+    event: 'hena:help',
+    keywords: 'teclas teclado atalho shortcuts ajuda comandos interrogação',
+  },
   {
     group: 'Ações',
     label: 'Relatar uma barreira de acessibilidade',
@@ -479,7 +490,15 @@ export default function CommandPalette({ open, onClose, initialQuery = '' }: { o
                   tabIndex={-1}
                   data-placement="palette"
                   {...(it.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                  onClick={() => {
+                  onClick={(e) => {
+                    if (it.event) {
+                      // the list opens over this page (the href is only for a middle click or "copy link")
+                      e.preventDefault();
+                      onClose();
+                      const ev = it.event;
+                      requestAnimationFrame(() => window.dispatchEvent(new Event(ev)));
+                      return;
+                    }
                     // the words go along to the page this result opens, which marks them in its text (SearchMarks)
                     if (!it.external) leaveMarks(query);
                     onClose();
