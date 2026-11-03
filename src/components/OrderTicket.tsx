@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { process } from '@/lib/content';
 
 const INK = '#140a26';
@@ -50,6 +50,28 @@ export default function OrderTicket() {
     });
   }, []);
 
+  // the order's table is "sua empresa" until the visitor has started the contact form in this tab (further down
+  // the page): then the slip is made out to the company they typed, or to their first name, read again each time
+  // the slip comes into view from the same-tab draft Contact keeps (sessionStorage, never sent anywhere)
+  const [table, setTable] = useState('SUA EMPRESA');
+  const slip = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = slip.current;
+    if (!el) return;
+    const read = () => {
+      try {
+        const f = JSON.parse(sessionStorage.getItem('hena:draft') ?? 'null')?.fields ?? {};
+        const org = typeof f.org === 'string' ? f.org.trim().replace(/\s+/g, ' ') : '';
+        const first = typeof f.name === 'string' ? f.name.trim().split(/\s+/)[0] : '';
+        const who = org || (/^[\p{L}'’-]{1,16}$/u.test(first) ? first : '');
+        setTable(who ? (who.length > 20 ? `${who.slice(0, 19)}…` : who).toUpperCase() : 'SUA EMPRESA');
+      } catch {}
+    };
+    const io = new IntersectionObserver((es) => es.some((e) => e.isIntersecting) && read());
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div className="relative z-20 mx-auto w-full max-w-sm pt-10">
       {/* order wheel clip */}
@@ -58,7 +80,7 @@ export default function OrderTicket() {
         <div className="-mt-1 h-7 w-16 rounded-b-xl border-[3px] border-t-0 border-toon bg-[#8b5cc7]" />
       </div>
 
-      <div data-ticket className="relative rotate-[1.5deg] [filter:drop-shadow(6px_6px_0_#140a26)]">
+      <div ref={slip} data-ticket className="relative rotate-[1.5deg] [filter:drop-shadow(6px_6px_0_#140a26)]">
         <div className="bg-[#fffdf6] px-6 pt-8 pb-5 font-mono text-[0.8rem] leading-relaxed text-acid-ink">
           {/* coffee cup ring */}
           <div aria-hidden className="pointer-events-none absolute top-[38%] right-3 h-24 w-24 rounded-full border-[5px] border-[#a8743f]/20" />
@@ -73,7 +95,7 @@ export default function OrderTicket() {
             <span>PEDIDO</span>
             <span className="text-right font-bold">Nº 0142</span>
             <span>MESA</span>
-            <span className="text-right">SUA EMPRESA</span>
+            <span className="min-w-0 truncate text-right">{table}</span>
             <span>DATA</span>
             <span className="text-right tabular-nums">
               {stamp.date} {stamp.time}
