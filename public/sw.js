@@ -40,6 +40,9 @@ self.addEventListener('activate', (event) => {
     (async () => {
       const keep = new Set(Object.keys(LIMIT));
       for (const k of await caches.keys()) if (!keep.has(k)) await caches.delete(k);
+      // navigation preload: the page request starts while the worker is still waking up, instead of after it
+      // (a sleeping worker cost each navigation its start-up time before the network was even asked)
+      if (self.registration.navigationPreload) await self.registration.navigationPreload.enable().catch(() => {});
       await self.clients.claim();
     })(),
   );
@@ -55,7 +58,8 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       (async () => {
         try {
-          const res = await fetch(req);
+          // the preloaded response when there is one (see activate), else a normal fetch
+          const res = (await Promise.resolve(event.preloadResponse).catch(() => undefined)) || (await fetch(req));
           // keep a copy of real pages (not error pages, not redirects), keyed without query or hash
           if (res.ok && res.type === 'basic' && (res.headers.get('content-type') || '').includes('text/html')) {
             const cache = await caches.open(PAGES);
