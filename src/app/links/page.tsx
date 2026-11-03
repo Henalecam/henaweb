@@ -74,8 +74,12 @@ export default function Links() {
               </li>
             </ul>
 
-            <p className="label mt-8 !text-acid-ink/70">Serviços</p>
-            <ul className="mt-3 grid grid-cols-2 gap-2.5">
+            {/* the two groups are headings, not just labels: a screen reader's heading list (and its "next heading" key)
+                jumps from the main buttons to the services or to the rest, and each list is named by its heading */}
+            <h2 id="links-servicos" className="label mt-8 !text-acid-ink/70">
+              Serviços
+            </h2>
+            <ul aria-labelledby="links-servicos" className="mt-3 grid grid-cols-2 gap-2.5">
               {services.map((s) => (
                 <li key={s.slug} {...pop()}>
                   <a href={`/servicos/${s.slug}`} className="toon-sm toon-press flex h-full min-h-12 items-center rounded-xl bg-white px-3 py-2 text-sm font-medium">
@@ -85,8 +89,10 @@ export default function Links() {
               ))}
             </ul>
 
-            <p className="label mt-8 !text-acid-ink/70">Mais</p>
-            <ul className="mt-3 flex flex-col gap-2.5">
+            <h2 id="links-mais" className="label mt-8 !text-acid-ink/70">
+              Mais
+            </h2>
+            <ul aria-labelledby="links-mais" className="mt-3 flex flex-col gap-2.5">
               <li {...pop()}>
                 <a href="/casos" className="toon-sm toon-press flex min-h-12 items-center justify-between rounded-xl bg-white px-4 text-sm font-medium">
                   Casos resolvidos <span aria-hidden>→</span>
