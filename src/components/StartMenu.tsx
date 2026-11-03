@@ -21,6 +21,9 @@ export default function StartMenu() {
   const menu = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [off, setOff] = useState(false);
+  // like the 95 menu's "Documentos" (recently opened files): a case the visitor started in this tab's contact form
+  // and left half-written shows up here, one click from where it waits (the same-tab draft Contact keeps)
+  const [draft, setDraft] = useState(false);
 
   // the popover lives in the top layer: sit it on the button, opening upwards like the real one
   useEffect(() => {
@@ -29,10 +32,23 @@ export default function StartMenu() {
     const onToggle = (e: Event) => {
       const isOpen = (e as ToggleEvent).newState === 'open';
       setOpen(isOpen);
+      if (isOpen) {
+        try {
+          const d = JSON.parse(sessionStorage.getItem('hena:draft') ?? 'null');
+          setDraft(Boolean(d && (d.picked?.length || Object.values(d.fields ?? {}).some((v) => typeof v === 'string' && v.trim()))));
+        } catch {
+          setDraft(false);
+        }
+      }
       if (!isOpen || !btn.current) return;
-      const r = btn.current.getBoundingClientRect();
-      m.style.left = `${Math.max(8, Math.min(r.left, innerWidth - m.offsetWidth - 8))}px`;
-      m.style.top = `${Math.max(8, r.top - m.offsetHeight - 6)}px`;
+      const place = () => {
+        const r = btn.current!.getBoundingClientRect();
+        m.style.left = `${Math.max(8, Math.min(r.left, innerWidth - m.offsetWidth - 8))}px`;
+        m.style.top = `${Math.max(8, r.top - m.offsetHeight - 6)}px`;
+      };
+      place();
+      // once more after React has drawn the draft item (if any), which makes the menu taller
+      requestAnimationFrame(place);
       m.querySelector<HTMLElement>('a, button')?.focus();
     };
     m.addEventListener('toggle', onToggle);
@@ -85,6 +101,17 @@ export default function StartMenu() {
                   </a>
                 </li>
               ))}
+              {draft && (
+                <li>
+                  <a href="/#mensagem" onClick={close} className="start-item">
+                    <span aria-hidden className="w-5 text-center">📝</span>
+                    <span className="flex flex-col leading-tight">
+                      Continuar o seu caso
+                      <span className="font-mono text-[0.65rem] text-acid-ink/75">rascunho_do_caso.txt</span>
+                    </span>
+                  </a>
+                </li>
+              )}
               <li>
                 <button
                   type="button"
