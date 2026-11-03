@@ -44,6 +44,18 @@ function find(words: string[]) {
   return ranges.sort((a, b) => a.compareBoundaryPoints(Range.START_TO_START, b));
 }
 
+/** Puts the keyboard on the paragraph of a mark (made focusable just for the visit), so the next Tab carries on
+ * from where the reader was, not from the top; with no mark, on the start of the content. */
+function landNear(r: Range | undefined) {
+  const el = r?.startContainer.parentElement?.closest<HTMLElement>('p, li, h1, h2, h3, h4, dd, td, figcaption, blockquote') ?? document.getElementById('conteudo');
+  if (!el) return;
+  if (!el.hasAttribute('tabindex')) {
+    el.setAttribute('tabindex', '-1');
+    el.addEventListener('blur', () => el.removeAttribute('tabindex'), { once: true });
+  }
+  el.focus({ preventScroll: true });
+}
+
 /**
  * A highlighter pen for the search: the words typed in the search (⌘K) stay marked on the page its result
  * opened, with the CSS Custom Highlight API (no change to the DOM). A small tag under the header counts them,
@@ -53,6 +65,7 @@ export default function SearchMarks() {
   const [marks, setMarks] = useState<{ words: string[]; n: number } | null>(null);
   const ranges = useRef<Range[]>([]);
   const at = useRef(-1);
+  const chip = useRef<HTMLDivElement>(null);
 
   const next = () => {
     const rs = ranges.current;
@@ -91,7 +104,12 @@ export default function SearchMarks() {
     const onMarks = (e: Event) => setTimeout(() => apply((e as CustomEvent<string[]>).detail), 300);
     const onKey = (e: KeyboardEvent) => {
       if (!CSS.highlights.has(NAME) || document.querySelector('[role="dialog"][aria-modal="true"], dialog[open]')) return;
-      if (e.key === 'Escape') clear();
+      if (e.key === 'Escape') {
+        const inside = !!chip.current?.contains(document.activeElement);
+        const near = ranges.current[Math.max(0, at.current)];
+        clear();
+        if (inside) landNear(near);
+      }
       // N steps to the next mark, like "próxima ↓" (not while typing, nor with a modifier: Ctrl+N is a new window)
       const t = e.target as HTMLElement;
       if ((e.key === 'n' || e.key === 'N') && !e.ctrlKey && !e.metaKey && !e.altKey && !t.closest('input, textarea, select, [contenteditable]')) {
@@ -112,11 +130,17 @@ export default function SearchMarks() {
   if (!marks) return null;
 
   const wipe = () => {
+    // the tag unmounts under the keyboard (× or "próxima ↓" then Esc): focus would drop onto <body> and the next
+    // Tab start over from the top, so it lands on the passage it was marking instead
+    const inside = !!chip.current?.contains(document.activeElement);
+    const near = ranges.current[Math.max(0, at.current)];
     window.dispatchEvent(new Event('hena:marks-clear'));
+    if (inside) landNear(near);
   };
 
   return (
     <div
+      ref={chip}
       data-print-hide
       className="toon-sm fixed top-[5.25rem] left-1/2 z-[54] flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-1 rounded-full bg-lemon py-1 pr-1 pl-3.5 font-mono text-xs text-acid-ink"
     >
