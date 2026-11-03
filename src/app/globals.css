@@ -1044,6 +1044,26 @@ html {
     [data-case-list][data-view='details'] > li > a > p:first-of-type {
       font-size: 1rem;
     }
+    /* a list has no pictures, so pointing at a row (or reaching it with Tab) pops its screenshot window up above
+       the row, like Explorer's thumbnail tip: it covers the row above, never the one being read. Decorative and
+       out of the way of the pointer; the picture only loads the first time it is asked for */
+    [data-case-list][data-view='details'] > li > a:is(:hover, :focus-visible) [data-case-window] {
+      display: block;
+      position: absolute;
+      left: 16rem;
+      bottom: calc(100% - 0.6rem);
+      z-index: 5;
+      width: 15rem;
+      pointer-events: none;
+      rotate: -2deg;
+      translate: none;
+      box-shadow: 6px 6px 0 var(--color-toon);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      [data-case-list][data-view='details'] > li > a:is(:hover, :focus-visible) [data-case-window] {
+        animation: case-tip 0.18s ease-out both;
+      }
+    }
     /* the column headers above the rows (casos/page.tsx), on the same grid as each row's link */
     [data-case-cols]:has(+ [data-case-list][data-view='details']) {
       display: grid;
@@ -1680,6 +1700,10 @@ html {
 }
 @keyframes numeral-ink {
   to { background-position: 0 100%; }
+}
+
+@keyframes case-tip {
+  from { opacity: 0; scale: 0.92; }
 }
 
 /* a shared "link to this passage" (QuoteLink, #:~:text=) lands on the sentence marked like the site's own
