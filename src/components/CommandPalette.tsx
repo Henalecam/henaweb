@@ -7,6 +7,7 @@ import { faqId } from '@/lib/slug';
 import { pastimes } from '@/lib/pastimes';
 import WinClose from './WinClose';
 import { addToDraft } from '@/lib/draft';
+import { CONSENT_OPEN } from '@/lib/consent';
 
 // keywords are searched but not shown: a case is found by what it does, not only by its name
 // `event`: an action on this page rather than a place (fired on window once the palette has closed)
@@ -78,6 +79,15 @@ const ITEMS: Item[] = [
     href: '/acessibilidade',
     event: 'hena:help',
     keywords: 'teclas teclado atalho shortcuts ajuda comandos interrogação',
+  },
+  // the cookie choice could only be revisited from a small footer button at the very bottom of the page
+  {
+    group: 'Ações',
+    label: 'Preferências de cookies',
+    hint: 'mudar a escolha',
+    href: '#cookies',
+    event: CONSENT_OPEN,
+    keywords: 'cookies privacidade lgpd rastreamento medição analytics pixel consentimento',
   },
   {
     group: 'Ações',

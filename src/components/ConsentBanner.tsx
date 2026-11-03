@@ -51,6 +51,7 @@ export default function ConsentBanner({ tools }: { tools: string[] }) {
   // the title-bar cookie reacts to the answer as the window slides away: bitten for "Aceitar", left whole for "Recusar"
   const [bitten, setBitten] = useState(false);
   const box = useRef<HTMLElement>(null);
+  const focusOnShow = useRef(false);
 
   // while the notice is up it covers the bottom of the screen (a fifth of a phone): Tab used to land on links
   // hidden right under it (36 of 76 on the home page at 390 px). The page's scroll padding grows by the
@@ -85,11 +86,21 @@ export default function ConsentBanner({ tools }: { tools: string[] }) {
       window.addEventListener('scroll', onScroll, { passive: true });
       onScroll();
     }
-    const reopen = () => setOpen(true);
+    // asked for on purpose (the footer button, ⌘K, a "#cookies" link): the keyboard lands on the choice itself,
+    // not left behind on the closed search or at the top of the page
+    const reopen = () => {
+      focusOnShow.current = true;
+      setOpen(true);
+    };
     window.addEventListener(CONSENT_OPEN, reopen);
+    // "#cookies" in the address opens the choice too: a link that can be sent ("revise aqui") or opened in a new tab
+    const onHash = () => location.hash === '#cookies' && reopen();
+    onHash();
+    window.addEventListener('hashchange', onHash);
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener(CONSENT_OPEN, reopen);
+      window.removeEventListener('hashchange', onHash);
     };
   }, []);
 
@@ -99,6 +110,11 @@ export default function ConsentBanner({ tools }: { tools: string[] }) {
     const id = requestAnimationFrame(() => setShown(true));
     return () => cancelAnimationFrame(id);
   }, [open]);
+  useEffect(() => {
+    if (!shown || !focusOnShow.current) return;
+    focusOnShow.current = false;
+    box.current?.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
+  }, [shown]);
 
   if (!open) return null;
 
