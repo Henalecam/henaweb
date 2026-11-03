@@ -352,7 +352,17 @@ export default async function ServicePage({ params }: PageProps<'/servicos/[slug
                 const n = projects.filter((p) => p.service === o.slug).length;
                 const key = o === nextSvc ? '→' : o === prevSvc ? '←' : null;
                 return (
-                  <li key={o.slug} className="pt-3.5">
+                  <li key={o.slug} className="group/f relative pt-3.5">
+                    {/* the folder's contents: one sheet of paper per solved case (up to three) peeking out behind the
+                        front, which rise a little when the folder is pointed at or focused; an empty folder shows none */}
+                    {Array.from({ length: Math.min(n, 3) }, (_, k) => (
+                      <span
+                        key={k}
+                        aria-hidden
+                        style={{ right: `${1 + k * 1.6}rem`, rotate: `${[-2, 3, -4][k]}deg`, transitionDelay: `${k * 40}ms` }}
+                        className="absolute top-0 h-8 w-16 rounded-sm border-2 border-toon bg-paper bg-[repeating-linear-gradient(transparent_0_5px,rgb(20_10_38/0.18)_5px_6px)] bg-[length:70%_100%] bg-[position:50%_6px] bg-no-repeat motion-safe:transition-transform motion-safe:duration-200 group-focus-within/f:-translate-y-2 group-hover/f:-translate-y-2"
+                      />
+                    ))}
                     {/* named by the service, described by its headline and track record (the whole card was the name) */}
                     <a
                       href={`/servicos/${o.slug}`}
