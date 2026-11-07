@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 380" role="img" aria-labelledby="buscas-sem-clique-t" class="chart">
+  <title id="buscas-sem-clique-t">Buscas no Google que terminam sem nenhum clique. % do total de buscas nos EUA</title>
+  <style>
+  .surface{fill:#ffffff}.t1{fill:#0b0b0b}.t2{fill:#52514e}.t3{fill:#77766f}.grid{stroke:#e6e5e0}.base{stroke:#c9c8c1}.bar{fill:#5B3DF5}.bar-soft{fill:#5B3DF5;opacity:.45}
+  text{font-family:Inter,system-ui,sans-serif}
+  @media (prefers-color-scheme: dark){.surface{fill:#1a1a19}.t1{fill:#f0efec}.t2{fill:#c3c2b7}.t3{fill:#9d9c94}.grid{stroke:#383835}.base{stroke:#55544f}.bar{fill:#8a74ff}.bar-soft{fill:#8a74ff;opacity:.5}}</style>
+  <rect width="680" height="380" class="surface"/>
+  
+  <text x="24" y="38" class="t1" font-size="19" font-weight="700">Buscas no Google que terminam sem nenhum clique</text>
+  <text x="24" y="62" class="t2" font-size="14">% do total de buscas nos EUA</text><line x1="64" x2="648" y1="296" y2="296" class="grid" stroke-width="1"/><text x="54" y="300" text-anchor="end" class="t3" font-size="12">0%</text><line x1="64" x2="648" y1="245" y2="245" class="grid" stroke-width="1"/><text x="54" y="249" text-anchor="end" class="t3" font-size="12">25%</text><line x1="64" x2="648" y1="194" y2="194" class="grid" stroke-width="1"/><text x="54" y="198" text-anchor="end" class="t3" font-size="12">50%</text><line x1="64" x2="648" y1="143" y2="143" class="grid" stroke-width="1"/><text x="54" y="147" text-anchor="end" class="t3" font-size="12">75%</text><line x1="64" x2="648" y1="92" y2="92" class="grid" stroke-width="1"/><text x="54" y="96" text-anchor="end" class="t3" font-size="12">100%</text><line x1="64" x2="648" y1="296" y2="296" class="base" stroke-width="1"/><g class="mark" data-tip="2019: 49% (aprox., outra metodologia)">
+      <rect x="71.99999999999999" y="92" width="178.66666666666666" height="204" fill="transparent"/>
+      <path d="M149.33333333333331,296V200.04000000000002Q149.33333333333331,196.04000000000002 153.33333333333331,196.04000000000002H169.33333333333331Q173.33333333333331,196.04000000000002 173.33333333333331,200.04000000000002V296Z" class="bar-soft"/>
+      <text x="161.33333333333331" y="186.04000000000002" text-anchor="middle" class="t1" font-size="16" font-weight="700">49%</text>
+      <text x="161.33333333333331" y="318" text-anchor="middle" class="t2" font-size="13.5" font-weight="600">2019</text>
+      <text x="161.33333333333331" y="335" text-anchor="middle" class="t3" font-size="11">aprox., outra metodologia</text>
+    </g><g class="mark" data-tip="2024: 60,5%">
+      <rect x="266.66666666666663" y="92" width="178.66666666666666" height="204" fill="transparent"/>
+      <path d="M343.99999999999994,296V176.682Q343.99999999999994,172.682 347.99999999999994,172.682H363.99999999999994Q367.99999999999994,172.682 367.99999999999994,176.682V296Z" class="bar-soft"/>
+      <text x="355.99999999999994" y="162.682" text-anchor="middle" class="t1" font-size="16" font-weight="700">60%</text>
+      <text x="355.99999999999994" y="318" text-anchor="middle" class="t2" font-size="13.5" font-weight="600">2024</text>
+      
+    </g><g class="mark" data-tip="2026: 68,0% (no celular: ~77%)">
+      <rect x="461.3333333333333" y="92" width="178.66666666666666" height="204" fill="transparent"/>
+      <path d="M538.6666666666666,296V161.2596Q538.6666666666666,157.2596 542.6666666666666,157.2596H558.6666666666666Q562.6666666666666,157.2596 562.6666666666666,161.2596V296Z" class="bar"/>
+      <text x="550.6666666666666" y="147.2596" text-anchor="middle" class="t1" font-size="22" font-weight="700">68%</text>
+      <text x="550.6666666666666" y="318" text-anchor="middle" class="t2" font-size="13.5" font-weight="600">2026</text>
+      <text x="550.6666666666666" y="335" text-anchor="middle" class="t3" font-size="11">no celular: ~77%</text>
+    </g><text x="24" y="364" class="t3" font-size="11.5">Fonte: SparkToro/Similarweb (2024, jan. a abr. de 2026); Jumpshot (2019, metodologia anterior)</text>
+</svg>

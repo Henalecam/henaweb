@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 270" role="img" aria-labelledby="brasil-ia-compras-t" class="chart">
+  <title id="brasil-ia-compras-t">O brasileiro já pergunta para a IA antes de comprar. Pesquisa com 1.200 brasileiros, 2026</title>
+  <style>
+  .surface{fill:#ffffff}.t1{fill:#0b0b0b}.t2{fill:#52514e}.t3{fill:#77766f}.grid{stroke:#e6e5e0}.base{stroke:#c9c8c1}.bar{fill:#5B3DF5}.bar-soft{fill:#5B3DF5;opacity:.45}
+  text{font-family:Inter,system-ui,sans-serif}
+  @media (prefers-color-scheme: dark){.surface{fill:#1a1a19}.t1{fill:#f0efec}.t2{fill:#c3c2b7}.t3{fill:#9d9c94}.grid{stroke:#383835}.base{stroke:#55544f}.bar{fill:#8a74ff}.bar-soft{fill:#8a74ff;opacity:.5}}</style>
+  <rect width="680" height="270" class="surface"/>
+  
+  <text x="24" y="38" class="t1" font-size="19" font-weight="700">O brasileiro já pergunta para a IA antes de comprar</text>
+  <text x="24" y="62" class="t2" font-size="14">Pesquisa com 1.200 brasileiros, 2026</text><g class="mark" data-tip="80% dos 1.200 entrevistados usam IA no dia a dia">
+      <rect x="24" y="92" width="308" height="140" rx="10" class="grid" fill="none" stroke-width="1"/>
+      <rect x="44" y="114" width="28" height="6" rx="3" class="bar"/>
+      <text x="44" y="174" class="t1" font-size="48" font-weight="800">80%</text>
+      <text x="44" y="200" class="t2" font-size="13.5">dos brasileiros usam ao menos uma</text><text x="44" y="217" class="t2" font-size="13.5">ferramenta de IA no dia a dia</text>
+    </g><g class="mark" data-tip="46% dos usuários de IA, cerca de 37% de todos os entrevistados">
+      <rect x="348" y="92" width="308" height="140" rx="10" class="grid" fill="none" stroke-width="1"/>
+      <rect x="368" y="114" width="28" height="6" rx="3" class="bar"/>
+      <text x="368" y="174" class="t1" font-size="48" font-weight="800">46%</text>
+      <text x="368" y="200" class="t2" font-size="13.5">de quem usa IA pesquisa produtos e</text><text x="368" y="217" class="t2" font-size="13.5">serviços com ela antes de comprar</text>
+    </g><text x="24" y="254" class="t3" font-size="11.5">Fonte: Fbiz e On The Go, pesquisa Prompt-me, 2026</text>
+</svg>
