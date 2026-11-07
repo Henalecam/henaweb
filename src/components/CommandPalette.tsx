@@ -58,6 +58,13 @@ const ITEMS: Item[] = [
     ].join(' '),
   })),
   // the answer is searched too: "prazo" finds "Em quanto tempo o primeiro resultado aparece?"
+  // published posts only (titles baked in at build by next.config.ts): "lgpd" or "erp" also finds the articles
+  ...(JSON.parse(process.env.NEXT_PUBLIC_BLOG ?? '[]') as { slug: string; title: string; tags: string[] }[]).map((p) => ({
+    group: 'Blog',
+    label: p.title,
+    href: `/blog/${p.slug}`,
+    keywords: p.tags.join(' '),
+  })),
   ...homeFaq.map((f) => ({ group: 'Perguntas', label: f.q, href: `/#${faqId(f.q)}`, keywords: f.a })),
   ...services.flatMap((s) =>
     s.faq.map((f) => ({ group: 'Perguntas', label: f.q, hint: s.name, href: `/servicos/${s.slug}#${faqId(f.q)}`, keywords: f.a })),

@@ -1,6 +1,7 @@
 import { homeFaq, projects, site } from '@/lib/content';
 import { services } from '@/lib/services';
 import { pastimes } from '@/lib/pastimes';
+import { publishedPosts } from '@/lib/blog';
 
 /**
  * /llms.txt: a plain Markdown map of the site for AI assistants and answer engines (llmstxt.org).
@@ -32,6 +33,17 @@ export function GET() {
     '',
     ...pastimes.map((p) => `- [${p.name}](${p.url})${p.action === 'Jogar' ? ' (jogo)' : ''}`),
     '',
+    // each post also exists as plain Markdown (/blog/<slug>.md), the easiest form for an assistant to read and cite
+    ...(publishedPosts().length
+      ? [
+          '## Blog',
+          '',
+          `Índice: ${site.url}/blog · RSS: ${site.url}/blog/feed.xml`,
+          '',
+          ...publishedPosts().map((p) => `- [${p.title}](${site.url}/blog/${p.slug}) ([Markdown](${site.url}/blog/${p.slug}.md)): ${p.answer}`),
+          '',
+        ]
+      : []),
     '## Mais',
     '',
     `- [Acessibilidade](${site.url}/acessibilidade): o que o site faz para ser usado por todo mundo e como relatar uma barreira`,

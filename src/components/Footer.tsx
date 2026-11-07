@@ -25,7 +25,16 @@ function footerMessage(path: string): string | undefined {
   if (service) return `Olá! Quero conversar sobre ${service} com a HenaWeb.`;
 }
 
-const studioLinks = [...nav.filter((n) => n.label !== 'Casos'), { label: 'Perguntas', href: '/#perguntas' }, { label: 'Contato', href: '/#contato' }, { label: 'Passa tempo', href: '/passatempo' }, { label: 'Acessibilidade', href: '/acessibilidade' }];
+// the blog joins the list once it has a published post (next.config.ts bakes the list in at build)
+const HAS_BLOG = (process.env.NEXT_PUBLIC_BLOG ?? '[]') !== '[]';
+const studioLinks = [
+  ...nav.filter((n) => n.label !== 'Casos'),
+  { label: 'Perguntas', href: '/#perguntas' },
+  ...(HAS_BLOG ? [{ label: 'Blog', href: '/blog' }] : []),
+  { label: 'Contato', href: '/#contato' },
+  { label: 'Passa tempo', href: '/passatempo' },
+  { label: 'Acessibilidade', href: '/acessibilidade' },
+];
 
 // the last change to the site (next.config bakes the last commit's date in at build), in Curitiba's calendar
 const UPDATED = process.env.NEXT_PUBLIC_UPDATED

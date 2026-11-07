@@ -1,6 +1,9 @@
 import type { NextConfig } from 'next';
 import { execFileSync } from 'node:child_process';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { pastimes } from './src/lib/pastimes';
+import { checkFrontmatter, parseFile } from './src/lib/blogFormat';
 
 // Content-Security-Policy. Scripts stay 'unsafe-inline' because the pages are static (a nonce would
 // force dynamic rendering) and Next/JSON-LD/analytics bootstraps are inline; the policy still pins
@@ -38,8 +41,26 @@ function lastUpdate() {
   return new Date().toISOString();
 }
 
+// the published posts' titles, baked in for the client code that can't read files (the footer link and the ⌘K
+// search): small, and only what a link needs. Drafts never get here.
+function blogIndex() {
+  try {
+    const dir = join(process.cwd(), 'content', 'blog');
+    return JSON.stringify(
+      readdirSync(dir)
+        .filter((f) => f.endsWith('.md') && !f.startsWith('_') && f !== 'README.md')
+        .map((f) => ({ slug: f.replace(/\.md$/, ''), ...checkFrontmatter(parseFile(readFileSync(join(dir, f), 'utf8')).data).fm }))
+        .filter((p) => !p.draft && p.title)
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .map((p) => ({ slug: p.slug, title: p.title, tags: p.tags })),
+    );
+  } catch {
+    return '[]';
+  }
+}
+
 const nextConfig: NextConfig = {
-  env: { NEXT_PUBLIC_UPDATED: lastUpdate() },
+  env: { NEXT_PUBLIC_UPDATED: lastUpdate(), NEXT_PUBLIC_BLOG: blogIndex() },
   poweredByHeader: false,
   images: { formats: ['image/avif', 'image/webp'] },
   async headers() {
@@ -79,13 +100,18 @@ const nextConfig: NextConfig = {
       })),
     ];
   },
+  // a post's plain Markdown (for AI assistants) at the address people and crawlers guess: /blog/<slug>.md
+  async rewrites() {
+    return [{ source: '/blog/:slug([a-z0-9-]+).md', destination: '/blog/md/:slug' }];
+  },
   async redirects() {
     return [
       { source: '/sobre', destination: '/#studio', permanent: true },
       { source: '/servicos', destination: '/#capacidades', permanent: true },
       { source: '/portfolio', destination: '/#projetos', permanent: true },
       { source: '/contato', destination: '/#contato', permanent: true },
-      { source: '/blog', destination: '/', permanent: false },
+      { source: '/artigos', destination: '/blog', permanent: true },
+      { source: '/artigos/:slug', destination: '/blog/:slug', permanent: true },
       // the usual names for a link-in-bio page, typed from memory or a printed card
       { source: '/bio', destination: '/links', permanent: true },
       { source: '/link', destination: '/links', permanent: true },
