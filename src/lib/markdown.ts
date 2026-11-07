@@ -161,7 +161,8 @@ export function faqOf(blocks: Block[]): { q: string; a: string }[] {
   const out: { q: string; a: string }[] = [];
   for (let i = start + 1; i < blocks.length; i++) {
     const b = blocks[i];
-    if (b.t === 'h' && b.level === 2) break;
+    // a new ## section or a --- rule ends the FAQ ("---" then "### Fontes" used to become a sixth question)
+    if ((b.t === 'h' && b.level === 2) || b.t === 'hr') break;
     if (b.t === 'h' && b.level === 3) out.push({ q: b.text, a: '' });
     else if (out.length) {
       const text = b.t === 'p' ? inlineText(b.c) : b.t === 'ul' || b.t === 'ol' ? b.items.map(inlineText).join('; ') : '';

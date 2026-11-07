@@ -37,6 +37,7 @@ artigo estático, com tudo que Google e IAs precisam (JSON-LD, sitemap, RSS, llm
 - Imagens: `![descrição obrigatória](/blog/arquivo.jpg "legenda opcional")`, com o arquivo em `public/blog/`.
 - **Perguntas frequentes**: uma seção `## Perguntas frequentes` com `### Pergunta?` e a resposta embaixo vira
   FAQPage (rich result no Google e fonte fácil para IAs).
+- **Fontes** de números e estudos: numa seção `## Fontes` no fim, depois das perguntas (com links).
 - Não funciona (o check acusa): tabelas, HTML, `#` título, `####`.
 
 ## O que faz um artigo ser encontrado (orgânico e IA)
