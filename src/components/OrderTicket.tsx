@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { process } from '@/lib/content';
 
 const INK = '#140a26';
@@ -50,6 +50,28 @@ export default function OrderTicket() {
     });
   }, []);
 
+  // the order's table is "sua empresa" until the visitor has started the contact form in this tab (further down
+  // the page): then the slip is made out to the company they typed, or to their first name, read again each time
+  // the slip comes into view from the same-tab draft Contact keeps (sessionStorage, never sent anywhere)
+  const [table, setTable] = useState('SUA EMPRESA');
+  const slip = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = slip.current;
+    if (!el) return;
+    const read = () => {
+      try {
+        const f = JSON.parse(sessionStorage.getItem('hena:draft') ?? 'null')?.fields ?? {};
+        const org = typeof f.org === 'string' ? f.org.trim().replace(/\s+/g, ' ') : '';
+        const first = typeof f.name === 'string' ? f.name.trim().split(/\s+/)[0] : '';
+        const who = org || (/^[\p{L}'’-]{1,16}$/u.test(first) ? first : '');
+        setTable(who ? (who.length > 20 ? `${who.slice(0, 19)}…` : who).toUpperCase() : 'SUA EMPRESA');
+      } catch {}
+    };
+    const io = new IntersectionObserver((es) => es.some((e) => e.isIntersecting) && read());
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div className="relative z-20 mx-auto w-full max-w-sm pt-10">
       {/* order wheel clip */}
@@ -58,7 +80,7 @@ export default function OrderTicket() {
         <div className="-mt-1 h-7 w-16 rounded-b-xl border-[3px] border-t-0 border-toon bg-[#8b5cc7]" />
       </div>
 
-      <div data-ticket className="relative rotate-[1.5deg] [filter:drop-shadow(6px_6px_0_#140a26)]">
+      <div ref={slip} data-ticket className="relative rotate-[1.5deg] [filter:drop-shadow(6px_6px_0_#140a26)]">
         <div className="bg-[#fffdf6] px-6 pt-8 pb-5 font-mono text-[0.8rem] leading-relaxed text-acid-ink">
           {/* coffee cup ring */}
           <div aria-hidden className="pointer-events-none absolute top-[38%] right-3 h-24 w-24 rounded-full border-[5px] border-[#a8743f]/20" />
@@ -73,7 +95,7 @@ export default function OrderTicket() {
             <span>PEDIDO</span>
             <span className="text-right font-bold">Nº 0142</span>
             <span>MESA</span>
-            <span className="text-right">SUA EMPRESA</span>
+            <span className="min-w-0 truncate text-right">{table}</span>
             <span>DATA</span>
             <span className="text-right tabular-nums">
               {stamp.date} {stamp.time}
@@ -89,13 +111,31 @@ export default function OrderTicket() {
             <span>PRAZO</span>
           </div>
           <ul className="mt-2 flex flex-col gap-3">
-            {process.map((s) => (
+            {process.map((s, i) => (
               <li key={s.n}>
                 <div className="flex items-baseline gap-2 font-bold">
                   <span className="shrink-0">1×</span>
-                  <span className="shrink-0">{s.title.toUpperCase()}</span>
+                  {/* each line of the order is also its table of contents: it leads back to that step of the menu */}
+                  <a
+                    href={`#etapa-${i + 1}`}
+                    // the smooth scroller's own anchor glide overshot this step by ~370 px on desktop (the stage
+                    // above re-measures mid-flight); an immediate jump lands it at the top of the screen
+                    onClick={(e) => {
+                      const step = document.getElementById(`etapa-${i + 1}`);
+                      if (!step) return;
+                      e.preventDefault();
+                      // with the smooth scroller on, it makes the jump (see SmoothScroll); reduced motion has none
+                      const handled = !window.dispatchEvent(new CustomEvent('hena:jump', { detail: step.id, cancelable: true }));
+                      if (!handled) step.scrollIntoView({ block: 'start' });
+                      history.replaceState(history.state, '', `#etapa-${i + 1}`);
+                    }}
+                    className="-my-px shrink-0 py-px underline decoration-acid-ink/30 decoration-dotted underline-offset-4 hover:decoration-solid">
+                    {s.title.toUpperCase()}
+                  </a>
                   <span aria-hidden className="mb-1 min-w-4 flex-1 border-b-2 border-dotted border-acid-ink/30" />
-                  <span className="shrink-0 text-right">{s.time.toUpperCase()}</span>
+                  {/* the time may wrap under itself ("SPRINTS / QUINZENAIS"): kept on one line it pushed past the
+                      slip on a 320px phone and let the whole page pan sideways */}
+                  <span className="min-w-0 text-right">{s.time.toUpperCase()}</span>
                 </div>
                 <ul className="pl-7 text-[0.72rem] text-acid-ink/70">
                   {s.ingredients.map((ing) => (
@@ -116,18 +156,31 @@ export default function OrderTicket() {
             <span>SISTEMA NO AR</span>
           </p>
 
-          {/* rubber stamp */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute right-5 bottom-28 -rotate-12 rounded-md border-4 border-[#d7263d] px-3 py-1 font-bold tracking-widest text-[#d7263d] opacity-80"
-          >
-            EM PREPARO
-          </div>
-
-          <div className="mt-5">
-            <Barcode />
-            <p className="mt-1 text-center text-[0.65rem] tracking-[0.4em]">0142 2026 HENA</p>
-          </div>
+          {/* the barcode is the order button: pointing at it passes the scanner's red line over the bars,
+              and following it goes to the form, where the visitor's own order is placed */}
+          <a href="#contato" className="scan group/scan relative mt-5 block rounded-sm outline-offset-4">
+          {/* rubber stamp: "em preparo" while the burger is being built, re-stamped "pronto" once the order is up
+                (Process sets data-served on its section when the last step lands). It sits on the barcode's bars: placed
+                from the ticket's bottom, it landed on the "escaneie para fazer o seu pedido" link text on a phone */}
+            <div
+              aria-hidden
+              data-order-stamp
+              className="pointer-events-none absolute -top-1 right-1 z-10 -rotate-12 rounded-md bg-paper/85 border-4 border-[#b3122b] px-3 py-1 font-bold tracking-widest text-[#b3122b] opacity-80 group-data-[served]/proc:border-[#1f6f63] group-data-[served]/proc:text-[#1f6f63]"
+            >
+              <span className="group-data-[served]/proc:hidden">EM PREPARO</span>
+              <span className="hidden group-data-[served]/proc:inline">PRONTO ✓</span>
+            </div>
+            <span className="relative block overflow-hidden">
+              <Barcode />
+              <span aria-hidden className="scan-laser pointer-events-none absolute inset-y-0 w-[3px] bg-[#e11d48] opacity-0 shadow-[0_0_8px_2px_rgb(225_29_72/0.6)]" />
+            </span>
+            <span aria-hidden className="mt-1 block text-center text-[0.65rem] tracking-[0.4em]">
+              0142 {new Date().getFullYear()} HENA
+            </span>
+            <span className="mt-1 block text-center text-[0.65rem] font-bold tracking-[0.2em] underline-offset-2 group-hover/scan:underline group-focus-visible/scan:underline">
+              <span aria-hidden>▸ </span>ESCANEIE PARA FAZER O SEU PEDIDO
+            </span>
+          </a>
           <p className="mt-4 text-center text-[0.68rem] tracking-[0.2em]">*** VOLTE SEMPRE: TEMOS ROADMAP ***</p>
           <p className="mt-1 text-center text-[0.65rem] text-acid-ink/70">henrique@henaweb.com</p>
         </div>

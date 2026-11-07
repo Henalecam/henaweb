@@ -1,64 +1,107 @@
 'use client';
 
-import { useRef } from 'react';
-import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap';
+import { useLayoutEffect, useRef } from 'react';
+import { prefersReducedMotion } from '@/lib/motion';
 
-// Dispatched on a fresh task so listeners don't run inside this component's GSAP context
-// (GSAP scopes selector strings in callbacks to the context that created the timeline).
+// Dispatched on a fresh task, so listeners run after this effect has finished, not inside it
 const markReady = () =>
   setTimeout(() => {
     document.documentElement.dataset.ready = 'true';
     window.dispatchEvent(new Event('hena:ready'));
   }, 0);
 
+/** The intro's status line, one step per quarter of the bar (decorative: the whole intro is aria-hidden). */
+const STEPS = ['Procurando fantasmas no código…', 'Interrogando as planilhas…', 'Ligando os pontos…', 'Caso quase resolvido…'];
+
+// GSAP's eases, as the curves WAAPI takes (and power3.inOut as a function, for the counter)
+const EXPO_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)';
+const EXPO_IN = 'cubic-bezier(0.7, 0, 0.84, 0)';
+const EXPO_IN_OUT = 'cubic-bezier(0.87, 0, 0.13, 1)';
+const POWER3_IN_OUT = 'cubic-bezier(0.65, 0, 0.35, 1)';
+const power3InOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
 export default function Preloader() {
   const root = useRef<HTMLDivElement>(null);
   const count = useRef<HTMLSpanElement>(null);
+  const step = useRef<HTMLParagraphElement>(null);
 
-  useGSAP(
-    () => {
-      let seen = false;
-      try {
-        seen = sessionStorage.getItem('hena:seen') === '1';
-        sessionStorage.setItem('hena:seen', '1');
-      } catch {}
+  // the intro as a WAAPI timeline (it was a GSAP one; same beats): words rise in, the bar and counter fill over
+  // 1.5 s, words leave, the page is marked ready and the curtain wipes up. Layout effect: the first frame painted
+  // already has the words below their line. The CSS failsafe (globals.css, preloader-failsafe) still covers JS
+  // that never runs
+  useLayoutEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem('hena:seen') === '1';
+      sessionStorage.setItem('hena:seen', '1');
+    } catch {}
 
-      // phones skip the intro so the headline paints right away (it is the page's LCP)
-      if (window.matchMedia('(max-width: 767px)').matches) {
-        gsap.set(root.current, { display: 'none' });
-        markReady();
-        return;
-      }
+    // phones skip the intro so the headline paints right away (it is the page's LCP)
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      el.style.display = 'none';
+      markReady();
+      return;
+    }
 
-      if (seen || prefersReducedMotion()) {
-        gsap.to(root.current, { autoAlpha: 0, duration: 0.35, onStart: markReady });
-        return;
-      }
+    const anims: Animation[] = [];
+    let raf = 0;
+    let done = 0;
 
-      const counter = { v: 0 };
-      gsap
-        .timeline()
-        .from('[data-pl-word]', { yPercent: 110, duration: 0.9, ease: 'expo.out', stagger: 0.06 })
-        .to(
-          counter,
-          {
-            v: 100,
-            duration: 1.5,
-            ease: 'power3.inOut',
-            onUpdate: () => {
-              if (count.current) count.current.textContent = String(Math.round(counter.v)).padStart(3, '0');
-            },
-          },
-          0,
-        )
-        .to('[data-pl-bar]', { scaleX: 1, duration: 1.5, ease: 'power3.inOut' }, 0)
-        .to('[data-pl-word]', { yPercent: -110, duration: 0.6, ease: 'expo.in', stagger: 0.03 }, '>-0.1')
-        .add(markReady, '>-0.15')
-        .to(root.current, { clipPath: 'inset(0% 0% 100% 0%)', duration: 0.9, ease: 'expo.inOut' }, '<')
-        .set(root.current, { display: 'none' });
-    },
-    { scope: root },
-  );
+    if (seen || prefersReducedMotion()) {
+      markReady();
+      const a = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 350, fill: 'forwards' });
+      a.onfinish = () => (el.style.visibility = 'hidden');
+      anims.push(a);
+      return () => anims.forEach((x) => x.cancel());
+    }
+
+    const words = [...el.querySelectorAll<HTMLElement>('[data-pl-word]')];
+    words.forEach((w, i) =>
+      anims.push(
+        w.animate([{ transform: 'translateY(110%)' }, { transform: 'none' }], { duration: 900, delay: i * 60, easing: EXPO_OUT, fill: 'backwards' }),
+      ),
+    );
+    const bar = el.querySelector<HTMLElement>('[data-pl-bar]');
+    if (bar) anims.push(bar.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 1500, easing: POWER3_IN_OUT, fill: 'forwards' }));
+
+    // the counter and the status line, on the same clock and curve as the bar
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const v = power3InOut(Math.min(1, (now - t0) / 1500)) * 100;
+      if (count.current) count.current.textContent = String(Math.round(v)).padStart(3, '0');
+      // the status line moves the investigation along with the bar, like an installer's step messages
+      const msg = STEPS[Math.min(STEPS.length - 1, Math.floor((v / 100) * STEPS.length))];
+      if (step.current && step.current.textContent !== msg) step.current.textContent = msg;
+      if (v < 100) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
+    // words leave 0.1 s before the bar is full; ready and the curtain 0.15 s before the last word is out
+    const out = 1400;
+    words.forEach((w, i) =>
+      anims.push(
+        w.animate([{ transform: 'none' }, { transform: 'translateY(-110%)' }], { duration: 600, delay: out + i * 30, easing: EXPO_IN, fill: 'forwards' }),
+      ),
+    );
+    const curtain = out + (words.length - 1) * 30 + 600 - 150;
+    done = window.setTimeout(markReady, curtain);
+    const wipe = el.animate([{ clipPath: 'inset(0% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 100% 0%)' }], {
+      duration: 900,
+      delay: curtain,
+      easing: EXPO_IN_OUT,
+      fill: 'forwards',
+    });
+    wipe.onfinish = () => (el.style.display = 'none');
+    anims.push(wipe);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(done);
+      anims.forEach((x) => x.cancel());
+    };
+  }, []);
 
   return (
     <div
@@ -87,7 +130,9 @@ export default function Preloader() {
               sistemas
             </span>
           </div>
-          <p className="mt-3 font-mono text-[0.68rem] uppercase">Procurando fantasmas no código…</p>
+          <p ref={step} data-pl-step className="mt-3 font-mono text-[0.68rem] uppercase">
+            {STEPS[0]}
+          </p>
           <div className="mt-4 flex items-center gap-3">
             <div className="h-6 flex-1 border-2 border-acid-ink bg-white p-0.5">
               <div

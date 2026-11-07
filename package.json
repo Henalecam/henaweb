@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next typegen && tsc --noEmit"
+    "lint": "next typegen && tsc --noEmit && npm run -s blog -- check",
+    "blog": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/blog.mts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

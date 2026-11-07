@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 380" role="img" aria-labelledby="ia-negocios-locais-t" class="chart">
+  <title id="ia-negocios-locais-t">Consumidores que usam IA para escolher negócios locais. % dos consumidores nos EUA</title>
+  <style>
+  .surface{fill:#ffffff}.t1{fill:#0b0b0b}.t2{fill:#52514e}.t3{fill:#77766f}.grid{stroke:#e6e5e0}.base{stroke:#c9c8c1}.bar{fill:#5B3DF5}.bar-soft{fill:#5B3DF5;opacity:.45}
+  text{font-family:Inter,system-ui,sans-serif}
+  @media (prefers-color-scheme: dark){.surface{fill:#1a1a19}.t1{fill:#f0efec}.t2{fill:#c3c2b7}.t3{fill:#9d9c94}.grid{stroke:#383835}.base{stroke:#55544f}.bar{fill:#8a74ff}.bar-soft{fill:#8a74ff;opacity:.5}}</style>
+  <rect width="680" height="380" class="surface"/>
+  
+  <text x="24" y="38" class="t1" font-size="19" font-weight="700">Consumidores que usam IA para escolher negócios locais</text>
+  <text x="24" y="62" class="t2" font-size="14">% dos consumidores nos EUA</text><line x1="64" x2="648" y1="296" y2="296" class="grid" stroke-width="1"/><text x="54" y="300" text-anchor="end" class="t3" font-size="12">0%</text><line x1="64" x2="648" y1="255.2" y2="255.2" class="grid" stroke-width="1"/><text x="54" y="259.2" text-anchor="end" class="t3" font-size="12">10%</text><line x1="64" x2="648" y1="214.39999999999998" y2="214.39999999999998" class="grid" stroke-width="1"/><text x="54" y="218.39999999999998" text-anchor="end" class="t3" font-size="12">20%</text><line x1="64" x2="648" y1="173.60000000000002" y2="173.60000000000002" class="grid" stroke-width="1"/><text x="54" y="177.60000000000002" text-anchor="end" class="t3" font-size="12">30%</text><line x1="64" x2="648" y1="132.79999999999998" y2="132.79999999999998" class="grid" stroke-width="1"/><text x="54" y="136.79999999999998" text-anchor="end" class="t3" font-size="12">40%</text><line x1="64" x2="648" y1="92" y2="92" class="grid" stroke-width="1"/><text x="54" y="96" text-anchor="end" class="t3" font-size="12">50%</text><line x1="64" x2="648" y1="296" y2="296" class="base" stroke-width="1"/><g class="mark" data-tip="2025: 6%">
+      <rect x="72" y="92" width="276" height="204" fill="transparent"/>
+      <path d="M198,296V275.52Q198,271.52 202,271.52H218Q222,271.52 222,275.52V296Z" class="bar-soft"/>
+      <text x="210" y="261.52" text-anchor="middle" class="t1" font-size="16" font-weight="700">6%</text>
+      <text x="210" y="318" text-anchor="middle" class="t2" font-size="13.5" font-weight="600">2025</text>
+      
+    </g><g class="mark" data-tip="2026: 45% (7,5× em um ano)">
+      <rect x="364" y="92" width="276" height="204" fill="transparent"/>
+      <path d="M490,296V116.4Q490,112.4 494,112.4H510Q514,112.4 514,116.4V296Z" class="bar"/>
+      <text x="502" y="102.4" text-anchor="middle" class="t1" font-size="22" font-weight="700">45%</text>
+      <text x="502" y="318" text-anchor="middle" class="t2" font-size="13.5" font-weight="600">2026</text>
+      <text x="502" y="335" text-anchor="middle" class="t3" font-size="11">7,5× em um ano</text>
+    </g><text x="24" y="364" class="t3" font-size="11.5">Fonte: BrightLocal, Local Consumer Review Survey 2026 (1.002 adultos, EUA)</text>
+</svg>

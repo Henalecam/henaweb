@@ -1,18 +1,20 @@
 import DavidStage from '@/components/DavidStage';
 import Hero from '@/components/Hero';
+import ResumeReading from '@/components/ResumeReading';
 import Marquee from '@/components/Marquee';
 import Manifesto from '@/components/Manifesto';
 import Capabilities from '@/components/Capabilities';
 import Clients from '@/components/Clients';
 import Mystery from '@/components/Mystery';
 import GovTech from '@/components/GovTech';
-import Work from '@/components/Work';
 import Process from '@/components/Process';
 import Studio from '@/components/Studio';
 import Contact from '@/components/Contact';
 import Faq from '@/components/Faq';
 import Testimonials from '@/components/Testimonials';
-import { homeFaq, projects, site } from '@/lib/content';
+import { capabilities, homeFaq, projects, site } from '@/lib/content';
+
+const capabilitySlugs = capabilities.map((c) => c.slug);
 import Footer from '@/components/Footer';
 
 const ticker = [
@@ -33,16 +35,6 @@ const jsonLd = {
       '@type': 'FAQPage',
       '@id': `${site.url}/#faq`,
       mainEntity: homeFaq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
-    },
-    {
-      '@type': 'ItemList',
-      '@id': `${site.url}/#projetos`,
-      name: 'Projetos da HenaWeb',
-      itemListElement: projects.map((p, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        item: { '@type': 'CreativeWork', name: p.name, description: p.summary, url: p.href, creator: { '@id': `${site.url}/#organization` } },
-      })),
     },
   ],
 };
@@ -84,16 +76,20 @@ export default function Home() {
           <Manifesto />
         </DavidStage>
         <Clients />
-        <Capabilities />
+        <Capabilities
+          caseCounts={Object.fromEntries(capabilitySlugs.map((slug) => [slug, projects.filter((p) => p.service === slug).length]))}
+          caseSlugs={Object.fromEntries(projects.map((p) => [p.name, p.slug]))}
+        />
         <Mystery />
         <GovTech />
-        <Work />
         <Testimonials />
         <Process />
         <Studio />
         <Faq />
         <Contact />
       </main>
+      {/* left halfway last time? offers to pick up at that section (home only) */}
+      <ResumeReading />
       <Footer />
     </>
   );

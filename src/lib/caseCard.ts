@@ -7,6 +7,8 @@ export type CaseCardData = {
   capability: string;
   firstStep: string;
   timeline: string;
+  /** name · company, when typed in the form */
+  client?: string;
 };
 
 const INK = '#140a26';
@@ -78,10 +80,27 @@ export async function renderCaseCard(d: CaseCardData): Promise<Blob> {
   ctx.font = `700 30px ${mono}`;
   ctx.textBaseline = 'middle';
   ctx.fillText(`FICHA DO CASO Nº ${d.caseNo}`, x + 40, y + 50);
-  ctx.textAlign = 'right';
-  ctx.fillText(new Date().toLocaleDateString('pt-BR'), x + w - 40, y + 50);
   ctx.textAlign = 'left';
 
+  // the rubber stamp sits across the tab's edge, top right: lower down it landed on the text of a full
+  // file (every symptom ticked wraps the first step into the stamp's spot)
+  ctx.save();
+  ctx.translate(x + w - 200, y + 100);
+  ctx.rotate(-0.12);
+  ctx.fillStyle = '#fdf3e1';
+  ctx.fillRect(-165, -40, 330, 80);
+  ctx.strokeStyle = '#d7263d';
+  ctx.lineWidth = 7;
+  ctx.strokeRect(-165, -40, 330, 80);
+  ctx.fillStyle = '#d7263d';
+  ctx.font = `700 32px ${mono}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('EM INVESTIGAÇÃO', 0, 3);
+  ctx.restore();
+
+  // a long list of symptoms tightens the whole file up so it still fits the card
+  const many = d.symptoms.length > 3;
+  const gap = many ? 18 : 30;
   let cy = y + 170;
   const label = (t: string) => {
     ctx.font = `700 24px ${mono}`;
@@ -92,49 +111,42 @@ export async function renderCaseCard(d: CaseCardData): Promise<Blob> {
   };
 
   label('Suspeito principal');
-  ctx.font = `64px ${groovy}`;
+  ctx.font = `${many ? 56 : 64}px ${groovy}`;
   ctx.fillStyle = '#c2410c';
   for (const l of wrap(ctx, d.suspect, w - 100)) {
     ctx.fillText(l, x + 50, cy + 10);
-    cy += 72;
+    cy += many ? 62 : 72;
   }
-  cy += 30;
+  cy += gap;
 
   label('Sintomas relatados');
-  ctx.font = `34px ${sans}`;
+  ctx.font = `${many ? 30 : 34}px ${sans}`;
   ctx.fillStyle = INK;
   for (const s of d.symptoms) {
     ctx.fillText(`✓  ${s}`, x + 50, cy);
-    cy += 50;
+    cy += many ? 42 : 50;
   }
-  cy += 30;
+  cy += gap;
 
   label('Especialidade indicada');
-  ctx.font = `600 40px ${sans}`;
-  ctx.fillText(d.capability, x + 50, cy);
-  cy += 80;
+  ctx.font = `600 ${many ? 34 : 40}px ${sans}`;
+  // two or three specialties used to run off the card in one line
+  for (const l of wrap(ctx, d.capability, w - 100)) {
+    ctx.fillText(l, x + 50, cy);
+    cy += many ? 44 : 50;
+  }
+  cy += gap;
 
   label('Primeira diligência');
-  ctx.font = `italic 44px ${serif}`;
+  ctx.font = `italic ${many ? 38 : 44}px ${serif}`;
   for (const l of wrap(ctx, d.firstStep, w - 100)) {
     ctx.fillText(l, x + 50, cy);
-    cy += 54;
+    cy += many ? 46 : 54;
   }
-  cy += 20;
+  cy += many ? 10 : 20;
   label(`Prazo desejado: ${d.timeline}`);
-
-  // stamp
-  ctx.save();
-  ctx.translate(x + w - 250, y + h - 150);
-  ctx.rotate(-0.2);
-  ctx.strokeStyle = '#d7263d';
-  ctx.lineWidth = 8;
-  ctx.strokeRect(-190, -50, 380, 100);
-  ctx.fillStyle = '#d7263d';
-  ctx.font = `700 40px ${mono}`;
-  ctx.textAlign = 'center';
-  ctx.fillText('EM INVESTIGAÇÃO', 0, 4);
-  ctx.restore();
+  // the label line doesn't wrap: a long name · company is cut to fit the card's width
+  if (d.client) label(`Cliente: ${d.client.length > 46 ? `${d.client.slice(0, 45)}…` : d.client}`);
 
   // footer
   ctx.fillStyle = '#f7931e';
@@ -144,7 +156,7 @@ export async function renderCaseCard(d: CaseCardData): Promise<Blob> {
   ctx.fillStyle = '#fdf3e1';
   ctx.font = `24px ${mono}`;
   ctx.textAlign = 'right';
-  ctx.fillText('henaweb.com', W - 80, H - 86);
+  ctx.fillText(`henaweb.com · ${new Date().toLocaleDateString('pt-BR')}`, W - 80, H - 86);
   ctx.fillText('mistérios resolvidos sob medida', W - 80, H - 52);
 
   return new Promise((resolve, reject) => c.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob'))), 'image/png'));

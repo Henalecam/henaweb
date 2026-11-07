@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { execFileSync } from 'node:child_process';
 import { services } from '@/lib/services';
 import { projects, site } from '@/lib/content';
+import { publishedPosts } from '@/lib/blog';
 
 /**
  * Date of the last commit that touched any of these paths, read at build time. A sitemap that says
@@ -29,6 +30,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly' as const,
       priority: s.slug === 'sistemas-sob-medida' || s.slug === 'sistemas-publicos' ? 0.9 : 0.8,
     })),
+    { url: `${site.url}/acessibilidade`, lastModified: lastCommit('src/app/acessibilidade', ...SHARED), changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${site.url}/passatempo`, lastModified: lastCommit('src/app/passatempo', 'src/lib/pastimes.ts', ...SHARED), changeFrequency: 'monthly', priority: 0.4 },
     { url: `${site.url}/casos`, lastModified: lastCommit('src/app/casos/page.tsx', 'src/lib/content.ts', 'public/cases', ...SHARED), changeFrequency: 'monthly', priority: 0.8 },
     ...projects.map((p) => ({
       url: `${site.url}/casos/${p.slug}`,
@@ -38,5 +41,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       // the real screenshot, so the case can show up in image search
       ...(p.shot && { images: [`${site.url}${p.shot.desktop}`] }),
     })),
+    // the blog only once it has a published post (an empty index is a thin page, and it says noindex until then)
+    ...(publishedPosts().length
+      ? [
+          { url: `${site.url}/blog`, lastModified: new Date(publishedPosts()[0].updated ?? publishedPosts()[0].date), changeFrequency: 'weekly' as const, priority: 0.7 },
+          ...publishedPosts().map((p) => ({
+            url: `${site.url}/blog/${p.slug}`,
+            // the post's own dates, not the commit: a typo fix shouldn't announce new content
+            lastModified: new Date(p.updated ?? p.date),
+            changeFrequency: 'monthly' as const,
+            priority: 0.7,
+            ...(p.cover && { images: [`${site.url}${p.cover}`] }),
+          })),
+        ]
+      : []),
   ];
 }

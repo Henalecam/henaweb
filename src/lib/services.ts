@@ -1,4 +1,5 @@
 import { serviceLinks } from './serviceLinks';
+import type { MockVariant } from './content';
 /** Landing pages per service. Each one targets a distinct search intent. */
 
 export type ServicePage = {
@@ -14,7 +15,9 @@ export type ServicePage = {
   problems: string[];
   deliverables: { title: string; body: string }[];
   stack: string[];
-  examples: { name: string; href?: string; note: string }[];
+  /** `sketch`: an example that isn't a case on the site gets a "retrato falado" (police sketch) of the kind of
+      screen it would have, drawn from MockUI: a type of system, not a real client's screenshot */
+  examples: { name: string; href?: string; note: string; sketch?: MockVariant }[];
   faq: { q: string; a: string }[];
 };
 
@@ -92,9 +95,9 @@ export const services: ServicePage[] = [
     ],
     stack: ['PHP', 'Node.js', 'React', 'PostgreSQL', 'Docker', 'gov.br', 'Dados abertos'],
     examples: [
-      { name: 'Gestão de projetos e repasse de verbas', note: 'Fluxo completo da solicitação de verba à prestação de resultados, com cada etapa auditável.' },
-      { name: 'Workflows de parecer e aprovação', note: 'Alçadas, prazos e assinatura digital no lugar de processos em papel e e-mail.' },
-      { name: 'Painéis de transparência', note: 'Indicadores públicos com exportação em formatos abertos.' },
+      { name: 'Gestão de projetos e repasse de verbas', sketch: 'ledger', note: 'Fluxo completo da solicitação de verba à prestação de resultados, com cada etapa auditável.' },
+      { name: 'Workflows de parecer e aprovação', sketch: 'calendar', note: 'Alçadas, prazos e assinatura digital no lugar de processos em papel e e-mail.' },
+      { name: 'Painéis de transparência', sketch: 'insights', note: 'Indicadores públicos com exportação em formatos abertos.' },
     ],
     faq: [
       {
@@ -136,9 +139,9 @@ export const services: ServicePage[] = [
     ],
     stack: ['n8n', 'LLMs', 'WhatsApp API', 'CRM', 'Node.js', 'PostgreSQL', 'Webhooks'],
     examples: [
-      { name: 'Agente de atendimento no WhatsApp', note: 'Responde dúvidas frequentes 24 horas e encaminha casos complexos para a equipe.' },
-      { name: 'Captação e follow-up de leads', note: 'Do anúncio ao CRM sem perda, com abordagem automática e acompanhamento.' },
-      { name: 'Relatórios automáticos', note: 'Dados consolidados e dashboards atualizados sem trabalho manual.' },
+      { name: 'Agente de atendimento no WhatsApp', sketch: 'chat', note: 'Responde dúvidas frequentes 24 horas e encaminha casos complexos para a equipe.' },
+      { name: 'Captação e follow-up de leads', sketch: 'site', note: 'Do anúncio ao CRM sem perda, com abordagem automática e acompanhamento.' },
+      { name: 'Relatórios automáticos', sketch: 'ledger', note: 'Dados consolidados e dashboards atualizados sem trabalho manual.' },
     ],
     faq: [
       {

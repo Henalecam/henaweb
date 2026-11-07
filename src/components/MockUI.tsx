@@ -1,6 +1,8 @@
 import type { CSSProperties } from 'react';
 import type { MockVariant } from '@/lib/content';
 
+const HITS = [3, 14, 22, 27, 38, 41, 49, 55];
+
 /** Stylized, data-free product UI used as case artwork. Purely decorative. */
 export default function MockUI({ variant, hue }: { variant: MockVariant; hue: number }) {
   const style = {
@@ -9,18 +11,19 @@ export default function MockUI({ variant, hue }: { variant: MockVariant; hue: nu
   } as CSSProperties;
 
   return (
-    <div style={style} aria-hidden className="relative flex h-full w-full overflow-hidden bg-[#0c0c0e] text-ink">
+    <div style={style} aria-hidden data-pause-offscreen className="relative flex h-full w-full overflow-hidden bg-[#0c0c0e] text-ink">
       <div
         className="pointer-events-none absolute -top-1/3 -right-1/4 h-[90%] w-[70%] rounded-full blur-[90px]"
         style={{ background: 'var(--hs)' }}
       />
-      {variant !== 'bank' && variant !== 'site' && (
-        <aside className="hidden w-[18%] shrink-0 flex-col gap-2.5 border-r border-line p-[3%] sm:flex">
+      {variant !== 'bank' && variant !== 'site' && variant !== 'chat' && (
+        // a plain div: an <aside> here was a stray "complementary" landmark inside a drawing
+        <div className="hidden w-[18%] shrink-0 flex-col gap-2.5 border-r border-line p-[3%] sm:flex">
           <div className="mb-3 h-3 w-2/3 rounded-full" style={{ background: 'var(--h)' }} />
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className={`h-2 rounded-full ${i === 1 ? 'bg-ink/50' : 'bg-ink/12'}`} style={{ width: `${55 + ((i * 17) % 35)}%` }} />
           ))}
-        </aside>
+        </div>
       )}
       <div className="relative flex-1 p-[4%]">{body(variant)}</div>
     </div>
@@ -56,14 +59,23 @@ function body(variant: MockVariant) {
     case 'raffle':
       return (
         <div className="grid h-full grid-cols-10 content-center gap-[1.2%]">
+          {/* the drawn numbers light up one after another, round and round, like a live draw (CSS, motion-safe) */}
           {Array.from({ length: 60 }).map((_, i) => {
-            const hit = [3, 14, 22, 27, 38, 41, 49, 55].includes(i);
+            const k = HITS.indexOf(i);
+            const hit = k >= 0;
             const sold = (i * 7) % 5 === 0;
             return (
               <div
                 key={i}
+                data-raffle-hit={hit ? '' : undefined}
                 className="flex aspect-square items-center justify-center rounded-md border border-line font-mono text-[clamp(0.45rem,0.9vw,0.75rem)]"
-                style={hit ? { background: 'var(--h)', color: '#0b0b0b', borderColor: 'transparent' } : sold ? { background: 'rgb(236 235 228 / .08)' } : undefined}
+                style={
+                  hit
+                    ? ({ background: 'var(--h)', color: '#0b0b0b', borderColor: 'transparent', '--k': k } as CSSProperties)
+                    : sold
+                      ? { background: 'rgb(236 235 228 / .08)' }
+                      : undefined
+                }
               >
                 {String(i + 1).padStart(2, '0')}
               </div>
@@ -134,6 +146,27 @@ function body(variant: MockVariant) {
             <div className="h-2 w-3/4 rounded-full bg-ink/10" />
             <div className="h-2 w-2/3 rounded-full bg-ink/10" />
           </div>
+        </div>
+      );
+    case 'chat':
+      // a messaging thread: the customer's bubbles on the left, the agent's answers (in the hue) on the right
+      return (
+        <div className="flex h-full flex-col gap-[5%] overflow-hidden rounded-lg border border-line p-[4%]">
+          <div className="flex items-center gap-[3%] border-b border-line pb-[3%]">
+            <span className="h-4 w-4 rounded-full" style={{ background: 'var(--h)' }} />
+            <span className="h-2 w-1/4 rounded-full bg-ink/30" />
+          </div>
+          {[58, 72, 40, 66].map((w, i) => (
+            <div key={i} className={`flex ${i % 2 ? 'justify-end' : ''}`}>
+              <div
+                className={`flex flex-col gap-1.5 rounded-2xl p-[3%] ${i % 2 ? 'rounded-br-sm' : 'rounded-bl-sm bg-ink/10'}`}
+                style={{ width: `${w}%`, ...(i % 2 ? { background: 'var(--hs)', border: '1px solid var(--h)' } : {}) }}
+              >
+                <span className="h-1.5 w-[85%] rounded-full bg-ink/30" />
+                {i !== 2 && <span className="h-1.5 w-[55%] rounded-full bg-ink/30" />}
+              </div>
+            </div>
+          ))}
         </div>
       );
     case 'site':
