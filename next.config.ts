@@ -108,7 +108,7 @@ const nextConfig: NextConfig = {
     return [
       { source: '/sobre', destination: '/#studio', permanent: true },
       { source: '/servicos', destination: '/#capacidades', permanent: true },
-      { source: '/portfolio', destination: '/#projetos', permanent: true },
+      { source: '/portfolio', destination: '/casos', permanent: true },
       { source: '/contato', destination: '/#contato', permanent: true },
       { source: '/artigos', destination: '/blog', permanent: true },
       { source: '/artigos/:slug', destination: '/blog/:slug', permanent: true },

@@ -25,12 +25,10 @@ function footerMessage(path: string): string | undefined {
   if (service) return `Olá! Quero conversar sobre ${service} com a HenaWeb.`;
 }
 
-// the blog joins the list once it has a published post (next.config.ts bakes the list in at build)
-const HAS_BLOG = (process.env.NEXT_PUBLIC_BLOG ?? '[]') !== '[]';
+// the cases have their own column; the blog comes in with the nav
 const studioLinks = [
   ...nav.filter((n) => n.label !== 'Casos'),
   { label: 'Perguntas', href: '/#perguntas' },
-  ...(HAS_BLOG ? [{ label: 'Blog', href: '/blog' }] : []),
   { label: 'Contato', href: '/#contato' },
   { label: 'Passa tempo', href: '/passatempo' },
   { label: 'Acessibilidade', href: '/acessibilidade' },

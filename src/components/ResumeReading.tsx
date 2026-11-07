@@ -11,7 +11,6 @@ const NAMES: Record<string, string> = {
   capacidades: 'Capacidades',
   caso: 'O mistério',
   govtech: 'Setor público',
-  projetos: 'Casos',
   processo: 'Processo',
   studio: 'Studio',
   perguntas: 'Perguntas',

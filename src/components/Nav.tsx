@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { usePathname } from 'next/navigation';
+import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { nav } from '@/lib/site';
 import { onReady, prefersReducedMotion } from '@/lib/motion';
 import { curtainSwipe } from '@/lib/curtainSwipe';
@@ -50,10 +49,6 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   // which nav section the reader is in (home only); on /casos pages the "Casos" entry stays lit
   const [active, setActive] = useState<string | null>(null);
-  // on a case page, "Casos" (lit as the current section) leads to the case archive, like the breadcrumb's "Casos"
-  // beside it; it used to go to the home's case strip, so the same word took the visitor to two different places
-  const pathname = usePathname();
-  const hrefOf = (href: string) => (href === '/#projetos' && /^\/casos\/./.test(pathname ?? '') ? '/casos' : href);
   const [search, setSearch] = useState(false);
   const [CommandPalette, setCommandPalette] = useState<PaletteType | null>(null);
   const [help, setHelp] = useState(false);
@@ -156,9 +151,12 @@ export default function Nav() {
   }, []);
 
   useEffect(() => {
-    if (window.location.pathname.startsWith('/casos')) {
-      setActive('/#projetos');
-      return;
+    // the archive and the blog are pages of their own: their entry stays lit on them and on each case or post
+    for (const page of ['/casos', '/blog']) {
+      if (window.location.pathname.startsWith(page)) {
+        setActive(page);
+        return;
+      }
     }
     if (window.location.pathname.startsWith('/passatempo')) {
       setActive('/passatempo');
@@ -286,13 +284,15 @@ export default function Nav() {
             </span>
             <span className="text-[0.6rem] align-super">®</span>
           </a>
-          <nav className="hidden items-center gap-5 lg:flex xl:gap-8" aria-label="Principal">
-            {nav.map((item) => (
+          <nav className="hidden items-center gap-3.5 lg:flex xl:gap-8" aria-label="Principal">
+            {nav.map((item, i) => (
+              <Fragment key={item.href}>
+              {/* the home's sections, then a hairline, then the pages of their own (the archive, the blog) */}
+              {!item.href.startsWith('/#') && nav[i - 1]?.href.startsWith('/#') && <span aria-hidden className="h-4 w-px bg-ink/25" />}
               <a
-                key={item.href}
-                href={hrefOf(item.href)}
-                aria-current={active === item.href ? 'location' : undefined}
-                className={`group relative text-sm transition-colors duration-300 ${active === item.href ? 'text-acid' : 'text-ink'}`}
+                href={item.href}
+                aria-current={active === item.href ? (item.href.startsWith('/#') ? 'location' : 'page') : undefined}
+                className={`group relative text-sm whitespace-nowrap transition-colors duration-300 ${active === item.href ? 'text-acid' : 'text-ink'}`}
               >
                 {item.label}
                 <span
@@ -301,6 +301,7 @@ export default function Nav() {
                   }`}
                 />
               </a>
+              </Fragment>
             ))}
             {/* the side projects get their own door, set apart from the studio's sections: a small arcade token */}
             <a
@@ -336,7 +337,7 @@ export default function Nav() {
             <Magnetic>
               <a
                 href="/#contato"
-                className="toon-sm toon-press flex items-center gap-2 rounded-full bg-acid px-5 py-2.5 text-sm font-medium text-acid-ink"
+                className="toon-sm toon-press flex items-center gap-2 rounded-full bg-acid px-4 py-2.5 text-sm font-medium whitespace-nowrap text-acid-ink xl:px-5"
               >
                 <span className="h-1.5 w-1.5 animate-[blink_1.4s_infinite] rounded-full bg-acid-ink" />
                 Abrir um caso
@@ -390,9 +391,9 @@ export default function Nav() {
           {[...nav, { label: 'Contato', href: '/#contato' }, { label: 'Passa tempo', href: '/passatempo' }].map((item, i) => (
             <a
               key={item.href}
-              href={hrefOf(item.href)}
+              href={item.href}
               onClick={() => setOpen(false)}
-              aria-current={active === item.href ? 'location' : undefined}
+              aria-current={active === item.href ? (item.href.startsWith('/#') ? 'location' : 'page') : undefined}
               // the links rise into place one after another behind the curtain wipe (closing: all at once)
               style={{ transitionDelay: open ? `${180 + i * 55}ms` : '0ms' }}
               className={`flex items-baseline gap-4 border-b border-line py-3 text-4xl font-medium tracking-tight [@media(max-height:640px)]:py-2 [@media(max-height:640px)]:text-3xl transition-[translate,opacity] duration-500 ease-[var(--ease-out-expo)] ${

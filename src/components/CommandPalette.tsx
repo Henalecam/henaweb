@@ -20,9 +20,14 @@ const fold = (s: string) =>
     .toLowerCase();
 
 const ITEMS: Item[] = [
-  ...nav.map((n) => ({ group: 'Seções', label: n.label, href: n.href })),
+  ...nav.map((n) => ({
+    group: 'Seções',
+    label: n.label,
+    href: n.href,
+    hint: n.href === '/casos' ? 'Todos os projetos' : n.href === '/blog' ? 'Artigos' : undefined,
+    keywords: n.href === '/casos' ? 'projetos portfólio portfolio trabalhos' : n.href === '/blog' ? 'artigos conteúdo posts' : undefined,
+  })),
   { group: 'Seções', label: 'Contato', hint: 'Abrir um caso', href: '/#contato' },
-  { group: 'Seções', label: 'Arquivo de casos', hint: 'Todos os projetos', href: '/casos' },
   { group: 'Seções', label: 'Passa tempo', hint: 'Jogos e experimentos', href: '/passatempo', keywords: `jogos jogo games fliperama ${pastimes.map((p) => p.name).join(' ')}` },
   // the accessibility statement wasn't findable from ⌘K at all (only from the footer): "leitor de tela" or
   // "alto contraste" now lead to it, and "barreira" straight to the part about reporting one

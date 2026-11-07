@@ -28,8 +28,9 @@ export const nav = [
   { label: 'Clientes', href: '/#clientes' },
   { label: 'Capacidades', href: '/#capacidades' },
   { label: 'Setor público', href: '/#govtech' },
-  // one entry for the cases: the home section, which links on to the full /casos archive
-  { label: 'Casos', href: '/#projetos' },
   { label: 'Processo', href: '/#processo' },
   { label: 'Studio', href: '/#studio' },
+  // pages of their own, apart from the landing page: the case archive and the blog
+  { label: 'Casos', href: '/casos' },
+  { label: 'Blog', href: '/blog' },
 ];

@@ -7,7 +7,6 @@ import Capabilities from '@/components/Capabilities';
 import Clients from '@/components/Clients';
 import Mystery from '@/components/Mystery';
 import GovTech from '@/components/GovTech';
-import Work from '@/components/Work';
 import Process from '@/components/Process';
 import Studio from '@/components/Studio';
 import Contact from '@/components/Contact';
@@ -17,7 +16,6 @@ import { capabilities, homeFaq, projects, site } from '@/lib/content';
 
 const capabilitySlugs = capabilities.map((c) => c.slug);
 import Footer from '@/components/Footer';
-import { caseMorphScript } from '@/lib/caseMorph';
 
 const ticker = [
   'Sistemas sob medida',
@@ -38,16 +36,6 @@ const jsonLd = {
       '@id': `${site.url}/#faq`,
       mainEntity: homeFaq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
     },
-    {
-      '@type': 'ItemList',
-      '@id': `${site.url}/#projetos`,
-      name: 'Projetos da HenaWeb',
-      itemListElement: projects.map((p, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        item: { '@type': 'CreativeWork', name: p.name, description: p.summary, url: p.href, creator: { '@id': `${site.url}/#organization` } },
-      })),
-    },
   ],
 };
 
@@ -55,8 +43,6 @@ export default function Home() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      {/* the cases section's screens morph into the case page window they open (lib/caseMorph) */}
-      <script dangerouslySetInnerHTML={{ __html: caseMorphScript }} />
       <main id="conteudo" tabIndex={-1} className="bg-bg">
         <DavidStage>
           <Hero />
@@ -96,7 +82,6 @@ export default function Home() {
         />
         <Mystery />
         <GovTech />
-        <Work />
         <Testimonials />
         <Process />
         <Studio />
