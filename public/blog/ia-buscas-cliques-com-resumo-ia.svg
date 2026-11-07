@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 308" role="img" aria-labelledby="cliques-com-resumo-ia-t" class="chart">
+  <title id="cliques-com-resumo-ia-t">Quando a IA responde, quase ninguém clica. % das visitas em que a pessoa clicou em um resultado</title>
+  <style>
+  .surface{fill:#ffffff}.t1{fill:#0b0b0b}.t2{fill:#52514e}.t3{fill:#77766f}.grid{stroke:#e6e5e0}.base{stroke:#c9c8c1}.bar{fill:#5B3DF5}.bar-soft{fill:#5B3DF5;opacity:.45}
+  text{font-family:Inter,system-ui,sans-serif}
+  @media (prefers-color-scheme: dark){.surface{fill:#1a1a19}.t1{fill:#f0efec}.t2{fill:#c3c2b7}.t3{fill:#9d9c94}.grid{stroke:#383835}.base{stroke:#55544f}.bar{fill:#8a74ff}.bar-soft{fill:#8a74ff;opacity:.5}}</style>
+  <rect width="680" height="308" class="surface"/>
+  
+  <text x="24" y="38" class="t1" font-size="19" font-weight="700">Quando a IA responde, quase ninguém clica</text>
+  <text x="24" y="62" class="t2" font-size="14">% das visitas em que a pessoa clicou em um resultado</text><line x1="250" x2="250" y1="86" y2="242" class="grid" stroke-width="1"/><text x="250" y="260" text-anchor="middle" class="t3" font-size="12">0%</text><line x1="340" x2="340" y1="86" y2="242" class="grid" stroke-width="1"/><text x="340" y="260" text-anchor="middle" class="t3" font-size="12">5%</text><line x1="430" x2="430" y1="86" y2="242" class="grid" stroke-width="1"/><text x="430" y="260" text-anchor="middle" class="t3" font-size="12">10%</text><line x1="520" x2="520" y1="86" y2="242" class="grid" stroke-width="1"/><text x="520" y="260" text-anchor="middle" class="t3" font-size="12">15%</text><line x1="610" x2="610" y1="86" y2="242" class="grid" stroke-width="1"/><text x="610" y="260" text-anchor="middle" class="t3" font-size="12">20%</text><line x1="250" x2="250" y1="86" y2="242" class="base" stroke-width="1"/><g class="mark" data-tip="Sem resumo de IA: 15% das visitas">
+      <rect x="24" y="88" width="632" height="44" fill="transparent"/>
+      <text x="238" y="113" text-anchor="end" class="t2" font-size="13.5" font-weight="600">Sem resumo de IA</text>
+      <path d="M250,100H516Q520,100 520,104V118Q520,122 516,122H250Z" class="bar-soft"/>
+      <text x="528" y="117" class="t1" font-size="16" font-weight="700">15%</text>
+    </g><g class="mark" data-tip="Com resumo de IA: 8% das visitas">
+      <rect x="24" y="140" width="632" height="44" fill="transparent"/>
+      <text x="238" y="165" text-anchor="end" class="t2" font-size="13.5" font-weight="600">Com resumo de IA</text>
+      <path d="M250,152H390Q394,152 394,156V170Q394,174 390,174H250Z" class="bar"/>
+      <text x="402" y="169" class="t1" font-size="16" font-weight="700">8%</text>
+    </g><g class="mark" data-tip="Link dentro do resumo: 1% das visitas">
+      <rect x="24" y="192" width="632" height="44" fill="transparent"/>
+      <text x="238" y="217" text-anchor="end" class="t2" font-size="13.5" font-weight="600">Link dentro do resumo</text>
+      <path d="M250,204H264Q268,204 268,208V222Q268,226 264,226H250Z" class="bar"/>
+      <text x="276" y="221" class="t1" font-size="16" font-weight="700">1%</text>
+    </g><text x="24" y="292" class="t3" font-size="11.5">Fonte: Pew Research Center, 2025, 68.879 buscas de 900 adultos nos EUA</text>
+</svg>
