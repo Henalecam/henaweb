@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 380" role="img" aria-labelledby="gasto-medio-t" class="chart">
+  <title id="gasto-medio-t">Quanto as pessoas aceitam gastar, em média. Valor com que o consumidor se sente confortável, em dólares</title>
+  <style>
+  .surface{fill:#ffffff}.t1{fill:#0b0b0b}.t2{fill:#52514e}.t3{fill:#77766f}.grid{stroke:#e6e5e0}.base{stroke:#c9c8c1}.bar{fill:#5B3DF5}.bar-soft{fill:#5B3DF5;opacity:.45}
+  text{font-family:Inter,system-ui,sans-serif}
+  @media (prefers-color-scheme: dark){.surface{fill:#1a1a19}.t1{fill:#f0efec}.t2{fill:#c3c2b7}.t3{fill:#9d9c94}.grid{stroke:#383835}.base{stroke:#55544f}.bar{fill:#8a74ff}.bar-soft{fill:#8a74ff;opacity:.5}}</style>
+  <rect width="680" height="380" class="surface"/>
+  
+  <text x="24" y="38" class="t1" font-size="19" font-weight="700">Quanto as pessoas aceitam gastar, em média</text>
+  <text x="24" y="62" class="t2" font-size="14">Valor com que o consumidor se sente confortável, em dólares</text><line x1="64" x2="648" y1="296" y2="296" class="grid" stroke-width="1"/><text x="54" y="300" text-anchor="end" class="t3" font-size="12">US$ 0</text><line x1="64" x2="648" y1="245" y2="245" class="grid" stroke-width="1"/><text x="54" y="249" text-anchor="end" class="t3" font-size="12">US$ 50</text><line x1="64" x2="648" y1="194" y2="194" class="grid" stroke-width="1"/><text x="54" y="198" text-anchor="end" class="t3" font-size="12">US$ 100</text><line x1="64" x2="648" y1="143" y2="143" class="grid" stroke-width="1"/><text x="54" y="147" text-anchor="end" class="t3" font-size="12">US$ 150</text><line x1="64" x2="648" y1="92" y2="92" class="grid" stroke-width="1"/><text x="54" y="96" text-anchor="end" class="t3" font-size="12">US$ 200</text><line x1="64" x2="648" y1="296" y2="296" class="base" stroke-width="1"/><g class="mark" data-tip="Loja no Instagram/TikTok: US$ 36">
+      <rect x="72" y="92" width="276" height="204" fill="transparent"/>
+      <path d="M198,296V263.28Q198,259.28 202,259.28H218Q222,259.28 222,263.28V296Z" class="bar-soft"/>
+      <text x="210" y="249.27999999999997" text-anchor="middle" class="t1" font-size="16" font-weight="700">US$ 36</text>
+      <text x="210" y="318" text-anchor="middle" class="t2" font-size="13.5" font-weight="600">Loja no Instagram/TikTok</text>
+      
+    </g><g class="mark" data-tip="Site da empresa: US$ 177 (quase 5× mais)">
+      <rect x="364" y="92" width="276" height="204" fill="transparent"/>
+      <path d="M490,296V119.46000000000001Q490,115.46000000000001 494,115.46000000000001H510Q514,115.46000000000001 514,119.46000000000001V296Z" class="bar"/>
+      <text x="502" y="105.46000000000001" text-anchor="middle" class="t1" font-size="22" font-weight="700">US$ 177</text>
+      <text x="502" y="318" text-anchor="middle" class="t2" font-size="13.5" font-weight="600">Site da empresa</text>
+      <text x="502" y="335" text-anchor="middle" class="t3" font-size="11">quase 5× mais</text>
+    </g><text x="24" y="364" class="t3" font-size="11.5">Fonte: DreamHost, 2026 Local Business Trust Index (1.201 consumidores, EUA)</text>
+</svg>
