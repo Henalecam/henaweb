@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 256" role="img" aria-labelledby="queda-alcance-t" class="chart">
+  <title id="queda-alcance-t">O alcance no Instagram caiu em um ano. Queda no alcance orgânico, 2025 comparado a 2024</title>
+  <style>
+  .surface{fill:#ffffff}.t1{fill:#0b0b0b}.t2{fill:#52514e}.t3{fill:#77766f}.grid{stroke:#e6e5e0}.base{stroke:#c9c8c1}.bar{fill:#5B3DF5}.bar-soft{fill:#5B3DF5;opacity:.45}
+  text{font-family:Inter,system-ui,sans-serif}
+  @media (prefers-color-scheme: dark){.surface{fill:#1a1a19}.t1{fill:#f0efec}.t2{fill:#c3c2b7}.t3{fill:#9d9c94}.grid{stroke:#383835}.base{stroke:#55544f}.bar{fill:#8a74ff}.bar-soft{fill:#8a74ff;opacity:.5}}</style>
+  <rect width="680" height="256" class="surface"/>
+  
+  <text x="24" y="38" class="t1" font-size="19" font-weight="700">O alcance no Instagram caiu em um ano</text>
+  <text x="24" y="62" class="t2" font-size="14">Queda no alcance orgânico, 2025 comparado a 2024</text><line x1="250" x2="250" y1="86" y2="190" class="grid" stroke-width="1"/><text x="250" y="208" text-anchor="middle" class="t3" font-size="12">0%</text><line x1="340" x2="340" y1="86" y2="190" class="grid" stroke-width="1"/><text x="340" y="208" text-anchor="middle" class="t3" font-size="12">10%</text><line x1="430" x2="430" y1="86" y2="190" class="grid" stroke-width="1"/><text x="430" y="208" text-anchor="middle" class="t3" font-size="12">20%</text><line x1="520" x2="520" y1="86" y2="190" class="grid" stroke-width="1"/><text x="520" y="208" text-anchor="middle" class="t3" font-size="12">30%</text><line x1="610" x2="610" y1="86" y2="190" class="grid" stroke-width="1"/><text x="610" y="208" text-anchor="middle" class="t3" font-size="12">40%</text><line x1="250" x2="250" y1="86" y2="190" class="base" stroke-width="1"/><g class="mark" data-tip="Reels: 35% das visitas">
+      <rect x="24" y="88" width="632" height="44" fill="transparent"/>
+      <text x="238" y="113" text-anchor="end" class="t2" font-size="13.5" font-weight="600">Reels</text>
+      <path d="M250,100H561Q565,100 565,104V118Q565,122 561,122H250Z" class="bar"/>
+      <text x="573" y="117" class="t1" font-size="16" font-weight="700">35%</text>
+    </g><g class="mark" data-tip="Posts: 31% das visitas">
+      <rect x="24" y="140" width="632" height="44" fill="transparent"/>
+      <text x="238" y="165" text-anchor="end" class="t2" font-size="13.5" font-weight="600">Posts</text>
+      <path d="M250,152H525Q529,152 529,156V170Q529,174 525,174H250Z" class="bar-soft"/>
+      <text x="537" y="169" class="t1" font-size="16" font-weight="700">31%</text>
+    </g><text x="24" y="240" class="t3" font-size="11.5">Fonte: Metricool, 2026 Social Media Study (39,7 milhões de posts, 1 milhão de contas)</text>
+</svg>

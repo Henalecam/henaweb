@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 360" role="img" aria-labelledby="confianca-sem-site-t" class="chart">
+  <title id="confianca-sem-site-t">O que as pessoas pensam de empresas sem site. % dos consumidores entrevistados</title>
+  <style>
+  .surface{fill:#ffffff}.t1{fill:#0b0b0b}.t2{fill:#52514e}.t3{fill:#77766f}.grid{stroke:#e6e5e0}.base{stroke:#c9c8c1}.bar{fill:#5B3DF5}.bar-soft{fill:#5B3DF5;opacity:.45}
+  text{font-family:Inter,system-ui,sans-serif}
+  @media (prefers-color-scheme: dark){.surface{fill:#1a1a19}.t1{fill:#f0efec}.t2{fill:#c3c2b7}.t3{fill:#9d9c94}.grid{stroke:#383835}.base{stroke:#55544f}.bar{fill:#8a74ff}.bar-soft{fill:#8a74ff;opacity:.5}}</style>
+  <rect width="680" height="360" class="surface"/>
+  
+  <text x="24" y="38" class="t1" font-size="19" font-weight="700">O que as pessoas pensam de empresas sem site</text>
+  <text x="24" y="62" class="t2" font-size="14">% dos consumidores entrevistados</text><line x1="250" x2="250" y1="86" y2="294" class="grid" stroke-width="1"/><text x="250" y="312" text-anchor="middle" class="t3" font-size="12">0%</text><line x1="370" x2="370" y1="86" y2="294" class="grid" stroke-width="1"/><text x="370" y="312" text-anchor="middle" class="t3" font-size="12">20%</text><line x1="490" x2="490" y1="86" y2="294" class="grid" stroke-width="1"/><text x="490" y="312" text-anchor="middle" class="t3" font-size="12">40%</text><line x1="610" x2="610" y1="86" y2="294" class="grid" stroke-width="1"/><text x="610" y="312" text-anchor="middle" class="t3" font-size="12">60%</text><line x1="250" x2="250" y1="86" y2="294" class="base" stroke-width="1"/><g class="mark" data-tip="Conferem o site para confirmar: 58% das visitas">
+      <rect x="24" y="88" width="632" height="44" fill="transparent"/>
+      <text x="238" y="113" text-anchor="end" class="t2" font-size="13.5" font-weight="600">Conferem o site para confirmar</text>
+      <path d="M250,100H594Q598,100 598,104V118Q598,122 594,122H250Z" class="bar"/>
+      <text x="606" y="117" class="t1" font-size="16" font-weight="700">58%</text>
+    </g><g class="mark" data-tip="Acham que parece temporária: 46% das visitas">
+      <rect x="24" y="140" width="632" height="44" fill="transparent"/>
+      <text x="238" y="165" text-anchor="end" class="t2" font-size="13.5" font-weight="600">Acham que parece temporária</text>
+      <path d="M250,152H522Q526,152 526,156V170Q526,174 522,174H250Z" class="bar-soft"/>
+      <text x="534" y="169" class="t1" font-size="16" font-weight="700">46%</text>
+    </g><g class="mark" data-tip="Acham que parece menos real: 45% das visitas">
+      <rect x="24" y="192" width="632" height="44" fill="transparent"/>
+      <text x="238" y="217" text-anchor="end" class="t2" font-size="13.5" font-weight="600">Acham que parece menos real</text>
+      <path d="M250,204H516Q520,204 520,208V222Q520,226 516,226H250Z" class="bar-soft"/>
+      <text x="528" y="221" class="t1" font-size="16" font-weight="700">45%</text>
+    </g><g class="mark" data-tip="Já desistiram de comprar: 39% das visitas">
+      <rect x="24" y="244" width="632" height="44" fill="transparent"/>
+      <text x="238" y="269" text-anchor="end" class="t2" font-size="13.5" font-weight="600">Já desistiram de comprar</text>
+      <path d="M250,256H480Q484,256 484,260V274Q484,278 480,278H250Z" class="bar"/>
+      <text x="492" y="273" class="t1" font-size="16" font-weight="700">39%</text>
+    </g><text x="24" y="344" class="t3" font-size="11.5">Fonte: DreamHost, 2026 Local Business Trust Index (1.201 consumidores, EUA)</text>
+</svg>
