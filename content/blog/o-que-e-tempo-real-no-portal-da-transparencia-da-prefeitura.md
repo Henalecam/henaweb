@@ -5,7 +5,7 @@ answer: Pela lei, "tempo real" é publicar cada despesa e receita até o primeir
 date: 2026-11-26
 tags: [portal da transparência, prefeitura, LC 131, SIAFIC, PNTP]
 service: sistemas-publicos
-draft: true
+draft: false
 ---
 
 Chegou um ofício do Tribunal de Contas, ou o controle interno avisou que a nota do PNTP caiu, e a pergunta da reunião é sempre a mesma: o portal da transparência "está em tempo real"? Alguém sobe os dados toda sexta e ninguém sabe quantos dias de atraso são aceitáveis. **Tem resposta, e ela está num decreto que muita prefeitura ainda não leu.**
@@ -46,7 +46,7 @@ O que a prefeitura precisa pedir ao fornecedor, seja do sistema contábil ou do 
 
 - **Publicação automática a partir do registro contábil**, com a data de cada atualização visível (a cartilha do PNTP exige indicar a data da última atualização quando ela não é óbvia).
 - **Trilha de auditoria**: o decreto veda usuários genéricos sem CPF (art. 11, § 1º) e exige logs de cada operação no banco de dados (art. 14, § 2º). É o mesmo princípio do [Diconta](/casos/diconta), um ERP em que cada ação fica registrada e rastreável.
-- **Dados abertos, acessibilidade e LGPD juntos**: o art. 7º, § 3º, pede compartilhamento por dados abertos, acessibilidade (e-MAG) e tratamento de dados pessoais conforme a LGPD.
+- **Dados abertos, acessibilidade e LGPD juntos**: o art. 7º, § 3º, pede compartilhamento por dados abertos, acessibilidade (preferencialmente pelo e-MAG) e tratamento de dados pessoais conforme a LGPD.
 - **Exportação em formato editável** (CSV, JSON): vale 10% de cada critério no PNTP.
 
 É o que construímos em [sistemas públicos](/servicos/sistemas-publicos): painéis públicos com dados abertos e trilha de auditoria pronta para a prestação de contas. Se o portal da sua prefeitura depende de alguém lembrar de atualizar, [fale com a gente](/#contato) antes do próximo ofício.
