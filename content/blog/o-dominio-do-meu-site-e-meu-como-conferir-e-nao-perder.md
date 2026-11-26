@@ -2,10 +2,10 @@
 title: O domínio do meu site é meu? Como conferir e não perder
 description: Em 2015 um ex-funcionário comprou google.com por US$ 12. Como saber em nome de quem está o domínio da sua empresa, o que acontece se vencer e como recuperar.
 answer: Só se o titular no Registro.br (ou no registrador do .com) for o CNPJ da sua empresa. Se o domínio está no nome da agência, do freelancer ou de um ex-sócio, quem manda nele é essa pessoa. Conferir leva um minuto na consulta pública; transferir a titularidade é simples enquanto todos concordam.
-date: 2026-11-25
+date: 2026-11-26
 tags: [domínio, registro.br, site institucional, propriedade]
 service: sites-e-produtos
-draft: true
+draft: false
 ---
 
 Você pagou o site, paga a hospedagem e o endereço é o nome da sua empresa. Mas quem registrou o domínio foi a agência, o sobrinho que "entendia de internet" ou um sócio que já saiu. Enquanto todo mundo se dá bem, ninguém nota. Quando a agência fecha ou a relação azeda, o site e os e-mails somem e a empresa descobre que **o domínio nunca foi dela**.
@@ -14,7 +14,7 @@ A resposta curta: o domínio pertence a quem aparece como titular no registro. N
 
 ## Quem é o dono do domínio: a empresa ou quem registrou?
 
-Quem registrou. Um **domínio** não é comprado, é alugado: você paga uma anuidade e usa aquele nome enquanto o registro estiver em dia. Nos domínios .br, só um CPF ou CNPJ válido no Brasil pode ser titular, e a anuidade custa R$ 40, sem reajuste desde 2017, segundo a Teletime.
+Quem registrou. Um **domínio** não é comprado, é alugado: você paga uma anuidade e usa aquele nome enquanto o registro estiver em dia. Nos domínios .br, só pessoas físicas ou jurídicas com vínculo com o Brasil podem ser titulares (na prática, um CPF ou CNPJ), e a anuidade custa R$ 40, valor não reajustado desde 2017, segundo a Teletime.
 
 Em disputas vale a regra do "primeiro a chegar". Uma sentença de 2019 da 2ª Vara Cível de Sorocaba, divulgada pelo TJSP, resumiu: "prevalece no âmbito do nome de domínio a regra do 'First come, first served'". O STJ, no caso do amaggi.com, registrado por um jornalista em 2004, três anos antes de a marca ser depositada no INPI, confirmou que essa regra predomina e só cai quando há má-fé, como naquele caso.
 
@@ -33,7 +33,7 @@ Pela **consulta pública (WHOIS)** do registrador: a do Registro.br para .com.br
 
 O site e os e-mails param. A página de ajuda do Registro.br diz que o domínio não pago "será congelado e após um período liberado para novo registro", conforme reproduz o site Liberados, que acompanha as listas de liberação desde 2017; a Task, revendedora de domínios, descreve o mesmo ciclo. Nenhum dos dois encontrou um prazo fixo publicado, por isso o conselho é um só: pagar antes do vencimento.
 
-O risco não é teórico. O .br passou de 6 milhões de domínios em 14 de outubro de 2026, com saldo de mais de 500 mil novos registros no ano, o maior crescimento da história, segundo a Teletime. Um domínio liberado com nome de empresa pode ir parar com um concorrente, um revendedor de nomes ou um golpista que passa a receber os e-mails que ainda chegam ao endereço antigo.
+O risco não é teórico. O .br passou de 6 milhões de domínios em 14 de outubro de 2026, com saldo de mais de 500 mil novos registros no ano, o crescimento mais expressivo da sua história, segundo a Teletime. Um domínio liberado com nome de empresa pode ir parar com um concorrente, um revendedor de nomes ou um golpista que passa a receber os e-mails que ainda chegam ao endereço antigo.
 
 > Um domínio vencido some com o site, o e-mail da empresa e os links que o Google levou anos para indexar. Renovar custa R$ 40 por ano; recuperar pode custar um processo.
 
