@@ -5,7 +5,7 @@ answer: Homologue com dados reais. Escreva os critérios de aceite antes do dese
 date: 2026-11-26
 tags: [homologação, critérios de aceite, contrato, testes]
 service: sistemas-sob-medida
-draft: true
+draft: false
 ---
 
 O fornecedor avisa que o sistema está pronto, manda um link e pede o aceite para liberar a última parcela. Você abre, clica em três telas, parece funcionar. Assina. Dois meses depois, o fechamento não bate, o fornecedor diz que é "erro de operação" e a conversa vira briga.
@@ -55,7 +55,7 @@ Registre tudo por escrito: o que falhou, a evidência, a resposta do fornecedor 
 
 Não. A Lei 14.133 diz que o recebimento provisório ou definitivo "não excluirá a responsabilidade civil pela solidez e pela segurança" do serviço, e um contrato privado bem escrito prevê garantia: por quanto tempo depois do aceite os erros encontrados em produção são corrigidos sem custo, e em que prazo.
 
-Dois itens do próprio sistema ajudam a provar o que aconteceu depois. O primeiro é o **histórico de auditoria**: cada ação registrada com usuário, data e valor anterior. No ERP contábil [Diconta](/casos/diconta), ele existe para que um lançamento alterado tenha dono e hora, o que encerra a discussão sobre "erro de operação" em minutos. O segundo é o código e o banco em contas da sua empresa, assunto de [o código do sistema que a minha empresa pagou é meu?](/blog/o-codigo-do-sistema-que-a-minha-empresa-pagou-e-meu): sem isso, nem um terceiro consegue dar parecer.
+Dois itens do próprio sistema ajudam a provar o que aconteceu depois. O primeiro é o **histórico de auditoria**: cada ação registrada com usuário, data e valor anterior. No ERP contábil [Diconta](/casos/diconta), ele existe para que um lançamento alterado tenha dono e hora, o que tira a discussão sobre "erro de operação" do campo da opinião. O segundo é o código e o banco em contas da sua empresa, assunto de [o código do sistema que a minha empresa pagou é meu?](/blog/o-codigo-do-sistema-que-a-minha-empresa-pagou-e-meu): sem isso, nem um terceiro consegue dar parecer.
 
 ## Como a HenaWeb organiza a homologação?
 
