@@ -5,7 +5,7 @@ answer: Pode, para o que é frequente: horário, status de pedido, agendamento, 
 date: 2026-11-26
 tags: [atendimento, ia, telefone, sac, automação]
 service: automacao-e-ia
-draft: true
+draft: false
 ---
 
 O telefone da empresa toca o dia inteiro com as mesmas perguntas: "vocês abrem sábado?", "meu pedido saiu?", "tem horário amanhã?". Quem atende é quem deveria estar vendendo. E, quando ninguém atende, a ligação vira um cliente perdido.
@@ -29,16 +29,16 @@ O que ela não resolve é o que o chatbot de texto também não resolve: reclama
 O **Decreto 13.135/2026**, publicado em 13 de outubro e em vigor desde 2 de novembro de 2026, revogou o decreto do SAC de 2022 (art. 24) e diz expressamente o que a IA pode fazer no atendimento. O art. 3º, § 3º, autoriza "procedimentos automatizados, inclusive sistemas de inteligência artificial, para a triagem, a distribuição interna e a resolução das demandas", desde que o consumidor tenha a opção de atendimento em tempo real por pessoa humana. As regras que mais mudam a operação por telefone:
 
 - **Humano das 8h às 20h, sete dias por semana** (arts. 12 e 14). A IA pode atender 24 horas, mas nesse período uma pessoa precisa estar disponível.
-- **No máximo cinco níveis de menu**, com a opção de falar com atendente (e a de cancelar) em todos eles, inclusive o primeiro (art. 16).
-- **Espera de até 20 segundos** para pelo menos 80% das ligações que pedem atendente, e de até 300 segundos para as demais (art. 15).
-- **Ligação que cai** durante o atendimento humano: a empresa retorna em até 300 segundos, sem fazer o cliente repetir tudo (art. 14, § 3º).
-- **Gravações guardadas por 90 dias** (art. 19) e nada de propaganda na espera (art. 6º).
+- **No máximo cinco níveis de menu**, com a opção de falar com atendente (e a de cancelar o contrato) em todos eles, inclusive o primeiro (art. 16).
+- **Espera de até 20 segundos** para pelo menos 80% das demandas atendidas, e de até 300 segundos para as demais (art. 15).
+- **Ligação que cai** durante o atendimento humano: a empresa retorna em até 300 segundos, considerando o que o cliente já informou (art. 14, § 3º).
+- **Gravações guardadas por no mínimo 90 dias** (art. 19) e nada de propaganda na espera (art. 6º).
 
 Quem fiscaliza é a Senacon (art. 23). O secretário nacional do Consumidor, Ricardo Morishita, resumiu a norma, segundo o Brasil de Fato: "As máquinas podem ajudar, podem até resolver, mas nunca substituir, evitar ou afastar o atendimento feito por pessoas."
 
 ## A minha empresa está sujeita ao decreto do SAC?
 
-Provavelmente não, se você tem uma clínica, uma loja, um restaurante ou um escritório. O art. 1º limita o decreto a dois grupos: **fornecedores de produtos e serviços regulados pelo Poder Executivo federal** (telefonia, energia, planos de saúde, aviação, bancos) e **empresas que prestam serviços financeiros, de pagamento ou de crédito por meios digitais**, sob supervisão do Banco Central. O texto não isenta ninguém por porte: uma fintech pequena está dentro; uma rede de lojas grande, fora.
+Provavelmente não, se você tem uma clínica, uma loja, um restaurante ou um escritório. O art. 1º limita o decreto a dois grupos: **fornecedores regulados pelo Poder Executivo federal** que se enquadrem nos critérios da agência reguladora (telefonia, energia, planos de saúde, aviação, bancos) e **empresas que prestam serviços financeiros, de pagamento ou de crédito por meios digitais**, sob supervisão do Banco Central. O texto não isenta ninguém por porte: uma fintech pequena está dentro; uma rede de lojas grande, fora.
 
 Fora do decreto vale o Código de Defesa do Consumidor, que não fixa 20 segundos nem 8h às 20h, mas exige informação clara e um canal para reclamar. Na prática, o decreto vira a referência de "atendimento adequado" que um Procon ou um juiz vai usar quando um cliente reclamar que o robô não deixou falar com ninguém.
 
@@ -65,7 +65,7 @@ A regra prática: a IA pode ligar para confirmar um horário, avisar que o pedid
 - **Comece pela triagem e pelas três perguntas mais frequentes.** Levante um mês de ligações e veja o que se repete: é o mapa de automações do serviço de [automação e IA](/servicos/automacao-e-ia).
 - **Dê à IA uma base de conhecimento oficial**: horários, política de troca, tabela de serviços. Ela responde só o que está lá.
 - **Transferência com contexto:** ao passar para a pessoa, a IA entrega um resumo da conversa, e o cliente não repete nada.
-- **Use os números do decreto como meta**: humano em horário comercial, espera de 20 segundos, retorno em 5 minutos se a ligação cair.
+- **Use os números do decreto como meta**: humano em horário comercial, espera de 20 segundos, retorno em 5 minutos se cair.
 - **Avise que é uma IA** na primeira frase. Respeita o cliente e protege a empresa, que [responde pelo que o chatbot diz](/blog/a-empresa-responde-pelo-que-o-chatbot-de-ia-diz).
 
 Se o telefone toca mais do que a equipe consegue atender, [fale com a gente](/#contato): montamos a IA com transferência para pessoas e ligamos tudo ao WhatsApp, como em [como automatizar o WhatsApp sem perder o toque humano](/blog/como-automatizar-o-whatsapp-sem-perder-o-toque-humano).
@@ -82,7 +82,7 @@ Só se ela estiver em setor regulado pelo governo federal ou prestar serviços f
 
 ### Qual o tempo máximo de espera no telefone pelo novo decreto?
 
-Até 20 segundos em pelo menos 80% das ligações que pedem atendente, e até 300 segundos nas demais (art. 15). Se a ligação cair, a empresa retorna em até 300 segundos.
+Até 20 segundos em pelo menos 80% das demandas atendidas, e até 300 segundos nas demais (art. 15). Se a ligação cair, a empresa retorna em até 300 segundos.
 
 ### A IA precisa dizer que é uma IA?
 
