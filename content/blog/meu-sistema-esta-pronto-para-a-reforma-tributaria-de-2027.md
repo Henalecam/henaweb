@@ -14,7 +14,7 @@ O contador mandou um aviso sobre "destaque de CBS na nota", o fornecedor do sist
 
 A **reforma tributária** (Emenda Constitucional 132/2023, regulamentada pela Lei Complementar 214/2025) troca os principais tributos sobre o consumo por dois. A **CBS** (Contribuição sobre Bens e Serviços) é federal e substitui PIS e Cofins. O **IBS** (Imposto sobre Bens e Serviços) é dividido entre estados e municípios e substitui ICMS e ISS.
 
-O ano de 2026 é de teste: as notas saem com um valor destacado de 0,9% de CBS e 0,1% de IBS, sem cobrança efetiva, segundo a Agência Senado. Em 2027 a história muda. A Receita Federal escreve que "a reforma tributária terá início em 2027, com a cobrança integral da CBS", e PIS e Cofins deixam de existir. O IBS continua em teste em 2027, cresce enquanto ICMS e ISS encolhem entre 2029 e 2032, e vale integralmente em 2033.
+O ano de 2026 é de teste: as notas saem com um valor destacado de 0,9% de CBS e 0,1% de IBS, sem cobrança efetiva, segundo a Agência Senado. Em 2027 a história muda. A Receita Federal escreve que "a reforma tributária terá início em 2027, com a cobrança integral da CBS"; é nesse momento que PIS e Cofins deixam de existir, segundo a Agência Senado. O IBS continua em teste em 2027, cresce enquanto ICMS e ISS são reduzidos entre 2029 e 2032, e vale integralmente em 2033.
 
 A Receita avisa que "esses prazos são constitucionais e não podem ser alterados a critério da Receita Federal ou do CGIBS".
 
