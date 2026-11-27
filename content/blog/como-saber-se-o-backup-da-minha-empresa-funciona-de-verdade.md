@@ -20,7 +20,7 @@ O guia de prevenção e resposta a ransomware do governo federal, publicado em j
 
 ## Backup no mesmo servidor é backup?
 
-Não. É uma **cópia que morre junto** com o original. Em abril de 2026, um agente de IA apagou em 9 segundos o banco de dados de produção da PocketOS, uma plataforma SaaS, e os backups foram junto: segundo a TechRadar, a hospedagem guardava os backups no mesmo volume dos dados, e "apagar um volume também apagava todos os backups associados a ele". Contamos a história em [posso deixar um agente de IA mexer no sistema da minha empresa?](/blog/posso-deixar-um-agente-de-ia-mexer-no-sistema-da-minha-empresa). O que vale para um agente vale para um disco que queima ou uma senha vazada.
+Não. É uma **cópia que morre junto** com o original. Em abril de 2026, um agente de IA apagou em 9 segundos o banco de dados de produção da PocketOS, uma plataforma SaaS, e os backups foram junto: segundo a TechRadar, a hospedagem guardava os backups no mesmo volume dos dados, e "apagar um volume também apagava todos os backups associados a ele". Contamos a história em [posso deixar um agente de IA mexer no sistema da minha empresa?](/blog/posso-deixar-um-agente-de-ia-mexer-no-sistema-da-minha-empresa). Vale o mesmo para um disco que queima ou uma senha vazada.
 
 Em Chapadão do Sul (MS), um ransomware criptografou os dados da prefeitura em maio de 2025 e teria paralisado saúde, assistência social, arrecadação e finanças, segundo o Baguete. Os criminosos pediram US$ 1,5 milhão; a prefeitura recusou, contratou uma empresa para recuperar os dados e, entre as medidas anunciadas depois, estava "incluir backup externo". A ordem certa é a inversa.
 
@@ -47,10 +47,10 @@ Faça estas perguntas a quem cuida do seu sistema. Cada "não sei" é um risco c
 1. **Onde a cópia está?** Se a resposta é "no mesmo servidor" ou "na mesma conta de nuvem", não é backup. Precisa de outra conta, de preferência em outro provedor, que a credencial do sistema não alcança.
 2. **Quem consegue apagar?** A conta do backup deve ser dedicada, com autenticação em dois fatores, e pelo menos uma cópia imutável. Se a senha do administrador do sistema apaga o backup, o invasor que a roubar apaga também.
 3. **Quando foi a última restauração de verdade?** Não o relatório de "backup concluído": uma restauração completa, num ambiente separado, com cronômetro (esse é o RTO real) e conferência de quantas horas de dados ficaram para trás (o RPO real).
-4. **O que está dentro?** Banco de dados, arquivos enviados pelos usuários, configurações e chaves de acesso. Restaurar o banco sem os documentos, ou sem a chave que abre o banco, é meio sistema. E guarde versões antigas, para voltar a um ponto anterior à invasão.
+4. **O que está dentro?** Banco de dados, arquivos enviados pelos usuários, configurações e chaves de acesso. Restaurar o banco sem os documentos, ou sem a chave que abre o banco, é meio sistema. Guarde versões antigas para voltar a antes da invasão.
 5. **Quem na empresa restaura sem o fornecedor?** Um procedimento escrito, testado por alguém de dentro. Novo Oriente mostra o que acontece quando a resposta depende de quem está saindo.
 
-É o tipo de critério que deve entrar no contrato e no aceite do sistema, como mostramos em [como testar o sistema antes de aceitar a entrega](/blog/como-testar-o-sistema-antes-de-aceitar-a-entrega-e-pagar). Num ERP como o [Diconta](/casos/diconta), que concentra financeiro, notas fiscais e documentos de vários CNPJs, a pergunta "quando volta?" se mede em horas de faturamento parado. Se você não sabe responder as cinco perguntas sobre o seu sistema, [fale com a gente](/#contato): uma restauração de teste vale mais que qualquer garantia verbal.
+É o tipo de critério que deve entrar no contrato e no aceite do sistema, como mostramos em [como testar o sistema antes de aceitar a entrega](/blog/como-testar-o-sistema-antes-de-aceitar-a-entrega-e-pagar). Num ERP como o [Diconta](/casos/diconta), que concentra financeiro, notas fiscais e documentos de vários CNPJs, a pergunta "quando volta?" se mede em horas de faturamento parado. Se não sabe responder as cinco perguntas sobre o seu sistema, [fale com a gente](/#contato): uma restauração de teste vale mais que qualquer garantia verbal.
 
 ## Perguntas frequentes
 
