@@ -5,7 +5,7 @@ answer: Não. A LGPD não cria sigilo nem autoriza negar acesso: nome, cargo, lo
 date: 2026-11-27
 tags: [LGPD, portal da transparência, LAI, prefeitura, servidores]
 service: sistemas-publicos
-draft: true
+draft: false
 ---
 
 Um servidor reclamou que o salário dele "está na internet", o jurídico citou a LGPD e alguém sugeriu trocar os nomes por matrícula no portal. Pouco depois chega o ofício do Tribunal de Contas perguntando por que a lista de servidores sumiu. **A LGPD não é o que a prefeitura imagina: ela não cria sigilo, e o Supremo já decidiu que nome e salário de servidor são informação pública.**
@@ -22,7 +22,7 @@ O guia conjunto da CGU e da ANPD, publicado em 25 de novembro de 2026, resume: a
 
 Permite, e a discussão é mais antiga que a LGPD. Em 2009 a Prefeitura de São Paulo pôs no site "De Olho nas Contas" nome, cargo, lotação e remuneração bruta de cada servidor. Sindicatos conseguiram liminares no TJ-SP alegando violação à intimidade e risco à segurança. Na Suspensão de Segurança 3.902, o presidente do STF as suspendeu: a remuneração é gasto público, "vinculada ao princípio da legalidade estrita".
 
-Em 2015 o Plenário fechou a questão no ARE 652777, com repercussão geral (Tema 483): por unanimidade, é legítima a publicação, inclusive em site da administração, do nome do servidor junto com vencimentos e vantagens. O relator, ministro Teori Zavascki, observou que a LAI, aprovada depois do precedente de 2009, chancelou esse entendimento. Repercussão geral orienta todos os tribunais do país, e o guia da CGU/ANPD cita o caso como base: remuneração, cargo, função e lotação "constituem informações de interesse coletivo".
+Em 2015 o Plenário fechou a questão no ARE 652777, com repercussão geral (Tema 483): por unanimidade, é legítima a publicação, inclusive em site da administração, do nome do servidor junto com vencimentos e vantagens. O relator, ministro Teori Zavascki, observou que a LAI, aprovada depois do precedente de 2009, chancelou esse entendimento. Repercussão geral orienta todos os tribunais do país. O guia da CGU/ANPD, citando a decisão de 2009, repete a conclusão: remuneração, cargos, funções e órgão de lotação "constituem informações de interesse coletivo ou geral".
 
 ## O que a prefeitura é obrigada a mostrar e o que deve esconder?
 
@@ -30,7 +30,7 @@ O guia traz uma tabela com a regra geral para **dados de agentes públicos**:
 
 - **Deve ser divulgado**: nome completo ("sem outras informações associadas, não é protegido pelo art. 31 da LAI"), remuneração ("informação pessoal de interesse coletivo"), cargo e função, lotação, matrícula, e-mail funcional, quem assina cada ato, currículo e registro de frequência.
 - **Deve ser divulgado de forma descaracterizada**: o CPF.
-- **Não deve ser divulgado**: endereço residencial, telefone e e-mail pessoais, assinatura manuscrita, descontos em folha (pensão, consignados) e dados de saúde.
+- **Não deve ser divulgado**: endereço residencial, telefone e e-mail pessoais, assinatura manuscrita, descontos como pensão alimentícia e consignados, e dados de saúde.
 
 A lotação tem ressalva: "pode ser restringida se houver risco concreto à segurança ou à integridade física do servidor". Caso a caso, motivado, e não regra para toda a folha.
 
@@ -53,7 +53,7 @@ E não é só o Tribunal que cobra: o [artigo sobre "tempo real" no portal](/blo
 ## Por onde começar a adequação do portal?
 
 1. **Liste o que o portal publica sobre pessoas** (servidores, fornecedores pessoa física, diárias, beneficiários) e, para cada campo, pergunte: a LAI ou a LC 131 mandam publicar? Então publica.
-2. **Mascare o CPF no sistema de origem**, no padrão `***.999.999-**`, e tire endereço, telefone pessoal, dados de saúde e descontos em folha de qualquer tela pública.
+2. **Mascare o CPF no sistema de origem**, no padrão `***.999.999-**`, e tire endereço, telefone pessoal, dados de saúde e descontos (pensão, consignados) de qualquer tela pública.
 3. **Trate exceções por escrito**: servidor com risco concreto à segurança pode ter a lotação restringida, com decisão motivada no processo.
 4. **Registre quem acessa dados completos** dentro da prefeitura: o log é a prova de responsabilização que a LGPD pede.
 5. **Não negue pedido de acesso "por LGPD"**: a negativa só vale com uma hipótese da LAI.
