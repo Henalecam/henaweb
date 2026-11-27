@@ -14,7 +14,7 @@ Você pagou o anúncio, fechou com o influenciador ou vai aparecer na TV. Na hor
 
 A Sofist, empresa que monitora o desempenho de lojas virtuais, acompanhou **104 e-commerces** de 15 setores da noite da véspera da Black Friday à Cyber Monday de 2023. Segundo a IstoÉ Dinheiro, cerca de 35 ficaram fora do ar em algum momento, somando **20 horas e 46 minutos de indisponibilidade**, e lentidão e instabilidade custaram R$ 98,3 milhões em vendas. Foi mais que o dobro de 2022 (R$ 48,4 milhões) e o segundo pior resultado em cinco anos, atrás de 2019 (R$ 132 milhões).
 
-O detalhe que importa para quem não é uma grande varejista: a Sofist considera o site "fora do ar" quando é impossível navegar, o que inclui página de erro, página de espera e o site que não carrega em 45 segundos. Para o cliente, é tudo a mesma coisa: ele fecha a aba.
+O detalhe que importa para a empresa menor: a Sofist considera o site "fora do ar" quando é impossível navegar, o que inclui página de erro, página de espera e o site que não carrega em 45 segundos. Para o cliente, é tudo a mesma coisa: ele fecha a aba.
 
 Em 2021, segundo o Canaltech, 96,5% das 116 lojas monitoradas tiveram instabilidade e 46,5% saíram do ar. E o pico é concentrado: na Black Friday de 2025, segundo a Neotrust, o e-commerce brasileiro faturou R$ 4,76 bilhões no dia, e **as primeiras 12 horas concentraram 35,5% do faturamento**. Quem cai na madrugada perde a melhor fatia do dia.
 
@@ -30,7 +30,7 @@ O terceiro vilão é o que não é seu. Na Black Friday de 2020, segundo a Consu
 
 ## O que significa "escalar" um site?
 
-**Escalar** é aumentar a capacidade quando a demanda sobe e reduzir quando ela cai, sem ninguém acordar de madrugada para trocar o servidor. Três jeitos, que se somam:
+**Escalar** é aumentar a capacidade quando a demanda sobe e reduzir quando ela cai, sem ninguém trocar o servidor à mão. Três jeitos, que se somam:
 
 - **CDN** (content delivery network): uma rede de servidores distribuídos que guarda cópias das suas páginas e arquivos perto de quem acessa. O web.dev, do Google, a descreve como "a distributed network of servers to deliver resources to users" e diz que, além de reduzir a latência, ela alivia o servidor de origem e lida bem com picos. Meta razoável, segundo a mesma página: 90% dos acessos respondidos pelo cache, sem chegar ao servidor.
 - **Escala automática**: a hospedagem cria mais instâncias do sistema quando o uso sobe. Funciona para a parte dinâmica, mas tem limite e custo, e o banco de dados costuma ser o gargalo que não escala sozinho.
