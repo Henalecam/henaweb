@@ -5,14 +5,14 @@ answer: Depende de onde cada página é montada. Páginas estáticas entregues p
 date: 2026-11-27
 tags: [pico de acessos, black friday, cdn, hospedagem, performance]
 service: sites-e-produtos
-draft: true
+draft: false
 ---
 
 Você pagou o anúncio, fechou com o influenciador ou vai aparecer na TV. Na hora em que mais gente entra no site, ele trava, mostra erro ou não abre. **O pico de acessos é o momento mais caro para descobrir o limite do seu site**, e quase sempre dava para saber antes.
 
 ## Quanto as lojas perdem quando o site cai na Black Friday?
 
-A Sofist, empresa que monitora o desempenho de lojas virtuais, acompanhou **104 e-commerces** de 15 setores da Black Friday à Cyber Monday de 2023. Segundo a IstoÉ Dinheiro, cerca de 35 ficaram fora do ar em algum momento, somando **20 horas e 46 minutos de indisponibilidade**, e lentidão e instabilidade custaram R$ 98,3 milhões em vendas. Foi mais que o dobro de 2022 (R$ 48,4 milhões) e o segundo pior resultado em cinco anos, atrás de 2019 (R$ 132 milhões).
+A Sofist, empresa que monitora o desempenho de lojas virtuais, acompanhou **104 e-commerces** de 15 setores da noite da véspera da Black Friday à Cyber Monday de 2023. Segundo a IstoÉ Dinheiro, cerca de 35 ficaram fora do ar em algum momento, somando **20 horas e 46 minutos de indisponibilidade**, e lentidão e instabilidade custaram R$ 98,3 milhões em vendas. Foi mais que o dobro de 2022 (R$ 48,4 milhões) e o segundo pior resultado em cinco anos, atrás de 2019 (R$ 132 milhões).
 
 O detalhe que importa para quem não é uma grande varejista: a Sofist considera o site "fora do ar" quando é impossível navegar, o que inclui página de erro, página de espera e o site que não carrega em 45 segundos. Para o cliente, é tudo a mesma coisa: ele fecha a aba.
 
