@@ -14,7 +14,7 @@ Alguém avisou que "WordPress é inseguro" e agora você olha para o site da emp
 
 Segundo o relatório *State of WordPress Security in 2026*, da Patchstack, empresa que cataloga vulnerabilidades do ecossistema, **11.334 novas falhas foram encontradas no WordPress em 2025**, 42% a mais que em 2024. A distribuição é o que importa: 91% estavam em plugins, 9% em temas e só 6 no núcleo do WordPress, todas de baixa prioridade. Do total, 1.966 (17%) tinham gravidade alta e 4.124 (36%) representavam ameaça real, não só teórica.
 
-O número mais incômodo do relatório: **46% das falhas não tinham correção quando foram divulgadas**. Ou seja, quase metade das vezes o dono do site descobre o problema antes de existir uma versão corrigida para instalar.
+O número mais incômodo do relatório: **46% das falhas não tinham correção quando foram divulgadas**. Quase metade das vezes, o dono do site sabe do problema antes de existir uma versão corrigida.
 
 Por que tanta atenção a um sistema só? Porque ele é o alvo mais comum: segundo a W3Techs, em 27 de novembro de 2026 o WordPress estava em **38,3% de todos os sites** do mundo. Quem ataca em massa escreve para o que existe em massa.
 
@@ -69,7 +69,7 @@ Não por si. Em 2025, segundo a Patchstack, só 6 das 11.334 falhas do ecossiste
 
 ### Quantos plugins um site de empresa pode ter?
 
-Não existe número mágico, mas cada plugin é um fornecedor com acesso ao seu servidor, e um dono de plugin pode mudar sem aviso, como no caso da EssentialPlugin em 2026. Um site institucional costuma funcionar com poucos; se passa de uma dúzia, vale revisar o que cada um faz.
+Não existe número mágico, mas cada plugin é um fornecedor com acesso ao seu servidor, e o dono dele pode mudar sem aviso, como no caso da EssentialPlugin em 2026. Um site institucional costuma funcionar com poucos; se passa de uma dúzia, vale revisar o que cada um faz.
 
 ### O site da minha empresa foi invadido: o que fazer primeiro?
 
