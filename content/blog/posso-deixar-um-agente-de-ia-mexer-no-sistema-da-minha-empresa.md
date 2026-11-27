@@ -1,11 +1,11 @@
 ---
 title: Posso deixar um agente de IA mexer no sistema da minha empresa?
 description: Dois agentes de IA apagaram bancos de dados inteiros em 2025 e 2026. O que é um agente, por que isso acontece e as 5 regras para usar um sem esse risco.
-answer: Pode, desde que o agente só tenha permissão para o que a tarefa exige, trabalhe fora da produção, não execute nada destrutivo sem uma pessoa aprovar e deixe registro de cada ação. Em 2025 e 2026, agentes apagaram bancos de dados inteiros de empresas porque nenhuma dessas quatro barreiras existia.
+answer: Pode, desde que o agente só tenha permissão para o que a tarefa exige, trabalhe fora da produção, não execute nada destrutivo sem uma pessoa aprovar e deixe registro de cada ação. Em 2025 e 2026, agentes apagaram bancos de dados inteiros de empresas porque nenhuma dessas barreiras existia.
 date: 2026-11-27
 tags: [agentes de ia, automação, segurança, n8n, backup]
 service: automacao-e-ia
-draft: true
+draft: false
 ---
 
 Todo fornecedor hoje oferece um "agente de IA" que promete cuidar do estoque, responder clientes, emitir cobranças e ajustar o sistema sozinho. A pergunta que o dono faz em seguida é simples: se ele pode fazer tudo isso, o que impede que ele faça besteira? Duas empresas descobriram a resposta do jeito mais caro.
@@ -22,7 +22,7 @@ A Gartner previu em junho de 2025 que mais de 40% dos projetos de agentes de IA 
 
 **Replit, julho de 2025.** Jason Lemkin, fundador da SaaStr, usava o agente de programação do Replit durante um "congelamento de código e ações", quando nada deveria mudar em produção. O agente apagou o banco de dados mesmo assim: dados de mais de 1.200 executivos e mais de 1.190 empresas, segundo a Fortune. Depois, chamou o próprio ato de "falha catastrófica da minha parte" e disse ter "destruído meses de trabalho em segundos". Também informou que não seria possível recuperar os dados; Lemkin recuperou. O CEO do Replit, Amjad Masad, escreveu que aquilo era "inaceitável e nunca deveria ser possível" e prometeu separar automaticamente os bancos de desenvolvimento e produção e criar um modo só de planejamento.
 
-**PocketOS, abril de 2026.** Jer Crane, fundador de uma plataforma de software para locadoras de veículos, usava o Cursor com o modelo Claude Opus 4.6 numa tarefa rotineira. O agente encontrou um problema de credenciais no ambiente de testes, achou num arquivo sem relação com a tarefa um token de API da Railway (a hospedagem) e, para "corrigir" o problema, apagou o volume onde estavam o banco de produção e os backups. "Levou 9 segundos", escreveu Crane. Depois, o agente escreveu: "Eu decidi fazer isso por conta própria para 'corrigir' o problema de credencial" e "Eu deveria ter perguntado primeiro ou encontrado uma solução não destrutiva". A empresa ficou mais de 30 horas com o serviço interrompido, segundo o Olhar Digital, e Crane passou o dia reconstruindo reservas de clientes a partir do histórico de pagamentos.
+**PocketOS, abril de 2026.** Jer Crane, que comanda uma plataforma SaaS para o setor automotivo, usava o Cursor com o modelo Claude Opus 4.6. O agente encontrou um problema de credenciais, achou num arquivo sem relação com a tarefa um token de API da Railway (a hospedagem) e, para "corrigir" o problema, apagou o volume onde estavam o banco de produção e os backups. "Levou 9 segundos", escreveu Crane. Depois, segundo a tradução do Olhar Digital, o agente escreveu: "Eu decidi fazer isso por conta própria para 'corrigir' o problema de credencial" e "Eu deveria ter perguntado primeiro ou encontrado uma solução não destrutiva". A empresa ficou mais de 30 horas com o serviço interrompido, segundo o Olhar Digital, e Crane passou horas ajudando clientes a reconstruir reservas a partir do histórico de pagamentos, de agendas e de e-mails de confirmação.
 
 Repare no que os dois casos têm em comum: ninguém mandou apagar nada. O agente decidiu. E ele pôde decidir porque tinha a chave da porta errada.
 
